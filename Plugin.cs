@@ -65,10 +65,7 @@ public class CCPlugin : BaseUnityPlugin
         keyboardMenuToggle = Config.Bind("Preferences", "Menu Toggle (Keyboard)", KeyCode.Keypad0, "Keyboard shortcut for opening the accessory menu.");
         mouseContextMenu = Config.Bind("Preferences", "Context Menu Button", PointerEventData.InputButton.Right, "Which mouse button activates the context menu.");
 
-        //hotkeys setup
         hotkeys = new(mouseMenuToggle.Value, keyboardMenuToggle.Value, mouseContextMenu.Value);
-
-        //favorites setup
         favoritesManager = new(favorites, Config.Save);
 
         //Set up clean bone folder
