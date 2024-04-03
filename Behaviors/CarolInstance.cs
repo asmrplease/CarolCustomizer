@@ -1,0 +1,73 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using CarolCustomizer.Utils;
+using System.Collections;
+using CarolCustomizer.Hooks.Watchdogs;
+
+namespace CarolCustomizer.Behaviors;
+/// <summary>
+/// This class is responsible for one player or other type of carol through the lifetime of the plugin.
+/// It delegates actions to other classes to maintain clothing continuity.
+/// </summary>
+public class CarolInstance : IDisposable
+{
+    #region Dependencies
+    SkeletonManager skeletonManager;
+    public OutfitManager outfitManager { get; private set; }
+    #endregion
+
+    #region WatchDog Instances
+    PelvisWatchdog targetPelvis;
+    List<PelvisWatchdog> previousTargets = new();
+    #endregion
+
+    #region Events
+    public Action<PelvisWatchdog> SpawnEvent { get; set; }
+    public Action OnDespawn { get; set; }
+    #endregion
+
+    #region Lifecycle
+    public CarolInstance(GameObject parent)
+    {
+        skeletonManager = new(this, parent);
+        outfitManager = new(this, skeletonManager, null);
+    }
+
+    public void Dispose()
+    {
+        outfitManager.Dispose();
+        this.DisposeFields();
+    }
+    #endregion
+
+    #region Notifications
+    public virtual void NotifySpawned(PelvisWatchdog pelvis)
+    {
+        if (!pelvis) { Log.Error("Null pelviswatchdog on NotifySpawned()"); return; }
+        if (pelvis == targetPelvis) { Log.Warning("PlayerManager was given its existing pelvis as a target."); }
+        else
+        {
+            if (targetPelvis) { previousTargets.Add(targetPelvis); }
+            previousTargets.RemoveAll(x => !x);
+            targetPelvis = pelvis;
+        }
+
+        Log.Debug($"SpawnEvent.Invoke({pelvis})");
+        SpawnEvent?.Invoke(targetPelvis);
+    }
+
+    public bool RestorePrevious(PelvisWatchdog pelvis)
+    {
+        if (targetPelvis != pelvis) return false;
+        if (previousTargets is null ) return false;
+        if (!previousTargets.Any(x => x)) return false;
+        Log.Debug("Notifying last valid target of spawn");
+        NotifySpawned(previousTargets.Last(x => x));
+        return true;
+    }
+    public void RefreshBaseVisibility() => outfitManager.RefreshBaseVisibility();
+    #endregion
+}
