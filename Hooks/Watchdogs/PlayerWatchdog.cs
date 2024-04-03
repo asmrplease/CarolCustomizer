@@ -6,7 +6,6 @@ using CarolCustomizer.Utils;
 using System.Collections;
 using System.Net.Sockets;
 using CarolCustomizer.Models;
-using CarolCustomizer.Behaviors;
 using Rewired;
 
 namespace CarolCustomizer.Hooks.Watchdogs;

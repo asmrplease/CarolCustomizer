@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 using CarolCustomizer.Utils;
-using CarolCustomizer.Behaviors;
 using System.Linq;
 
 namespace CarolCustomizer.Hooks;

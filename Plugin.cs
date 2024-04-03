@@ -3,7 +3,6 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using System.Collections;
 using CarolCustomizer.UI;
@@ -13,8 +12,9 @@ using CarolCustomizer.Utils;
 using UnityEngine.SceneManagement;
 using BepInEx.Configuration;
 using UnityEngine.EventSystems;
+using CarolCustomizer.Behaviors;
 
-namespace CarolCustomizer.Behaviors;
+namespace CarolCustomizer;
 
 [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
 [BepInProcess("Onirism.exe")]
@@ -50,14 +50,14 @@ public class CCPlugin : BaseUnityPlugin
     private void Awake()
     {
         //Setup Static Log
-        var logger = new Log(this.Logger);
+        var logger = new Log(Logger);
         Log.Message("Logger Ready!");
 
         //Set run in background
         Application.runInBackground = true;
         Log.Debug("run in background set");
 
-        gmRewrite = this.gameObject.AddComponent<GameManagerRewrite>();
+        gmRewrite = gameObject.AddComponent<GameManagerRewrite>();
 
         //Configuration Binding
         favorites = Config.Bind("Preferences", "Favorites", "", "List of favorited accessories.");
@@ -74,7 +74,7 @@ public class CCPlugin : BaseUnityPlugin
         //Set up clean bone folder
         var cleanBoneFolder = new GameObject().transform;
         cleanBoneFolder.name = "Cleaned Bones";
-        cleanBoneFolder.parent = this.transform;
+        cleanBoneFolder.parent = transform;
         BespokeBone.SetCleanFolder(cleanBoneFolder);
 
 
@@ -82,24 +82,24 @@ public class CCPlugin : BaseUnityPlugin
         uiAssetLoader = new();
 
         //Instantiate Dynamic Assets  
-        dynamicAssetManager = new(this.transform);
+        dynamicAssetManager = new(transform);
         recipesManager = new(Constants.RecipeFolderPath);
 
         //Set up NPC manager
-        NPCManager.Constructor(this.gameObject, recipesManager);
-        npcInstances = new(this.transform);
+        NPCManager.Constructor(gameObject, recipesManager);
+        npcInstances = new(transform);
 
         //Instantiate Player Managers
         for (int i = 1; i <= numPlayers; i++)
         {
             Log.Debug($"Making playerManager[{i}]...");
-            var player = new PlayerCarolInstance(this.gameObject);
+            var player = new PlayerCarolInstance(gameObject);
             playerManagers.Add(player);
 
-            var uiInstance = this.gameObject.AddComponent<UIInstance>();
+            var uiInstance = gameObject.AddComponent<UIInstance>();
             uiInstance.Constructor(uiAssetLoader, player, dynamicAssetManager, favoritesManager, recipesManager, hotkeys);
 
-            var menuToggle = this.gameObject.AddComponent<MenuToggle>();
+            var menuToggle = gameObject.AddComponent<MenuToggle>();
             menuToggle.Constructor(uiInstance, hotkeys);
 
             uiInstances.Add(uiInstance);
@@ -107,8 +107,8 @@ public class CCPlugin : BaseUnityPlugin
         cutscenePlayer = playerManagers[0];
 
         //Instantiate Harmony Instance
-        this.HarmonyInstance = new Harmony("AccessoryModPatch");
-        this.HarmonyInstance.PatchAll();
+        HarmonyInstance = new Harmony("AccessoryModPatch");
+        HarmonyInstance.PatchAll();
         Log.Debug("harmony patched");
     }
 
@@ -178,9 +178,9 @@ public class CCPlugin : BaseUnityPlugin
 
         //save configuration
         Config.Save();
-        
+
         //Unpatch Harmony
-        this.HarmonyInstance?.UnpatchSelf();
+        HarmonyInstance?.UnpatchSelf();
 
         //Dispose
         this.DisposeFields();
