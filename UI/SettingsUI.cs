@@ -7,7 +7,10 @@ using UnityEngine;
 namespace CarolCustomizer.UI;
 internal class SettingsUI : MonoBehaviour
 {
-
+    //hotkeys
+    //menu speed
+    //bot outfits
+    //clear favorites
     public void Constructor()
     {
 

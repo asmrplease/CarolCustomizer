@@ -11,6 +11,8 @@ using Slate;
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PelvisWatchdog : MonoBehaviour
 {
+    private static List<PelvisWatchdog> debugWatchdogList = new();
+    
     readonly Guid Guid = Guid.NewGuid();
     protected Guid SourceGuid;
 
@@ -47,6 +49,7 @@ public class PelvisWatchdog : MonoBehaviour
     virtual public void Awake()
     {
         Log.Debug($"Awake(){this}");
+        debugWatchdogList.Add(this);
 
         if (!boneData) boneData = this.gameObject.AddComponent<BoneData>().Constructor();
         if (!meshData) meshData = this.gameObject.AddComponent<MeshData>().Constructor();
@@ -70,18 +73,17 @@ public class PelvisWatchdog : MonoBehaviour
 
     void SetupCheckList()
     {
-        Log.Debug("Setting up checklist");
         checks = new()
         {
             (Check<VirtualCarol,    MPBotWatchdog>,  (x)=> true),
             (Check<Entity,          PlayerWatchdog>, (x)=> x.rootName == "CAROL(Clone)"),
-            //CampaignBot
-            //(Check<Entity,          BlankWatchdog>, (x)=> true), //TODO: fix
+            (Check<Entity,          BotWatchdog>,    (x)=> true), 
             (Check<CutsceneActor,   ActressWatchdog>, (x)=> true),
             (Check<Character,       PirateWatchdog>, (x)=> x.parentName == "Carol_Pirate"),
             (Check<Character,       ActressWatchdog>, (x)=> true),
             (Check<MenuSwitchOutfit,  MenuWatchdog>, (x)=> true),
-            (Check<Transform,       PirateWatchdog>, (x)=> x.parentName == "Carol_Pirate"),
+            //TODO: these checks may have unexpected results when the base outfit is a pirate
+            (Check<Transform,       PirateWatchdog>, (x)=> x.rootName.Contains("CUTSCENES") && x.parentName == "Carol_Pirate"),
             (Check<Transform,       ActressWatchdog>, (x)=> x.rootName.Contains("CUTSCENES") && x.parentName != "Carol_Pirate")
         };
     }
@@ -101,13 +103,14 @@ public class PelvisWatchdog : MonoBehaviour
         try { if (!predicate.Invoke(this)) return false; }
         catch (NullReferenceException e) { Log.Warning("predicate caused an exception"); return false; }
         
-        if (GetType() == typeof(ResultType)) return true;
         if (!parentComponents.ContainsKey(typeof(SearchType))) return false;
         var component = parentComponents[typeof(SearchType)];
 
-        Log.Info($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
-        gameObject.AddComponent<ResultType>().BuildFromExisting(this, component);
+        if (GetType() == typeof(ResultType)) return true;
         
+        Log.Info($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
+        var asdf = gameObject.AddComponent<ResultType>().BuildFromExisting(this, component);
+        debugWatchdogList.Add(asdf);
         Destroy(this);
         return true;
     }
@@ -115,5 +118,11 @@ public class PelvisWatchdog : MonoBehaviour
     public virtual void SetBaseOutfit(Outfit outfit) { }
 
     public override string ToString() => $"{GetType()}@{rootName}->{grandparentName}({Guid})";
+
+    void OnDestroy()
+    {
+        Log.Info($"{this} destroyed.");
+        debugWatchdogList.Remove(this);
+    }
 
 }

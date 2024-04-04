@@ -74,7 +74,6 @@ public class CCPlugin : BaseUnityPlugin
         cleanBoneFolder.parent = transform;
         BespokeBone.SetCleanFolder(cleanBoneFolder);
 
-
         //Instantiate Static Assets
         uiAssetLoader = new();
 

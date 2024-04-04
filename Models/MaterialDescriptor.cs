@@ -21,8 +21,6 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>
     [JsonConstructor]
     public MaterialDescriptor(string name, string source, SourceType type)
     {
-        //TODO: split this into one class for live and one for json
-        //for now lets just not fuck up which is which
         this.Name = name;
         this.Source = source;
         this.Type = type;
