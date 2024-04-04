@@ -8,7 +8,7 @@ internal class PirateWatchdog : PelvisWatchdog
 {
     void OnEnable() => NPCManager.OnShezaraAwake(this);
 
-    //void OnDisable() => NPCManager.shezaraInstance?.RestorePrevious();
+    //void OnDisable() => NPCManager.shezaraInstance?.RestorePrevious(this);
 
-    void OnDestory() => NPCManager.OnShezaraDestroyed(this);
+    void OnDestory() => NPCManager.shezaraInstance?.RestorePrevious(this);//NPCManager.OnShezaraDestroyed(this);
 }

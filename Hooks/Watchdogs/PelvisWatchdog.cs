@@ -7,12 +7,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 using Slate;
+using CarolCustomizer.Assets;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PelvisWatchdog : MonoBehaviour
-{
-    private static List<PelvisWatchdog> debugWatchdogList = new();
-    
+{   
     readonly Guid Guid = Guid.NewGuid();
     protected Guid SourceGuid;
 
@@ -49,8 +48,6 @@ public class PelvisWatchdog : MonoBehaviour
     virtual public void Awake()
     {
         Log.Debug($"Awake(){this}");
-        debugWatchdogList.Add(this);
-
         if (!boneData) boneData = this.gameObject.AddComponent<BoneData>().Constructor();
         if (!meshData) meshData = this.gameObject.AddComponent<MeshData>().Constructor();
 
@@ -83,8 +80,8 @@ public class PelvisWatchdog : MonoBehaviour
             (Check<Character,       ActressWatchdog>, (x)=> true),
             (Check<MenuSwitchOutfit,  MenuWatchdog>, (x)=> true),
             //TODO: these checks may have unexpected results when the base outfit is a pirate
-            (Check<Transform,       PirateWatchdog>, (x)=> x.rootName.Contains("CUTSCENES") && x.parentName == "Carol_Pirate"),
-            (Check<Transform,       ActressWatchdog>, (x)=> x.rootName.Contains("CUTSCENES") && x.parentName != "Carol_Pirate")
+            (Check<Transform,       PirateWatchdog>, (x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && x.parentName == "Carol_Pirate"),
+            (Check<Transform,       ActressWatchdog>, (x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && x.parentName != "Carol_Pirate")
         };
     }
 
@@ -104,13 +101,11 @@ public class PelvisWatchdog : MonoBehaviour
         catch (NullReferenceException e) { Log.Warning("predicate caused an exception"); return false; }
         
         if (!parentComponents.ContainsKey(typeof(SearchType))) return false;
-        var component = parentComponents[typeof(SearchType)];
-
         if (GetType() == typeof(ResultType)) return true;
         
         Log.Info($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
-        var asdf = gameObject.AddComponent<ResultType>().BuildFromExisting(this, component);
-        debugWatchdogList.Add(asdf);
+        var component = parentComponents[typeof(SearchType)];
+        gameObject.AddComponent<ResultType>().BuildFromExisting(this, component);
         Destroy(this);
         return true;
     }
@@ -118,11 +113,4 @@ public class PelvisWatchdog : MonoBehaviour
     public virtual void SetBaseOutfit(Outfit outfit) { }
 
     public override string ToString() => $"{GetType()}@{rootName}->{grandparentName}({Guid})";
-
-    void OnDestroy()
-    {
-        Log.Info($"{this} destroyed.");
-        debugWatchdogList.Remove(this);
-    }
-
 }
