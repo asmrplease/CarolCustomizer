@@ -30,6 +30,7 @@ public class OutfitAssetManager : IDisposable
         liveFolder = new GameObject().transform;
         liveFolder.name = "AccMod Dynamic Assets";
         liveFolder.transform.parent = parent;
+        liveFolder.position = Constants.OutOfTheWay;
         if (!liveFolder) Log.Error("DAM was given a null liveFolder.");
 
         outfitSets.Add(ListName, HaDSOutfits);

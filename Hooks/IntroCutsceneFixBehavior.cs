@@ -37,5 +37,4 @@ internal class IntroCutsceneFixBehavior : IDisposable
         SceneManager.sceneLoaded -= OnSceneLoad;
         SceneManager.sceneUnloaded -= OnSceneUnload;
     }
-
 }

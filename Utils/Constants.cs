@@ -59,6 +59,8 @@ internal static class Constants
     public static readonly string ApplicationPath = Directory.GetParent(Application.dataPath).FullName;
     public static readonly string RecipeFolderPath = Path.Combine(Constants.ApplicationPath, Constants.RecipeFolderName);
 
+    public static readonly Vector3 OutOfTheWay = new(-10000, -10000, -10000);
+
     //TODO: move this to config
     public const float PhoneHideTime = 1.75f;//1.5f
     public const float CarolDefaultMass = 0.01f;
