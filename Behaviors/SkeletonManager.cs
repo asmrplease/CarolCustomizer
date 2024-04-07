@@ -19,7 +19,7 @@ public class SkeletonManager : IDisposable
     {
         if (CommonBones is not null) { Log.Error("tried to replace standard bone names"); return; }
 
-        var pjs = GameManager.manager.GetOutfit("CAROL_PyjamaBasic");
+        var pjs = GameManager.manager.GetOutfit(Constants.Pyjamas);
         if (!pjs) { Log.Debug("didn't find pjs"); return; }
 
         var pelvis = pjs.transform.RecursiveFindTransform(x => x.name == "CarolPelvis");

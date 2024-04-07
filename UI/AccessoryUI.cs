@@ -27,8 +27,9 @@ internal class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuAc
     OutfitUI outfitUI;
     public StoredAccessory accessory { get; private set; }
     OutfitListUI ui;
-    private DynamicContextMenu contextMenu;
-    private OutfitManager outfitManager;
+    DynamicContextMenu contextMenu;
+    OutfitManager outfitManager;
+    FavoritesManager favoritesManager;
     #endregion
 
     #region Local Component References
@@ -49,13 +50,20 @@ internal class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuAc
     public string DisplayName => accessory.DisplayName;
 
     #region Constructor
-    public void Constructor(OutfitUI outfitUI, StoredAccessory accessory, OutfitListUI ui, DynamicContextMenu contextMenu, OutfitManager outfitManager)
+    public void Constructor(
+        OutfitUI outfitUI, 
+        StoredAccessory accessory, 
+        OutfitListUI ui, 
+        DynamicContextMenu contextMenu, 
+        OutfitManager outfitManager,
+        FavoritesManager favoritesManager)
     {
         this.outfitUI = outfitUI;
         this.accessory = accessory;
         this.contextMenu = contextMenu;
         this.ui = ui;
         this.outfitManager = outfitManager;
+        this.favoritesManager = favoritesManager;
 
         this.name = "AccUI: " + accessory.DisplayName;
 
@@ -69,7 +77,7 @@ internal class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuAc
         activationToggle.onValueChanged.AddListener(OnToggle); 
 
         favoriteIcon = this.transform.Find(favoriteAddress)?.GetComponent<Image>();
-        favoriteIcon.enabled = ui.favoritesManager.IsInFavorites(accessory);
+        favoriteIcon.enabled = this.favoritesManager.IsInFavorites(accessory);
 
         this.gameObject.SetActive(false);
     }
@@ -123,13 +131,13 @@ internal class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuAc
 
     private void ToggleFavorite()
     {
-        ui.favoritesManager.ToggleFavorite(new AccessoryDescriptor(this.accessory));
+        favoritesManager.ToggleFavorite(new AccessoryDescriptor(this.accessory));
         favoriteIcon.enabled = !favoriteIcon.enabled;
     }
 
     public Dictionary<string, UnityAction> GetContextMenuItems()
     {
-        bool currentlyFavorite = ui.favoritesManager.IsInFavorites(this.accessory);
+        bool currentlyFavorite = favoritesManager.IsInFavorites(this.accessory);
         return new Dictionary<string, UnityAction> { {currentlyFavorite? "Remove from Favorites" : "Add to favorites", ToggleFavorite} };
     }
     #endregion

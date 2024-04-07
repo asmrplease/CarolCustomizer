@@ -60,13 +60,14 @@ public class RecipeListUI : MonoBehaviour
 
     private void OnDestroy()
     {
+        Log.Debug("ReceiptListUI.OnDestroy()");
         this.recipesManager.OnRecipeCreated -= OnRecipeCreated;
         this.recipesManager.OnRecipeDeleted -= OnRecipeDeleted;
     }
 
     public void OnRecipeCreated(Recipe newRecipe)
     {
-        Log.Debug("OnRecipeLoaded");
+        Log.Debug("RecipeListUI.OnRecipeCreated");
         //instantiate a outfit ui object
         var uiInstance = GameObject.Instantiate(loader.OutfitListElement, listRoot);
         if (!uiInstance) { Log.Error("Failed to instantiate outfit UI prefab for a recipeUI."); return; }

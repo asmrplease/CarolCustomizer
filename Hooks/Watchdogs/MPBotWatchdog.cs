@@ -7,9 +7,10 @@ using System.Text;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class MPBotWatchdog : PelvisWatchdog
+public class MPBotWatchdog : BotWatchdog
 {
     VirtualCarol virtualCarol;
+    Entity entity;
 
     public override PelvisWatchdog BuildFromExisting(PelvisWatchdog watchdog, Component typeComponent)
     {
@@ -17,15 +18,15 @@ public class MPBotWatchdog : PelvisWatchdog
         return base.BuildFromExisting(watchdog, typeComponent);
     }
 
-    public override void SetBaseOutfit(Outfit outfit)
+    public override void SetBaseOutfit(Outfit outfit) 
     {
-
+        entity ??= GetComponentInParent<Entity>(true);
+        entity.SwapModel(outfit.storedAsset.gameObject);
     }
 
-    public void SetBotName(string botName)
+    public override void SetBotName(string botName)
     {
-        VirtualCarol vCarol = virtualCarol;
-        MultiplayerManager.PlayerStats stats = vCarol.GetPlayerStats();
+        MultiplayerManager.PlayerStats stats = virtualCarol.GetPlayerStats();
         stats.name = botName;
     }
 }

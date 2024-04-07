@@ -21,7 +21,7 @@ public class GameManagerRewrite : MonoBehaviour
     {
         float time = Time.time;
         float time2 = Time.time;
-        GameManager.manager.carolModel = GameManager.manager.GetOutfit("carol_pyjamabasic");
+        GameManager.manager.carolModel = GameManager.manager.GetOutfit(Constants.Pyjamas);
         string[] weaponsFiles = this.RemoveDuplicates(Resources.Load<TextAsset>("weapons").text.Split(';', StringSplitOptions.None));
         yield return null;
         string[] gadgetsFiles = this.RemoveDuplicates(Resources.Load<TextAsset>("gadgets").text.Split(';', StringSplitOptions.None));

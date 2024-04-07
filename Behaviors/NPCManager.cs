@@ -15,7 +15,6 @@ internal class NPCManager
 {
     private static RecipesManager recipesManager;
 
-    //list of all live bots in the scene
     private static Dictionary<PelvisWatchdog, CarolInstance> liveBots = new();
     public static CarolInstance shezaraInstance { get; private set; }
 
@@ -29,7 +28,7 @@ internal class NPCManager
         shezaraInstance = new(folder);
     }
 
-    public static void OnBotSpawn(MPBotWatchdog pelvis)
+    public static void OnBotSpawn(BotWatchdog pelvis)
     {
         Log.Debug("OnBotSpawn()");
         var botInstance = new CarolInstance(folder);

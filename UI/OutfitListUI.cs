@@ -106,7 +106,9 @@ internal class OutfitListUI : MonoBehaviour
     {
         bool favorites = favoriteFilter.isOn;
         bool active = activeFilter.isOn;
-        bool accFilterActive = favorites || active;
+        bool textFilter = searchString.Trim() != "";
+
+        bool accFilterActive = favorites || active || textFilter;
 
         foreach (var outfit in outfitUIs)
         {
@@ -128,6 +130,13 @@ internal class OutfitListUI : MonoBehaviour
             acc.gameObject.SetActive(false);
         }
     }
+
+    private void NewProcessFilters(bool unused)
+    {
+        //hide all ui elements
+        //show ui elements that match a filter
+    }
+
     private void OnOutfitLoaded(Outfit outfit)
     {
         var uiInstance = GameObject.Instantiate(loader.OutfitListElement, listRoot);
@@ -169,7 +178,7 @@ internal class OutfitListUI : MonoBehaviour
 
         var accUI = accInstance.AddComponent<AccessoryUI>();
         if (!accUI) { Log.Error("Failed to add AccUI component"); return null; }
-        accUI.Constructor(outfitUI, accessory, this, contextMenu, outfitManager);
+        accUI.Constructor(outfitUI, accessory, this, contextMenu, outfitManager, favoritesManager);
         accessoryUIs[accessory] = accUI;
         return accUI;
     }

@@ -7,7 +7,6 @@ using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Events;
 using CarolCustomizer.Hooks.Watchdogs;
-//using InstanceType = CarolCustomizer.Hooks.PelvisWatchdog.InstanceType;
 
 namespace CarolCustomizer.Behaviors;
 /// <summary>
@@ -20,6 +19,7 @@ public class OutfitManager : IDisposable
     private CarolInstance playerManager;
     private OutfitAssetManager dynamicAssetManager;
     public PelvisWatchdog pelvis { get; private set; }
+    Outfit BaseOutfit;
     #endregion
 
     #region State Management
@@ -27,7 +27,7 @@ public class OutfitManager : IDisposable
     #endregion
 
     #region Public Interface
-    public string BaseOutfitName;
+    public string BaseOutfitName => BaseOutfit is not null? BaseOutfit.AssetName : Constants.Pyjamas;
     public bool BaseVisible { get; private set; }
     public int BaseAccessorySlot => 0;
     public Action<AccessoryChangedEvent> AccessoryChanged;
@@ -153,6 +153,7 @@ public class OutfitManager : IDisposable
     {
         if (!this.pelvis) { Log.Warning("Tried to swap outfits with no pelviswatchdog instantiated."); return; }
         this.pelvis.SetBaseOutfit(outfit);
+        this.BaseOutfit = outfit;
     }
 
     public static void SetBaseOutfit(MenuSwitchOutfit mso, Outfit outfit)

@@ -25,10 +25,10 @@ public class RecipesManager : IDisposable
         this.watcher = new FileSystemWatcher(path);
 
         this.watcher.Filter = $"*{Constants.RecipeExtension}";
-        this.watcher.Created += OnRecipeFileCreated;
-        this.watcher.Deleted += OnRecipeFileRemoved;
-        this.watcher.Changed += OnRecipeFileChanged;
-        this.watcher.Renamed += OnRecipeFileRenamed;
+        this.watcher.Created += HandleRecipeFileCreated;
+        this.watcher.Deleted += HandleRecipeFileRemoved;
+        this.watcher.Changed += HandleRecipeFileChanged;
+        this.watcher.Renamed += HandleRecipeFileRenamed;
 
         this.watcher.EnableRaisingEvents = true;
 
@@ -50,40 +50,46 @@ public class RecipesManager : IDisposable
 
     private void OnRecipeFileCreated(Recipe newRecipe)
     {
+        Log.Debug($"OnRecipeFileCreated({newRecipe.Name})");
         recipes[newRecipe.Path] = newRecipe;
+        Log.Debug($"OnRecipeCreated?.Invoke({newRecipe.Name})");
         OnRecipeCreated?.Invoke(newRecipe);
     }
 
     private void OnRecipeFileRemoved(Recipe removedRecipe)
     {
+        Log.Debug($"OnRecipeFileRemoved({removedRecipe.Name})");
         recipes.Remove(removedRecipe.Path);
         OnRecipeDeleted?.Invoke(removedRecipe);
     }
 
-    private void OnRecipeFileCreated(object sender, FileSystemEventArgs e)
+    private void HandleRecipeFileCreated(object sender, FileSystemEventArgs e)
     {
-        Log.Debug("OnRecipeFileCreated");
+        Log.Debug("HandleRecipeFileCreated");
         var newRecipe = new Recipe(e.FullPath);
+        //Log.Debug($"recipe created: {newRecipe.Name}");
         OnRecipeFileCreated(newRecipe);
     }
 
-    private void OnRecipeFileChanged(object sender, FileSystemEventArgs e)
+    private void HandleRecipeFileChanged(object sender, FileSystemEventArgs e)
     {
+        Log.Debug("HandleRecipeFileChanged");
         OnRecipeFileRemoved(recipes[e.FullPath]);
         OnRecipeFileCreated(new Recipe(e.FullPath));
     }
 
-    private void OnRecipeFileRenamed(object sender, RenamedEventArgs e)
+    private void HandleRecipeFileRenamed(object sender, RenamedEventArgs e)
     {
+        Log.Debug("HandleRecipeFileRenamed");
         OnRecipeFileRemoved(recipes[e.OldName]);
         OnRecipeFileCreated(new Recipe(e.FullPath));
     }
 
-    private void OnRecipeFileRemoved(object sender, FileSystemEventArgs e)
+    private void HandleRecipeFileRemoved(object sender, FileSystemEventArgs e)
     {
+        Log.Debug("HandleRecipeFileRemoved");
         if (!recipes.ContainsKey(e.FullPath)) return;
         var removed = recipes[e.FullPath];
         OnRecipeFileRemoved(removed);
     }
-
 }

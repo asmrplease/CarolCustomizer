@@ -13,7 +13,7 @@ public class FavoritesManager : IDisposable
 {
     private ConfigEntry<string> favoritesConfig;
     private Action saveMethod;
-    HashSet<AccessoryDescriptor> favorites;
+    public HashSet<AccessoryDescriptor> favorites { get; private set; }
 
     public FavoritesManager(ConfigEntry<string> favoritesConfig, Action saveMethod)
     {

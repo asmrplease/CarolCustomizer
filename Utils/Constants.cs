@@ -51,6 +51,7 @@ internal static class Constants
     public const string MenuSceneName = "Main_menu_new";
     public const string LoadingSceneName = "Loading_Startup";
     public const string IntroCutsceneName = "INTRO_CUTSCENES";
+    public const string Pyjamas = "CAROL_PyjamaBasic";
 
     public const string Shezara = "Shezara";
 

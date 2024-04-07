@@ -39,8 +39,12 @@ internal static class RecipeLoader
         catch { results.Status = Recipe.Status.InvalidJson; return results; }
         if (results.Recipe is null) { results.Status = Recipe.Status.InvalidJson; return results; }
 
-        if (RecipeApplier.GetMissingSources(results.Recipe).Any())
-        { results.Status = Recipe.Status.MissingSource; return results; }
+        try
+        {
+            if (RecipeApplier.GetMissingSources(results.Recipe).Any())
+            { results.Status = Recipe.Status.MissingSource; }
+        }
+        catch { results.Status = Recipe.Status.MissingSource; }
 
         return results;
     }
