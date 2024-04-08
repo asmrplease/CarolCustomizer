@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
 
 namespace CarolCustomizer.Utils;
@@ -12,26 +11,6 @@ namespace CarolCustomizer.Utils;
 /// </summary>
 public static class MiscExtensions
 {
-    /// <summary>
-    /// Finds the CarolPelvis by addressing the skeleton of the newTarget Entity.
-    /// </summary>
-    /// <returns>Null, or the CarolPelvis transform of the current newTarget entity.</returns>
-    public static Transform GetPelvis(this Entity entity)
-    {
-        if (!entity) return null;
-        return entity.currentModel?.spineBone?.transform.parent.parent.parent;
-    }
-
-    /// <summary>
-    /// Removes common unity/onirism text from strings. 
-    /// </summary>
-    /// <param name="name">String to clean</param>
-    /// <returns>String without CAROLMOD_, CAROL_,  '_', and (Clone).</returns>
-    public static string CleanName(this string name)
-    {
-        return name.Replace("CAROLMOD_", "").Replace("CAROL_", "").Replace("(Clone)", "").Replace("_", " ").Trim();
-    }
-
     public static string DeClone(this string name)
     {
         return name.Replace("(Clone)", "");
@@ -83,17 +62,7 @@ public static class MiscExtensions
         }
     }
 
-    /// <summary>
-    /// Updates dynbone components to support adding arbitrary bones, requires reflection calls. 
-    /// </summary>
-    /// <param name="dBone">Dynamic Bone to restart.</param>
-    public static void RestartHairJiggle(this DynamicBone dBone)
-    {
-        //TODO: can we cache these MethodInfo objects to make this faster?
-        if (dBone == null) { Log.Warning("Couldn't find hair DynamicBone!"); return; }//TODO: try to instantiate if null? for now just don't NRE on the next line
-        typeof(DynamicBone).GetMethod("InitTransforms", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(dBone, null);
-        typeof(DynamicBone).GetMethod("SetupParticles", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(dBone, null);
-    }
+
 
     /// <summary>
     /// Automatically calls IDisposable.Dispose() on any fields in the object
@@ -138,37 +107,6 @@ public static class MiscExtensions
         yield return new WaitForEndOfFrame();
         anim.SetBool(triggerName, false);
         yield break;
-    }
-
-    public static MultiplayerManager.PlayerStats GetPlayerStats(this VirtualCarol virtualCarol)
-    {
-        if (!MultiplayerManager.manager) return null;
-        return MultiplayerManager.manager.players.First(x=>x.player == virtualCarol.entity);
-    }
-
-    public static void UpdateBoneArray2(this SkinnedMeshRenderer target, SkinnedMeshRenderer source)
-    {
-        Transform pelvisParent;
-        if (!target.rootBone)
-        {
-            pelvisParent = target.transform.RecursiveFindTransform(x => x.name == "CarolPelvis").parent;
-        }
-        else pelvisParent = target.transform.parent;
-
-        if (!pelvisParent) { Log.Warning($"Failed to update bone array for {target.name}"); }
-
-        var targetBoneList = pelvisParent.SkeletonToList().ToDictionaryOverwrite(x => x.name);
-
-        Transform[] newBones = new Transform[source.bones.Length];
-        int index = 0;
-        foreach (var bone in source.bones)
-        {
-            Transform result;
-            targetBoneList.TryGetValue(bone.name, out result);
-            if (!result) { Log.Error($"Missing bone on {target.name}");}
-            newBones[index++] = result;
-        }
-        target.bones = newBones;
     }
 
     public static Type[] AllAssetsAs<Type>(this AssetBundleRequest request) where Type : class

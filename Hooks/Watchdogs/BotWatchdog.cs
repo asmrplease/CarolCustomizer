@@ -12,7 +12,7 @@ public class BotWatchdog : PelvisWatchdog
         base.Awake();
         NPCManager.OnBotSpawn(this);
     }
-    public virtual void SetBotName(string botName) { }
+    public virtual void SetBotName(string botName) { Log.Debug("BotWatchdog.SetBotName()"); }
 
     void OnDestroy() => NPCManager.OnBotDespawn(this);
 }
