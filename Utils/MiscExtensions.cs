@@ -62,8 +62,6 @@ public static class MiscExtensions
         }
     }
 
-
-
     /// <summary>
     /// Automatically calls IDisposable.Dispose() on any fields in the object
     /// </summary>
