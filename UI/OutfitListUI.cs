@@ -95,6 +95,13 @@ internal class OutfitListUI : MonoBehaviour
         OutfitAssetManager.OnOutfitUnloaded -= OnOutfitUnloaded;
         outfitManager.AccessoryChanged -= HandleAccessoryChanged;
     }
+    
+    //do we need to break down this class?
+    //how do we break down this class?
+        //UI element instantiation
+        //filter processing
+        //ui event handling
+        //clothing event handling
 
     private void OnSearchBoxChanged(string searchString)
     {
@@ -117,24 +124,17 @@ internal class OutfitListUI : MonoBehaviour
             outfit.Value.gameObject.SetActive(textSearchResult);
         }
 
-        foreach (var acc in accessoryUIs.Values)
+        foreach (var acc in accessoryUIs.Keys)
         {
-            if (!acc) continue;
-            if (favorites && favoritesManager.IsInFavorites(acc.accessory)) { acc.ShowAndExpandOutfit(); continue; }
-            if (active && outfitManager.IsEnabled(acc.accessory)) { acc.ShowAndExpandOutfit(); continue; }
+            if (favorites && favoritesManager.IsInFavorites(acc)) { SetAccUIVisible(acc, true); continue; }
+            if (active && outfitManager.IsEnabled(acc)) { SetAccUIVisible(acc, true); continue; }
 
-            if (searchString == "") { acc.gameObject.SetActive(false); continue; }
+            if (searchString == "") { SetAccUIVisible(acc, false); continue; }
             bool textSearchResult = acc.DisplayName.ToLower().Contains(searchString.ToLower());
-            if (textSearchResult) { acc.ShowAndExpandOutfit(); continue; }
+            if (textSearchResult) { SetAccUIVisible(acc, true); continue; }
 
-            acc.gameObject.SetActive(false);
+            SetAccUIVisible(acc, false);
         }
-    }
-
-    private void NewProcessFilters(bool unused)
-    {
-        //hide all ui elements
-        //show ui elements that match a filter
     }
 
     private void OnOutfitLoaded(Outfit outfit)
@@ -166,7 +166,7 @@ internal class OutfitListUI : MonoBehaviour
 
     private AccessoryUI BuildAccUI(StoredAccessory accessory)
     {
-        var outfitUI = outfitUIs[accessory.outfit];
+        var outfitUI = this.outfitUIs[accessory.outfit];
 
         var accInstance = GameObject.Instantiate(loader.AccessoryListElement, outfitUI.transform);
         if (!accInstance) { Log.Error("Failed to instantiate accessory UI prefab."); return null; }
@@ -174,18 +174,18 @@ internal class OutfitListUI : MonoBehaviour
         var accUI = accInstance.AddComponent<AccessoryUI>();
         if (!accUI) { Log.Error("Failed to add AccUI component"); return null; }
         accUI.Constructor(outfitUI, accessory, this, contextMenu, outfitManager, favoritesManager);
-        accessoryUIs[accessory] = accUI;
+        this.accessoryUIs[accessory] = accUI;
         return accUI;
     }
 
     private MaterialUI BuildMatUI(AccMatSlot location, MaterialDescriptor material) 
     {
-        var accessoryUI = accessoryUIs[location.accessory];
+        var accessoryUI = this.accessoryUIs[location.accessory];
         if (!accessoryUI) 
         {
             accessoryUI = BuildAccUI(location.accessory);
         }
-        var matInstance = GameObject.Instantiate(loader.AccessoryListElement, accessoryUI.transform.parent);
+        var matInstance = GameObject.Instantiate(this.loader.AccessoryListElement, accessoryUI.transform.parent);
         if (!matInstance) { Log.Error("Failed to instantiate material UI prefab."); return null; }
 
         int index = accessoryUI.transform.GetSiblingIndex() + location.index + 1;
@@ -196,7 +196,7 @@ internal class OutfitListUI : MonoBehaviour
 
         matUI.Constructor(accessoryUI, material, location.index, this, contextMenu, outfitManager);
         accessoryUI.AddMaterial(matUI);
-        materialUIs[location] = matUI;
+        this.materialUIs[location] = matUI;
         return matUI;
     }
 
@@ -219,10 +219,10 @@ internal class OutfitListUI : MonoBehaviour
     public void SetAccessoryExpanded(StoredAccessory accessory, bool expanded)
     {
         int index = 0;
-        foreach (var mat in accessory.Materials) SetMatVisible(new AccMatSlot { accessory = accessory, index = index }, expanded);
+        foreach (var mat in accessory.Materials) SetMatUIVisible(new AccMatSlot { accessory = accessory, index = index }, expanded);
     }
 
-    private void SetMatVisible(AccMatSlot material, bool visible)
+    private void SetMatUIVisible(AccMatSlot material, bool visible)
     {
         var uiInstance = materialUIs[material];
         if (!visible) { uiInstance?.gameObject.SetActive(false); return; }
@@ -245,6 +245,7 @@ internal class OutfitListUI : MonoBehaviour
             uiInstance = BuildAccUI(accessory);
             if (!uiInstance) { Log.Error($"Failed to find or construct {accessory}'s UI instance during show"); return; }
         }
+        if (visible) outfitUIs[accessory.outfit].gameObject.SetActive(true);
         uiInstance.gameObject.SetActive(true);
     }
 

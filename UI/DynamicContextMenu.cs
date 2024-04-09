@@ -38,7 +38,6 @@ public class DynamicContextMenu : MonoBehaviour
 
         foreach (var item in menuItems.GetContextMenuItems())
         {
-            //instantiate/populate button
             GameObject buttonGO = GameObject.Instantiate(buttonPrefab, buttonContainer);
             if (!buttonGO) { Log.Error("failed to instantiate button prefab."); return; }
             Button buttonComponent = buttonGO.GetComponent<Button>();
@@ -46,6 +45,7 @@ public class DynamicContextMenu : MonoBehaviour
 
             buttonComponent.GetComponentInChildren<Text>(true).text = item.Key;
             buttonComponent.onClick.AddListener(item.Value);
+            buttonComponent.onClick.AddListener(Hide);
             buttonList.Add(buttonComponent);
         }
 

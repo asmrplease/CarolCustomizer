@@ -108,12 +108,6 @@ internal class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuAc
         SetMaterialVisibity(expanded);
     }
 
-    public void ShowAndExpandOutfit()
-    {
-        gameObject.SetActive(true);
-        outfitUI.gameObject.SetActive(true);
-    }
-
     private void SetMaterialVisibity(bool state)
     {
         ui.SetAccessoryExpanded(this.accessory, state);
