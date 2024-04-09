@@ -10,14 +10,13 @@ using CarolCustomizer.Hooks.Watchdogs;
 
 namespace CarolCustomizer.Behaviors;
 /// <summary>
-/// Responsible for the clothing of one player. 
+/// Responsible for the clothing of one Carol Instance. 
 /// </summary>
 public class OutfitManager : IDisposable
 {
     #region Dependencies
     private SkeletonManager skeletonManager;
     private CarolInstance playerManager;
-    private OutfitAssetManager dynamicAssetManager;
     public PelvisWatchdog pelvis { get; private set; }
     Outfit BaseOutfit;
     #endregion
@@ -32,20 +31,18 @@ public class OutfitManager : IDisposable
     public int BaseAccessorySlot => 0;
     public Action<AccessoryChangedEvent> AccessoryChanged;
     public IEnumerable<LiveAccessory> ActiveAccessories =>
-            instantiatedAccessories.Values.
-            Where(x => x.isActive);
+            instantiatedAccessories.Values
+            .Where(x => x.isActive);
 
     public OutfitManager(CarolInstance player, SkeletonManager skeletonManager, OutfitAssetManager dynamicAssetManager)
     {
         this.skeletonManager = skeletonManager;
         this.playerManager = player;
-        this.dynamicAssetManager = dynamicAssetManager;
         this.BaseVisible = true;
 
         this.playerManager.SpawnEvent += RefreshSMRs;
         this.playerManager.SpawnEvent += OnSpawn;
         this.AccessoryChanged += DebugAccChanged;
-
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
     }
 
@@ -69,8 +66,6 @@ public class OutfitManager : IDisposable
 
     public void EnableAccessory(StoredAccessory accessory)
     {
-        Log.Debug("OutfitManager.EnabledAccessory");
-        //Log.Info($"LiveAcc count: {ActiveAccessories.Count()}");
         if (!instantiatedAccessories.ContainsKey(accessory)) { Instantiate(accessory); }
         instantiatedAccessories[accessory].Enable();
         var liveAccessory = instantiatedAccessories[accessory] as AccessoryDescriptor;
@@ -108,7 +103,6 @@ public class OutfitManager : IDisposable
     public MaterialDescriptor[] GetLiveMaterials(StoredAccessory accessory)
     {
         if (!instantiatedAccessories.ContainsKey(accessory)) { return null; }
-
         return instantiatedAccessories[accessory].Materials;
     }
     #endregion
@@ -135,15 +129,13 @@ public class OutfitManager : IDisposable
 
     public void RefreshBaseVisibility() => SetBaseVisibility(this.BaseVisible);
 
-
     public void SetBaseVisibility(bool visible)
     {
         Log.Debug($"Setting base visibility to {visible}");
-        this.BaseVisible = visible;
         if (!this.pelvis) { Log.Warning("Tried to set base outfit visibility when no pelvis watchdog exists."); return; }
-
+        
+        this.BaseVisible = visible;
         foreach (var mesh in this.pelvis.MeshData?.baseMeshes) { mesh.gameObject.SetActive(visible); }
-        if (!visible) return;
     }
 
     public void SetBaseOutfit(Outfit outfit)
@@ -151,18 +143,6 @@ public class OutfitManager : IDisposable
         if (!this.pelvis) { Log.Warning("Tried to swap outfits with no pelviswatchdog instantiated."); return; }
         this.pelvis.SetBaseOutfit(outfit);
         this.BaseOutfit = outfit;
-    }
-
-    public static void SetBaseOutfit(MenuSwitchOutfit mso, Outfit outfit)
-    {
-        Log.Debug("SetBaseOutfit(MenuSwitchOutfit)");
-        if (mso.loadedModel) { GameObject.Destroy(mso.loadedModel); }
-        mso.loadedModel = Util.SpawnOverTarget(outfit.storedAsset.gameObject, mso.gameObject);
-        mso.loadedModel.SetActive(true);
-        mso.loadedModel.transform.SetParent(mso.transform);
-        mso.loadedModel.transform.ResetLocalPosRot();
-        mso.modelData = ((HaDSOutfit)outfit).modelData;
-        mso.PickHair(mso.transform);
     }
 
     private void OnOutfitUnloaded(Outfit outfit)
@@ -177,4 +157,3 @@ public class OutfitManager : IDisposable
         }
     }
 }
-

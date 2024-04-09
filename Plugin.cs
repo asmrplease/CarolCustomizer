@@ -13,6 +13,8 @@ using UnityEngine.SceneManagement;
 using BepInEx.Configuration;
 using UnityEngine.EventSystems;
 using CarolCustomizer.Behaviors;
+using Slate;
+using CarolCustomizer.Hooks.Watchdogs;
 
 namespace CarolCustomizer;
 
@@ -138,29 +140,19 @@ public class CCPlugin : BaseUnityPlugin
     {
         if (MainMenuManager.manager)
         {
-            var menuCarol = SceneManager.GetActiveScene().GetRootGameObjects().First(x => x.name == "MenuCarolLoader");
-            if (!menuCarol) { Log.Warning("Tried to set outfit on main menu but couldn't find menu carol."); return; }
+            var menuCarolLoader = SceneManager.GetActiveScene().GetRootGameObjects().First(x => x.name == "MenuCarolLoader");
+            var menuPelvis = menuCarolLoader.transform.RecursiveFindTransform(x => x.name == "CarolPelvis");
 
-            var mso = menuCarol.GetComponent<MenuSwitchOutfit>();
-            if (!mso) { Log.Warning("Failed to get menuswitchoutfit component when trying to init main menu watchdog"); return; }
-
-            string outfitName = mso.transform.GetChild(0).name.DeClone();
-            var model = OutfitAssetManager.GetOutfitByAssetName(outfitName);
-            if (model is null) { Log.Warning($"coudln't find {outfitName} when performing initial model load"); return; }
-
-            Log.Debug($"setting outfit {outfitName} on main menu carol");
-            OutfitManager.SetBaseOutfit(mso, model);
+            menuPelvis.GetAddComponent<PelvisWatchdog>();
             return;
         }
 
         if (Entity.players is null) { Log.Debug("no players to refresh."); return; }
 
-        foreach (var entity in Entity.players)
+        foreach (var player in Entity.players)
         {
-            string outfitName = entity.currentModel.model.name.DeClone();
-            var model = OutfitAssetManager.GetOutfitByAssetName(outfitName);
-            if (model is null) { Log.Warning($"coudln't find {outfitName} when performing initial model load"); continue; }
-            entity.SwapModel(model.storedAsset.gameObject);
+            var pelvis = player.transform.RecursiveFindTransform(x => x.name == "CarolPelvis");
+            pelvis.GetAddComponent<PelvisWatchdog>();
         }
     }
 
