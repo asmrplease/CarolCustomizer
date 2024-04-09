@@ -152,7 +152,7 @@ internal class OutfitListUI : MonoBehaviour
         foreach (var accessory in outfit.Accessories)
         {
             OnAccessoryLoaded(outfitUI, accessory);
-            accessoryUIs.Add(accessory, null);
+            accessoryUIs[accessory] = null;
         }
     }
 
@@ -208,7 +208,7 @@ internal class OutfitListUI : MonoBehaviour
 
     public void OnMaterialLoaded(StoredAccessory accessory, MaterialDescriptor material, int index)
     {
-        materialUIs.Add(new AccMatSlot { accessory = accessory, index = index }, null);
+        materialUIs[new AccMatSlot { accessory = accessory, index = index }] = null;
     }
 
     public void SetOutfitExpanded(Outfit outfit, bool expanded)
@@ -253,6 +253,7 @@ internal class OutfitListUI : MonoBehaviour
 
     private void OnDisableAll() => outfitManager.DisableAllAccessories();
 
+    //TODO: there may be an issue here with some StoredAccessories not actually being unique enough on their own
     private record AccMatSlot { public StoredAccessory accessory; public int index; }
 
     private void HandleAccessoryChanged(AccessoryChangedEvent e)
