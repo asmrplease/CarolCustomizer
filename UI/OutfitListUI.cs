@@ -151,20 +151,15 @@ internal class OutfitListUI : MonoBehaviour
         
         foreach (var accessory in outfit.Accessories)
         {
-            var accElement = OnAccessoryLoaded(outfitUI, accessory);
-            outfitUI.AddAccessory(accElement);
-            accessoryUIs.Add(accessory, accElement);
+            OnAccessoryLoaded(outfitUI, accessory);
+            accessoryUIs.Add(accessory, null);
         }
-        
     }
 
     private void OnOutfitUnloaded(Outfit outfit)
     {
-        Log.Debug($"UI.OnOutfitUnloaded({outfit.DisplayName})");
-        //find the associated UI element
         if (!outfitUIs.ContainsKey(outfit)) { Log.Warning("UI instance was asked to remove a UI element that was not in it's dict"); return; }
         var outfitUI = outfitUIs[outfit];
-        //destroy it
         outfitUIs.Remove(outfit);
         GameObject.Destroy(outfitUI.gameObject);
     }
@@ -205,39 +200,26 @@ internal class OutfitListUI : MonoBehaviour
         return matUI;
     }
 
-    public AccessoryUI OnAccessoryLoaded(OutfitUI outfitUI, StoredAccessory accessory)
+    public void OnAccessoryLoaded(OutfitUI outfitUI, StoredAccessory accessory)
     {
         int index = 0;
-        foreach (var mat in accessory.Materials)
-        {
-            var matUI = OnMaterialLoaded(accessory, mat, index++);
-        }
-        return null;
+        foreach (var mat in accessory.Materials) OnMaterialLoaded(accessory, mat, index++);
     }
 
-    public MaterialUI OnMaterialLoaded(StoredAccessory accessory, MaterialDescriptor material, int index)
+    public void OnMaterialLoaded(StoredAccessory accessory, MaterialDescriptor material, int index)
     {
-        
         materialUIs.Add(new AccMatSlot { accessory = accessory, index = index }, null);
-        return null;
     }
-
 
     public void SetOutfitExpanded(Outfit outfit, bool expanded)
     {
-        foreach (StoredAccessory accessory in outfit.Accessories)
-        {
-            SetAccUIVisible(accessory, expanded);
-        }
+        foreach (StoredAccessory accessory in outfit.Accessories) SetAccUIVisible(accessory, expanded);
     }
 
     public void SetAccessoryExpanded(StoredAccessory accessory, bool expanded)
     {
         int index = 0;
-        foreach (var mat in accessory.Materials)
-        {
-            SetMatVisible(new AccMatSlot { accessory = accessory, index = index }, expanded);
-        }
+        foreach (var mat in accessory.Materials) SetMatVisible(new AccMatSlot { accessory = accessory, index = index }, expanded);
     }
 
     private void SetMatVisible(AccMatSlot material, bool visible)
@@ -266,20 +248,9 @@ internal class OutfitListUI : MonoBehaviour
         uiInstance.gameObject.SetActive(true);
     }
 
+    internal void SetBaseOutfit(Outfit outfit) => outfitManager.SetBaseOutfit(outfit);
 
-    internal void SetBaseOutfit(Outfit outfit)
-    {
-        outfitManager.SetBaseOutfit(outfit);
-    }
-
-    private void OnDisableAll()
-    {
-        outfitManager.DisableAllAccessories();
-        foreach (var accUI in accessoryUIs.Values)
-        {
-            accUI.activationToggle.SetIsOnWithoutNotify(false);
-        }
-    }
+    private void OnDisableAll() => outfitManager.DisableAllAccessories();
 
     private record AccMatSlot { public StoredAccessory accessory; public int index; }
 
@@ -290,7 +261,6 @@ internal class OutfitListUI : MonoBehaviour
 
         if (!accessoryUIs[e.Target]) BuildAccUI(e.Target);
         accessoryUIs[e.Target].activationToggle.SetIsOnWithoutNotify(e.Visible);
-        //accessoryUIs[e.Target].activationToggle.isOn = e.Visible;
 
         int index = 0;
         foreach (var materialState in e.State.Materials)
@@ -300,6 +270,5 @@ internal class OutfitListUI : MonoBehaviour
             materialUIs[accMatSlot].UpdateActiveMaterial(materialState);
             index++;
         }
-        
     }
 }

@@ -31,7 +31,6 @@ public class OutfitManager : IDisposable
     public bool BaseVisible { get; private set; }
     public int BaseAccessorySlot => 0;
     public Action<AccessoryChangedEvent> AccessoryChanged;
-    //public Action<StoredAccessory, int, MaterialDescriptor> OnAccessoryPainted;
     public IEnumerable<LiveAccessory> ActiveAccessories =>
             instantiatedAccessories.Values.
             Where(x => x.isActive);
@@ -50,10 +49,7 @@ public class OutfitManager : IDisposable
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
     }
 
-    private void DebugAccChanged(AccessoryChangedEvent e) 
-    {
-        Log.Debug(e.ToString());
-    }
+    private void DebugAccChanged(AccessoryChangedEvent e) => Log.Debug(e.ToString());
 
     public void Dispose()
     {
@@ -97,7 +93,8 @@ public class OutfitManager : IDisposable
 
     public void DisableAllAccessories()
     {
-        foreach (var accessory in instantiatedAccessories.Values) { accessory.Disable(); }
+        //TODO: only call this on active accessories
+        foreach (var accessory in instantiatedAccessories.Keys) { DisableAccessory(accessory); }
     }
 
     public void PaintAccessory(StoredAccessory accessory, MaterialDescriptor material, int index)
