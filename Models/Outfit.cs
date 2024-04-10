@@ -17,25 +17,21 @@ public class Outfit : IDisposable, IComparable<Outfit>
     #endregion
 
     #region Public Interface
-    /// <summary>
-    /// The unique asset name.
-    /// </summary>
     virtual public string AssetName => storedAsset.name;
-    /// <summary>
-    /// The human-readable display name.
-    /// </summary>
     virtual public string DisplayName { get; private set; }
     virtual public Sprite Sprite => null;
     virtual public string Author => "Crimson Tales";
-    virtual public List<StoredAccessory> Accessories { get; private set; } = new();
+    public List<StoredAccessory> Accessories => AccDict.Values.ToList();
+    private Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = new();
     virtual public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = new();
-    virtual public bool IsModOutfit => false;
     
     PelvisWatchdog prefabWatchdog;
     public MeshData meshData => prefabWatchdog.MeshData;
     public BoneData boneData => prefabWatchdog.BoneData;
 
     public int CompareTo(Outfit other) { return this.DisplayName.CompareTo(other.DisplayName); }
+
+    public StoredAccessory GetAccessory(AccessoryDescriptor descriptor) => AccDict.ContainsKey(descriptor)? AccDict[descriptor] : null;
     #endregion
 
     #region Lifecycle
@@ -67,7 +63,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
         foreach (var smr in smrs)
         {
             var newAcc = new StoredAccessory(this, smr);
-            Accessories.Add(newAcc);
+            AccDict[newAcc] = newAcc;
 
             foreach (var newMat in newAcc.Materials) { if (newMat is not null) MaterialDescriptors.Add(newMat); }
         }

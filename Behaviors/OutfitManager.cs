@@ -30,9 +30,10 @@ public class OutfitManager : IDisposable
     public bool BaseVisible { get; private set; }
     public int BaseAccessorySlot => 0;
     public Action<AccessoryChangedEvent> AccessoryChanged;
-    public IEnumerable<LiveAccessory> ActiveAccessories =>
-            instantiatedAccessories.Values
-            .Where(x => x.isActive);
+    public IEnumerable<StoredAccessory> ActiveAccessories =>
+            instantiatedAccessories
+            .Where(x => x.Value.isActive)
+            .Select(x => x.Key);
 
     public OutfitManager(CarolInstance player, SkeletonManager skeletonManager, OutfitAssetManager dynamicAssetManager)
     {
@@ -61,7 +62,7 @@ public class OutfitManager : IDisposable
 
     private void RefreshSMRs(PelvisWatchdog pelvis)
     {
-        foreach (var accessory in ActiveAccessories) { accessory.Refresh(); }
+        foreach (var accessory in ActiveAccessories) { instantiatedAccessories[accessory].Refresh(); }
     }
 
     public void EnableAccessory(StoredAccessory accessory)

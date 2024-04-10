@@ -34,7 +34,7 @@ internal static class RecipeApplier
         if (outfit is null) { Log.Warning($"failed to find {accessoryDescription.Source}."); return; }
         Log.Debug("found source");
 
-        var accessory = outfit.Accessories.First(x => x.Name == accessoryDescription.Name);
+        var accessory = outfit.GetAccessory(accessoryDescription);
         if (accessory is null) { Log.Warning($"failed to find {accessoryDescription.Name}"); return; }
         Log.Debug("found accessory");
 

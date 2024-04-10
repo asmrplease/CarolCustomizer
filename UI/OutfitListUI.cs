@@ -21,7 +21,7 @@ internal class OutfitListUI : MonoBehaviour
     private static readonly string searchBoxAddress = "Search Box";
     private static readonly string searchBoxHintAddress = "Search Box/Text";
     private static readonly string listRootAddress = "Scroll View/Viewport/Content";
-    private string showHideAddress = "Buttons/Toggle Base";
+    string showHideAddress = "Buttons/Toggle Base";
     private static readonly string uncheckAllAddress = "Buttons/Uncheck All";
     private string filtersAddress = "Filters";
     #endregion
@@ -41,12 +41,12 @@ internal class OutfitListUI : MonoBehaviour
     private Toggle favoriteFilter;
     private Toggle activeFilter;
 
-    private Button deselectAll;
-    private Button showHideBase;
+    Button deselectAll;
+    Button showHideBase;
 
-    private SortedList<Outfit, OutfitUI> outfitUIs = new();
-    private Dictionary<StoredAccessory, AccessoryUI> accessoryUIs = new();
-    private Dictionary<AccMatSlot, MaterialUI> materialUIs = new();
+    SortedList<Outfit, OutfitUI> outfitUIs = new();
+    Dictionary<AccessoryDescriptor, AccessoryUI> accessoryUIs = new();
+    Dictionary<AccMatSlot, MaterialUI> materialUIs = new();
 
     public void Constructor(
         TabbedUIAssetLoader loader, 
@@ -111,11 +111,13 @@ internal class OutfitListUI : MonoBehaviour
 
     private void ProcessFilters(bool unused = true)
     {
+        Log.Debug("OutfitListUI.ProcessFilters");
         bool favorites = favoriteFilter.isOn;
         bool active = activeFilter.isOn;
         bool textFilter = searchString.Trim() != "";
-
         bool accFilterActive = favorites || active || textFilter;
+
+        foreach (var acc in accessoryUIs.Keys) { SetAccUIVisible(acc, false); }
 
         foreach (var outfit in outfitUIs)
         {
@@ -124,17 +126,18 @@ internal class OutfitListUI : MonoBehaviour
             outfit.Value.gameObject.SetActive(textSearchResult);
         }
 
-        foreach (var acc in accessoryUIs.Keys)
+        if (active) { foreach (var acc in outfitManager.ActiveAccessories) { SetAccUIVisible(acc, true); } }
+        if (favorites) { foreach (var acc in favoritesManager.favorites) { SetAccUIVisible(acc, true); } }
+        
+        if (textFilter)
         {
-            if (favorites && favoritesManager.IsInFavorites(acc)) { SetAccUIVisible(acc, true); continue; }
-            if (active && outfitManager.IsEnabled(acc)) { SetAccUIVisible(acc, true); continue; }
-
-            if (searchString == "") { SetAccUIVisible(acc, false); continue; }
-            bool textSearchResult = acc.DisplayName.ToLower().Contains(searchString.ToLower());
-            if (textSearchResult) { SetAccUIVisible(acc, true); continue; }
-
-            SetAccUIVisible(acc, false);
+            foreach (var acc in outfitManager.ActiveAccessories)
+            {
+                bool textSearchResult = acc.DisplayName.ToLower().Contains(searchString.ToLower());
+                if (textSearchResult) { SetAccUIVisible(acc, true); continue; }
+            }
         }
+        
     }
 
     private void OnOutfitLoaded(Outfit outfit)
@@ -148,7 +151,7 @@ internal class OutfitListUI : MonoBehaviour
 
         outfitUIs[outfit] = outfitUI;
         outfitUI.transform.SetSiblingIndex(outfitUIs.IndexOfKey(outfit));
-        
+        Log.Debug("Creating ");
         foreach (var accessory in outfit.Accessories)
         {
             OnAccessoryLoaded(outfitUI, accessory);
@@ -164,9 +167,11 @@ internal class OutfitListUI : MonoBehaviour
         GameObject.Destroy(outfitUI.gameObject);
     }
 
-    private AccessoryUI BuildAccUI(StoredAccessory accessory)
+    private AccessoryUI BuildAccUI(AccessoryDescriptor accessoryDescriptor)
     {
-        var outfitUI = this.outfitUIs[accessory.outfit];
+        var outfit = OutfitAssetManager.GetOutfitByAssetName(accessoryDescriptor.Source);
+        StoredAccessory accessory = outfit.GetAccessory(accessoryDescriptor);
+        var outfitUI = this.outfitUIs[outfit];
 
         var accInstance = GameObject.Instantiate(loader.AccessoryListElement, outfitUI.transform);
         if (!accInstance) { Log.Error("Failed to instantiate accessory UI prefab."); return null; }
@@ -174,7 +179,7 @@ internal class OutfitListUI : MonoBehaviour
         var accUI = accInstance.AddComponent<AccessoryUI>();
         if (!accUI) { Log.Error("Failed to add AccUI component"); return null; }
         accUI.Constructor(outfitUI, accessory, this, contextMenu, outfitManager, favoritesManager);
-        this.accessoryUIs[accessory] = accUI;
+        this.accessoryUIs[accessoryDescriptor] = accUI;
         return accUI;
     }
 
@@ -235,8 +240,9 @@ internal class OutfitListUI : MonoBehaviour
         uiInstance.gameObject.SetActive(true);
     }
 
-    private void SetAccUIVisible(StoredAccessory accessory, bool visible)
+    private void SetAccUIVisible(AccessoryDescriptor accessory, bool visible)
     {
+        if (!accessoryUIs.ContainsKey(accessory)) { Log.Warning($"Missing {accessory.Name}, {accessory.Source} is likely missing."); return; }
         var uiInstance = accessoryUIs[accessory];
         if (!visible) { uiInstance?.gameObject.SetActive(false); return; }
 
@@ -245,7 +251,7 @@ internal class OutfitListUI : MonoBehaviour
             uiInstance = BuildAccUI(accessory);
             if (!uiInstance) { Log.Error($"Failed to find or construct {accessory}'s UI instance during show"); return; }
         }
-        if (visible) outfitUIs[accessory.outfit].gameObject.SetActive(true);
+        if (visible) outfitUIs[OutfitAssetManager.GetOutfitByAssetName(accessory.Source)].gameObject.SetActive(true);
         uiInstance.gameObject.SetActive(true);
     }
 
