@@ -26,7 +26,7 @@ public class SkeletonManager : IDisposable
         if (!pelvis) { Log.Debug("didn't find pelvis"); return; }
 
         CommonBones = pelvis.SkeletonToList().ToDictionary(keySelector: x => x.name, elementSelector: x => x);
-        Log.Info($"Found {CommonBones.Count} of 69 standard bones.");
+        Log.Info($"Found {CommonBones.Count} of expected 69 standard bones.");
     }
     #endregion
 
@@ -62,7 +62,6 @@ public class SkeletonManager : IDisposable
     #region Update Target
     private void SetNewPelvis(PelvisWatchdog newPelvis)
     {
-        //Log.Debug("Changing SkeletonManager Target...");
         this.targetPelvis = newPelvis;        
         RebuildBones();
 
@@ -78,14 +77,11 @@ public class SkeletonManager : IDisposable
 
     private void RebuildBones()
     {
+        var activeOutfits = outfitBoneDicts.Keys.ToList();
         liveStandardBones.Clear();
         outfitBoneDicts.Clear();
         
         liveStandardBones = this.targetPelvis.BoneData.StandardBones;
-
-        //TODO: Remove dependency on pm & om
-        HashSet<Outfit> activeOutfits = 
-            new(this.playerManager.outfitManager.ActiveAccessories.Select(x => x.outfit));
 
         foreach (var outfit in activeOutfits) { AddBespokeBones(outfit); }
     }
@@ -94,11 +90,7 @@ public class SkeletonManager : IDisposable
     #region Public Interface
     public Transform[] Mount(LiveAccessory acc)
     {
-        //Log.Debug($"Mount({acc.Name})");
-        var siblingAcc = this.playerManager.outfitManager.ActiveAccessories.
-            Any(x => x != acc && x.outfit == acc.outfit);
-        if (!siblingAcc) { AddBespokeBones(acc.outfit); }
-
+        AddBespokeBones(acc.outfit); 
         return GetLiveBoneArray(acc.outfit, acc.bones);
     }
 
@@ -108,7 +100,7 @@ public class SkeletonManager : IDisposable
     #region Private Implementation
     private void AddBespokeBones(Outfit outfit)
     {
-        if (outfitBoneDicts.ContainsKey(outfit)) { return; }
+        if (outfitBoneDicts.ContainsKey(outfit)) return;
         Dictionary<string, Transform> boneDict = new();
 
         foreach (var bespokeBone in outfit.boneData.BespokeBones)

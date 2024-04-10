@@ -114,19 +114,20 @@ internal class OutfitListUI : MonoBehaviour
 
         if (active) { foreach (var acc in outfitManager.ActiveAccessories) { SetAccUIVisible(acc, true); } }
         if (favorites) { foreach (var acc in favoritesManager.favorites) { SetAccUIVisible(acc, true); } }
+        
         if (!textFilter) return;
-
+        var lowerString = searchString.ToLower();
         foreach (var outfit in outfitUIs.Keys
             .Where(x => x.DisplayName
                 .ToLower()
-                .Contains(searchString.ToLower()))
+                .Contains(lowerString))
             .ToList())
         { outfitUIs[outfit].gameObject.SetActive(true); }
 
         foreach (var acc in accessoryUIs.Keys
             .Where(x => x.Name
                 .ToLower()
-                .Contains(searchString.ToLower()))
+                .Contains(lowerString))
             .ToList())
         { SetAccUIVisible(acc, true); }
     }
