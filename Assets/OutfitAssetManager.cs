@@ -69,7 +69,6 @@ public class OutfitAssetManager : IDisposable
         if (outfitSets is null) { Log.Error("outfitSets was null when searching for asset"); return null; }
         if (assetName is null) { Log.Warning("GetOutfitByAssetName was given a null value"); return null; }
 
-        Log.Debug($"GetOutfitByAssetName({assetName})");
         foreach ((var key, var dict) in outfitSets) 
         {
             if (!dict.ContainsKey(assetName)) { continue; }

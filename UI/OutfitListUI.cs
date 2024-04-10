@@ -95,13 +95,6 @@ internal class OutfitListUI : MonoBehaviour
         OutfitAssetManager.OnOutfitUnloaded -= OnOutfitUnloaded;
         outfitManager.AccessoryChanged -= HandleAccessoryChanged;
     }
-    
-    //do we need to break down this class?
-    //how do we break down this class?
-        //UI element instantiation
-        //filter processing
-        //ui event handling
-        //clothing event handling
 
     private void OnSearchBoxChanged(string searchString)
     {
@@ -111,33 +104,31 @@ internal class OutfitListUI : MonoBehaviour
 
     private void ProcessFilters(bool unused = true)
     {
-        Log.Debug("OutfitListUI.ProcessFilters");
         bool favorites = favoriteFilter.isOn;
         bool active = activeFilter.isOn;
         bool textFilter = searchString.Trim() != "";
         bool accFilterActive = favorites || active || textFilter;
 
         foreach (var acc in accessoryUIs.Keys) { SetAccUIVisible(acc, false); }
-
-        foreach (var outfit in outfitUIs)
-        {
-            if (searchString == "") { outfit.Value.gameObject.SetActive(!accFilterActive); continue; }
-            bool textSearchResult = outfit.Key.DisplayName.ToLower().Contains(searchString.ToLower());
-            outfit.Value.gameObject.SetActive(textSearchResult);
-        }
+        foreach (var outfit in outfitUIs.Values) { outfit.gameObject.SetActive(!accFilterActive); }
 
         if (active) { foreach (var acc in outfitManager.ActiveAccessories) { SetAccUIVisible(acc, true); } }
         if (favorites) { foreach (var acc in favoritesManager.favorites) { SetAccUIVisible(acc, true); } }
-        
-        if (textFilter)
-        {
-            foreach (var acc in outfitManager.ActiveAccessories)
-            {
-                bool textSearchResult = acc.DisplayName.ToLower().Contains(searchString.ToLower());
-                if (textSearchResult) { SetAccUIVisible(acc, true); continue; }
-            }
-        }
-        
+        if (!textFilter) return;
+
+        foreach (var outfit in outfitUIs.Keys
+            .Where(x => x.DisplayName
+                .ToLower()
+                .Contains(searchString.ToLower()))
+            .ToList())
+        { outfitUIs[outfit].gameObject.SetActive(true); }
+
+        foreach (var acc in accessoryUIs.Keys
+            .Where(x => x.Name
+                .ToLower()
+                .Contains(searchString.ToLower()))
+            .ToList())
+        { SetAccUIVisible(acc, true); }
     }
 
     private void OnOutfitLoaded(Outfit outfit)
