@@ -43,37 +43,4 @@ public class BoneData : MonoBehaviour
         Log.Debug("BoneData construction complete.");
         return this;
     }
-
-    //TODO: Move this back to skeletonManager, we can't instantiate them ahead of time
-    private void FixMissingStandardBones()
-    {
-        var existingStandard = StandardBones;
-
-        var missingBones = SkeletonManager.CommonBones
-            .Where(x => !existingStandard.ContainsKey(x.Key))
-            .ToDictionary(x => x.Key, x => x.Value);
-        var parents = missingBones
-            .Where(x => !missingBones.Values.Contains(x.Value.parent));
-
-        foreach (var bone in parents)
-        {
-            Transform newBone = InstantiateAt(bone.Value, bone.Value.transform.parent.name);
-            standardBones.Add(newBone);
-            foreach (var child in newBone.SkeletonToList()) { standardBones.Add(child); }
-        }
-    }
-
-    private Transform InstantiateAt(Transform objectToInstantiate, string parentName)
-    {
-        var existingStandard = StandardBones;
-        if (!existingStandard.ContainsKey(parentName))
-        { Log.Error($"Could not find {objectToInstantiate.name}'s parent, {parentName}."); return null; }
-
-        var parentBone = existingStandard[parentName];
-        if (!parentBone) { Log.Error($"failed to find parent bone when instantiating {objectToInstantiate.name}"); return null; }
-
-        var newBone = GameObject.Instantiate(objectToInstantiate.gameObject, parentBone.transform).transform;
-        newBone.DeCloneName();
-        return newBone;
-    }
 }

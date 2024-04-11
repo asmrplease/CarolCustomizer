@@ -1,11 +1,7 @@
 ﻿using CarolCustomizer.Contracts;
 using CarolCustomizer.Models;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using UnityEngine;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Assets;
 using HarmonyLib;

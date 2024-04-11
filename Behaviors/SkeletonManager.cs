@@ -64,7 +64,7 @@ public class SkeletonManager : IDisposable
     {
         this.targetPelvis = newPelvis;        
         RebuildBones();
-
+        
         var head = liveStandardBones["Bn_CarolHead"];
         if (!head) { Log.Warning("didn't find head bone!?"); return; }
 
@@ -82,6 +82,7 @@ public class SkeletonManager : IDisposable
         outfitBoneDicts.Clear();
         
         liveStandardBones = this.targetPelvis.BoneData.StandardBones;
+        FixMissingStandardBones();
 
         foreach (var outfit in activeOutfits) { AddBespokeBones(outfit); }
     }
@@ -146,6 +147,22 @@ public class SkeletonManager : IDisposable
             Log.Warning($"Neither dict found {boneName}.");
         }
         return output;
+    }
+
+    private void FixMissingStandardBones()
+    {
+        var missingBones = CommonBones
+            .Where(x => !liveStandardBones.ContainsKey(x.Key))
+            .ToDictionary(x => x.Key, x => x.Value);
+        var parents = missingBones
+            .Where(x => !missingBones.Values.Contains(x.Value.parent));
+
+        foreach (var bone in parents)
+        {
+            var newBone = InstantiateAt(bone.Value, bone.Value.transform.parent.name);
+            liveStandardBones[newBone.name] = newBone;
+            foreach (var child in newBone.SkeletonToList()) { liveStandardBones[child.name] = child; }
+        }
     }
     #endregion
 }
