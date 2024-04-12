@@ -151,23 +151,23 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         if (eventData.button == hotKeyConfig.ContextMenuMouseButton) contextMenu.Show(this);
     }
 
-    public Dictionary<string, UnityAction> GetContextMenuItems()
+    public List<(string, UnityAction)> GetContextMenuItems()
     {
-        var output = new Dictionary<string, UnityAction>();
+        var output = new List<(string, UnityAction)>();
         if (this.recipe.Error != Recipe.Status.FileError)
         {
-            output.Add("Overwrite", OnContextMenuOverwrite);
-            output.Add("Delete", OnContextMenuDelete);
-            output.Add("Rename", OnContextMenuRename);
+            output.Add(("Overwrite", OnContextMenuOverwrite));
+            output.Add(("Delete", OnContextMenuDelete));
+            output.Add(("Rename", OnContextMenuRename));
         }
         if (this.recipe.Error == Recipe.Status.NoError)
         {
-            output.Add("Load", OnContextMenuLoad);
+            output.Add(("Load", OnContextMenuLoad));
         }
         if (this.recipe.Error == Recipe.Status.MissingSource)
         {
-            output.Add("Load*", OnContextMenuWarningLoad);
-            output.Add("Show Missing", OnContextMenuListMissing);
+            output.Add(("Load*", OnContextMenuWarningLoad));
+            output.Add(("Show Missing", OnContextMenuListMissing));
         }
         return output;
     }

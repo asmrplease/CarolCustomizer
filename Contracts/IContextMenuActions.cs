@@ -7,5 +7,5 @@ using UnityEngine.Events;
 namespace CarolCustomizer.Contracts;
 public interface IContextMenuActions
 {
-    public Dictionary<string, UnityAction> GetContextMenuItems();
+    public List<(string, UnityAction)> GetContextMenuItems();
 }

@@ -129,10 +129,10 @@ internal class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuAc
         favoriteIcon.enabled = !favoriteIcon.enabled;
     }
 
-    public Dictionary<string, UnityAction> GetContextMenuItems()
+    public List<(string, UnityAction)> GetContextMenuItems()
     {
         bool currentlyFavorite = favoritesManager.IsInFavorites(this.accessory);
-        return new Dictionary<string, UnityAction> { {currentlyFavorite? "Remove from Favorites" : "Add to favorites", ToggleFavorite} };
+        return new List<(string, UnityAction)> { (currentlyFavorite? "Remove from Favorites" : "Add to favorites", ToggleFavorite) };
     }
     #endregion
 }

@@ -75,7 +75,7 @@ public class PelvisWatchdog : MonoBehaviour
             (Check<Character,       PirateWatchdog>, (x)=> x.parentName == "Carol_Pirate"),
             (Check<Character,       ActressWatchdog>, (x)=> true),
             (Check<MenuSwitchOutfit,  MenuWatchdog>, (x)=> true),
-            //TODO: these checks may have unexpected results when the base outfit is a pirate
+            //TODO: the following checks may have unexpected results when the base outfit is a pirate
             (Check<Transform,       PirateWatchdog>, (x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && x.parentName == "Carol_Pirate"),
             (Check<Transform,       ActressWatchdog>, (x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && x.parentName != "Carol_Pirate")
         };

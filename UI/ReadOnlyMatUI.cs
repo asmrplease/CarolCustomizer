@@ -57,11 +57,11 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
         contextMenu.Show(this);
     }
 
-    public Dictionary<string, UnityAction> GetContextMenuItems()
+    public List<(string, UnityAction)> GetContextMenuItems()
     {
-        Dictionary<string, UnityAction> menuItems = new()
+        List<(string, UnityAction)> menuItems = new()
         {
-            { "Copy Material", CopyMaterial},
+            ("Copy Material", CopyMaterial),
 
         };
         return menuItems;

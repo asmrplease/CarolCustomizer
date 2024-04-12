@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using CarolCustomizer.Utils;
+using UnityEngine.Events;
 
 namespace CarolCustomizer.UI;
 public class DynamicContextMenu : MonoBehaviour
@@ -36,15 +37,15 @@ public class DynamicContextMenu : MonoBehaviour
         if (menuItems is null) return;
         if (this.gameObject.activeSelf) { Hide(); }
 
-        foreach (var item in menuItems.GetContextMenuItems())
+        foreach ((string name, UnityAction action) in menuItems.GetContextMenuItems())
         {
             GameObject buttonGO = GameObject.Instantiate(buttonPrefab, buttonContainer);
             if (!buttonGO) { Log.Error("failed to instantiate button prefab."); return; }
             Button buttonComponent = buttonGO.GetComponent<Button>();
             if (!buttonComponent) { Log.Error("failed to find button component."); return; }
 
-            buttonComponent.GetComponentInChildren<Text>(true).text = item.Key;
-            buttonComponent.onClick.AddListener(item.Value);
+            buttonComponent.GetComponentInChildren<Text>(true).text = name;
+            buttonComponent.onClick.AddListener(action);
             buttonComponent.onClick.AddListener(Hide);
             buttonList.Add(buttonComponent);
         }

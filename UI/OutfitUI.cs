@@ -90,12 +90,8 @@ internal class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
         background.color = Constants.DefaultColor;
     }
 
-    public Dictionary<string, UnityAction> GetContextMenuItems()
-    {
-        return new Dictionary<string, UnityAction> { {"Set Outfit", () => ui.SetBaseOutfit(this.outfit) } };
-    }
 
-    public List<(string, UnityAction)> GetContextMenuItems2ple()
+    public List<(string, UnityAction)> GetContextMenuItems()
     {
         return new List<(string, UnityAction)> { ( "Set Outfit", () => ui.SetBaseOutfit(this.outfit) ) };
     }
