@@ -5,6 +5,7 @@ using System.Linq;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Assets;
 using HarmonyLib;
+using UnityEngine.Analytics;
 
 namespace CarolCustomizer.Behaviors;
 internal static class RecipeApplier
@@ -17,6 +18,17 @@ internal static class RecipeApplier
         var baseOutfit = OutfitAssetManager.GetOutfitByAssetName(recipe.BaseOutfitName);
         if (baseOutfit is not null) outfitManager.SetBaseOutfit(baseOutfit);
         outfitManager.SetBaseVisibility(recipe.BaseVisible);
+    }
+
+    public static void ActivateVariant(OutfitManager outfitManager, HaDSOutfit outfit, string variantName)
+    {
+        Log.Debug("ActivateVariant()");
+        outfitManager.DisableAllAccessories();
+
+        outfit.Variants.TryGetValue(variantName, out var variant);
+        if (variant is null) { Log.Warning($"variant {variantName} not found in {outfit.DisplayName}"); return; }
+
+        foreach (var acc in variant) SetAccessory(outfitManager, acc);
     }
 
     private static void SetAccessory(OutfitManager outfitManager, AccessoryDescriptor accessoryDescription)
@@ -40,7 +52,6 @@ internal static class RecipeApplier
         }
     }
 
-    //TODO: pass the outfit through these methods so we dont' have to keep finding it
     private static void SetMaterial(OutfitManager outfitManager, StoredAccessory accessory, MaterialDescriptor materialDescription, int index)
     {
         Log.Debug("setting material...");

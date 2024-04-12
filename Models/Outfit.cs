@@ -40,8 +40,13 @@ public class Outfit : IDisposable, IComparable<Outfit>
     public StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
     {
         AccDict.TryGetValue(descriptor, out StoredAccessory result); 
-        result ??= AccDict.Values.FirstOrDefault(x => x.Name == descriptor.Name); ;
+        result ??=  GetAccessory(descriptor.Name);
         return result;
+    }
+
+    public StoredAccessory GetAccessory(string name)
+    {
+        return AccDict.Values.FirstOrDefault(x => x.Name == name);
     }
 
     #endregion

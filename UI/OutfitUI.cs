@@ -10,6 +10,7 @@ using UnityEngine.UI;
 using static ModelData;
 using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
+using CarolCustomizer.Behaviors;
 
 namespace CarolCustomizer.UI;
 internal class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
@@ -91,9 +92,18 @@ internal class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
     }
 
 
+
     public List<(string, UnityAction)> GetContextMenuItems()
     {
-        return new List<(string, UnityAction)> { ( "Set Outfit", () => ui.SetBaseOutfit(this.outfit) ) };
+        //return new List<(string, UnityAction)> { ( "Set Outfit", () => ui.SetBaseOutfit(this.outfit) ) };
+        var results = new List<(string, UnityAction)>();
+        var hads = outfit as HaDSOutfit; //TODO: idk but anything but this
+        foreach (var entry in hads.modelData.accessories)
+        {
+            var idk = () => RecipeApplier.ActivateVariant(ui.playerManager.outfitManager, hads, entry.name);
+            results.Add(($"Load: {entry.name}", new UnityAction(idk)));
+        }
+        return results;
     }
     #endregion
 }
