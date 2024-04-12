@@ -143,12 +143,45 @@ internal class OutfitListUI : MonoBehaviour
 
         outfitUIs[outfit] = outfitUI;
         outfitUI.transform.SetSiblingIndex(outfitUIs.IndexOfKey(outfit));
-        Log.Debug("Creating ");
+
         foreach (var accessory in outfit.Accessories)
         {
             OnAccessoryLoaded(outfitUI, accessory);
             accessoryUIs[accessory] = null;
         }
+    }
+
+    private List<Outfit> SortOutfitUIs()
+    {
+        //foreach (var outfit in outfitUIs) outfit.Value.transform.SetSiblingIndex(outfitUIs.IndexOfKey(outfit.Key));
+        List<Outfit> results = new();
+        foreach (var outfit in outfitUIs)
+        {
+            int expectedPos = outfitUIs.IndexOfKey(outfit.Key);
+            int actualPos = outfit.Value.transform.GetSiblingIndex();
+            if (expectedPos == actualPos)
+            {
+                Log.Info($"{outfit.Key.DisplayName} was at expected position {expectedPos}.");
+                continue;
+            }
+            results.Add(outfit.Key);
+            Log.Warning($"{outfit.Key.DisplayName} was expected at {expectedPos} but was at {actualPos}, difference of {actualPos - expectedPos}.");
+        }
+        Log.Debug("--------");
+        foreach (Transform trans in listRoot.transform)
+        {
+            var ui = trans.gameObject.GetComponent<OutfitUI>();
+            int expectedPos = outfitUIs.IndexOfKey(ui.outfit);
+            int actualPos = ui.transform.GetSiblingIndex();
+            if (expectedPos == actualPos)
+            {
+                Log.Info($"{ui.outfit.DisplayName} was at expected position {expectedPos}.");
+                continue;
+            }
+            Log.Warning($"{ui.outfit.DisplayName} was expected at {expectedPos} but was at {actualPos}, difference of {actualPos - expectedPos}.");
+
+        }
+        return results;
     }
 
     private void OnOutfitUnloaded(Outfit outfit)
@@ -161,8 +194,10 @@ internal class OutfitListUI : MonoBehaviour
 
     private AccessoryUI BuildAccUI(AccessoryDescriptor accessoryDescriptor)
     {
-        var outfit = OutfitAssetManager.GetOutfitByAssetName(accessoryDescriptor.Source);
+        Outfit outfit = OutfitAssetManager.GetOutfitByAssetName(accessoryDescriptor.Source);
+        Log.Debug($"BuildAccUI: source: {accessoryDescriptor.Source} outfit.assetname: {outfit.AssetName}");
         StoredAccessory accessory = outfit.GetAccessory(accessoryDescriptor);
+        //does this line use the outfit name comparison?
         var outfitUI = this.outfitUIs[outfit];
 
         var accInstance = GameObject.Instantiate(loader.AccessoryListElement, outfitUI.transform);

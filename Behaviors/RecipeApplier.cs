@@ -11,21 +11,17 @@ internal static class RecipeApplier
 {
     public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor recipe)
     {
-        //set the accessory states
         outfitManager.DisableAllAccessories();
         foreach (var accessory in recipe.ActiveAccessories) { SetAccessory(outfitManager, accessory); }
 
-        //set the outfit state last so that we're not immediately trying to change stuff?
         var baseOutfit = OutfitAssetManager.GetOutfitByAssetName(recipe.BaseOutfitName);
         if (baseOutfit is not null) outfitManager.SetBaseOutfit(baseOutfit);
-        Log.Debug("Setting base visibility based on recipe state.");
         outfitManager.SetBaseVisibility(recipe.BaseVisible);
     }
 
     private static void SetAccessory(OutfitManager outfitManager, AccessoryDescriptor accessoryDescription)
     {
         Log.Debug($"Setting accessory {accessoryDescription.Source}:{accessoryDescription.Name}...");
-        //find this accessory in the dam 
         var outfit = OutfitAssetManager.GetOutfitByAssetName(accessoryDescription.Source);
         if (outfit is null) { Log.Warning($"failed to find {accessoryDescription.Source}."); return; }
         Log.Debug("found source");
@@ -34,10 +30,9 @@ internal static class RecipeApplier
         if (accessory is null) { Log.Warning($"failed to find {accessoryDescription.Name}"); return; }
         Log.Debug("found accessory");
 
-        //call enable accessory with the stored accessory
         outfitManager.EnableAccessory(accessory);
         Log.Debug("enabled accessory");
-        //set materials
+
         int index = 0;
         foreach (var material in accessoryDescription.Materials)
         {

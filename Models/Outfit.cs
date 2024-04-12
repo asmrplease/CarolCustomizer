@@ -7,6 +7,7 @@ using CarolCustomizer.Utils;
 using CarolCustomizer.Behaviors;
 using BepInEx.Logging;
 using CarolCustomizer.Hooks.Watchdogs;
+using System.Xml.Linq;
 
 namespace CarolCustomizer.Models;
 
@@ -29,9 +30,20 @@ public class Outfit : IDisposable, IComparable<Outfit>
     public MeshData meshData => prefabWatchdog.MeshData;
     public BoneData boneData => prefabWatchdog.BoneData;
 
-    public int CompareTo(Outfit other) { return this.DisplayName.CompareTo(other.DisplayName); }
+    public int CompareTo(Outfit other)
+    {
+        int displayNameComparison = this.DisplayName.CompareTo(other.DisplayName);
+        if (displayNameComparison != 0) return displayNameComparison;
+        return this.AssetName.CompareTo(other.AssetName);
+    }
 
-    public StoredAccessory GetAccessory(AccessoryDescriptor descriptor) => AccDict.ContainsKey(descriptor)? AccDict[descriptor] : null;
+    public StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
+    {
+        AccDict.TryGetValue(descriptor, out StoredAccessory result); 
+        result ??= AccDict.Values.FirstOrDefault(x => x.Name == descriptor.Name); ;
+        return result;
+    }
+
     #endregion
 
     #region Lifecycle

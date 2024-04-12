@@ -16,7 +16,7 @@ internal class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
 {
 
     #region Dependencies
-    Outfit outfit;
+    public Outfit outfit { get; private set; }
     OutfitListUI ui;
     DynamicContextMenu contextMenu;
     #endregion
