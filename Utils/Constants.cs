@@ -52,6 +52,7 @@ internal static class Constants
     public const string LoadingSceneName = "Loading_Startup";
     public const string IntroCutsceneName = "INTRO_CUTSCENES";
     public const string Pyjamas = "CAROL_PyjamaBasic";
+    public const string RobotHead = "Robocarolhead";
 
     public const string Shezara = "Shezara";
 

@@ -130,14 +130,7 @@ public class OutfitManager : IDisposable
 
     public void RefreshBaseVisibility() => SetBaseVisibility(this.BaseVisible);
 
-    public void SetBaseVisibility(bool visible)
-    {
-        Log.Debug($"Setting base visibility to {visible}");
-        if (!this.pelvis) { Log.Warning("Tried to set base outfit visibility when no pelvis watchdog exists."); return; }
-        
-        this.BaseVisible = visible;
-        foreach (var mesh in this.pelvis.MeshData?.baseMeshes) { mesh.gameObject.SetActive(visible); }
-    }
+    public void SetBaseVisibility(bool visible) => this.pelvis?.SetBaseVisibilty(visible);
 
     public void SetBaseOutfit(Outfit outfit)
     {

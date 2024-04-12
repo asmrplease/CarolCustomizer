@@ -47,7 +47,7 @@ public class PelvisWatchdog : MonoBehaviour
 
     virtual public void Awake()
     {
-        Log.Debug($"Awake(){this}");
+        Log.Debug($"{this}.Awake()");
         if (!boneData) boneData = this.gameObject.AddComponent<BoneData>().Constructor();
         if (!meshData) meshData = this.gameObject.AddComponent<MeshData>().Constructor();
 
@@ -55,12 +55,8 @@ public class PelvisWatchdog : MonoBehaviour
         foreach (var toggle in coopToggles) { toggle.enabled = false; }
         DetectType();
     }
-    //virtual protected void Start() => DetectType();
-    //virtual protected void OnEnable() => DetectType();
-    virtual protected void OnTransformParentChanged()
-    {
-        DetectType();
-    }
+
+    virtual protected void OnTransformParentChanged() => DetectType(); 
 
     private void RefreshParentComponents()
     {
@@ -111,6 +107,10 @@ public class PelvisWatchdog : MonoBehaviour
     }
 
     public virtual void SetBaseOutfit(Outfit outfit) { }
+    public virtual void SetBaseVisibilty(bool visible)
+    {
+        foreach (var mesh in MeshData?.baseMeshes) { mesh.gameObject.SetActive(visible); }
+    }
 
     public override string ToString() => $"{GetType()}@{rootName}->{grandparentName}({Guid})";
 }

@@ -24,23 +24,18 @@ public class BoneData : MonoBehaviour
         allTransforms = this.transform.SkeletonToList();
 
         List<Transform> filteringList = new(this.allTransforms);
-
         if (SkeletonManager.CommonBones is null) { SkeletonManager.SetStandardBones(); }
 
         standardBones = filteringList.Where(x => SkeletonManager.CommonBones.Keys.Contains(x.name)).ToList();
-
-        //FixMissingStandardBones();
-
+        
         filteringList = filteringList
             .Except(standardBones)
             .ToList();
 
-        //remove all bones that are children of a non-standard bone
         filteringList.RemoveAll
             (x => !SkeletonManager.CommonBones.Keys.Contains(x.transform.parent.name));
 
         BespokeBones = filteringList.Select(x => new BespokeBone(x)).ToList();
-        Log.Debug("BoneData construction complete.");
         return this;
     }
 }

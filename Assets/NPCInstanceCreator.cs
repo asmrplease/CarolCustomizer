@@ -110,7 +110,11 @@ public class NPCInstanceCreator : IDisposable
 
         botPrefab.hideFlags = HideFlags.HideAndDontSave;
 
-        var watchdog = botPrefab.AddComponent<PelvisWatchdog>();
+        var watchdog = botPrefab
+            .transform
+            .RecursiveFindTransform(x => x.name == "CarolPelvis")
+            .gameObject
+            .AddComponent<PelvisWatchdog>();
 
         carolBotPrefabs.Add(watchdog);
     }
