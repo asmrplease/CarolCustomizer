@@ -29,6 +29,7 @@ public class CCPlugin : BaseUnityPlugin
     private static TabbedUIAssetLoader uiAssetLoader;
     public static Action<CCPlugin> OnSetupComplete;
     public static GameManagerRewrite gmRewrite;
+    public static RecipesManager recipesManager { get; private set; }
     #endregion
 
     #region Config
@@ -45,7 +46,7 @@ public class CCPlugin : BaseUnityPlugin
     private OutfitAssetManager dynamicAssetManager;
     private FavoritesManager favoritesManager;
     private NPCInstanceCreator npcInstances;
-    public RecipesManager recipesManager { get; private set; }
+    
     #endregion
 
     #region Setup

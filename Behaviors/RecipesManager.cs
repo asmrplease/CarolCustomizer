@@ -19,6 +19,13 @@ public class RecipesManager : IDisposable
 
     public IEnumerable<Recipe> Recipes => recipes.Values;
 
+    public Recipe GetRecipeByFilename(string name)
+    {
+        string address = RecipeSaver.RecipeFilenameToPath(name + Constants.RecipeExtension);
+        Log.Debug($"address: {address}");
+        recipes.TryGetValue(address, out Recipe recipe); return recipe;
+    }
+
     public RecipesManager(string path)
     {
         this.path = path;

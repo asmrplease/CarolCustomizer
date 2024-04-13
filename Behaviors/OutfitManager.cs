@@ -128,7 +128,7 @@ public class OutfitManager : IDisposable
         RefreshBaseVisibility();
     }
 
-    public void RefreshBaseVisibility() => SetBaseVisibility(this.BaseVisible);
+    public void RefreshBaseVisibility() => SetBaseVisibility(false); //TODO: better approach
 
     public void SetBaseVisibility(bool visible) => this.pelvis?.SetBaseVisibilty(visible);
 

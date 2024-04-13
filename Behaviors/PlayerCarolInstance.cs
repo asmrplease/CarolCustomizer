@@ -10,7 +10,11 @@ public class PlayerCarolInstance : CarolInstance
 {
     PlayerWatchdog player;
     static Type playerWatchdogType = typeof(PlayerWatchdog);
-    public PlayerCarolInstance(GameObject parent) : base(parent) { }
+    AutoSaver autoSaver;
+    public PlayerCarolInstance(GameObject parent) : base(parent) 
+    {
+        autoSaver = new(this);
+    }
 
     public override void NotifySpawned(PelvisWatchdog pelvis)
     {
@@ -27,4 +31,10 @@ public class PlayerCarolInstance : CarolInstance
 
     public void LockPlayer()   => player?.LockPlayer();
     public void UnlockPlayer() => player?.UnlockPlayer();
+
+    public override void Dispose()
+    {
+        autoSaver.Save();
+        base.Dispose();
+    }
 }

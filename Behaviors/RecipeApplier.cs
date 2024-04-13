@@ -12,12 +12,13 @@ internal static class RecipeApplier
 {
     public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor recipe)
     {
+        outfitManager.SetBaseVisibility(false);
         outfitManager.DisableAllAccessories();
         foreach (var accessory in recipe.ActiveAccessories) { SetAccessory(outfitManager, accessory); }
 
-        var baseOutfit = OutfitAssetManager.GetOutfitByAssetName(recipe.BaseOutfitName);
-        if (baseOutfit is not null) outfitManager.SetBaseOutfit(baseOutfit);
-        outfitManager.SetBaseVisibility(recipe.BaseVisible);
+        //var baseOutfit = OutfitAssetManager.GetOutfitByAssetName(recipe.BaseOutfitName);
+        //if (baseOutfit is not null) outfitManager.SetBaseOutfit(baseOutfit);
+        //outfitManager.SetBaseVisibility(recipe.BaseVisible);
     }
 
     public static void ActivateVariant(OutfitManager outfitManager, HaDSOutfit outfit, string variantName)

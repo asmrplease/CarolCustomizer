@@ -36,7 +36,7 @@ public class CarolInstance : IDisposable
         outfitManager = new(this, skeletonManager, null);
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         outfitManager.Dispose();
         this.DisposeFields();
