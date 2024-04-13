@@ -15,7 +15,7 @@ namespace CarolCustomizer.UI;
 /// <summary>
 /// Represents one Accessory in the UI. 
 /// </summary>
-internal class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
+public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
     #region Static Addresses
     static string displayNameAddress = "Text/Accessory Name";

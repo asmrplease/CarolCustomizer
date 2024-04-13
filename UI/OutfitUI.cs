@@ -13,7 +13,7 @@ using CarolCustomizer.Utils;
 using CarolCustomizer.Behaviors;
 
 namespace CarolCustomizer.UI;
-internal class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
+public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
 
     #region Dependencies

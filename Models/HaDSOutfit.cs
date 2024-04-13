@@ -26,13 +26,13 @@ public class HaDSOutfit : Outfit
     {
         if (modelData?.accessories is null) { Log.Error("mda was null during build variants"); return; }
         if (Accessories is null) { Log.Error("accessories was null during build variants"); return; }
-        //Log.Debug($"{DisplayName}.BuildVariants()");
+        Log.Debug($"{DisplayName}.BuildVariants()");
         HashSet<StoredAccessory> toggleables = new();
         foreach (var mda in modelData.accessories)
         {
             //Log.Debug($"Creating {DisplayName}.{mda.name}");
             List<StoredAccessory> thisVariant = new();
-            //if (mda?.objects is null) { Variants[mda.name] = thisVariant; continue; }
+            if (mda?.objects is null) { Variants[mda.name] = thisVariant; continue; }
             foreach (var accessory in mda.objects)
             {
                 if (!accessory) { continue; }
@@ -50,7 +50,7 @@ public class HaDSOutfit : Outfit
         {
             Variants[mda.name].AddRange(nonToggleables);
         }
-        //Log.Debug("Variants dict complete. ");
+        Log.Debug("Variants dict complete. ");
     }
     #endregion
 }

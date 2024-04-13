@@ -14,7 +14,7 @@ using UnityEngine.UI;
 using static ModelData;
 
 namespace CarolCustomizer.UI;
-internal class OutfitListUI : MonoBehaviour
+public class OutfitListUI : MonoBehaviour
 {
     #region Static Constants
     private readonly string SearchModeHint = "Click here to search!";

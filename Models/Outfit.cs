@@ -73,9 +73,9 @@ public class Outfit : IDisposable, IComparable<Outfit>
         if (!prefabWatchdog) { Log.Error($"failed to instantiate {DisplayName}'s pelvis watchdog"); return; }
         prefabWatchdog.Awake();
 
-        Log.Debug("Setting up accessories.");
+        Log.Debug($"Setting up accessories: {storedAsset.name}.");
         if (!prefabWatchdog.MeshData) Log.Warning("Failed to instantiate meshdata in time.");
-        var smrs = prefabWatchdog.MeshData.baseMeshes;
+        var smrs = prefabWatchdog?.MeshData?.baseMeshes;
         if (smrs is null) { Log.Error("no smrs found in watchdog mesh data.") ; return; }
         foreach (var smr in smrs)
         {
@@ -84,6 +84,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
 
             foreach (var newMat in newAcc.Materials) { if (newMat is not null) MaterialDescriptors.Add(newMat); }
         }
+        Log.Debug($"{this.DisplayName} Outfit constructed.");
     }
 
     public void Dispose() { if (prefabWatchdog) GameObject.DestroyImmediate(prefabWatchdog); }

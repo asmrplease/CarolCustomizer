@@ -13,7 +13,7 @@ using CarolCustomizer.Utils;
 using CarolCustomizer.Behaviors;
 
 namespace CarolCustomizer.UI;
-internal class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
+public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
     #region Static Addresses
     static string defaultMaterialTextAddress = "Text/Accessory Name";
