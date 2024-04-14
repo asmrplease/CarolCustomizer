@@ -12,7 +12,7 @@ public class BotWatchdog : PelvisWatchdog
     }
     public virtual void SetBotName(string botName) { }
 
-    public override void SetBaseVisibilty(bool visible)
+    public override void SetBaseVisibility(bool visible)
     {
         foreach (var mesh in MeshData?.baseMeshes.Where(x=>x.name != Constants.RobotHead)) 
             { mesh.gameObject.SetActive(visible); }

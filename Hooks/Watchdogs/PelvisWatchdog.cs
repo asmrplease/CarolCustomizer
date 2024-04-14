@@ -8,6 +8,7 @@ using System.Text;
 using UnityEngine;
 using Slate;
 using CarolCustomizer.Assets;
+using BepInEx.Logging;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PelvisWatchdog : MonoBehaviour
@@ -107,9 +108,10 @@ public class PelvisWatchdog : MonoBehaviour
     }
 
     public virtual void SetBaseOutfit(Outfit outfit) { }
-    public virtual void SetBaseVisibilty(bool visible)
+    public virtual void SetBaseVisibility(bool visible)
     {
-        foreach (var mesh in MeshData?.baseMeshes) { mesh.gameObject.SetActive(visible); }
+        Log.Debug("PelvisWatchdog.SetBaseVisibility()");
+        foreach (var mesh in MeshData?.baseMeshes) { mesh.gameObject.SetActive(false); }//TODO: not this
     }
 
     public override string ToString() => $"{GetType()}@{rootName}->{grandparentName}({Guid})";

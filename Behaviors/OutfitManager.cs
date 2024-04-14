@@ -118,19 +118,20 @@ public class OutfitManager : IDisposable
 
     public void ToggleBaseVisibility()
     {
-        this.BaseVisible = !this.BaseVisible;
+        this.BaseVisible = false;//!this.BaseVisible;
         RefreshBaseVisibility();
     }
 
     private void OnSpawn(PelvisWatchdog pelvis)
     {
         this.pelvis = pelvis;
+        SetBaseVisibility(false);
         RefreshBaseVisibility();
     }
 
-    public void RefreshBaseVisibility() => SetBaseVisibility(false); //TODO: better approach
+    public void RefreshBaseVisibility() => SetBaseVisibility(this.BaseVisible); //TODO: better approach
 
-    public void SetBaseVisibility(bool visible) => this.pelvis?.SetBaseVisibilty(visible);
+    public void SetBaseVisibility(bool visible) => this.pelvis?.SetBaseVisibility(visible);
 
     public void SetBaseOutfit(Outfit outfit)
     {

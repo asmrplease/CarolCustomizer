@@ -27,14 +27,12 @@ public class MenuWatchdog : PelvisWatchdog
 
     private IEnumerator MainMenuFix()
     {
-        yield return new WaitUntil(() => CCPlugin.cutscenePlayer is not null);
         while (true)
         {
-            if (!CCPlugin.cutscenePlayer.outfitManager.BaseVisible
-                && MeshData.baseMeshes.Any(x => x.gameObject.activeSelf))
+            if (MeshData.baseMeshes.Any(x => x.gameObject.activeSelf))
             {
                 Log.Debug("MainMenuFix RefreshBaseVisibility");
-                CCPlugin.cutscenePlayer.RefreshBaseVisibility();
+                base.SetBaseVisibility(false);
             }
             yield return new WaitForSeconds(1);
         }
