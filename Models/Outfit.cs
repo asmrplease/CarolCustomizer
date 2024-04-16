@@ -29,6 +29,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
     PelvisWatchdog prefabWatchdog;
     public MeshData meshData => prefabWatchdog.MeshData;
     public BoneData boneData => prefabWatchdog.BoneData;
+    public CompData compData => prefabWatchdog.CompData;
 
     public int CompareTo(Outfit other)
     {
@@ -87,6 +88,12 @@ public class Outfit : IDisposable, IComparable<Outfit>
         Log.Debug($"{this.DisplayName} Outfit constructed.");
     }
 
-    public void Dispose() { if (prefabWatchdog) GameObject.DestroyImmediate(prefabWatchdog); }
+    public void Dispose() {
+        if (!prefabWatchdog) return;
+        if (prefabWatchdog.MeshData) GameObject.DestroyImmediate(prefabWatchdog.MeshData);
+        if (prefabWatchdog.BoneData) GameObject.DestroyImmediate(prefabWatchdog.BoneData);
+        if (prefabWatchdog.CompData) GameObject.DestroyImmediate(prefabWatchdog.CompData);
+        GameObject.DestroyImmediate(prefabWatchdog); 
+    }
     #endregion
 }

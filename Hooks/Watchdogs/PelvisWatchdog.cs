@@ -9,6 +9,7 @@ using UnityEngine;
 using Slate;
 using CarolCustomizer.Assets;
 using BepInEx.Logging;
+using MonoMod.Utils;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PelvisWatchdog : MonoBehaviour
@@ -24,13 +25,13 @@ public class PelvisWatchdog : MonoBehaviour
     MeshData meshData;
     public MeshData MeshData { get { return meshData; } }
 
+    [SerializeField]
+    CompData compData;
+    public CompData CompData { get { return compData; } }
+
     string parentName => transform.parent?.name ?? "none";
     string grandparentName => transform.parent?.parent?.name ?? "none";
     string rootName => transform.root?.name ?? "none";
-
-    public CoopModelToggle[] coopToggles { get; private set; }
-
-    Dictionary<Type, Component> parentComponents = new();
 
     List<(Func<Predicate<PelvisWatchdog>, bool>,
     Predicate<PelvisWatchdog>)> checks;
@@ -42,7 +43,7 @@ public class PelvisWatchdog : MonoBehaviour
         SourceGuid = watchdog.Guid;
         boneData = watchdog.BoneData;
         meshData = watchdog.MeshData;
-        coopToggles = watchdog.coopToggles;
+        compData = watchdog.CompData;
         return this;
     }
 
@@ -51,19 +52,11 @@ public class PelvisWatchdog : MonoBehaviour
         Log.Debug($"{this}.Awake()");
         if (!boneData) boneData = this.gameObject.AddComponent<BoneData>().Constructor();
         if (!meshData) meshData = this.gameObject.AddComponent<MeshData>().Constructor();
-
-        coopToggles = transform.parent.GetComponentsInChildren<CoopModelToggle>(true);
-        foreach (var toggle in coopToggles) { toggle.enabled = false; }
+        if (!compData) compData = this.gameObject.GetAddComponent<CompData>().Constructor();
         DetectType();
     }
 
     virtual protected void OnTransformParentChanged() => DetectType(); 
-
-    private void RefreshParentComponents()
-    {
-        parentComponents = GetComponentsInParent<Component>(true)
-            .ToDictionaryOverwrite(x => x.GetType());
-    }
 
     void SetupCheckList()
     {
@@ -72,21 +65,20 @@ public class PelvisWatchdog : MonoBehaviour
             (Check<VirtualCarol,    MPBotWatchdog>,  (x)=> true),
             (Check<Entity,          PlayerWatchdog>, (x)=> x.rootName == "CAROL(Clone)"),
             (Check<Entity,          BotWatchdog>,    (x)=> true), 
-            (Check<CutsceneActor,   ActressWatchdog>, (x)=> true),
+            (Check<CutsceneActor,   ActressWatchdog>,(x)=> true),
             (Check<Character,       PirateWatchdog>, (x)=> x.parentName == "Carol_Pirate"),
-            (Check<Character,       ActressWatchdog>, (x)=> true),
-            (Check<MenuSwitchOutfit,  MenuWatchdog>, (x)=> true),
-            //TODO: the following checks may have unexpected results when the base outfit is a pirate
+            (Check<Character,       ActressWatchdog>,(x)=> true),
+            (Check<MenuSwitchOutfit,MenuWatchdog>,   (x)=> true),
             (Check<Transform,       PirateWatchdog>, (x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && x.parentName == "Carol_Pirate"),
-            (Check<Transform,       ActressWatchdog>, (x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && x.parentName != "Carol_Pirate")
+            (Check<Transform,       ActressWatchdog>,(x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && x.parentName != "Carol_Pirate")
         };
     }
 
     protected bool DetectType()
     {
-        RefreshParentComponents();
+        compData.RefreshParentComponents();
         SetupCheckList();
-        foreach (var (func, pred) in checks) if (func.Invoke(pred)) return true;
+        foreach (var (func, pred) in checks) if (func.Invoke(pred) is true) return true;
         return false;
     }
 
@@ -95,13 +87,13 @@ public class PelvisWatchdog : MonoBehaviour
         where ResultType : PelvisWatchdog
     {
         try { if (!predicate.Invoke(this)) return false; }
-        catch (NullReferenceException e) { Log.Warning("predicate caused an exception"); return false; }
-        
-        if (!parentComponents.ContainsKey(typeof(SearchType))) return false;
+        catch (NullReferenceException e) { Log.Warning("predicate caused an exception:"); e.LogDetailed(); return false; }
+
+        var component = compData.GetParentComponent(typeof(SearchType));
+        if (!component) return false;
         if (GetType() == typeof(ResultType)) return true;
         
         Log.Info($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
-        var component = parentComponents[typeof(SearchType)];
         gameObject.AddComponent<ResultType>().BuildFromExisting(this, component);
         Destroy(this);
         return true;
