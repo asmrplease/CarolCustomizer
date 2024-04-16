@@ -72,7 +72,7 @@ public class OutfitListUI : MonoBehaviour
         this.searchString = "";
 
         deselectAll = this.transform.Find(uncheckAllAddress).GetComponent<Button>();
-        deselectAll.onClick.AddListener(OnDisableAll);
+        deselectAll.onClick.AddListener(outfitManager.DisableAllAccessories);
         favoriteFilter = this.transform.Find(filtersAddress + "/Favorites").GetComponent<Toggle>();
         favoriteFilter.onValueChanged.AddListener(ProcessFilters);
         activeFilter = this.transform.Find(filtersAddress + "/Active").GetComponent<Toggle>();
@@ -151,39 +151,6 @@ public class OutfitListUI : MonoBehaviour
         }
     }
 
-    private List<Outfit> SortOutfitUIs()
-    {
-        //foreach (var outfit in outfitUIs) outfit.Value.transform.SetSiblingIndex(outfitUIs.IndexOfKey(outfit.Key));
-        List<Outfit> results = new();
-        foreach (var outfit in outfitUIs)
-        {
-            int expectedPos = outfitUIs.IndexOfKey(outfit.Key);
-            int actualPos = outfit.Value.transform.GetSiblingIndex();
-            if (expectedPos == actualPos)
-            {
-                Log.Info($"{outfit.Key.DisplayName} was at expected position {expectedPos}.");
-                continue;
-            }
-            results.Add(outfit.Key);
-            Log.Warning($"{outfit.Key.DisplayName} was expected at {expectedPos} but was at {actualPos}, difference of {actualPos - expectedPos}.");
-        }
-        Log.Debug("--------");
-        foreach (Transform trans in listRoot.transform)
-        {
-            var ui = trans.gameObject.GetComponent<OutfitUI>();
-            int expectedPos = outfitUIs.IndexOfKey(ui.outfit);
-            int actualPos = ui.transform.GetSiblingIndex();
-            if (expectedPos == actualPos)
-            {
-                Log.Info($"{ui.outfit.DisplayName} was at expected position {expectedPos}.");
-                continue;
-            }
-            Log.Warning($"{ui.outfit.DisplayName} was expected at {expectedPos} but was at {actualPos}, difference of {actualPos - expectedPos}.");
-
-        }
-        return results;
-    }
-
     private void OnOutfitUnloaded(Outfit outfit)
     {
         if (!outfitUIs.ContainsKey(outfit)) { Log.Warning("UI instance was asked to remove a UI element that was not in it's dict"); return; }
@@ -251,7 +218,7 @@ public class OutfitListUI : MonoBehaviour
     public void SetAccessoryExpanded(StoredAccessory accessory, bool expanded)
     {
         int index = 0;
-        foreach (var mat in accessory.Materials) SetMatUIVisible(new AccMatSlot { accessory = accessory, index = index }, expanded);
+        foreach (var mat in accessory.Materials) SetMatUIVisible(new AccMatSlot { accessory = accessory, index = index++ }, expanded);
     }
 
     private void SetMatUIVisible(AccMatSlot material, bool visible)
@@ -281,10 +248,6 @@ public class OutfitListUI : MonoBehaviour
         if (visible) outfitUIs[OutfitAssetManager.GetOutfitByAssetName(accessory.Source)].gameObject.SetActive(true);
         uiInstance.gameObject.SetActive(true);
     }
-
-    internal void SetBaseOutfit(Outfit outfit) => outfitManager.SetBaseOutfit(outfit);
-
-    private void OnDisableAll() => outfitManager.DisableAllAccessories();
 
     //TODO: there may be an issue here with some StoredAccessories not actually being unique enough on their own
     private record AccMatSlot { public StoredAccessory accessory; public int index; }
