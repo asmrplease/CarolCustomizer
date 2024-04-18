@@ -7,7 +7,6 @@ using UnityEngine;
 using System.Collections;
 using CarolCustomizer.UI;
 using CarolCustomizer.Assets;
-using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 using UnityEngine.SceneManagement;
 using BepInEx.Configuration;
@@ -15,6 +14,8 @@ using UnityEngine.EventSystems;
 using CarolCustomizer.Behaviors;
 using Slate;
 using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Models.Outfits;
 
 namespace CarolCustomizer;
 
@@ -32,20 +33,13 @@ public class CCPlugin : BaseUnityPlugin
     public static RecipesManager recipesManager { get; private set; }
     #endregion
 
-    #region Config
+    //the dream is that we can increase this, but that's not really working out rn
     int numPlayers = 1;
-    ConfigEntry<string> favorites;
-    ConfigEntry<KeyCode> mouseMenuToggle;
-    ConfigEntry<KeyCode> keyboardMenuToggle;
-    ConfigEntry<PointerEventData.InputButton> mouseContextMenu;
-    HotKeyConfig hotkeys;
-    #endregion
 
     #region Instance Components
-    private Harmony HarmonyInstance;
-    private OutfitAssetManager dynamicAssetManager;
-    private FavoritesManager favoritesManager;
-    private NPCInstanceCreator npcInstances;
+    Harmony HarmonyInstance;
+    OutfitAssetManager dynamicAssetManager;
+    NPCInstanceCreator npcInstances;
     
     #endregion
 
@@ -60,16 +54,9 @@ public class CCPlugin : BaseUnityPlugin
         Application.runInBackground = true;
         Log.Debug("run in background set");
 
+        Settings.Constructor(Config);
+
         gmRewrite = gameObject.AddComponent<GameManagerRewrite>();
-
-        //Configuration Binding
-        favorites = Config.Bind("Preferences", "Favorites", "", "List of favorited accessories.");
-        mouseMenuToggle = Config.Bind("Preferences", "Menu Toggle (Mouse)", KeyCode.Mouse3, "Mouse shortcut for opening the accessory menu.");
-        keyboardMenuToggle = Config.Bind("Preferences", "Menu Toggle (Keyboard)", KeyCode.Keypad0, "Keyboard shortcut for opening the accessory menu.");
-        mouseContextMenu = Config.Bind("Preferences", "Context Menu Button", PointerEventData.InputButton.Right, "Which mouse button activates the context menu.");
-
-        hotkeys = new(mouseMenuToggle.Value, keyboardMenuToggle.Value, mouseContextMenu.Value);
-        favoritesManager = new(favorites, Config.Save);
 
         //Set up clean bone folder
         var cleanBoneFolder = new GameObject().transform;
@@ -96,10 +83,10 @@ public class CCPlugin : BaseUnityPlugin
             playerManagers.Add(player);
 
             var uiInstance = gameObject.AddComponent<UIInstance>();
-            uiInstance.Constructor(uiAssetLoader, player, dynamicAssetManager, favoritesManager, recipesManager, hotkeys);
+            uiInstance.Constructor(uiAssetLoader, player, recipesManager);
 
             var menuToggle = gameObject.AddComponent<MenuToggle>();
-            menuToggle.Constructor(uiInstance, hotkeys);
+            menuToggle.Constructor(uiInstance);
 
             uiInstances.Add(uiInstance);
         }
@@ -109,6 +96,7 @@ public class CCPlugin : BaseUnityPlugin
         HarmonyInstance = new Harmony("AccessoryModPatch");
         HarmonyInstance.PatchAll();
         Log.Debug("harmony patched");
+        Log.Info("CCPlugin.Awake() success.");
     }
 
     private IEnumerator Start()
@@ -117,20 +105,16 @@ public class CCPlugin : BaseUnityPlugin
         yield return new WaitUntil(() => GameManager.manager && LocalizationIndex.index is not null);
         Log.Info("Start()");
 
-        //Call this just in case it wasn't already called
-        SkeletonManager.SetStandardBones();
+        if (SkeletonManager.CommonBones is null) SkeletonManager.SetCommonBones();
 
-        //reduce likelyhood of level reloading when typing
-        GameManager.manager.loadKey = KeyCode.KeypadMinus;
+        Settings.Game.ApplySettings();
 
         //Load outfits
         Log.Debug("starting hads coroutine");
+        OutfitAssetManager.OnHaDSOutfitsLoaded += LoadInitialWatchdogs;
         StartCoroutine(dynamicAssetManager.LoadAllHaDSOutfits());
 
-        //Trigger player outfit reloads to instsantiate initial watchdog
-        OutfitAssetManager.OnHaDSOutfitsLoaded += LoadInitialWatchdogs;
-
-        Log.Info("Invoking Setup() callbacks");
+        Log.Debug("Invoking CCPlugin.Start() callbacks");
         OnSetupComplete?.Invoke(this);
         Log.Info("Start() complete.");
         yield return null;
@@ -157,27 +141,12 @@ public class CCPlugin : BaseUnityPlugin
         }
     }
 
-    #region Cleanup
     private void OnDestroy()
     {
         Log.Info("Plugin OnDestroy()");
-
-        //restore default load hotkey
-        if (GameManager.manager) GameManager.manager.loadKey = KeyCode.Alpha8;
-
-        //save configuration
         Config.Save();
-
-        //Unpatch Harmony
         HarmonyInstance?.UnpatchSelf();
-
-        //Dispose
+        Settings.Dispose();
         this.DisposeFields();
-
-        //Disable runinbackground
-        Application.runInBackground = false;
     }
-    #endregion
 }
-
-

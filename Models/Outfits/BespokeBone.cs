@@ -6,7 +6,7 @@ using System.Text;
 using UnityEngine;
 using CarolCustomizer.Utils;
 
-namespace CarolCustomizer.Models;
+namespace CarolCustomizer.Models.Outfits;
 
 /// <summary>
 /// Represents one heirarchy of bones that are unique to an outfit.
@@ -37,15 +37,15 @@ public class BespokeBone
     {
         this.referenceBone = referenceBone;
 
-        cleanedBone = GameObject.Instantiate(referenceBone, cleanFolder);
+        cleanedBone = UnityEngine.Object.Instantiate(referenceBone, cleanFolder);
         var unusualComponents = cleanedBone.GetComponentsInChildren<Component>(true);
         foreach (var component in unusualComponents.
             Where(x => x.GetType() != typeof(Transform)
                     && x.GetType() != typeof(DynamicBone)
                     && x.GetType() != typeof(RectTransform)
-                 )) 
-        { 
-            GameObject.Destroy(component); 
+                 ))
+        {
+            UnityEngine.Object.Destroy(component);
         }
     }
     #endregion

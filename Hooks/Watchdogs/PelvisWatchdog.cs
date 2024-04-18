@@ -1,5 +1,4 @@
-﻿using CarolCustomizer.Models;
-using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +9,7 @@ using Slate;
 using CarolCustomizer.Assets;
 using BepInEx.Logging;
 using MonoMod.Utils;
+using CarolCustomizer.Models.Outfits;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PelvisWatchdog : MonoBehaviour

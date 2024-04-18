@@ -1,5 +1,4 @@
-﻿using CarolCustomizer.Models;
-using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Utils;
 using BepInEx.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -7,18 +6,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine.UI;
+using CarolCustomizer.Models.Accessories;
 
 namespace CarolCustomizer.Behaviors;
 public class FavoritesManager : IDisposable
 {
-    private ConfigEntry<string> favoritesConfig;
-    private Action saveMethod;
+    ConfigFile config;
+    ConfigEntry<string> favoritesConfig;
+    //Action saveMethod;
     public HashSet<AccessoryDescriptor> favorites { get; private set; }
 
-    public FavoritesManager(ConfigEntry<string> favoritesConfig, Action saveMethod)
+    public FavoritesManager(ConfigFile config)
     {
-        this.favoritesConfig = favoritesConfig;
-        this.saveMethod = saveMethod;
+        this.config = config;
+        this.favoritesConfig = config.Bind("Preferences", "Favorites", "", "List of favorited accessories.");
         LoadFavorites();
     }
 
@@ -37,7 +38,7 @@ public class FavoritesManager : IDisposable
         //save the current list of favorites to text
         string json = JsonConvert.SerializeObject(favorites);
         favoritesConfig.Value = json;
-        saveMethod.Invoke();
+        config.Save();
     }
 
     public bool IsInFavorites(AccessoryDescriptor descriptor)

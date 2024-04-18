@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace CarolCustomizer.Models;
+namespace CarolCustomizer.Models.Accessories;
 [Serializable]
 public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
 {
@@ -20,22 +20,22 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
     [JsonConstructor]
     public AccessoryDescriptor(string name, string source, MaterialDescriptor[] materials)
     {
-        this.Name = name;
-        this.Source = source;
-        this.Materials = materials;
+        Name = name;
+        Source = source;
+        Materials = materials;
     }
 
     public AccessoryDescriptor(string name, string source)
     {
-        this.Name = name;
-        this.Source = source;
+        Name = name;
+        Source = source;
     }
 
     public AccessoryDescriptor(AccessoryDescriptor existing)
     {
-        this.Name = existing.Name;
-        this.Source = existing.Source;
-        this.Materials = existing.Materials;
+        Name = existing.Name;
+        Source = existing.Source;
+        Materials = existing.Materials;
     }
 
     public bool Equals(AccessoryDescriptor other)
@@ -43,16 +43,16 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return (this.Name.DeInstance() == other.Name.DeInstance() && this.Source == other.Source && Enumerable.SequenceEqual(this.Materials, other.Materials));
+        return Name.DeInstance() == other.Name.DeInstance() && Source == other.Source && Materials.SequenceEqual(other.Materials);
     }
 
     public override bool Equals(object other)
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        if (other.GetType() != this.GetType()) return false;
+        if (other.GetType() != GetType()) return false;
 
-        return this.Equals((AccessoryDescriptor)other);
+        return Equals((AccessoryDescriptor)other);
     }
 
     public static bool operator ==(AccessoryDescriptor left, AccessoryDescriptor right) => Equals(left, right);
@@ -60,9 +60,9 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
 
     public override int GetHashCode()
     {
-        var mats = this.Materials as IStructuralEquatable;
+        var mats = Materials as IStructuralEquatable;
         var matsHash = mats.GetHashCode(EqualityComparer<MaterialDescriptor>.Default);
-        unchecked { return this.Name.DeInstance().GetHashCode() << 12  ^ this.Source.GetHashCode() << 8 ^ matsHash; }
+        unchecked { return Name.DeInstance().GetHashCode() << 12 ^ Source.GetHashCode() << 8 ^ matsHash; }
     }
 
     public override string ToString() => $"AD:{Source}.{Name}";

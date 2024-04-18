@@ -1,7 +1,10 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors;
+using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Events;
 using CarolCustomizer.Models;
+using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
@@ -30,8 +33,7 @@ public class OutfitListUI : MonoBehaviour
     private OutfitManager outfitManager;
     public CarolInstance playerManager { get; private set; }
     public MaterialManager materialManager { get; private set; }
-    public FavoritesManager favoritesManager { get; private set; }
-    public HotKeyConfig hotkeys { get; private set; }
+    
     private DynamicContextMenu contextMenu;
 
     public string searchString { get; private set; }
@@ -52,16 +54,12 @@ public class OutfitListUI : MonoBehaviour
         TabbedUIAssetLoader loader, 
         CarolInstance playerManager,
         MaterialManager materialManager, 
-        FavoritesManager favoritesManager, 
-        HotKeyConfig hotkeys,
         DynamicContextMenu contextMenu)
     {
         this.loader = loader;
         this.materialManager = materialManager;
         this.playerManager = playerManager;
         this.outfitManager = playerManager.outfitManager;
-        this.favoritesManager = favoritesManager;
-        this.hotkeys = hotkeys;
         this.contextMenu = contextMenu;
 
         OutfitAssetManager.OnOutfitLoaded += OnOutfitLoaded;
@@ -113,7 +111,7 @@ public class OutfitListUI : MonoBehaviour
         foreach (var outfit in outfitUIs.Values) { outfit.gameObject.SetActive(!accFilterActive); }
 
         if (active) { foreach (var acc in outfitManager.ActiveAccessories) { SetAccUIVisible(acc, true); } }
-        if (favorites) { foreach (var acc in favoritesManager.favorites) { SetAccUIVisible(acc, true); } }
+        if (favorites) { foreach (var acc in Settings.Favorites.favorites) { SetAccUIVisible(acc, true); } }
         
         if (!textFilter) return;
         var lowerString = searchString.ToLower();
@@ -172,7 +170,7 @@ public class OutfitListUI : MonoBehaviour
 
         var accUI = accInstance.AddComponent<AccessoryUI>();
         if (!accUI) { Log.Error("Failed to add AccUI component"); return null; }
-        accUI.Constructor(outfitUI, accessory, this, contextMenu, outfitManager, favoritesManager);
+        accUI.Constructor(outfitUI, accessory, this, contextMenu, outfitManager);
         this.accessoryUIs[accessoryDescriptor] = accUI;
         return accUI;
     }

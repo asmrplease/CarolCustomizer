@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
+using CarolCustomizer.Models.Recipes;
 
 namespace CarolCustomizer.UI;
 public class FilenameDialogue : MonoBehaviour
@@ -15,8 +15,8 @@ public class FilenameDialogue : MonoBehaviour
     Button cancel;
     RectTransform rect;
 
-    RecipeDescriptor recipe;
-    UnityAction<RecipeDescriptor, string> onConfirm;
+    RecipeDescriptor20 recipe;
+    UnityAction<RecipeDescriptor20, string> onConfirm;
 
     public void Constructor()
     {
@@ -34,7 +34,7 @@ public class FilenameDialogue : MonoBehaviour
         Log.Debug("end constructor");
     }
 
-    public void Show(RecipeDescriptor recipe, UnityAction<RecipeDescriptor, string> onConfirm)
+    public void Show(RecipeDescriptor20 recipe, UnityAction<RecipeDescriptor20, string> onConfirm)
     {
         Log.Debug("FilenameDialogue.Show()");
         this.recipe = recipe;

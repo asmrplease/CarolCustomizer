@@ -5,8 +5,8 @@ using UnityEngine;
 using CarolCustomizer.Utils;
 using System.Collections;
 using System.Net.Sockets;
-using CarolCustomizer.Models;
 using Rewired;
+using CarolCustomizer.Models.Outfits;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PlayerWatchdog : PelvisWatchdog

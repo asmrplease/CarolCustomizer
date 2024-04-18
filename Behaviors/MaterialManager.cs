@@ -11,9 +11,8 @@ namespace CarolCustomizer.Behaviors;
 public class MaterialManager
 {
     public MaterialDescriptor clipboard;
-    //public MaterialDescriptor worldClipboard { get; private set; }
 
-    private GameObject currentTarget;
+    GameObject currentTarget;
     
     public List<MaterialDescriptor> currentMaterials { get; private set; }
 

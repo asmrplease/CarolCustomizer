@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using CarolCustomizer.Utils;
-using CarolCustomizer.Models;
 using CarolCustomizer.Hooks;
 using System.Collections;
 using CarolCustomizer.UI;
 using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Models.Outfits;
 
 namespace CarolCustomizer.Assets;
 public class OutfitAssetManager : IDisposable

@@ -9,9 +9,10 @@ using CarolCustomizer.Utils;
 using CarolCustomizer.Contracts;
 using System.Collections.Generic;
 using UnityEngine.Events;
-using CarolCustomizer.Models;
 using BepInEx;
 using System;
+using CarolCustomizer.Models.Recipes;
+using CarolCustomizer.Behaviors.Settings;
 
 namespace CarolCustomizer.UI;
 public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
@@ -19,7 +20,6 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     Recipe recipe;
     RecipeListUI ui;
     OutfitManager outfitManager;
-    HotKeyConfig hotKeyConfig;
     DynamicContextMenu contextMenu;
     FilenameDialogue filenameDialogue;
     MessageDialogue messageDialogue;
@@ -37,7 +37,6 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         Recipe recipe, 
         RecipeListUI ui, 
         OutfitManager outfitManager, 
-        HotKeyConfig hotKeyConfig, 
         DynamicContextMenu contextMenu, 
         FilenameDialogue filenameDialogue, 
         MessageDialogue messageDialogue)
@@ -45,7 +44,6 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         this.ui = ui;
         this.recipe = recipe;
         this.outfitManager = outfitManager;
-        this.hotKeyConfig = hotKeyConfig;
         this.contextMenu = contextMenu;
         this.filenameDialogue = filenameDialogue;
         this.messageDialogue = messageDialogue;
@@ -94,7 +92,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     private void Overwrite()
     {
-        RecipeSaver.Save(new RecipeDescriptor(this.outfitManager), this.recipe.Path);
+        RecipeSaver.Save(new RecipeDescriptor20(this.outfitManager), this.recipe.Path);
     }
 
     private void OnContextMenuLoad()
@@ -135,7 +133,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         messageDialogue.Show(message, cancelText: "Done");
     }
 
-    private void OnRename(RecipeDescriptor unused, string newName)
+    private void OnRename(RecipeDescriptor20 unused, string newName)
     {
         if (newName.IsNullOrWhiteSpace()) return;
         foreach (var character in Path.GetInvalidFileNameChars()) { if (newName.Contains(character)) return; }
@@ -148,7 +146,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == hotKeyConfig.ContextMenuMouseButton) contextMenu.Show(this);
+        if (eventData.button == Settings.HotKeys.ContextMenu) contextMenu.Show(this);
     }
 
     public List<(string, UnityAction)> GetContextMenuItems()

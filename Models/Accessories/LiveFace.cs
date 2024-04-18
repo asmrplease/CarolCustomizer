@@ -7,7 +7,7 @@ using CarolCustomizer.Hooks;
 using CarolCustomizer.Behaviors;
 using CarolCustomizer.Utils;
 
-namespace CarolCustomizer.Models;
+namespace CarolCustomizer.Models.Accessories;
 public class LiveFace : LiveAccessory
 {
     #region Dependencies
@@ -15,9 +15,9 @@ public class LiveFace : LiveAccessory
     #endregion
 
     #region Behavior
-    public LiveFace(StoredAccessory acc, SkeletonManager skeleton, Transform folder) : base(acc, skeleton, folder) 
+    public LiveFace(StoredAccessory acc, SkeletonManager skeleton, Transform folder) : base(acc, skeleton, folder)
     {
-        this.faceCopier = skeleton.faceCopier;
+        faceCopier = skeleton.faceCopier;
     }
 
     public override void Enable()
@@ -26,7 +26,7 @@ public class LiveFace : LiveAccessory
         faceCopier.AddTarget(this);
     }
 
-    public override void Disable() 
+    public override void Disable()
     {
         base.Disable();
         faceCopier.RemoveTarget(this);

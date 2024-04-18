@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using CarolCustomizer.Assets;
 using CarolCustomizer.Models;
+using CarolCustomizer.Models.Recipes;
+using CarolCustomizer.Behaviors.Settings;
 
 namespace CarolCustomizer.UI;
 public class RecipeListUI : MonoBehaviour
@@ -14,7 +16,6 @@ public class RecipeListUI : MonoBehaviour
 
     private TabbedUIAssetLoader loader;
     private OutfitManager outfitManager;
-    private HotKeyConfig hotkeyConfig;
     private DynamicContextMenu contextMenu;
     private FilenameDialogue fileDialogue;
     private MessageDialogue messageDialogue;
@@ -29,15 +30,13 @@ public class RecipeListUI : MonoBehaviour
     public void Constructor(
         TabbedUIAssetLoader loader,
         RecipesManager recipesManager,
-        OutfitManager outfitManager, 
-        HotKeyConfig hotKeyConfig, 
+        OutfitManager outfitManager,  
         DynamicContextMenu contextMenu, 
         MessageDialogue messageDialogue)
     {
         this.loader = loader;
         this.outfitManager = outfitManager;
         this.recipesManager = recipesManager;
-        this.hotkeyConfig = hotKeyConfig;
         this.contextMenu = contextMenu;
         this.messageDialogue = messageDialogue;
 
@@ -75,7 +74,7 @@ public class RecipeListUI : MonoBehaviour
         //add a RecipeUI component
         var recipeUI = uiInstance.AddComponent<RecipeUI>();
         if (!recipeUI) { Log.Warning("failed to instantiate recipeUI component"); return; }
-        recipeUI.Constructor(newRecipe, this, outfitManager, hotkeyConfig, contextMenu, fileDialogue, messageDialogue);
+        recipeUI.Constructor(newRecipe, this, outfitManager, contextMenu, fileDialogue, messageDialogue);
 
         //add to list of recipeUIs
         recipeUIs.Add(newRecipe.Path, recipeUI);
@@ -89,6 +88,6 @@ public class RecipeListUI : MonoBehaviour
 
     private void OnNewSave()
     {
-        fileDialogue.Show(new RecipeDescriptor(outfitManager), RecipeSaver.Save);
+        fileDialogue.Show(new RecipeDescriptor20(outfitManager), RecipeSaver.Save);
     }
 }

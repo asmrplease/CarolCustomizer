@@ -11,6 +11,7 @@ using UnityEngine.UI;
 using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Behaviors;
+using CarolCustomizer.Behaviors.Settings;
 
 namespace CarolCustomizer.UI;
 public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
@@ -101,7 +102,7 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == ui.hotkeys.ContextMenuMouseButton) { OnContextClick(); return; }
+        if (eventData.button == Settings.HotKeys.ContextMenu) { OnContextClick(); return; }
     }
 
     private void OnContextClick() => contextMenu.Show(this);
@@ -110,7 +111,7 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
     {
         List<(string, UnityAction)> menuItems = new()
         {
-            ( "Copy Default Material", CopyDefaultMaterial ),
+            ("Copy Default Material", CopyDefaultMaterial),
             ("Copy Current Material", CopyCurrentMaterial),       
             ("Paste Material", PasteMaterial),
             ("Reset Material", ResetMaterial)

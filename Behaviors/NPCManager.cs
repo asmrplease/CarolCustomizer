@@ -7,8 +7,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
-using CarolCustomizer.Models;
 using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Models.Recipes;
 
 namespace CarolCustomizer.Behaviors;
 internal class NPCManager 

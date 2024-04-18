@@ -1,13 +1,7 @@
 ﻿using CarolCustomizer.Behaviors;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using CarolCustomizer.Assets;
-using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 
 namespace CarolCustomizer.UI;
@@ -26,8 +20,6 @@ public class UIInstance : MonoBehaviour
     public PlayerCarolInstance playerManager { get; private set; }
     public DynamicContextMenu contextMenu { get; private set; }
     public MaterialManager materialManager { get; private set; }
-    public FavoritesManager favoritesManager{ get; private set; }
-    public HotKeyConfig hotkeys { get; private set; }
     #endregion
 
     #region Gameobjects
@@ -59,14 +51,10 @@ public class UIInstance : MonoBehaviour
     public void Constructor(
         TabbedUIAssetLoader loader, 
         PlayerCarolInstance player,
-        OutfitAssetManager dynAssets, 
-        FavoritesManager favoritesManager, 
-        RecipesManager recipesManager,
-        HotKeyConfig hotkeys)
+        RecipesManager recipesManager)
     {
         this.loader = loader;
         this.playerManager = player;
-        this.hotkeys = hotkeys;
         this.materialManager = new();
 
         uiObject = GameObject.Instantiate(this.loader.UIContainer, this.transform);
@@ -84,21 +72,21 @@ public class UIInstance : MonoBehaviour
 
         outfitViewGO = GameObject.Instantiate(this.loader.OutfitView, viewRoot);
         outfitView = outfitViewGO.AddComponent<OutfitListUI>();
-        outfitView.Constructor(this.loader, player, materialManager, favoritesManager, hotkeys, contextMenu);
+        outfitView.Constructor(this.loader, player, materialManager, contextMenu);
 
         outfitsButton = uiObject.transform.Find(outfitsButtonAddress).GetComponent<Button>();
         outfitsButton.onClick.AddListener(OnOutfitButton);
 
         recipesViewGO = GameObject.Instantiate(this.loader.RecipesView, viewRoot);
         recipesView = recipesViewGO.AddComponent<RecipeListUI>();
-        recipesView.Constructor(this.loader, recipesManager, player.outfitManager, hotkeys, contextMenu, messageDialogue);
+        recipesView.Constructor(this.loader, recipesManager, player.outfitManager, contextMenu, messageDialogue);
 
         recipesButton = uiObject.transform.Find(recipesButtonAddress).GetComponent<Button>();
         recipesButton.onClick.AddListener(OnRecipeButton);
 
         materialsViewGO = GameObject.Instantiate(this.loader.MaterialsView, viewRoot);
         materialsView = materialsViewGO.AddComponent<MaterialsListUI>();
-        materialsView.Constructor(this.loader, materialManager, contextMenu, hotkeys);
+        materialsView.Constructor(this.loader, materialManager, contextMenu);
 
         materialsButton = uiObject.transform.Find(materialsButtonAddress).GetComponent<Button>();
         materialsButton.onClick.AddListener(OnMaterialsButton);

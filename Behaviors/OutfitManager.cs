@@ -7,6 +7,8 @@ using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Events;
 using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Models.Accessories;
 
 namespace CarolCustomizer.Behaviors;
 /// <summary>

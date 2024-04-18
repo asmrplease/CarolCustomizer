@@ -8,9 +8,10 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static ModelData;
-using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Behaviors;
+using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Behaviors.Settings;
 
 namespace CarolCustomizer.UI;
 public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
@@ -73,7 +74,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     #region Input Event Handling
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == ui.hotkeys.ContextMenuMouseButton) { OnContextClick(); }
+        if (eventData.button == Settings.HotKeys.ContextMenu) { OnContextClick(); }
         if (eventData.button == PointerEventData.InputButton.Left) { OnLeftClick(); }  
     }
 

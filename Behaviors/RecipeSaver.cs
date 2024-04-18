@@ -1,7 +1,7 @@
-﻿using CarolCustomizer.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.IO;
 using CarolCustomizer.Utils;
+using CarolCustomizer.Models.Recipes;
 
 namespace CarolCustomizer.Behaviors;
 internal static class RecipeSaver
@@ -13,7 +13,7 @@ internal static class RecipeSaver
         return path;
     }
 
-    public static void Save(RecipeDescriptor recipe, string filePath)
+    public static void Save(RecipeDescriptor20 recipe, string filePath)
     {
         string json = JsonConvert.SerializeObject(recipe, Formatting.Indented);
         Log.Debug(json);

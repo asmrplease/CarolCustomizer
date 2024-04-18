@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Assets;
+using CarolCustomizer.Models.Recipes;
 
 namespace CarolCustomizer.Behaviors;
 public class RecipesManager : IDisposable

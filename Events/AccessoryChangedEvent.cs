@@ -1,4 +1,4 @@
-﻿using CarolCustomizer.Models;
+﻿using CarolCustomizer.Models.Accessories;
 using System;
 using System.Collections.Generic;
 using System.Text;

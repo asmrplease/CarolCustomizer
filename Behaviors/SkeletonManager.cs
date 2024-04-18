@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Hooks;
 using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Models.Accessories;
 
 namespace CarolCustomizer.Behaviors;
 
@@ -15,7 +16,7 @@ public class SkeletonManager : IDisposable
 {
     #region Static Fields
     public static Dictionary<string, Transform> CommonBones { get; private set; }
-    public static void SetStandardBones()
+    public static void SetCommonBones()
     {
         if (CommonBones is not null) { Log.Error("tried to replace standard bone names"); return; }
 

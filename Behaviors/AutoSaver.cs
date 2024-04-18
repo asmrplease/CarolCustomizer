@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Models;
+using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using System.Collections;
 using System.Linq;
@@ -19,7 +20,7 @@ internal class AutoSaver
 
     public void Save()
     {
-        var descriptor = new RecipeDescriptor(outfitManager);
+        var descriptor = new RecipeDescriptor20(outfitManager);
         var path = RecipeSaver.RecipeFilenameToPath(AutoSaveFile);
         RecipeSaver.Save(descriptor, path);
     }

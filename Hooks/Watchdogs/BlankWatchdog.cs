@@ -1,4 +1,4 @@
-﻿using CarolCustomizer.Models;
+﻿using CarolCustomizer.Models.Outfits;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 internal class BlankWatchdog : PelvisWatchdog

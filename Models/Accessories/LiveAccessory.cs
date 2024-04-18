@@ -1,13 +1,13 @@
-﻿using CarolCustomizer.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 using CarolCustomizer.Behaviors;
 using CarolCustomizer.Utils;
+using CarolCustomizer.Models.Outfits;
 
-namespace CarolCustomizer.Models;
+namespace CarolCustomizer.Models.Accessories;
 public class LiveAccessory : AccessoryDescriptor
 {
     #region Dependencies
@@ -32,9 +32,9 @@ public class LiveAccessory : AccessoryDescriptor
     {
         this.skeleton = skeleton;
         this.folder = folder;
-        this.storedAcc = acc;
+        storedAcc = acc;
 
-        this.Materials = new MaterialDescriptor[acc.Materials.Length];
+        Materials = new MaterialDescriptor[acc.Materials.Length];
         int index = 0;
         foreach (var material in acc.Materials)
         {
@@ -42,7 +42,7 @@ public class LiveAccessory : AccessoryDescriptor
             index++;
         }
 
-        var liveObj = GameObject.Instantiate(storedAcc.referenceSMR.gameObject, folder);
+        var liveObj = UnityEngine.Object.Instantiate(storedAcc.referenceSMR.gameObject, folder);
         if (!liveObj) { Log.Error($"Failed to instantiate {storedAcc.referenceSMR.name}."); return; }
 
         liveSMR = liveObj.GetComponent<SkinnedMeshRenderer>();
@@ -56,10 +56,10 @@ public class LiveAccessory : AccessoryDescriptor
 
         liveSMR.bones = liveBoneArray;
         string rootBoneName;
-        if (storedAcc.referenceSMR.rootBone) {rootBoneName = storedAcc.referenceSMR.rootBone.name; }
+        if (storedAcc.referenceSMR.rootBone) { rootBoneName = storedAcc.referenceSMR.rootBone.name; }
         else { rootBoneName = "CarolPelvis"; }
 
-        
+
         liveSMR.rootBone = skeleton.GetLiveStandardBone(rootBoneName);
     }
 
@@ -76,7 +76,7 @@ public class LiveAccessory : AccessoryDescriptor
 
         Disable();
 
-        GameObject.Destroy(liveSMR);
+        UnityEngine.Object.Destroy(liveSMR);
         liveSMR = null;
         Log.Debug("Done.");
     }

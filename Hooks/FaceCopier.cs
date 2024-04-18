@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using CarolCustomizer.Behaviors;
-using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Models.Accessories;
 
 namespace CarolCustomizer.Hooks;
 public class FaceCopier : MonoBehaviour

@@ -6,6 +6,7 @@ using UnityEngine;
 using CarolCustomizer.Behaviors;
 using CarolCustomizer.Assets;
 using CarolCustomizer.Utils;
+using CarolCustomizer.Behaviors.Settings;
 
 namespace CarolCustomizer.UI;
 internal class MaterialsListUI : MonoBehaviour
@@ -15,18 +16,16 @@ internal class MaterialsListUI : MonoBehaviour
     MaterialManager materialManager;
     TabbedUIAssetLoader loader;
     DynamicContextMenu contextMenu;
-    HotKeyConfig hotkeys;
 
     Transform listRoot;
 
     List<ReadOnlyMatUI> materialUIs = new();
 
-    public void Constructor(TabbedUIAssetLoader loader, MaterialManager materialManager, DynamicContextMenu contextMenu, HotKeyConfig hotkeys)
+    public void Constructor(TabbedUIAssetLoader loader, MaterialManager materialManager, DynamicContextMenu contextMenu)
     {
         this.materialManager = materialManager;
         this.loader = loader;
         this.contextMenu = contextMenu;
-        this.hotkeys = hotkeys;
 
         listRoot = this.transform.Find(listRootAddress);
     }
@@ -45,8 +44,7 @@ internal class MaterialsListUI : MonoBehaviour
         {
             var listElementGO = GameObject.Instantiate(loader.AccessoryListElement, listRoot);
             var matUI = listElementGO.AddComponent<ReadOnlyMatUI>();
-            matUI.Constructor(material, materialManager, contextMenu, hotkeys);
-
+            matUI.Constructor(material, materialManager, contextMenu);
             materialUIs.Add(matUI);
         }
     }

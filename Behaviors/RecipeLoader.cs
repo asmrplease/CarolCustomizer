@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using CarolCustomizer.Models;
+using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
+using MonoMod.Utils;
 using Newtonsoft.Json;
 
 namespace CarolCustomizer.Behaviors;
@@ -25,7 +26,7 @@ internal static class RecipeLoader
         return results;
     }
 
-    public struct ValidationResults { public Recipe.Status Status; public RecipeDescriptor Recipe; }
+    public struct ValidationResults { public Recipe.Status Status; public RecipeDescriptor20 Recipe; }
 
     public static ValidationResults ValidateRecipeFile(string filePath)
     {
@@ -35,8 +36,37 @@ internal static class RecipeLoader
         try { json = GetRecipeJson(filePath); }
         catch { results.Status = Recipe.Status.FileError; return results; }
 
-        try { results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor>(json); }
-        catch { results.Status = Recipe.Status.InvalidJson; return results; }
+        try
+        {
+            var version = JsonConvert.DeserializeObject<VersionedObject>(json)?.version;
+            if (version is null) { results.Status = Recipe.Status.InvalidJson; return results; }
+
+            switch (version)
+            {
+                case var x when x > Constants.v200:
+                    Log.Debug("VRF dectected recipe version as > 2.0.0");
+                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor20>(json);
+                    break;
+                case var x when x == Constants.v200:
+                    Log.Debug("VRF dectected recipe version as exactly 2.0.0");
+                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor20>(json);
+                    break;
+                case var x when x == Constants.v100:
+                    Log.Debug("VRF recipe version detected as 1.0.0, presumed 2.0.0");
+                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor20>(json);
+                    break;
+                default:
+                    Log.Error($"Unable to handle recipe version: {version}.");
+                    break;
+            }
+        }
+        catch (Exception ex) 
+        { 
+            ex.LogDetailed(); 
+            results.Status = Recipe.Status.InvalidJson; 
+            return results; 
+        }
+
         if (results.Recipe is null) { results.Status = Recipe.Status.InvalidJson; return results; }
 
         try

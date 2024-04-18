@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace CarolCustomizer.Models;
+namespace CarolCustomizer.Models.Outfits;
 public class BoneData : MonoBehaviour
 {
     [SerializeField]
@@ -21,13 +21,13 @@ public class BoneData : MonoBehaviour
 
     public BoneData Constructor()
     {
-        allTransforms = this.transform.SkeletonToList();
+        allTransforms = transform.SkeletonToList();
 
-        List<Transform> filteringList = new(this.allTransforms);
-        if (SkeletonManager.CommonBones is null) { SkeletonManager.SetStandardBones(); }
+        List<Transform> filteringList = new(allTransforms);
+        if (SkeletonManager.CommonBones is null) { SkeletonManager.SetCommonBones(); }
 
         standardBones = filteringList.Where(x => SkeletonManager.CommonBones.Keys.Contains(x.name)).ToList();
-        
+
         filteringList = filteringList
             .Except(standardBones)
             .ToList();

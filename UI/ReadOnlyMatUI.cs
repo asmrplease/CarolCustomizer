@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Behaviors;
+using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models;
 using System.Collections.Generic;
@@ -17,18 +18,16 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
     DynamicContextMenu contextMenu;
     MaterialManager materialManager;
     MaterialDescriptor material;
-    HotKeyConfig hotkeys;
 
     Text displayName;
     Text materialName;
     Image favoriteIcon;
 
-    public void Constructor(MaterialDescriptor material, MaterialManager materialManager, DynamicContextMenu contextMenu, HotKeyConfig hotkeys)
+    public void Constructor(MaterialDescriptor material, MaterialManager materialManager, DynamicContextMenu contextMenu)
     {
         this.material = material;
         this.materialManager = materialManager;
         this.contextMenu = contextMenu;
-        this.hotkeys = hotkeys;
 
         displayName = this.transform.Find(displayNameAddress).GetComponent<Text>();
         displayName.text = this.material.Name;
@@ -49,7 +48,7 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == hotkeys.ContextMenuMouseButton) { OnContextClick(); return; }
+        if (eventData.button == Settings.HotKeys.ContextMenu) { OnContextClick(); return; }
     }
 
     private void OnContextClick()
@@ -62,7 +61,6 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
         List<(string, UnityAction)> menuItems = new()
         {
             ("Copy Material", CopyMaterial),
-
         };
         return menuItems;
     }

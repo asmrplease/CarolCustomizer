@@ -1,4 +1,4 @@
-﻿using CarolCustomizer.UI;
+﻿using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections;
@@ -8,12 +8,11 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace CarolCustomizer.Behaviors;
+namespace CarolCustomizer.UI;
 public class MenuToggle : MonoBehaviour
 {
     #region Dependencies
     UIInstance uiInstance;
-    HotKeyConfig hotkeys;
     #endregion
 
     #region State Variables
@@ -24,10 +23,9 @@ public class MenuToggle : MonoBehaviour
 
     //TODO: fix input still going to UI when hidden... how? is there an interactable flag we can set?
 
-    public void Constructor(UIInstance uiInstance, HotKeyConfig hotkeys)
+    public void Constructor(UIInstance uiInstance)
     {
         this.uiInstance = uiInstance;
-        this.hotkeys = hotkeys;
         SceneManager.sceneLoaded += OnSceneChange;
     }
     private void OnDestroy()
@@ -56,8 +54,8 @@ public class MenuToggle : MonoBehaviour
 
     private bool CheckInput()
     {
-        return (Input.GetKeyDown(hotkeys.MenuToggleMouseKey) 
-             || Input.GetKeyDown(hotkeys.MenuToggleKeyboardKey));
+        return Input.GetKeyDown(Settings.HotKeys.MenuToggleMouse)
+             || Input.GetKeyDown(Settings.HotKeys.MenuToggleKeyboard);
     }
 
     private IEnumerator OnMainMenuLoaded()
@@ -82,27 +80,27 @@ public class MenuToggle : MonoBehaviour
     {
         //if we're told to switch to the state we're already in, don't do anything lol
         if (newVisibility == isVisible) { return; }
-        
+
         //if we are currently visible and asked to go back to regular menu
         if (isVisible && !newVisibility)
         {
             uiInstance.Hide();
             mainMenuPages.transform.GetChild(0).gameObject.SetActive(true);
-            this.isVisible = newVisibility;
+            isVisible = newVisibility;
             return;
         }
-        
+
         //if we are not currently visible and asked to become visible
-        var activePage = mainMenuPages.transform.Cast<Transform>().First(x=>x.gameObject.activeSelf);
+        var activePage = mainMenuPages.transform.Cast<Transform>().First(x => x.gameObject.activeSelf);
         if (!activePage) { Log.Warning("tried to hide menu screen but no active page was found."); return; }
         if (activePage.GetSiblingIndex() != 0) { Log.Debug("tried to open accUI but we weren't on the main page"); return; }
-        
+
         uiInstance.Show();
         activePage.gameObject.SetActive(false);
         Log.Debug("hid menu");
 
         //store the visibility state
-        this.isVisible = newVisibility;
+        isVisible = newVisibility;
     }
 
     private void GameplayUpdate()
@@ -115,7 +113,7 @@ public class MenuToggle : MonoBehaviour
         if (!player.CanOpenMenu()) return;
 
         //hide the menu if it's visible and we pause
-        if (isVisible && (Input.GetKeyDown(KeyCode.Escape) || CheckInput())) 
+        if (isVisible && (Input.GetKeyDown(KeyCode.Escape) || CheckInput()))
         { GameplaySetMenuState(false); return; }
 
         //if we're in any invalid states for opening the menu
@@ -137,10 +135,10 @@ public class MenuToggle : MonoBehaviour
         if (visible) uiInstance.Show(); else uiInstance.Hide();
 
         //Set player state
-        if (visible) uiInstance.playerManager.LockPlayer(); 
+        if (visible) uiInstance.playerManager.LockPlayer();
         else uiInstance.playerManager.UnlockPlayer();
 
         //store the visibility state
-        this.isVisible = visible;
+        isVisible = visible;
     }
 }

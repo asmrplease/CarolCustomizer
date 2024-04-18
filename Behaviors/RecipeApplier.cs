@@ -6,11 +6,14 @@ using CarolCustomizer.Utils;
 using CarolCustomizer.Assets;
 using HarmonyLib;
 using UnityEngine.Analytics;
+using CarolCustomizer.Models.Recipes;
+using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Models.Accessories;
 
 namespace CarolCustomizer.Behaviors;
 internal static class RecipeApplier
 {
-    public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor recipe)
+    public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor20 recipe)
     {
         outfitManager.SetBaseVisibility(false);
         outfitManager.DisableAllAccessories();
@@ -71,7 +74,7 @@ internal static class RecipeApplier
         outfitManager.PaintAccessory(accessory, liveMaterial, index);
     }
 
-    public static IEnumerable<string> GetSources(RecipeDescriptor recipe)
+    public static IEnumerable<string> GetSources(RecipeDescriptor20 recipe)
     {
         Log.Debug("GetSources()");
         if (recipe.ActiveAccessories is null) { Log.Error("no accessories in recipe!"); return new List<string>(); };
@@ -81,7 +84,7 @@ internal static class RecipeApplier
         return accSources.Concat(matSources).AddItem(baseSource).Distinct();
     }
 
-    public static IEnumerable<string> GetMissingSources(RecipeDescriptor recipe)
+    public static IEnumerable<string> GetMissingSources(RecipeDescriptor20 recipe)
     {
         return GetSources(recipe).Where(x=> OutfitAssetManager.GetOutfitByAssetName(x) is null);
     }

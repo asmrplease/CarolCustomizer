@@ -5,7 +5,7 @@ using UnityEngine;
 using CarolCustomizer.Utils;
 using System.Linq;
 
-namespace CarolCustomizer.Models;
+namespace CarolCustomizer.Models.Outfits;
 public class CompData : MonoBehaviour
 {
     [SerializeField]
@@ -21,7 +21,7 @@ public class CompData : MonoBehaviour
     public CompData Constructor()
     {
         animator ??= GetComponentsInParent<Animator>(true)?
-            .FirstOrDefault(x=>x.runtimeAnimatorController);
+            .FirstOrDefault(x => x.runtimeAnimatorController);
         if (!animator) Log.Warning("no animator found during CD.Constructor()");
         controller ??= animator?.runtimeAnimatorController;
         if (!controller) Log.Warning("no RAC found during CD.Constructor()");
@@ -54,7 +54,7 @@ public class CompData : MonoBehaviour
 
     public void SetRAC(RuntimeAnimatorController controller)
     {
-        if (!animator) { Log.Warning("No animator component");  return; }
+        if (!animator) { Log.Warning("No animator component"); return; }
         if (!controller) { Log.Warning("tried to set RAC as null"); return; }
 
         animator.runtimeAnimatorController = controller;

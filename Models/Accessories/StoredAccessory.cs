@@ -1,12 +1,12 @@
-﻿using CarolCustomizer.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 using CarolCustomizer.Behaviors;
+using CarolCustomizer.Models.Outfits;
 
-namespace CarolCustomizer.Models;
+namespace CarolCustomizer.Models.Accessories;
 
 public class StoredAccessory : AccessoryDescriptor
 {
@@ -14,15 +14,15 @@ public class StoredAccessory : AccessoryDescriptor
     public readonly SkinnedMeshRenderer referenceSMR;
     public readonly bool isFace;
     public string DisplayName => Name.Split('_').Last();
-    public string GetName() => this.Name;
-    public string GetSource() => this.Source;
+    public string GetName() => Name;
+    public string GetSource() => Source;
 
     public StoredAccessory(Outfit outfit, SkinnedMeshRenderer smr)
         : base(smr.name, outfit.AssetName)
     {
         this.outfit = outfit;
-        this.referenceSMR = smr;
-        this.isFace = smr.name == "tete";
+        referenceSMR = smr;
+        isFace = smr.name == "tete";
 
         Materials = new MaterialDescriptor[referenceSMR.materials.Length];
 

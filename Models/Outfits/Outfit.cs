@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using CarolCustomizer.Utils;
-using CarolCustomizer.Behaviors;
-using BepInEx.Logging;
 using CarolCustomizer.Hooks.Watchdogs;
-using System.Xml.Linq;
+using CarolCustomizer.Models.Accessories;
 
-namespace CarolCustomizer.Models;
+namespace CarolCustomizer.Models.Outfits;
 
 public class Outfit : IDisposable, IComparable<Outfit>
 {
@@ -25,7 +22,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
     public List<StoredAccessory> Accessories => AccDict.Values.ToList();
     private Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = new();
     virtual public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = new();
-    
+
     PelvisWatchdog prefabWatchdog;
     public MeshData meshData => prefabWatchdog.MeshData;
     public BoneData boneData => prefabWatchdog.BoneData;
@@ -33,15 +30,15 @@ public class Outfit : IDisposable, IComparable<Outfit>
 
     public int CompareTo(Outfit other)
     {
-        int displayNameComparison = this.DisplayName.CompareTo(other.DisplayName);
+        int displayNameComparison = DisplayName.CompareTo(other.DisplayName);
         if (displayNameComparison != 0) return displayNameComparison;
-        return this.AssetName.CompareTo(other.AssetName);
+        return AssetName.CompareTo(other.AssetName);
     }
 
     public StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
     {
-        AccDict.TryGetValue(descriptor, out StoredAccessory result); 
-        result ??=  GetAccessory(descriptor.Name);
+        AccDict.TryGetValue(descriptor, out StoredAccessory result);
+        result ??= GetAccessory(descriptor.Name);
         return result;
     }
 
@@ -58,26 +55,26 @@ public class Outfit : IDisposable, IComparable<Outfit>
         if (!storedAsset) { Log.Error("Outfit constructor was passed a null transform."); return; }
         Log.Debug($"Constructing {storedAsset.name}");
         this.storedAsset = storedAsset;
-        this.DisplayName = LocalizationIndex.index.GetLine(this.storedAsset.gameObject.name); 
+        DisplayName = LocalizationIndex.index.GetLine(this.storedAsset.gameObject.name);
 
         var pelvis = storedAsset.RecursiveFindTransform(x => x.name == "CarolPelvis");
         if (!pelvis) { Log.Error("failed to find pelvis during Outfit construction."); return; }
 
         var earlyWatchdog = pelvis.gameObject.GetComponent<PelvisWatchdog>();
-        if (earlyWatchdog) 
+        if (earlyWatchdog)
         {
-            GameObject.DestroyImmediate(earlyWatchdog);
+            UnityEngine.Object.DestroyImmediate(earlyWatchdog);
             Log.Debug("Early watchdog found and removed");
         }
 
-        this.prefabWatchdog = pelvis.gameObject.AddComponent<PelvisWatchdog>();
+        prefabWatchdog = pelvis.gameObject.AddComponent<PelvisWatchdog>();
         if (!prefabWatchdog) { Log.Error($"failed to instantiate {DisplayName}'s pelvis watchdog"); return; }
         prefabWatchdog.Awake();
 
         Log.Debug($"Setting up accessories: {storedAsset.name}.");
         if (!prefabWatchdog.MeshData) Log.Warning("Failed to instantiate meshdata in time.");
         var smrs = prefabWatchdog?.MeshData?.baseMeshes;
-        if (smrs is null) { Log.Error("no smrs found in watchdog mesh data.") ; return; }
+        if (smrs is null) { Log.Error("no smrs found in watchdog mesh data."); return; }
         foreach (var smr in smrs)
         {
             var newAcc = new StoredAccessory(this, smr);
@@ -85,15 +82,16 @@ public class Outfit : IDisposable, IComparable<Outfit>
 
             foreach (var newMat in newAcc.Materials) { if (newMat is not null) MaterialDescriptors.Add(newMat); }
         }
-        Log.Debug($"{this.DisplayName} Outfit constructed.");
+        Log.Debug($"{DisplayName} Outfit constructed.");
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         if (!prefabWatchdog) return;
-        if (prefabWatchdog.MeshData) GameObject.DestroyImmediate(prefabWatchdog.MeshData);
-        if (prefabWatchdog.BoneData) GameObject.DestroyImmediate(prefabWatchdog.BoneData);
-        if (prefabWatchdog.CompData) GameObject.DestroyImmediate(prefabWatchdog.CompData);
-        GameObject.DestroyImmediate(prefabWatchdog); 
+        if (prefabWatchdog.MeshData) UnityEngine.Object.DestroyImmediate(prefabWatchdog.MeshData);
+        if (prefabWatchdog.BoneData) UnityEngine.Object.DestroyImmediate(prefabWatchdog.BoneData);
+        if (prefabWatchdog.CompData) UnityEngine.Object.DestroyImmediate(prefabWatchdog.CompData);
+        UnityEngine.Object.DestroyImmediate(prefabWatchdog);
     }
     #endregion
 }

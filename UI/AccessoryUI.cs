@@ -7,9 +7,10 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Behaviors;
+using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Behaviors.Settings;
 
 namespace CarolCustomizer.UI;
 /// <summary>
@@ -29,7 +30,6 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
     OutfitListUI ui;
     DynamicContextMenu contextMenu;
     OutfitManager outfitManager;
-    FavoritesManager favoritesManager;
     #endregion
 
     #region Local Component References
@@ -55,15 +55,13 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
         StoredAccessory accessory, 
         OutfitListUI ui, 
         DynamicContextMenu contextMenu, 
-        OutfitManager outfitManager,
-        FavoritesManager favoritesManager)
+        OutfitManager outfitManager)
     {
         this.outfitUI = outfitUI;
         this.accessory = accessory;
         this.contextMenu = contextMenu;
         this.ui = ui;
         this.outfitManager = outfitManager;
-        this.favoritesManager = favoritesManager;
 
         this.name = "AccUI: " + accessory.DisplayName;
 
@@ -77,7 +75,7 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
         activationToggle.onValueChanged.AddListener(OnToggle); 
 
         favoriteIcon = this.transform.Find(favoriteAddress)?.GetComponent<Image>();
-        favoriteIcon.enabled = this.favoritesManager.IsInFavorites(accessory);
+        favoriteIcon.enabled = Settings.Favorites.IsInFavorites(accessory);
 
         this.gameObject.SetActive(false);
     }
@@ -98,7 +96,7 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == ui.hotkeys.ContextMenuMouseButton) { OnContextClick(); return; }
+        if (eventData.button == Settings.HotKeys.ContextMenu) { OnContextClick(); return; }
         if (eventData.button == PointerEventData.InputButton.Left) { OnLeftClick(); return; }
     }
 
@@ -125,13 +123,13 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
 
     private void ToggleFavorite()
     {
-        favoritesManager.ToggleFavorite(new AccessoryDescriptor(this.accessory));
-        favoriteIcon.enabled = !favoriteIcon.enabled;
+        Settings.Favorites.ToggleFavorite(new AccessoryDescriptor(this.accessory));
+        favoriteIcon.enabled = Settings.Favorites.IsInFavorites(this.accessory);
     }
 
     public List<(string, UnityAction)> GetContextMenuItems()
     {
-        bool currentlyFavorite = favoritesManager.IsInFavorites(this.accessory);
+        bool currentlyFavorite = Settings.Favorites.IsInFavorites(this.accessory);
         return new List<(string, UnityAction)> { (currentlyFavorite? "Remove from Favorites" : "Add to favorites", ToggleFavorite) };
     }
     #endregion

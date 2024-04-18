@@ -53,8 +53,12 @@ internal static class Constants
     public const string IntroCutsceneName = "INTRO_CUTSCENES";
     public const string Pyjamas = "CAROL_PyjamaBasic";
     public const string RobotHead = "Robocarolhead";
+    public const string Preferences = "Preferences";
 
     public const string Shezara = "Shezara";
+
+    public static readonly Version v200 = new("2.0.0");
+    public static readonly Version v100 = new("1.0.0");
 
     public const string RecipeExtension = ".json";
     public const string RecipeFolderName = "Recipes";
@@ -62,8 +66,10 @@ internal static class Constants
     public static readonly string RecipeFolderPath = Path.Combine(Constants.ApplicationPath, Constants.RecipeFolderName);
 
     public static readonly Vector3 OutOfTheWay = new(-10000, -10000, -10000);
+    public const float CarolDefaultMass = 0.01f;
+    public const KeyCode DefaultReload = KeyCode.Alpha8;
 
     //TODO: move this to config
     public const float PhoneHideTime = 1.75f;//1.5f
-    public const float CarolDefaultMass = 0.01f;
+    
 }

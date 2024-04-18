@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using CarolCustomizer.Utils;
+using CarolCustomizer.Models.Accessories;
 
-namespace CarolCustomizer.Models;
+namespace CarolCustomizer.Models.Outfits;
 public class HaDSOutfit : Outfit
 {
     #region ModelData Handling 
@@ -17,8 +18,8 @@ public class HaDSOutfit : Outfit
 
     public HaDSOutfit(Transform storedAsset) : base(storedAsset)
     {
-        this.modelData = this.storedAsset.gameObject.GetComponent<ModelData>();
-        if (!this.modelData) { Log.Error("No ModelData component was found during HaDS constructor."); return; }
+        modelData = this.storedAsset.gameObject.GetComponent<ModelData>();
+        if (!modelData) { Log.Error("No ModelData component was found during HaDS constructor."); return; }
         BuildVariants();
     }
 
