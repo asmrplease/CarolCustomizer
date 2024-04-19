@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Behaviors.Carol;
 
 namespace CarolCustomizer.Models.Accessories;
 public class LiveAccessory : AccessoryDescriptor

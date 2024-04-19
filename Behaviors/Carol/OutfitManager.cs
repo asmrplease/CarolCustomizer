@@ -10,7 +10,7 @@ using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Models.Accessories;
 
-namespace CarolCustomizer.Behaviors;
+namespace CarolCustomizer.Behaviors.Carol;
 /// <summary>
 /// Responsible for the clothing of one Carol Instance. 
 /// </summary>
@@ -28,7 +28,7 @@ public class OutfitManager : IDisposable
     #endregion
 
     #region Public Interface
-    public string BaseOutfitName => BaseOutfit is not null? BaseOutfit.AssetName : Constants.Pyjamas;
+    public string BaseOutfitName => BaseOutfit is not null ? BaseOutfit.AssetName : Constants.Pyjamas;
     public bool BaseVisible { get; private set; }
     public int BaseAccessorySlot => 0;
     public Action<AccessoryChangedEvent> AccessoryChanged;
@@ -40,12 +40,12 @@ public class OutfitManager : IDisposable
     public OutfitManager(CarolInstance player, SkeletonManager skeletonManager, OutfitAssetManager dynamicAssetManager)
     {
         this.skeletonManager = skeletonManager;
-        this.playerManager = player;
-        this.BaseVisible = true;
+        playerManager = player;
+        BaseVisible = true;
 
-        this.playerManager.SpawnEvent += RefreshSMRs;
-        this.playerManager.SpawnEvent += OnSpawn;
-        this.AccessoryChanged += DebugAccChanged;
+        playerManager.SpawnEvent += RefreshSMRs;
+        playerManager.SpawnEvent += OnSpawn;
+        AccessoryChanged += DebugAccChanged;
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
     }
 
@@ -57,8 +57,8 @@ public class OutfitManager : IDisposable
         SetBaseVisibility(true);//Ensure the player is visible when we leave.
         foreach (var liveAcc in instantiatedAccessories.Values) { liveAcc.Dispose(); }
 
-        this.playerManager.SpawnEvent -= RefreshSMRs;
-        this.playerManager.SpawnEvent -= OnSpawn;
+        playerManager.SpawnEvent -= RefreshSMRs;
+        playerManager.SpawnEvent -= OnSpawn;
         OutfitAssetManager.OnOutfitUnloaded -= OnOutfitUnloaded;
     }
 
@@ -120,7 +120,7 @@ public class OutfitManager : IDisposable
 
     public void ToggleBaseVisibility()
     {
-        this.BaseVisible = false;//!this.BaseVisible;
+        BaseVisible = false;//!this.BaseVisible;
         RefreshBaseVisibility();
     }
 
@@ -131,15 +131,15 @@ public class OutfitManager : IDisposable
         RefreshBaseVisibility();
     }
 
-    public void RefreshBaseVisibility() => SetBaseVisibility(this.BaseVisible); //TODO: better approach
+    public void RefreshBaseVisibility() => SetBaseVisibility(BaseVisible); //TODO: better approach
 
-    public void SetBaseVisibility(bool visible) => this.pelvis?.SetBaseVisibility(visible);
+    public void SetBaseVisibility(bool visible) => pelvis?.SetBaseVisibility(visible);
 
     public void SetBaseOutfit(Outfit outfit)
     {
-        if (!this.pelvis) { Log.Warning("Tried to swap outfits with no pelviswatchdog instantiated."); return; }
-        this.pelvis.SetBaseOutfit(outfit);
-        this.BaseOutfit = outfit;
+        if (!pelvis) { Log.Warning("Tried to swap outfits with no pelviswatchdog instantiated."); return; }
+        pelvis.SetBaseOutfit(outfit);
+        BaseOutfit = outfit;
     }
 
     private void OnOutfitUnloaded(Outfit outfit)
@@ -150,7 +150,7 @@ public class OutfitManager : IDisposable
             if (!instantiatedAccessories.ContainsKey(storedAcc)) continue;
             var liveAcc = instantiatedAccessories[storedAcc];
             if (liveAcc is not null) { liveAcc.Dispose(); }
-            instantiatedAccessories.Remove(storedAcc); 
+            instantiatedAccessories.Remove(storedAcc);
         }
     }
 }

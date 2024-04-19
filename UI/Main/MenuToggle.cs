@@ -8,7 +8,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace CarolCustomizer.UI;
+namespace CarolCustomizer.UI.Main;
 public class MenuToggle : MonoBehaviour
 {
     #region Dependencies

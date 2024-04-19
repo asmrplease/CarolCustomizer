@@ -5,13 +5,13 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace CarolCustomizer.Behaviors;
+namespace CarolCustomizer.Behaviors.Carol;
 public class PlayerCarolInstance : CarolInstance
 {
     PlayerWatchdog player;
     static Type playerWatchdogType = typeof(PlayerWatchdog);
     AutoSaver autoSaver;
-    public PlayerCarolInstance(GameObject parent) : base(parent) 
+    public PlayerCarolInstance(GameObject parent) : base(parent)
     {
         autoSaver = new(this);
     }
@@ -24,12 +24,12 @@ public class PlayerCarolInstance : CarolInstance
         player = pelvis as PlayerWatchdog;
     }
 
-    public bool CanOpenMenu() => player?.CanOpenMenu()?? true;
+    public bool CanOpenMenu() => player?.CanOpenMenu() ?? true;
 
-    public bool ManagesPlayer(Entity playerEntity) 
-        => player? player.ManagesPlayer(playerEntity) : false;
+    public bool ManagesPlayer(Entity playerEntity)
+        => player ? player.ManagesPlayer(playerEntity) : false;
 
-    public void LockPlayer()   => player?.LockPlayer();
+    public void LockPlayer() => player?.LockPlayer();
     public void UnlockPlayer() => player?.UnlockPlayer();
 
     public override void Dispose()

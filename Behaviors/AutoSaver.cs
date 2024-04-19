@@ -1,5 +1,5 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Models;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using System.Collections;
@@ -31,17 +31,11 @@ internal class AutoSaver
         if (recipe is null) { Log.Warning("Couldn't find autosave recipe"); return; }
         if (recipe.Error != Recipe.Status.NoError) { Log.Warning($"AutoLoad recipe error:{recipe.Error}"); return; }
         CCPlugin.uiInstances.First().StartCoroutine(LoadRoutine(recipe));//TODO: put this on a proper gameobject
-        
     } 
 
     private IEnumerator LoadRoutine(Recipe recipe)
     {
-
-        if (!outfitManager.pelvis)
-        {
-            Log.Debug("Waiting for pelvis");
-            yield return new WaitUntil(() => outfitManager.pelvis);
-        }
+        if (!outfitManager.pelvis) yield return new WaitUntil(() => outfitManager.pelvis);
         RecipeApplier.ActivateRecipe(this.outfitManager, recipe.Descriptor);
         Log.Debug("Load completed succesfully");
         yield break;

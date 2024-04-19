@@ -1,8 +1,6 @@
 ﻿using BepInEx.Configuration;
 using CarolCustomizer.Utils;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Settings;

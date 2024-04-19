@@ -7,8 +7,10 @@ using CarolCustomizer.Assets;
 using CarolCustomizer.Models;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.UI.Main;
 
-namespace CarolCustomizer.UI;
+namespace CarolCustomizer.UI.Recipes;
 public class RecipeListUI : MonoBehaviour
 {
     private static readonly string listRootAddress = "Scroll View/Viewport/Content";
@@ -30,8 +32,8 @@ public class RecipeListUI : MonoBehaviour
     public void Constructor(
         TabbedUIAssetLoader loader,
         RecipesManager recipesManager,
-        OutfitManager outfitManager,  
-        DynamicContextMenu contextMenu, 
+        OutfitManager outfitManager,
+        DynamicContextMenu contextMenu,
         MessageDialogue messageDialogue)
     {
         this.loader = loader;
@@ -40,14 +42,14 @@ public class RecipeListUI : MonoBehaviour
         this.contextMenu = contextMenu;
         this.messageDialogue = messageDialogue;
 
-        listRoot = this.transform.Find(listRootAddress);
+        listRoot = transform.Find(listRootAddress);
 
-        filenameDialogueGO = GameObject.Instantiate(loader.FilenameDialogue, this.transform.parent.parent);
+        filenameDialogueGO = Instantiate(loader.FilenameDialogue, transform.parent.parent);
         fileDialogue = filenameDialogueGO.AddComponent<FilenameDialogue>();
         fileDialogue.Constructor();
         filenameDialogueGO.SetActive(false);
 
-        var newRecipeButtonGO = this.transform.Find(newRecipeAddress);
+        var newRecipeButtonGO = transform.Find(newRecipeAddress);
         newRecipeButton = newRecipeButtonGO.GetComponent<Button>();
         newRecipeButton.onClick.AddListener(OnNewSave);
 
@@ -60,15 +62,15 @@ public class RecipeListUI : MonoBehaviour
     private void OnDestroy()
     {
         Log.Debug("ReceiptListUI.OnDestroy()");
-        this.recipesManager.OnRecipeCreated -= OnRecipeCreated;
-        this.recipesManager.OnRecipeDeleted -= OnRecipeDeleted;
+        recipesManager.OnRecipeCreated -= OnRecipeCreated;
+        recipesManager.OnRecipeDeleted -= OnRecipeDeleted;
     }
 
     public void OnRecipeCreated(Recipe newRecipe)
     {
         Log.Debug("RecipeListUI.OnRecipeCreated");
         //instantiate a outfit ui object
-        var uiInstance = GameObject.Instantiate(loader.OutfitListElement, listRoot);
+        var uiInstance = Instantiate(loader.OutfitListElement, listRoot);
         if (!uiInstance) { Log.Error("Failed to instantiate outfit UI prefab for a recipeUI."); return; }
 
         //add a RecipeUI component

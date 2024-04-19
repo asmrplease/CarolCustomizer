@@ -1,4 +1,4 @@
-﻿using CarolCustomizer.Behaviors;
+﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;

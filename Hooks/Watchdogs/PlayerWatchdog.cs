@@ -7,16 +7,19 @@ using System.Collections;
 using System.Net.Sockets;
 using Rewired;
 using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Behaviors.Settings;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PlayerWatchdog : PelvisWatchdog
 {
+    private const float LockSpeed = 1.00f;
+    private const float UnlockSpeed = 1.75f;
+
     Entity carolEntity;
     CarolController carolController;
 
-    public bool Busy { get; private set; }
-    public bool Locked { get; private set; }
-
+    public bool Busy { get; private set; } = false;
+    public bool Locked { get; private set; } = false;
     public bool isGrounded => carolController.onGround;
     public bool isSwimming => carolController.swim.swimming;
     public bool controllerDisabled => !carolController.enabled;
@@ -30,31 +33,15 @@ public class PlayerWatchdog : PelvisWatchdog
         return base.BuildFromExisting(watchdog, typeComponent);
     }
 
-    override public void Awake()
-    {
-        Log.Info("PlayerWatchdog Awake()");
-
-        base.Awake();
-        Locked = false;
-        Busy = false;
-    }
-
     void OnEnable()
     {
-        //if (DetectType()) return;
         CCPlugin.cutscenePlayer.NotifySpawned(this);
         if (Locked) LockPlayer(0.01f);
     }
 
-    protected override void OnTransformParentChanged()
-    {
-        Log.Info("PlayerWatchdog OnTransformParentChanged");
-        base.OnTransformParentChanged();
-    }
+    public void LockPlayer(float initialDelay = 0) => StartCoroutine(LockRoutine(initialDelay));
 
-    public void LockPlayer(float initialDelay = 0) => StartCoroutine(LockRoutine(1, initialDelay));
-
-    public void UnlockPlayer() => StartCoroutine(UnlockRoutine(1.75f));
+    public void UnlockPlayer() => StartCoroutine(UnlockRoutine());
 
     public override void SetBaseOutfit(Outfit outfit)
     {
@@ -62,12 +49,12 @@ public class PlayerWatchdog : PelvisWatchdog
         carolEntity.SwapModel(outfit.storedAsset.gameObject);
     }
 
-    private IEnumerator LockRoutine(float speed = 1, float initialDelay = 0f)
+    private IEnumerator LockRoutine(float initialDelay = 0f)
     {
-        Log.Debug("Locking player");
+        float speed = LockSpeed * Settings.Plugin.MenuSpeed;
+        Log.Debug($"Locking player, speed: {speed}");
         Busy = true;
         Locked = true;
-        Log.Debug($"Waiting for {initialDelay} seconds");
         if (initialDelay > 0) yield return new WaitForSeconds(initialDelay);
 
         var inventory = carolEntity.GetComponent<Inventory>();
@@ -91,8 +78,9 @@ public class PlayerWatchdog : PelvisWatchdog
         yield break;
     }
 
-    private IEnumerator UnlockRoutine(float speed = 1)
+    private IEnumerator UnlockRoutine()
     {
+        float speed = UnlockSpeed * Settings.Plugin.MenuSpeed;
         Log.Debug("Unlocking player");
         Busy = true;
         Locked = false;
@@ -111,10 +99,7 @@ public class PlayerWatchdog : PelvisWatchdog
         yield break;
     }
 
-    public bool ManagesPlayer(Entity playerEntity)
-    {
-        return carolEntity == playerEntity;
-    }
+    public bool ManagesPlayer(Entity playerEntity) => carolEntity == playerEntity;
 
     public bool CanOpenMenu()
     {

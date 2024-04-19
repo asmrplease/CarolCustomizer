@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using CarolCustomizer.Hooks;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Utils;
+using CarolCustomizer.Behaviors.Carol;
 
 namespace CarolCustomizer.Models.Accessories;
 public class LiveFace : LiveAccessory

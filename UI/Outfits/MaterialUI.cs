@@ -10,10 +10,11 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.UI.Main;
 
-namespace CarolCustomizer.UI;
+namespace CarolCustomizer.UI.Outfits;
 public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
     #region Static Addresses
@@ -41,29 +42,29 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
 
     public void Constructor(AccessoryUI accessory, MaterialDescriptor material, int index, OutfitListUI ui, DynamicContextMenu contextMenu, OutfitManager outfitManager)
     {
-        this.accessoryUI = accessory;
-        this.defaultMaterial = material;
+        accessoryUI = accessory;
+        defaultMaterial = material;
         this.outfitManager = outfitManager;
         this.ui = ui;
         this.index = index;
         this.contextMenu = contextMenu;
-        this.rect = GetComponent<RectTransform>();
+        rect = GetComponent<RectTransform>();
 
-        rect.Translate(new Vector3(16, 0,0));
+        rect.Translate(new Vector3(16, 0, 0));
         rect.sizeDelta = new Vector2(208, 32);
 
-        defaultMaterialName = this.transform.Find(defaultMaterialTextAddress).GetComponent<Text>();
-        defaultMaterialName.text = this.defaultMaterial.Name;
+        defaultMaterialName = transform.Find(defaultMaterialTextAddress).GetComponent<Text>();
+        defaultMaterialName.text = defaultMaterial.Name;
 
-        currentMaterialName = this.transform.Find(currentMaterialTextAddress).GetComponent<Text>();
+        currentMaterialName = transform.Find(currentMaterialTextAddress).GetComponent<Text>();
         currentMaterialName.text = CurrentLiveMaterial().Name;
 
-        this.name = "MatUI: " + this.defaultMaterial.Name;
+        name = "MatUI: " + defaultMaterial.Name;
 
-        favoriteIcon = this.transform.Find(favoriteAddress)?.GetComponent<Image>();
+        favoriteIcon = transform.Find(favoriteAddress)?.GetComponent<Image>();
         favoriteIcon.enabled = false;
 
-        this.gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 
     public void UpdateActiveMaterial(MaterialDescriptor material)
@@ -74,7 +75,7 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
 
     private void CopyDefaultMaterial()
     {
-        ui.materialManager.clipboard = this.defaultMaterial;
+        ui.materialManager.clipboard = defaultMaterial;
     }
 
     private void CopyCurrentMaterial()
@@ -87,18 +88,18 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
     private void SetMaterial(MaterialDescriptor material)
     {
         Log.Debug("MatUI SetMaterial!");
-        outfitManager.PaintAccessory(this.accessoryUI.accessory, material, this.index);
+        outfitManager.PaintAccessory(accessoryUI.accessory, material, index);
     }
 
     private MaterialDescriptor CurrentLiveMaterial()
     {
-        var storedAcc = this.accessoryUI.accessory;
+        var storedAcc = accessoryUI.accessory;
         var mats = outfitManager.GetLiveMaterials(storedAcc);
-        if (mats is null) return this.defaultMaterial;
-        return mats[this.index]; 
+        if (mats is null) return defaultMaterial;
+        return mats[index];
     }
 
-    private void ResetMaterial() => SetMaterial(this.defaultMaterial);
+    private void ResetMaterial() => SetMaterial(defaultMaterial);
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -112,7 +113,7 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
         List<(string, UnityAction)> menuItems = new()
         {
             ("Copy Default Material", CopyDefaultMaterial),
-            ("Copy Current Material", CopyCurrentMaterial),       
+            ("Copy Current Material", CopyCurrentMaterial),
             ("Paste Material", PasteMaterial),
             ("Reset Material", ResetMaterial)
         };

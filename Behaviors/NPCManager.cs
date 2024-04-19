@@ -1,14 +1,10 @@
-﻿using CarolCustomizer.Utils;
-using BepInEx;
-using System;
-using System.Collections.Generic;
-using System.IO.IsolatedStorage;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using UnityEngine;
+using CarolCustomizer.Utils;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Recipes;
+using CarolCustomizer.Behaviors.Carol;
 
 namespace CarolCustomizer.Behaviors;
 internal class NPCManager 
@@ -24,7 +20,6 @@ internal class NPCManager
     {
         NPCManager.folder = folder;
         NPCManager.recipesManager = recipesManager;
-        
         shezaraInstance = new(folder);
     }
 
@@ -48,13 +43,6 @@ internal class NPCManager
         if (shezaraRecipe is null) { Log.Warning("didn't find shezara recipe"); return; }
         shezaraInstance.NotifySpawned(pelvis);
         RecipeApplier.ActivateRecipe(shezaraInstance.outfitManager, shezaraRecipe.Descriptor);
-    }
-
-    public static void OnShezaraDestroyed(PelvisWatchdog pelvis)
-    {
-        Log.Debug($"ShezaraDestroyed {pelvis}");
-        //if (shezaraInstance.RestorePrevious(pelvis)) return;
-        //shezaraInstance.outfitManager.Dispose();
     }
 
     public static void OnBotDespawn(PelvisWatchdog pelvis)

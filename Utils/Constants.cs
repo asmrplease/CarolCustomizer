@@ -69,7 +69,5 @@ internal static class Constants
     public const float CarolDefaultMass = 0.01f;
     public const KeyCode DefaultReload = KeyCode.Alpha8;
 
-    //TODO: move this to config
-    public const float PhoneHideTime = 1.75f;//1.5f
-    
+    public const float PhoneHideTime = 1.75f;
 }

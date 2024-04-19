@@ -1,10 +1,12 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Events;
 using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
@@ -16,7 +18,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static ModelData;
 
-namespace CarolCustomizer.UI;
+namespace CarolCustomizer.UI.Outfits;
 public class OutfitListUI : MonoBehaviour
 {
     #region Static Constants
@@ -33,7 +35,7 @@ public class OutfitListUI : MonoBehaviour
     private OutfitManager outfitManager;
     public CarolInstance playerManager { get; private set; }
     public MaterialManager materialManager { get; private set; }
-    
+
     private DynamicContextMenu contextMenu;
 
     public string searchString { get; private set; }
@@ -51,15 +53,15 @@ public class OutfitListUI : MonoBehaviour
     Dictionary<AccMatSlot, MaterialUI> materialUIs = new();
 
     public void Constructor(
-        TabbedUIAssetLoader loader, 
+        TabbedUIAssetLoader loader,
         CarolInstance playerManager,
-        MaterialManager materialManager, 
+        MaterialManager materialManager,
         DynamicContextMenu contextMenu)
     {
         this.loader = loader;
         this.materialManager = materialManager;
         this.playerManager = playerManager;
-        this.outfitManager = playerManager.outfitManager;
+        outfitManager = playerManager.outfitManager;
         this.contextMenu = contextMenu;
 
         OutfitAssetManager.OnOutfitLoaded += OnOutfitLoaded;
@@ -67,20 +69,20 @@ public class OutfitListUI : MonoBehaviour
 
         outfitManager.AccessoryChanged += HandleAccessoryChanged;
 
-        this.searchString = "";
+        searchString = "";
 
-        deselectAll = this.transform.Find(uncheckAllAddress).GetComponent<Button>();
+        deselectAll = transform.Find(uncheckAllAddress).GetComponent<Button>();
         deselectAll.onClick.AddListener(outfitManager.DisableAllAccessories);
-        favoriteFilter = this.transform.Find(filtersAddress + "/Favorites").GetComponent<Toggle>();
+        favoriteFilter = transform.Find(filtersAddress + "/Favorites").GetComponent<Toggle>();
         favoriteFilter.onValueChanged.AddListener(ProcessFilters);
-        activeFilter = this.transform.Find(filtersAddress + "/Active").GetComponent<Toggle>();
+        activeFilter = transform.Find(filtersAddress + "/Active").GetComponent<Toggle>();
         activeFilter.onValueChanged.AddListener(ProcessFilters);
-        showHideBase = this.transform.Find(showHideAddress).GetComponent<Button>();
+        showHideBase = transform.Find(showHideAddress).GetComponent<Button>();
         showHideBase.onClick.AddListener(outfitManager.ToggleBaseVisibility);
 
-        listRoot = this.transform.Find(listRootAddress);
+        listRoot = transform.Find(listRootAddress);
 
-        searchBox = this.transform.Find(searchBoxAddress).GetComponent<InputField>();
+        searchBox = transform.Find(searchBoxAddress).GetComponent<InputField>();
         searchBox.onEndEdit.AddListener(OnSearchBoxChanged);
 
         searchBoxHint = searchBox.transform.GetChild(1).GetComponent<Text>();
@@ -112,7 +114,7 @@ public class OutfitListUI : MonoBehaviour
 
         if (active) { foreach (var acc in outfitManager.ActiveAccessories) { SetAccUIVisible(acc, true); } }
         if (favorites) { foreach (var acc in Settings.Favorites.favorites) { SetAccUIVisible(acc, true); } }
-        
+
         if (!textFilter) return;
         var lowerString = searchString.ToLower();
         foreach (var outfit in outfitUIs.Keys
@@ -132,7 +134,7 @@ public class OutfitListUI : MonoBehaviour
 
     private void OnOutfitLoaded(Outfit outfit)
     {
-        var uiInstance = GameObject.Instantiate(loader.OutfitListElement, listRoot);
+        var uiInstance = Instantiate(loader.OutfitListElement, listRoot);
         if (!uiInstance) { Log.Error("Failed to instantiate outfit UI prefab."); return; }
 
         var outfitUI = uiInstance.AddComponent<OutfitUI>();
@@ -154,7 +156,7 @@ public class OutfitListUI : MonoBehaviour
         if (!outfitUIs.ContainsKey(outfit)) { Log.Warning("UI instance was asked to remove a UI element that was not in it's dict"); return; }
         var outfitUI = outfitUIs[outfit];
         outfitUIs.Remove(outfit);
-        GameObject.Destroy(outfitUI.gameObject);
+        Destroy(outfitUI.gameObject);
     }
 
     private AccessoryUI BuildAccUI(AccessoryDescriptor accessoryDescriptor)
@@ -163,26 +165,26 @@ public class OutfitListUI : MonoBehaviour
         Log.Debug($"BuildAccUI: source: {accessoryDescriptor.Source} outfit.assetname: {outfit.AssetName}");
         StoredAccessory accessory = outfit.GetAccessory(accessoryDescriptor);
         //does this line use the outfit name comparison?
-        var outfitUI = this.outfitUIs[outfit];
+        var outfitUI = outfitUIs[outfit];
 
-        var accInstance = GameObject.Instantiate(loader.AccessoryListElement, outfitUI.transform);
+        var accInstance = Instantiate(loader.AccessoryListElement, outfitUI.transform);
         if (!accInstance) { Log.Error("Failed to instantiate accessory UI prefab."); return null; }
 
         var accUI = accInstance.AddComponent<AccessoryUI>();
         if (!accUI) { Log.Error("Failed to add AccUI component"); return null; }
         accUI.Constructor(outfitUI, accessory, this, contextMenu, outfitManager);
-        this.accessoryUIs[accessoryDescriptor] = accUI;
+        accessoryUIs[accessoryDescriptor] = accUI;
         return accUI;
     }
 
-    private MaterialUI BuildMatUI(AccMatSlot location, MaterialDescriptor material) 
+    private MaterialUI BuildMatUI(AccMatSlot location, MaterialDescriptor material)
     {
-        var accessoryUI = this.accessoryUIs[location.accessory];
-        if (!accessoryUI) 
+        var accessoryUI = accessoryUIs[location.accessory];
+        if (!accessoryUI)
         {
             accessoryUI = BuildAccUI(location.accessory);
         }
-        var matInstance = GameObject.Instantiate(this.loader.AccessoryListElement, accessoryUI.transform.parent);
+        var matInstance = Instantiate(loader.AccessoryListElement, accessoryUI.transform.parent);
         if (!matInstance) { Log.Error("Failed to instantiate material UI prefab."); return null; }
 
         int index = accessoryUI.transform.GetSiblingIndex() + location.index + 1;
@@ -193,7 +195,7 @@ public class OutfitListUI : MonoBehaviour
 
         matUI.Constructor(accessoryUI, material, location.index, this, contextMenu, outfitManager);
         accessoryUI.AddMaterial(matUI);
-        this.materialUIs[location] = matUI;
+        materialUIs[location] = matUI;
         return matUI;
     }
 
@@ -261,7 +263,7 @@ public class OutfitListUI : MonoBehaviour
         int index = 0;
         foreach (var materialState in e.State.Materials)
         {
-            var accMatSlot = new AccMatSlot { accessory = e.Target, index = index};
+            var accMatSlot = new AccMatSlot { accessory = e.Target, index = index };
             if (!materialUIs[accMatSlot]) BuildMatUI(accMatSlot, e.Target.Materials[index]);
             materialUIs[accMatSlot].UpdateActiveMaterial(materialState);
             index++;

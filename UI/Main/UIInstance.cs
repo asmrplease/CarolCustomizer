@@ -3,20 +3,27 @@ using UnityEngine;
 using UnityEngine.UI;
 using CarolCustomizer.Assets;
 using CarolCustomizer.Utils;
+using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.UI.Recipes;
+using CarolCustomizer.UI.Outfits;
+using CarolCustomizer.UI.Materials;
+using CarolCustomizer.UI.Config;
 
-namespace CarolCustomizer.UI;
+namespace CarolCustomizer.UI.Main;
 
 public class UIInstance : MonoBehaviour
 {
+    #region Static Addresses
     private static readonly string viewRootAddress = "Accessory Panel";
     private static readonly string versionAddress = "Accessory Panel/TitleBar/Version";
     private static readonly string outfitsButtonAddress = "Accessory Panel/Tabs/Outfits";
     private static readonly string recipesButtonAddress = "Accessory Panel/Tabs/Recipes";
     private static readonly string materialsButtonAddress = "Accessory Panel/Tabs/Materials";
     private static readonly string settingsButtonAddress = "Accessory Panel/Tabs/Settings";
+    #endregion
 
     #region Dependencies
-    private TabbedUIAssetLoader loader;
+    TabbedUIAssetLoader loader;
     public PlayerCarolInstance playerManager { get; private set; }
     public DynamicContextMenu contextMenu { get; private set; }
     public MaterialManager materialManager { get; private set; }
@@ -38,62 +45,62 @@ public class UIInstance : MonoBehaviour
     Button settingsButton;
 
     #region Common Component References
-    private Canvas canvas;
-    private OutfitListUI outfitView;
-    private RecipeListUI recipesView;
-    private MaterialsListUI materialsView;
-    private SettingsUI settingsUI;
-    private MessageDialogue messageDialogue;
-    private Transform viewRoot;
+    Canvas canvas;
+    OutfitListUI outfitView;
+    RecipeListUI recipesView;
+    MaterialsListUI materialsView;
+    ConfigUI configView;
+    MessageDialogue messageDialogue;
+    Transform viewRoot;
     #endregion
 
     #region Public Interface
     public void Constructor(
-        TabbedUIAssetLoader loader, 
+        TabbedUIAssetLoader loader,
         PlayerCarolInstance player,
         RecipesManager recipesManager)
     {
         this.loader = loader;
-        this.playerManager = player;
-        this.materialManager = new();
+        playerManager = player;
+        materialManager = new();
 
-        uiObject = GameObject.Instantiate(this.loader.UIContainer, this.transform);
+        uiObject = Instantiate(this.loader.UIContainer, transform);
         viewRoot = uiObject.transform.Find(viewRootAddress);
 
-        contextMenuGO = GameObject.Instantiate(this.loader.ContextMenu, uiObject.transform);
+        contextMenuGO = Instantiate(this.loader.ContextMenu, uiObject.transform);
         contextMenu = contextMenuGO.AddComponent<DynamicContextMenu>();
         contextMenu.Constructor(this.loader.ContextMenuButton);
         contextMenuGO.SetActive(false);
 
-        messageDialogueGO = GameObject.Instantiate(this.loader.MessageDialogue, uiObject.transform);
+        messageDialogueGO = Instantiate(this.loader.MessageDialogue, uiObject.transform);
         messageDialogue = messageDialogueGO.AddComponent<MessageDialogue>();
         messageDialogue.Constructor();
         messageDialogueGO.SetActive(false);
 
-        outfitViewGO = GameObject.Instantiate(this.loader.OutfitView, viewRoot);
+        outfitViewGO = Instantiate(this.loader.OutfitView, viewRoot);
         outfitView = outfitViewGO.AddComponent<OutfitListUI>();
         outfitView.Constructor(this.loader, player, materialManager, contextMenu);
 
         outfitsButton = uiObject.transform.Find(outfitsButtonAddress).GetComponent<Button>();
         outfitsButton.onClick.AddListener(OnOutfitButton);
 
-        recipesViewGO = GameObject.Instantiate(this.loader.RecipesView, viewRoot);
+        recipesViewGO = Instantiate(this.loader.RecipesView, viewRoot);
         recipesView = recipesViewGO.AddComponent<RecipeListUI>();
         recipesView.Constructor(this.loader, recipesManager, player.outfitManager, contextMenu, messageDialogue);
 
         recipesButton = uiObject.transform.Find(recipesButtonAddress).GetComponent<Button>();
         recipesButton.onClick.AddListener(OnRecipeButton);
 
-        materialsViewGO = GameObject.Instantiate(this.loader.MaterialsView, viewRoot);
+        materialsViewGO = Instantiate(this.loader.MaterialsView, viewRoot);
         materialsView = materialsViewGO.AddComponent<MaterialsListUI>();
         materialsView.Constructor(this.loader, materialManager, contextMenu);
 
         materialsButton = uiObject.transform.Find(materialsButtonAddress).GetComponent<Button>();
         materialsButton.onClick.AddListener(OnMaterialsButton);
 
-        settingsViewGO = GameObject.Instantiate(this.loader.SettingsView, viewRoot);
-        settingsUI = settingsViewGO.AddComponent<SettingsUI>();
-        settingsUI.Constructor();
+        settingsViewGO = Instantiate(this.loader.SettingsView, viewRoot);
+        configView = settingsViewGO.AddComponent<ConfigUI>();
+        configView.Constructor();
 
         settingsButton = uiObject.transform.Find(settingsButtonAddress).GetComponent<Button>();
         settingsButton.onClick.AddListener(OnSettingsButton);

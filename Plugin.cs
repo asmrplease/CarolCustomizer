@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using System.Collections;
-using CarolCustomizer.UI;
 using CarolCustomizer.Assets;
 using CarolCustomizer.Utils;
 using UnityEngine.SceneManagement;
@@ -16,6 +15,8 @@ using Slate;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.UI.Main;
 
 namespace CarolCustomizer;
 

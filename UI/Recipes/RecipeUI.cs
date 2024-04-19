@@ -13,8 +13,10 @@ using BepInEx;
 using System;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.UI.Main;
 
-namespace CarolCustomizer.UI;
+namespace CarolCustomizer.UI.Recipes;
 public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
     Recipe recipe;
@@ -34,11 +36,11 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     static readonly string pickupLocationAddress = "Outfit Header/Text/Pickup Location";
 
     public void Constructor(
-        Recipe recipe, 
-        RecipeListUI ui, 
-        OutfitManager outfitManager, 
-        DynamicContextMenu contextMenu, 
-        FilenameDialogue filenameDialogue, 
+        Recipe recipe,
+        RecipeListUI ui,
+        OutfitManager outfitManager,
+        DynamicContextMenu contextMenu,
+        FilenameDialogue filenameDialogue,
         MessageDialogue messageDialogue)
     {
         this.ui = ui;
@@ -47,44 +49,44 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         this.contextMenu = contextMenu;
         this.filenameDialogue = filenameDialogue;
         this.messageDialogue = messageDialogue;
-        this.name = this.recipe.Name;
+        name = this.recipe.Name;
 
-        displayImage = this.transform.Find(displayImageAddress)?.GetComponent<Image>();
+        displayImage = transform.Find(displayImageAddress)?.GetComponent<Image>();
         displayImage.enabled = false;
 
-        displayName = this.transform.Find(outfitNameAddress)?.GetComponentInChildren<Text>();
+        displayName = transform.Find(outfitNameAddress)?.GetComponentInChildren<Text>();
         displayName.text = this.recipe.Name;
 
-        background = this.transform.GetChild(0).gameObject.GetComponent<Image>();
+        background = transform.GetChild(0).gameObject.GetComponent<Image>();
         background.color = GetUIColor();
 
-        pickupLocation = this.transform.Find(pickupLocationAddress)?.GetComponent<Text>();
+        pickupLocation = transform.Find(pickupLocationAddress)?.GetComponent<Text>();
         pickupLocation.text = GetStatusMessage();
     }
 
     private string GetStatusMessage()
     {
-        switch (this.recipe.Error)
+        switch (recipe.Error)
         {
-            case Recipe.Status.MissingSource:  return $"Missing {RecipeApplier.GetMissingSources(this.recipe.Descriptor).Count()} sources";
-            case Recipe.Status.InvalidJson:    return "Recipe file invalid";
-            case Recipe.Status.FileError:      return "Error loading file";
+            case Recipe.Status.MissingSource: return $"Missing {RecipeApplier.GetMissingSources(recipe.Descriptor).Count()} sources";
+            case Recipe.Status.InvalidJson: return "Recipe file invalid";
+            case Recipe.Status.FileError: return "Error loading file";
             default: return "";
         }
     }
 
     private Color GetUIColor()
     {
-        switch (this.recipe.Error)
+        switch (recipe.Error)
         {
             case Recipe.Status.MissingSource: return Constants.DefaultColor;
-            case Recipe.Status.InvalidJson:   return Color.gray;
-            case Recipe.Status.FileError:     return Color.gray;
+            case Recipe.Status.InvalidJson: return Color.gray;
+            case Recipe.Status.FileError: return Color.gray;
             default: return Constants.DefaultColor;
         }
     }
 
-    private void OnContextMenuOverwrite() 
+    private void OnContextMenuOverwrite()
     {
         string message = "Are you sure you'd like to overwrite this recipe?";
         messageDialogue.Show(message, confirmText: "Yes!", confirmAction: Overwrite);
@@ -92,18 +94,18 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     private void Overwrite()
     {
-        RecipeSaver.Save(new RecipeDescriptor20(this.outfitManager), this.recipe.Path);
+        RecipeSaver.Save(new RecipeDescriptor20(outfitManager), recipe.Path);
     }
 
     private void OnContextMenuLoad()
     {
-        RecipeApplier.ActivateRecipe(outfitManager, this.recipe.Descriptor);
+        RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
     }
 
     private void OnContextMenuWarningLoad()
     {
         string message = "Some of the resources for this recipe aren't available: " + Environment.NewLine; ;
-        var missingSources = RecipeApplier.GetMissingSources(this.recipe.Descriptor);
+        var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
         foreach (var source in missingSources) { message += source + Environment.NewLine; }
         messageDialogue.Show(message, cancelText: "Nevermind", confirmText: "Load Anyway", confirmAction: OnContextMenuLoad);
     }
@@ -122,12 +124,12 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     private void DeleteRecipe()
     {
-        System.IO.File.Delete(this.recipe.Path);
+        File.Delete(recipe.Path);
     }
 
     private void OnContextMenuListMissing()
     {
-        var missingSources = RecipeApplier.GetMissingSources(this.recipe.Descriptor);
+        var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
         string message = string.Empty;
         foreach (var source in missingSources) { message += source + Environment.NewLine; }
         messageDialogue.Show(message, cancelText: "Done");
@@ -141,7 +143,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         if (!newName.ToLower().EndsWith(Constants.RecipeExtension)) newName += Constants.RecipeExtension;
         var newPath = RecipeSaver.RecipeFilenameToPath(newName);
 
-        File.Move(this.recipe.Path, newPath);
+        File.Move(recipe.Path, newPath);
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -152,17 +154,17 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         var output = new List<(string, UnityAction)>();
-        if (this.recipe.Error != Recipe.Status.FileError)
+        if (recipe.Error != Recipe.Status.FileError)
         {
             output.Add(("Overwrite", OnContextMenuOverwrite));
             output.Add(("Delete", OnContextMenuDelete));
             output.Add(("Rename", OnContextMenuRename));
         }
-        if (this.recipe.Error == Recipe.Status.NoError)
+        if (recipe.Error == Recipe.Status.NoError)
         {
             output.Add(("Load", OnContextMenuLoad));
         }
-        if (this.recipe.Error == Recipe.Status.MissingSource)
+        if (recipe.Error == Recipe.Status.MissingSource)
         {
             output.Add(("Load*", OnContextMenuWarningLoad));
             output.Add(("Show Missing", OnContextMenuListMissing));

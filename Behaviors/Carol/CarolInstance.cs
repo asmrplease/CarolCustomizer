@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using CarolCustomizer.Utils;
-using System.Collections;
 using CarolCustomizer.Hooks.Watchdogs;
 
-namespace CarolCustomizer.Behaviors;
+namespace CarolCustomizer.Behaviors.Carol;
 /// <summary>
 /// This class is responsible for one player or other type of carol through the lifetime of the plugin.
 /// It delegates actions to other classes to maintain clothing continuity.
@@ -62,7 +60,7 @@ public class CarolInstance : IDisposable
     public bool RestorePrevious(PelvisWatchdog pelvis)
     {
         if (targetPelvis != pelvis) return false;
-        if (previousTargets is null ) return false;
+        if (previousTargets is null) return false;
         if (!previousTargets.Any(x => x)) return false;
         Log.Debug("Notifying last valid target of spawn");
         NotifySpawned(previousTargets.Last(x => x));

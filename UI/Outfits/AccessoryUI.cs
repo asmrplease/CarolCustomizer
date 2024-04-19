@@ -8,11 +8,12 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using CarolCustomizer.Utils;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.UI.Main;
 
-namespace CarolCustomizer.UI;
+namespace CarolCustomizer.UI.Outfits;
 /// <summary>
 /// Represents one Accessory in the UI. 
 /// </summary>
@@ -51,10 +52,10 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
 
     #region Constructor
     public void Constructor(
-        OutfitUI outfitUI, 
-        StoredAccessory accessory, 
-        OutfitListUI ui, 
-        DynamicContextMenu contextMenu, 
+        OutfitUI outfitUI,
+        StoredAccessory accessory,
+        OutfitListUI ui,
+        DynamicContextMenu contextMenu,
         OutfitManager outfitManager)
     {
         this.outfitUI = outfitUI;
@@ -63,21 +64,21 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
         this.ui = ui;
         this.outfitManager = outfitManager;
 
-        this.name = "AccUI: " + accessory.DisplayName;
+        name = "AccUI: " + accessory.DisplayName;
 
-        displayName = this.transform.Find(displayNameAddress).GetComponent<Text>();
+        displayName = transform.Find(displayNameAddress).GetComponent<Text>();
         displayName.text = accessory.DisplayName;
 
-        materialName = this.transform.Find(materialNameAddress).GetComponent<Text>();
+        materialName = transform.Find(materialNameAddress).GetComponent<Text>();
         materialName.text = "";
 
-        activationToggle = this.transform.GetComponentInChildren<Toggle>(true);
-        activationToggle.onValueChanged.AddListener(OnToggle); 
+        activationToggle = transform.GetComponentInChildren<Toggle>(true);
+        activationToggle.onValueChanged.AddListener(OnToggle);
 
-        favoriteIcon = this.transform.Find(favoriteAddress)?.GetComponent<Image>();
+        favoriteIcon = transform.Find(favoriteAddress)?.GetComponent<Image>();
         favoriteIcon.enabled = Settings.Favorites.IsInFavorites(accessory);
 
-        this.gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 
     public void AddMaterial(MaterialUI material)
@@ -108,7 +109,7 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
 
     private void SetMaterialVisibity(bool state)
     {
-        ui.SetAccessoryExpanded(this.accessory, state);
+        ui.SetAccessoryExpanded(accessory, state);
     }
 
     private void OnContextClick() => contextMenu.Show(this);
@@ -123,14 +124,14 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
 
     private void ToggleFavorite()
     {
-        Settings.Favorites.ToggleFavorite(new AccessoryDescriptor(this.accessory));
-        favoriteIcon.enabled = Settings.Favorites.IsInFavorites(this.accessory);
+        Settings.Favorites.ToggleFavorite(new AccessoryDescriptor(accessory));
+        favoriteIcon.enabled = Settings.Favorites.IsInFavorites(accessory);
     }
 
     public List<(string, UnityAction)> GetContextMenuItems()
     {
-        bool currentlyFavorite = Settings.Favorites.IsInFavorites(this.accessory);
-        return new List<(string, UnityAction)> { (currentlyFavorite? "Remove from Favorites" : "Add to favorites", ToggleFavorite) };
+        bool currentlyFavorite = Settings.Favorites.IsInFavorites(accessory);
+        return new List<(string, UnityAction)> { (currentlyFavorite ? "Remove from Favorites" : "Add to favorites", ToggleFavorite) };
     }
     #endregion
 }

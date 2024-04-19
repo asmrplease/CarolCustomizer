@@ -2,13 +2,14 @@
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models;
+using CarolCustomizer.UI.Main;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI;
+namespace CarolCustomizer.UI.Materials;
 internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
     private static readonly string displayNameAddress = "Text/Accessory Name";
@@ -29,21 +30,21 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
         this.materialManager = materialManager;
         this.contextMenu = contextMenu;
 
-        displayName = this.transform.Find(displayNameAddress).GetComponent<Text>();
+        displayName = transform.Find(displayNameAddress).GetComponent<Text>();
         displayName.text = this.material.Name;
 
-        materialName = this.transform.Find(materialNameAddress).GetComponent<Text>();
+        materialName = transform.Find(materialNameAddress).GetComponent<Text>();
         materialName.text = "";
 
-        favoriteIcon = this.transform.Find(favoriteAddress)?.GetComponent<Image>();
+        favoriteIcon = transform.Find(favoriteAddress)?.GetComponent<Image>();
         favoriteIcon.enabled = false;
 
-        this.name = "ReadonlyMatUI: " + this.material.Name;
+        name = "ReadonlyMatUI: " + this.material.Name;
     }
 
     private void CopyMaterial()
     {
-        materialManager.clipboard = this.material;
+        materialManager.clipboard = material;
     }
 
     public void OnPointerClick(PointerEventData eventData)

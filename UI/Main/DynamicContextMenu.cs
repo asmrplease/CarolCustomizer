@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using CarolCustomizer.Utils;
 using UnityEngine.Events;
 
-namespace CarolCustomizer.UI;
+namespace CarolCustomizer.UI.Main;
 public class DynamicContextMenu : MonoBehaviour
 {
     #region Dependencies
@@ -20,14 +20,14 @@ public class DynamicContextMenu : MonoBehaviour
     #region Lifecycle
     private void Awake()
     {
-        foreach (Transform child in this.transform) { GameObject.Destroy(child.gameObject); }
-        this.gameObject.SetActive(false);
+        foreach (Transform child in transform) { Destroy(child.gameObject); }
+        gameObject.SetActive(false);
     }
 
     public void Constructor(GameObject buttonPrefab)
     {
         this.buttonPrefab = buttonPrefab;
-        this.buttonContainer = this.transform;
+        buttonContainer = transform;
     }
     #endregion
 
@@ -35,11 +35,11 @@ public class DynamicContextMenu : MonoBehaviour
     public void Show(IContextMenuActions menuItems)
     {
         if (menuItems is null) return;
-        if (this.gameObject.activeSelf) { Hide(); }
+        if (gameObject.activeSelf) { Hide(); }
 
         foreach ((string name, UnityAction action) in menuItems.GetContextMenuItems())
         {
-            GameObject buttonGO = GameObject.Instantiate(buttonPrefab, buttonContainer);
+            GameObject buttonGO = Instantiate(buttonPrefab, buttonContainer);
             if (!buttonGO) { Log.Error("failed to instantiate button prefab."); return; }
             Button buttonComponent = buttonGO.GetComponent<Button>();
             if (!buttonComponent) { Log.Error("failed to find button component."); return; }
@@ -50,20 +50,20 @@ public class DynamicContextMenu : MonoBehaviour
             buttonList.Add(buttonComponent);
         }
 
-        this.transform.position = Input.mousePosition;
-        this.gameObject.SetActive(true);
+        transform.position = Input.mousePosition;
+        gameObject.SetActive(true);
     }
 
     public void Hide()
     {
-        this.gameObject.SetActive(false);
-        foreach (var button in buttonList) { GameObject.Destroy(button.gameObject); }
+        gameObject.SetActive(false);
+        foreach (var button in buttonList) { Destroy(button.gameObject); }
         buttonList.Clear();
     }
 
     private void Update()
     {
-        if    (Input.GetMouseButtonUp(0) 
+        if (Input.GetMouseButtonUp(0)
             || Input.GetMouseButtonUp(1)
             || Input.GetMouseButtonUp(2)
             || Input.GetKeyDown(KeyCode.Escape))

@@ -9,6 +9,7 @@ using UnityEngine.Analytics;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Behaviors.Carol;
 
 namespace CarolCustomizer.Behaviors;
 internal static class RecipeApplier

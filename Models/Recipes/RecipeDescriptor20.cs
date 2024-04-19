@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Behaviors.Carol;
 
 namespace CarolCustomizer.Models.Recipes;
 public class RecipeDescriptor20 : IRecipeDescriptor

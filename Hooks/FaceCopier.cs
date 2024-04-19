@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Behaviors.Carol;
 
 namespace CarolCustomizer.Hooks;
 public class FaceCopier : MonoBehaviour

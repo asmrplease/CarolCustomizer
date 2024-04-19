@@ -6,9 +6,9 @@ using UnityEngine.EventSystems;
 namespace CarolCustomizer.Behaviors.Settings;
 public class HotKeyConfig
 {
-    ConfigEntry<KeyCode> mouseMenuToggle;
-    ConfigEntry<KeyCode> keyboardMenuToggle;
-    ConfigEntry<PointerEventData.InputButton> mouseContextMenu;
+    public readonly ConfigEntry<KeyCode> mouseMenuToggle;
+    public readonly ConfigEntry<KeyCode> keyboardMenuToggle;
+    public readonly ConfigEntry<PointerEventData.InputButton> mouseContextMenu;
     public KeyCode MenuToggleMouse => mouseMenuToggle.Value;
     public KeyCode MenuToggleKeyboard => keyboardMenuToggle.Value;
     public PointerEventData.InputButton ContextMenu => mouseContextMenu.Value;

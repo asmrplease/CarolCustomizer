@@ -12,8 +12,9 @@ using CarolCustomizer.Utils;
 using CarolCustomizer.Behaviors;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.UI.Main;
 
-namespace CarolCustomizer.UI;
+namespace CarolCustomizer.UI.Outfits;
 public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
 
@@ -48,18 +49,18 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         this.ui = ui;
         this.contextMenu = contextMenu;
 
-        this.name = "OutfitUI: " + outfit.DisplayName;
+        name = "OutfitUI: " + outfit.DisplayName;
 
-        background = this.transform.GetChild(0).gameObject.GetComponent<Image>();
+        background = transform.GetChild(0).gameObject.GetComponent<Image>();
         background.color = Constants.DefaultColor;
 
-        displayImage = this.transform.Find(displayImageAddress)?.GetComponent<Image>();
+        displayImage = transform.Find(displayImageAddress)?.GetComponent<Image>();
         displayImage.sprite = outfit.Sprite;
 
-        displayName = this.transform.Find(outfitNameAddress)?.GetComponentInChildren<Text>();
+        displayName = transform.Find(outfitNameAddress)?.GetComponentInChildren<Text>();
         displayName.text = outfit.DisplayName;
 
-        pickupLocation = this.transform.Find(pickupLocationAddress)?.GetComponent<Text>();
+        pickupLocation = transform.Find(pickupLocationAddress)?.GetComponent<Text>();
         pickupLocation.text = "";
 
     }
@@ -75,13 +76,13 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == Settings.HotKeys.ContextMenu) { OnContextClick(); }
-        if (eventData.button == PointerEventData.InputButton.Left) { OnLeftClick(); }  
+        if (eventData.button == PointerEventData.InputButton.Left) { OnLeftClick(); }
     }
 
     private void OnLeftClick()
     {
         expanded.Flip();
-        ui.SetOutfitExpanded(this.outfit, expanded);
+        ui.SetOutfitExpanded(outfit, expanded);
     }
 
     private void OnContextClick() => contextMenu.Show(this);
@@ -97,7 +98,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         //return new List<(string, UnityAction)> { ( "Set Outfit", () => ui.SetBaseOutfit(this.outfit) ) };
         var results = new List<(string, UnityAction)>();
         var hads = outfit as HaDSOutfit; //TODO: idk but anything but this
-        
+
         foreach (var entry in hads.modelData.accessories)
         {
             var idk = () => RecipeApplier.ActivateVariant(ui.playerManager.outfitManager, hads, entry.name);

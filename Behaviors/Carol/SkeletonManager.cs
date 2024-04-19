@@ -10,7 +10,7 @@ using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Models.Accessories;
 
-namespace CarolCustomizer.Behaviors;
+namespace CarolCustomizer.Behaviors.Carol;
 
 public class SkeletonManager : IDisposable
 {
@@ -46,8 +46,8 @@ public class SkeletonManager : IDisposable
     #region Lifecycle
     public SkeletonManager(CarolInstance player, GameObject parent)
     {
-        this.playerManager = player;
-        this.playerManager.SpawnEvent += SetNewPelvis;
+        playerManager = player;
+        playerManager.SpawnEvent += SetNewPelvis;
 
         faceCopier = parent.AddComponent<FaceCopier>();
         faceCopier.Constructor(playerManager);
@@ -55,17 +55,17 @@ public class SkeletonManager : IDisposable
 
     public void Dispose()
     {
-        this.playerManager.SpawnEvent -= SetNewPelvis;
-        GameObject.Destroy(faceCopier);
-    } 
+        playerManager.SpawnEvent -= SetNewPelvis;
+        UnityEngine.Object.Destroy(faceCopier);
+    }
     #endregion
 
     #region Update Target
     private void SetNewPelvis(PelvisWatchdog newPelvis)
     {
-        this.targetPelvis = newPelvis;        
+        targetPelvis = newPelvis;
         RebuildBones();
-        
+
         var head = liveStandardBones["Bn_CarolHead"];
         if (!head) { Log.Warning("didn't find head bone!?"); return; }
 
@@ -81,8 +81,8 @@ public class SkeletonManager : IDisposable
         var activeOutfits = outfitBoneDicts.Keys.ToList();
         liveStandardBones.Clear();
         outfitBoneDicts.Clear();
-        
-        liveStandardBones = this.targetPelvis.BoneData.StandardBones;
+
+        liveStandardBones = targetPelvis.BoneData.StandardBones;
         FixMissingStandardBones();
 
         foreach (var outfit in activeOutfits) { AddBespokeBones(outfit); }
@@ -92,7 +92,7 @@ public class SkeletonManager : IDisposable
     #region Public Interface
     public Transform[] Mount(LiveAccessory acc)
     {
-        AddBespokeBones(acc.outfit); 
+        AddBespokeBones(acc.outfit);
         return GetLiveBoneArray(acc.outfit, acc.bones);
     }
 
@@ -127,17 +127,17 @@ public class SkeletonManager : IDisposable
         var parentBone = liveStandardBones[parentName];
         if (!parentBone) { Log.Error($"failed to find parent bone when instantiating {objectToInstantiate.name}"); return null; }
 
-        var newBone = GameObject.Instantiate(objectToInstantiate.gameObject, parentBone.transform).transform;
+        var newBone = UnityEngine.Object.Instantiate(objectToInstantiate.gameObject, parentBone.transform).transform;
         newBone.DeCloneName();
         return newBone;
     }
 
-    private Transform[] GetLiveBoneArray(Outfit outfit, Transform[] boneList) 
+    private Transform[] GetLiveBoneArray(Outfit outfit, Transform[] boneList)
     {
         Transform[] output = new Transform[boneList.Length];
 
         if (!outfitBoneDicts.ContainsKey(outfit)) { Log.Error($"Tried to get bones when {outfit.DisplayName} wasn't in custom bone table"); return output; }
-        var bespokeBones = outfitBoneDicts[outfit];        
+        var bespokeBones = outfitBoneDicts[outfit];
 
         for (int i = 0; i < boneList.Length; i++)
         {

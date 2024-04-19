@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using CarolCustomizer.Behaviors;
 using CarolCustomizer.Assets;
 using CarolCustomizer.Utils;
-using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.UI.Main;
 
-namespace CarolCustomizer.UI;
+namespace CarolCustomizer.UI.Materials;
 internal class MaterialsListUI : MonoBehaviour
 {
     private static readonly string listRootAddress = "Scroll View/Viewport/Content";
@@ -27,14 +24,14 @@ internal class MaterialsListUI : MonoBehaviour
         this.loader = loader;
         this.contextMenu = contextMenu;
 
-        listRoot = this.transform.Find(listRootAddress);
+        listRoot = transform.Find(listRootAddress);
     }
 
     private void OnEnable()
     {
         if (!listRoot) { Log.Warning("MaterialsListUI was null during OnEnable"); return; }
         //get the world materials from the material manager
-        foreach (var item in materialUIs) { if (item) GameObject.Destroy(item.gameObject); }
+        foreach (var item in materialUIs) { if (item) Destroy(item.gameObject); }
         materialUIs.Clear();
 
         var materials = materialManager.ListMaterials();
@@ -42,7 +39,7 @@ internal class MaterialsListUI : MonoBehaviour
 
         foreach (var material in materialManager.ListMaterials())
         {
-            var listElementGO = GameObject.Instantiate(loader.AccessoryListElement, listRoot);
+            var listElementGO = Instantiate(loader.AccessoryListElement, listRoot);
             var matUI = listElementGO.AddComponent<ReadOnlyMatUI>();
             matUI.Constructor(material, materialManager, contextMenu);
             materialUIs.Add(matUI);
