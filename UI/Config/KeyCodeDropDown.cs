@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace CarolCustomizer.UI.Config;
 
@@ -19,7 +20,7 @@ public class KeyCodeDropDown : MonoBehaviour
     Text label;
     ConfigEntry<KeyCode> keycodeConfig;
 
-    public void Constructor(ConfigEntry<KeyCode> keycodeConfig)
+    public KeyCodeDropDown Constructor(ConfigEntry<KeyCode> keycodeConfig)
     {
         Log.Debug("ConfigUI.Constructor()");
         this.keycodeConfig = keycodeConfig;
@@ -39,6 +40,7 @@ public class KeyCodeDropDown : MonoBehaviour
         }
 
         SetKeyCode(keycodeConfig.Value);
+        return this;
     }
 
     private void OnDropdownChanged(int index)

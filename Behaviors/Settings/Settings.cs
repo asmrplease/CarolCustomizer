@@ -3,7 +3,7 @@
 namespace CarolCustomizer.Behaviors.Settings;
 public static class Settings 
 {
-    static public ConfigFile config { get; private set; }
+    static public ConfigFile Config { get; private set; }
 
     static public HotKeyConfig HotKeys { get; private set; }
     static public FavoritesManager Favorites { get; private set; }
@@ -11,7 +11,7 @@ public static class Settings
     static public PluginConfig Plugin { get; private set; }
     static public void Constructor(ConfigFile config)
     {
-        Settings.config = config;
+        Settings.Config = config;
         Settings.HotKeys = new(config);
         Settings.Favorites = new(config);
         Settings.Game = new(config);
@@ -20,7 +20,7 @@ public static class Settings
 
     static public void Dispose()
     {
-        config.Save();
+        Config.Save();
         Favorites.Dispose();
         Game.Dispose();
     }

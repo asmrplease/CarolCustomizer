@@ -35,6 +35,16 @@ public class FavoritesManager : IDisposable
         config.Save();
     }
 
+    public void ResetFavorites()
+    {
+        Log.Warning("Called ResetFavorites() but the behavior is not yet implemented.");
+        foreach (var favorite in favorites)
+        {
+            //notify the UI to unfavorite this accessory
+        }
+        //favorites.Clear(); //don't call this until we're updating the UI
+    }
+
     public bool IsInFavorites(AccessoryDescriptor descriptor) => favorites.Contains(descriptor);
 
     public void AddToFavorites(AccessoryDescriptor descriptor, bool autoSave = true)

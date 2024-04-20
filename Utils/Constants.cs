@@ -62,8 +62,13 @@ internal static class Constants
 
     public const string RecipeExtension = ".json";
     public const string RecipeFolderName = "Recipes";
+    public const string LogFolderRelativePath = "BepInEx";
     public static readonly string ApplicationPath = Directory.GetParent(Application.dataPath).FullName;
     public static readonly string RecipeFolderPath = Path.Combine(Constants.ApplicationPath, Constants.RecipeFolderName);
+    public static readonly string BepInExFolderPath = Path.Combine(Constants.ApplicationPath, Constants.LogFolderRelativePath);
+    public static readonly string LogFileName = "LogOutput.log";
+    public static readonly string LogFilePath = Path.Combine(BepInExFolderPath, LogFileName);
+
 
     public static readonly Vector3 OutOfTheWay = new(-10000, -10000, -10000);
     public const float CarolDefaultMass = 0.01f;

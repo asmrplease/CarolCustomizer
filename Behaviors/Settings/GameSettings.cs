@@ -7,8 +7,8 @@ namespace CarolCustomizer.Behaviors.Settings;
 public class GameSettings : IDisposable
 {
     ConfigFile config;
-    ConfigEntry<bool> RunInBackground;
-    ConfigEntry<KeyCode> Reload;
+    public readonly ConfigEntry<bool> RunInBackground;
+    public readonly ConfigEntry<KeyCode> Reload;
 
     public GameSettings(ConfigFile config)
     {
