@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace CarolCustomizer.UI.Config;
@@ -23,7 +24,7 @@ public class ConfigUI : MonoBehaviour
     const string ClearFavoritesButtonAddress = "ClearFavorites";
 
     const string RunInBackgroundToggleAddress = "RunInBackground/Toggle";
-    const string ContextMenuToggleAddress = "MouseButton";
+    const string RightMouseButtonToggle = "MouseButton/Toggles/Right";
     #endregion
 
     MessageDialogue dialoge;
@@ -68,32 +69,39 @@ public class ConfigUI : MonoBehaviour
             .AddComponent<KeyCodeDropDown>()
             .Constructor(Settings.Game.Reload);
 
+        var RMBToggle = transform
+            .Find(RightMouseButtonToggle)
+            .GetComponent<Toggle>();
+        RMBToggle
+            .onValueChanged
+            .AddListener(OnRightToggle);
+        RMBToggle
+            .SetIsOnWithoutNotify(
+            Settings.HotKeys.mouseContextMenu.Value == PointerEventData.InputButton.Right);
+
         var runInBackground = transform
             .Find(RunInBackgroundToggleAddress)
             .GetComponent<Toggle>();
         runInBackground
             .onValueChanged
-            .AddListener(OnRiBChanged);
+            .AddListener
+            ((x) => Settings.Game.RunInBackground = x);
         runInBackground
             .SetIsOnWithoutNotify(
             Settings.Game.RunInBackground);
-
-        var contextToggleGroup = transform
-            .Find(ContextMenuToggleAddress)
-            .GetComponent<ToggleGroup>();
-
     }
 
-    private void OnRiBChanged(bool state)
+    private void OnRightToggle(bool state)
     {
-        Log.Debug($"Setting RunInBackgroud({state})");
-        Settings.Game.RunInBackground = state;
+        Settings.HotKeys.mouseContextMenu.Value = 
+            state?
+            PointerEventData.InputButton.Right:
+            PointerEventData.InputButton.Middle;
     }
 
     private void ConfirmClearFavorites()
     {
         Log.Debug("ConfirmClearFavorites()");
-        //show dialogue confirming we want to permanently clear all favorites.
         dialoge.Show(
             "Are you sure you want to permanently clear your favorites?",
             "Yes.", Settings.Favorites.ResetFavorites,
