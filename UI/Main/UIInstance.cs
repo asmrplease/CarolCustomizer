@@ -100,7 +100,7 @@ public class UIInstance : MonoBehaviour
 
         settingsViewGO = Instantiate(this.loader.SettingsView, viewRoot);
         configView = settingsViewGO.AddComponent<ConfigUI>();
-        configView.Constructor();
+        configView.Constructor(messageDialogue);
 
         settingsButton = uiObject.transform.Find(settingsButtonAddress).GetComponent<Button>();
         settingsButton.onClick.AddListener(OnSettingsButton);

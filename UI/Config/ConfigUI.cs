@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
@@ -12,14 +13,22 @@ using UnityEngine.UI;
 namespace CarolCustomizer.UI.Config;
 public class ConfigUI : MonoBehaviour
 {
+    #region Transform Addresses
     const string KeyboardToggleAddress = "Menu Toggle Keyboard Key/Dropdown";
     const string MouseToggleAddress = "Menu Toggle Mouse Key/Dropdown";
     const string ReloadStageAddress = "Reload Stage Replacement Key/Dropdown";
+
     const string LogFolderButtonAddress = "OpenLogFolder";
     const string LogFileButtonAddress = "OpenLogFile";
+    const string ClearFavoritesButtonAddress = "ClearFavorites";
+    #endregion
 
-    public void Constructor()
+    MessageDialogue dialoge;
+
+    public void Constructor(MessageDialogue dialogue)
     {
+        this.dialoge = dialogue;
+
         transform
             .Find(LogFolderButtonAddress)
             .GetComponent<Button>()
@@ -31,6 +40,12 @@ public class ConfigUI : MonoBehaviour
             .GetComponent<Button>()
             .onClick
             .AddListener(OpenLogFile);
+
+        transform
+            .Find(ClearFavoritesButtonAddress)
+            .GetComponent<Button>()
+            .onClick
+            .AddListener(ConfirmClearFavorites);
 
         transform
             .Find(KeyboardToggleAddress)
@@ -51,7 +66,15 @@ public class ConfigUI : MonoBehaviour
             .Constructor(Settings.Game.Reload);
     }
 
-
+    private void ConfirmClearFavorites()
+    {
+        Log.Debug("ConfirmClearFavorites()");
+        //show dialogue confirming we want to permanently clear all favorites.
+        dialoge.Show(
+            "Are you sure you want to permanently clear your favorites?",
+            "Yes.", Settings.Favorites.ResetFavorites,
+            "Cancel!", null);
+    }
 
     private void OpenLogFolder()
     {
