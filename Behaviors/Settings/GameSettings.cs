@@ -7,13 +7,23 @@ namespace CarolCustomizer.Behaviors.Settings;
 public class GameSettings : IDisposable
 {
     ConfigFile config;
-    public readonly ConfigEntry<bool> RunInBackground;
+    public bool RunInBackground
+    {
+        set
+        {
+            RunInBackgroundCE.Value = value;
+            Application.runInBackground = value;
+        }
+        get { return RunInBackgroundCE.Value; }
+    }
+
+    readonly ConfigEntry<bool> RunInBackgroundCE;
     public readonly ConfigEntry<KeyCode> Reload;
 
     public GameSettings(ConfigFile config)
     {
         this.config = config;
-        RunInBackground = config.Bind(
+        RunInBackgroundCE = config.Bind(
             Constants.Preferences,
             "Run In Background",
             true,
@@ -27,7 +37,7 @@ public class GameSettings : IDisposable
 
     public void ApplySettings()
     {
-        Application.runInBackground = RunInBackground.Value;
+        Application.runInBackground = RunInBackgroundCE.Value;
         if (GameManager.manager) GameManager.manager.loadKey = Reload.Value;
         else Log.Warning("GameManager was null when replacing reload hotkey");
     }

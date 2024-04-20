@@ -21,6 +21,9 @@ public class ConfigUI : MonoBehaviour
     const string LogFolderButtonAddress = "OpenLogFolder";
     const string LogFileButtonAddress = "OpenLogFile";
     const string ClearFavoritesButtonAddress = "ClearFavorites";
+
+    const string RunInBackgroundToggleAddress = "RunInBackground/Toggle";
+    const string ContextMenuToggleAddress = "MouseButton";
     #endregion
 
     MessageDialogue dialoge;
@@ -64,6 +67,27 @@ public class ConfigUI : MonoBehaviour
             .gameObject
             .AddComponent<KeyCodeDropDown>()
             .Constructor(Settings.Game.Reload);
+
+        var runInBackground = transform
+            .Find(RunInBackgroundToggleAddress)
+            .GetComponent<Toggle>();
+        runInBackground
+            .onValueChanged
+            .AddListener(OnRiBChanged);
+        runInBackground
+            .SetIsOnWithoutNotify(
+            Settings.Game.RunInBackground);
+
+        var contextToggleGroup = transform
+            .Find(ContextMenuToggleAddress)
+            .GetComponent<ToggleGroup>();
+
+    }
+
+    private void OnRiBChanged(bool state)
+    {
+        Log.Debug($"Setting RunInBackgroud({state})");
+        Settings.Game.RunInBackground = state;
     }
 
     private void ConfirmClearFavorites()
