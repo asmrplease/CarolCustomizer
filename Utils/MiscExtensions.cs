@@ -128,4 +128,16 @@ public static class MiscExtensions
         }
         return results;
     }
+
+    public static void ForEach<T>(this IEnumerable<T> sequence, Action<T> action)
+    {
+        if (action == null)
+        {
+            throw new ArgumentNullException(nameof(action));
+        }
+        foreach (T item in sequence)
+        {
+            action(item);
+        }
+    }
 }

@@ -45,15 +45,21 @@ internal static class Constants
     public static readonly Color Highlight = new(0.6f, 0.2039f, 0.7373f, 0.728f);//new(0.4641f, 0f, 0.4706f, 1f);
     public static readonly Color Vanilla = new(0, 0.1294f, 0.3647f, 1f);
     public static readonly Color Teal = new(0, 0.1961f, 0.1373f, 1f);
+    public static readonly Dictionary<string, float> MenuSpeeds = new()
+    {
+        {"Slow", 0.66f},
+        {"Normal", 1.0f},
+        {"Fast", 2.0f}
+    };
 
     public const string MenuSceneName = "Main_menu_new";
     public const string LoadingSceneName = "Loading_Startup";
     public const string IntroCutsceneName = "INTRO_CUTSCENES";
     public const string Pyjamas = "CAROL_PyjamaBasic";
     public const string RobotHead = "Robocarolhead";
-    public const string Preferences = "Preferences";
-
     public const string Shezara = "Shezara";
+    public const float CarolDefaultMass = 0.01f;
+    public const KeyCode DefaultReload = KeyCode.Alpha8;
 
     public static readonly Version v200 = new("2.0.0");
     public static readonly Version v100 = new("1.0.0");
@@ -61,6 +67,7 @@ internal static class Constants
     public const string RecipeExtension = ".json";
     public const string RecipeFolderName = "Recipes";
     public const string LogFolderRelativePath = "BepInEx";
+    public const string Preferences = "Preferences";
     public static readonly string ApplicationPath = Directory.GetParent(Application.dataPath).FullName;
     public static readonly string RecipeFolderPath = Path.Combine(Constants.ApplicationPath, Constants.RecipeFolderName);
     public static readonly string BepInExFolderPath = Path.Combine(Constants.ApplicationPath, Constants.LogFolderRelativePath);
@@ -69,8 +76,5 @@ internal static class Constants
 
 
     public static readonly Vector3 OutOfTheWay = new(-10000, -10000, -10000);
-    public const float CarolDefaultMass = 0.01f;
-    public const KeyCode DefaultReload = KeyCode.Alpha8;
-
     public const float PhoneHideTime = 1.75f;
 }

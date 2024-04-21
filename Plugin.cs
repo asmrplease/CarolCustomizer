@@ -41,13 +41,12 @@ public class CCPlugin : BaseUnityPlugin
     OutfitAssetManager dynamicAssetManager;
     NPCInstanceCreator npcInstances;
     IntroCutsceneFixBehavior introFix;
-    
     #endregion
 
     #region Setup
     private void Awake()
     {
-        var logger = new Log(Logger);
+        new Log(Logger);
         Log.Message("Logger Ready!");
 
         Settings.Constructor(Config);

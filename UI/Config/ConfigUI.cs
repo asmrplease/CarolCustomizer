@@ -3,6 +3,7 @@ using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -21,6 +22,7 @@ public class ConfigUI : MonoBehaviour
 
     const string RunInBackgroundToggleAddress = "RunInBackground/Toggle";
     const string RightMouseButtonToggle = "MouseButton/Toggles/Right";
+    const string MenuSpeedToggleGroupAddress = "Menu Speed";
     #endregion
 
     MessageDialogue dialoge;
@@ -65,12 +67,23 @@ public class ConfigUI : MonoBehaviour
             .AddComponent<KeyCodeDropDown>()
             .Constructor(Settings.Game.Reload);
 
+        var toggles = transform
+            .Find(MenuSpeedToggleGroupAddress)
+            .GetComponentsInChildren<Toggle>(true);
+        foreach (Toggle toggle in toggles)
+        {
+            toggle.onValueChanged.AddListener(OnMenuSpeedToggleChanged);
+            if (toggle.name != Settings.Plugin.menuSpeed.Value) continue;
+            toggle.SetIsOnWithoutNotify(true);
+            break;
+        }
+
         var RMBToggle = transform
             .Find(RightMouseButtonToggle)
             .GetComponent<Toggle>();
         RMBToggle
             .onValueChanged
-            .AddListener(OnRightToggle);
+            .AddListener(OnContextToggleChanged);
         RMBToggle
             .SetIsOnWithoutNotify(
             Settings.HotKeys.mouseContextMenu.Value == PointerEventData.InputButton.Right);
@@ -84,10 +97,21 @@ public class ConfigUI : MonoBehaviour
             ((x) => Settings.Game.RunInBackground = x);
         runInBackground
             .SetIsOnWithoutNotify(
-            Settings.Game.RunInBackground);
+            Settings.Game.RunInBackground);         
     }
 
-    private void OnRightToggle(bool state)
+    private void OnMenuSpeedToggleChanged(bool state)
+    {
+        Log.Debug("OnMenuSpeedToggleChanged");
+        string activeToggle = transform
+            .Find(MenuSpeedToggleGroupAddress)
+            .GetComponent<ToggleGroup>()
+            .GetFirstActiveToggle()?
+            .name;
+        Settings.Plugin.menuSpeed.Value = activeToggle;
+    }
+
+    private void OnContextToggleChanged(bool state)
     {
         Settings.HotKeys.mouseContextMenu.Value = 
             state?
@@ -97,7 +121,6 @@ public class ConfigUI : MonoBehaviour
 
     private void ConfirmClearFavorites()
     {
-        Log.Debug("ConfirmClearFavorites()");
         dialoge.Show(
             "Are you sure you want to remove everything from the favorites list?",
             "Yes.", Settings.Favorites.ResetFavorites,
