@@ -1,11 +1,9 @@
-﻿using CarolCustomizer.Contracts;
-using CarolCustomizer.Models;
+﻿using CarolCustomizer.Models;
 using System.Collections.Generic;
 using System.Linq;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Assets;
 using HarmonyLib;
-using UnityEngine.Analytics;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Models.Accessories;

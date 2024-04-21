@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors;
-using CarolCustomizer.Assets;
-using CarolCustomizer.Utils;
 using CarolCustomizer.UI.Main;
+using CarolCustomizer.Utils;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace CarolCustomizer.UI.Materials;
 internal class MaterialsListUI : MonoBehaviour

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Assets;
@@ -10,7 +9,6 @@ namespace CarolCustomizer.Behaviors.Recipes;
 public class RecipesManager : IDisposable
 {
     FileSystemWatcher watcher;
-    string path;
 
     public Action<Recipe> OnRecipeCreated;
     public Action<Recipe> OnRecipeDeleted;
@@ -28,15 +26,12 @@ public class RecipesManager : IDisposable
 
     public RecipesManager(string path)
     {
-        this.path = path;
         watcher = new FileSystemWatcher(path);
-
         watcher.Filter = $"*{Constants.RecipeExtension}";
         watcher.Created += HandleRecipeFileCreated;
         watcher.Deleted += HandleRecipeFileRemoved;
         watcher.Changed += HandleRecipeFileChanged;
         watcher.Renamed += HandleRecipeFileRenamed;
-
         watcher.EnableRaisingEvents = true;
 
         OutfitAssetManager.OnHaDSOutfitsLoaded += RefreshAll;

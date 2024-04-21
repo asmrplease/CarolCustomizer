@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using CarolCustomizer.Utils;
-using CarolCustomizer.Hooks;
 using System.Collections;
-using CarolCustomizer.UI;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Outfits;
 
@@ -16,7 +13,6 @@ public class OutfitAssetManager : IDisposable
     private static string ListName = "HaDS Outfits"; 
 
     public static Transform liveFolder { get; private set; }
-    IntroCutsceneFixBehavior introCutsceneFix;
 
     public static Action<Outfit> OnOutfitLoaded;
     public static Action<Outfit> OnOutfitUnloaded;
@@ -32,10 +28,7 @@ public class OutfitAssetManager : IDisposable
         liveFolder.transform.parent = parent;
         liveFolder.position = Constants.OutOfTheWay;
         if (!liveFolder) Log.Error("DAM was given a null liveFolder.");
-
         outfitSets.Add(ListName, HaDSOutfits);
-
-        introCutsceneFix = new(liveFolder.gameObject);
     }
     public IEnumerator LoadAllHaDSOutfits()
     {

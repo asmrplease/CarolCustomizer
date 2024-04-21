@@ -8,15 +8,10 @@ using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
-using static ModelData;
 
 namespace CarolCustomizer.UI.Outfits;
 public class OutfitListUI : MonoBehaviour

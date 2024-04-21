@@ -1,17 +1,15 @@
-﻿using CarolCustomizer.Contracts;
-using System;
+﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Contracts;
+using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.UI.Main;
+using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using CarolCustomizer.Utils;
-using CarolCustomizer.Models.Accessories;
-using CarolCustomizer.Behaviors.Settings;
-using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.UI.Main;
 
 namespace CarolCustomizer.UI.Outfits;
 /// <summary>

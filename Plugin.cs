@@ -1,21 +1,21 @@
 ﻿using BepInEx;
+using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors;
+using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Hooks;
+using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.UI.Main;
+using CarolCustomizer.Utils;
 using HarmonyLib;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using System.Collections;
-using CarolCustomizer.Assets;
-using CarolCustomizer.Utils;
 using UnityEngine.SceneManagement;
-using CarolCustomizer.Behaviors;
-//using Slate;
-using CarolCustomizer.Hooks.Watchdogs;
-using CarolCustomizer.Behaviors.Settings;
-using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.UI.Main;
-using CarolCustomizer.Behaviors.Recipes;
 
 namespace CarolCustomizer;
 
@@ -40,6 +40,7 @@ public class CCPlugin : BaseUnityPlugin
     Harmony HarmonyInstance;
     OutfitAssetManager dynamicAssetManager;
     NPCInstanceCreator npcInstances;
+    IntroCutsceneFixBehavior introFix;
     
     #endregion
 
@@ -64,6 +65,7 @@ public class CCPlugin : BaseUnityPlugin
 
         //Instantiate Dynamic Assets  
         dynamicAssetManager = new(transform);
+        introFix = new(this.gameObject);
         recipesManager = new(Constants.RecipeFolderPath);
 
         //Set up NPC manager

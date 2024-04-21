@@ -1,13 +1,9 @@
 ﻿using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using UnityEngine;
 using Slate;
 using CarolCustomizer.Assets;
-using BepInEx.Logging;
 using MonoMod.Utils;
 using CarolCustomizer.Models.Outfits;
 
@@ -52,7 +48,7 @@ public class PelvisWatchdog : MonoBehaviour
         Log.Debug($"{this}.Awake()");
         if (!boneData) boneData = this.gameObject.AddComponent<BoneData>().Constructor();
         if (!meshData) meshData = this.gameObject.AddComponent<MeshData>().Constructor();
-        if (!compData) compData = this.gameObject.GetAddComponent<CompData>().Constructor();
+        if (!compData) compData = this.gameObject.AddComponent<CompData>().Constructor();
         DetectType();
     }
 

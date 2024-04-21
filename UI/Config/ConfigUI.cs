@@ -1,12 +1,8 @@
 ﻿using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using CarolCustomizer.Utils;
 
 namespace CarolCustomizer.UI.Main;
 public class MessageDialogue : MonoBehaviour

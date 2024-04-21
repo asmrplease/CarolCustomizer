@@ -1,8 +1,5 @@
 ﻿using CarolCustomizer.Hooks.Watchdogs;
-using Rewired;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Carol;

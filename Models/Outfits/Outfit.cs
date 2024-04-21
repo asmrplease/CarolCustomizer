@@ -1,10 +1,10 @@
-﻿using System;
+﻿using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using CarolCustomizer.Utils;
-using CarolCustomizer.Hooks.Watchdogs;
-using CarolCustomizer.Models.Accessories;
 
 namespace CarolCustomizer.Models.Outfits;
 

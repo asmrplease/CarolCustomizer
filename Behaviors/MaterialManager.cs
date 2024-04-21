@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
@@ -15,11 +13,6 @@ public class MaterialManager
     GameObject currentTarget;
     
     public List<MaterialDescriptor> currentMaterials { get; private set; }
-
-    public MaterialManager()
-    {
-        
-    }
 
     public void OnNewTarget(GameObject newObject)
     {

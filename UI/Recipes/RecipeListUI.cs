@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Models.Recipes;
+using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using CarolCustomizer.Assets;
-using CarolCustomizer.Models;
-using CarolCustomizer.Models.Recipes;
-using CarolCustomizer.Behaviors.Settings;
-using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.UI.Main;
-using CarolCustomizer.Behaviors.Recipes;
 
 namespace CarolCustomizer.UI.Recipes;
 public class RecipeListUI : MonoBehaviour

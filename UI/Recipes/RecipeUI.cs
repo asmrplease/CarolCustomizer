@@ -1,20 +1,18 @@
-﻿using System.IO;
+﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Contracts;
+using CarolCustomizer.Models.Recipes;
+using CarolCustomizer.UI.Main;
+using CarolCustomizer.Utils;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using CarolCustomizer.Utils;
-using CarolCustomizer.Contracts;
-using System.Collections.Generic;
-using UnityEngine.Events;
-using BepInEx;
-using System;
-using CarolCustomizer.Models.Recipes;
-using CarolCustomizer.Behaviors.Settings;
-using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.UI.Main;
-using CarolCustomizer.Behaviors.Recipes;
 
 namespace CarolCustomizer.UI.Recipes;
 public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
@@ -137,7 +135,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     private void OnRename(RecipeDescriptor20 unused, string newName)
     {
-        if (newName.IsNullOrWhiteSpace()) return;
+        if (newName.Trim() == "") return;
         foreach (var character in Path.GetInvalidFileNameChars()) { if (newName.Contains(character)) return; }
 
         if (!newName.ToLower().EndsWith(Constants.RecipeExtension)) newName += Constants.RecipeExtension;

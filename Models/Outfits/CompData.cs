@@ -1,9 +1,8 @@
-﻿using System;
+﻿using CarolCustomizer.Utils;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
-using CarolCustomizer.Utils;
 using System.Linq;
+using UnityEngine;
 
 namespace CarolCustomizer.Models.Outfits;
 public class CompData : MonoBehaviour

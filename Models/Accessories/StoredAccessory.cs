@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Behaviors.Carol;
+using System.Linq;
+using UnityEngine;
 
 namespace CarolCustomizer.Models.Accessories;
 

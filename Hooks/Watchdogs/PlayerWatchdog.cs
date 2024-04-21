@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 using CarolCustomizer.Utils;
 using System.Collections;
-using System.Net.Sockets;
-using Rewired;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Settings;
 

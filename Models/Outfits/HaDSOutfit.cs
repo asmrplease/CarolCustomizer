@@ -1,10 +1,8 @@
-﻿using System;
+﻿using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
-using CarolCustomizer.Utils;
-using CarolCustomizer.Models.Accessories;
 
 namespace CarolCustomizer.Models.Outfits;
 public class HaDSOutfit : Outfit

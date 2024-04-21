@@ -1,18 +1,14 @@
-﻿using CarolCustomizer.Contracts;
-using Slate.ActionClips;
-using System;
+﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Contracts;
+using CarolCustomizer.Models;
+using CarolCustomizer.UI.Main;
+using CarolCustomizer.Utils;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using CarolCustomizer.Models;
-using CarolCustomizer.Utils;
-using CarolCustomizer.Behaviors.Settings;
-using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.UI.Main;
 
 namespace CarolCustomizer.UI.Outfits;
 public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions

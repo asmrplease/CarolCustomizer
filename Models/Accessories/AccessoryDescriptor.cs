@@ -1,13 +1,9 @@
-﻿using CarolCustomizer.UI;
-using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using UnityEngine;
 
 namespace CarolCustomizer.Models.Accessories;
 [Serializable]

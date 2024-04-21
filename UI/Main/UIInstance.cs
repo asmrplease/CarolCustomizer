@@ -1,14 +1,14 @@
-﻿using CarolCustomizer.Behaviors;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors;
+using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.UI.Config;
+using CarolCustomizer.UI.Materials;
+using CarolCustomizer.UI.Outfits;
+using CarolCustomizer.UI.Recipes;
+using CarolCustomizer.Utils;
 using UnityEngine;
 using UnityEngine.UI;
-using CarolCustomizer.Assets;
-using CarolCustomizer.Utils;
-using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.UI.Recipes;
-using CarolCustomizer.UI.Outfits;
-using CarolCustomizer.UI.Materials;
-using CarolCustomizer.UI.Config;
-using CarolCustomizer.Behaviors.Recipes;
 
 namespace CarolCustomizer.UI.Main;
 

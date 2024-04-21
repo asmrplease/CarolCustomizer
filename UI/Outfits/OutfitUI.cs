@@ -1,18 +1,15 @@
-﻿using CarolCustomizer.Contracts;
-using System;
+﻿using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Contracts;
+using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.UI.Main;
+using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static ModelData;
-using CarolCustomizer.Utils;
-using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Behaviors.Settings;
-using CarolCustomizer.UI.Main;
-using CarolCustomizer.Behaviors.Recipes;
 
 namespace CarolCustomizer.UI.Outfits;
 public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions

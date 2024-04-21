@@ -14,7 +14,6 @@ public static class OnrismPatches
         public static void PostFix(Collider collider, Projectile __instance)
         {
             if (!Entity.players.Contains(__instance.origin)) return;
-            //var playerEntity = __instance.origin;
 
             var uis = CCPlugin.uiInstances.Where(x => x.playerManager.ManagesPlayer(__instance.origin));
             if (uis.Count() != 1) { Log.Debug($"when firing a projectile, found {uis.Count()} players that matched."); return; }
