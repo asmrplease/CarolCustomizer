@@ -8,15 +8,14 @@ using System.Collections;
 using CarolCustomizer.Assets;
 using CarolCustomizer.Utils;
 using UnityEngine.SceneManagement;
-using BepInEx.Configuration;
-using UnityEngine.EventSystems;
 using CarolCustomizer.Behaviors;
-using Slate;
+//using Slate;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.UI.Main;
+using CarolCustomizer.Behaviors.Recipes;
 
 namespace CarolCustomizer;
 
@@ -47,13 +46,8 @@ public class CCPlugin : BaseUnityPlugin
     #region Setup
     private void Awake()
     {
-        //Setup Static Log
         var logger = new Log(Logger);
         Log.Message("Logger Ready!");
-
-        //Set run in background
-        Application.runInBackground = true;
-        Log.Debug("run in background set");
 
         Settings.Constructor(Config);
 
@@ -110,7 +104,6 @@ public class CCPlugin : BaseUnityPlugin
 
         Settings.Game.ApplySettings();
 
-        //Load outfits
         Log.Debug("starting hads coroutine");
         OutfitAssetManager.OnHaDSOutfitsLoaded += LoadInitialWatchdogs;
         StartCoroutine(dynamicAssetManager.LoadAllHaDSOutfits());
@@ -126,10 +119,16 @@ public class CCPlugin : BaseUnityPlugin
     {
         if (MainMenuManager.manager)
         {
-            var menuCarolLoader = SceneManager.GetActiveScene().GetRootGameObjects().First(x => x.name == "MenuCarolLoader");
-            var menuPelvis = menuCarolLoader.transform.RecursiveFindTransform(x => x.name == "CarolPelvis");
-
-            menuPelvis.GetAddComponent<PelvisWatchdog>();
+            SceneManager
+                .GetActiveScene()
+                .GetRootGameObjects()
+                .First
+                (x => x.name == "MenuCarolLoader")
+                .transform
+                .RecursiveFindTransform
+                (x => x.name == "CarolPelvis")
+                .gameObject
+                .AddComponent<PelvisWatchdog>();
             return;
         }
 
@@ -137,8 +136,12 @@ public class CCPlugin : BaseUnityPlugin
 
         foreach (var player in Entity.players)
         {
-            var pelvis = player.transform.RecursiveFindTransform(x => x.name == "CarolPelvis");
-            pelvis.GetAddComponent<PelvisWatchdog>();
+            player
+                .transform
+                .RecursiveFindTransform
+                (x => x.name == "CarolPelvis")
+                .gameObject
+                .AddComponent<PelvisWatchdog>();
         }
     }
 

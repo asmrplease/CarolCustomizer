@@ -38,7 +38,7 @@ public class OutfitListUI : MonoBehaviour
 
     private DynamicContextMenu contextMenu;
 
-    public string searchString { get; private set; }
+    public string searchString { get; private set; } = "";
     private Transform listRoot;
     private InputField searchBox;
     private Text searchBoxHint;
@@ -66,10 +66,8 @@ public class OutfitListUI : MonoBehaviour
 
         OutfitAssetManager.OnOutfitLoaded += OnOutfitLoaded;
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
-
         outfitManager.AccessoryChanged += HandleAccessoryChanged;
-
-        searchString = "";
+        Settings.Favorites.OnFavoritesCleared += UnfavoriteAllAccessories;
 
         deselectAll = transform.Find(uncheckAllAddress).GetComponent<Button>();
         deselectAll.onClick.AddListener(outfitManager.DisableAllAccessories);
@@ -267,6 +265,17 @@ public class OutfitListUI : MonoBehaviour
             if (!materialUIs[accMatSlot]) BuildMatUI(accMatSlot, e.Target.Materials[index]);
             materialUIs[accMatSlot].UpdateActiveMaterial(materialState);
             index++;
+        }
+    }
+
+    private void UnfavoriteAllAccessories()
+    {
+        foreach (var accessory in Settings.Favorites.favorites.ToList())
+        {
+            accessoryUIs.TryGetValue(accessory, out var ui);
+            if (!ui) { Log.Debug($"{accessory} was not in ui accessory list.");  continue; }
+            Log.Debug($"Unfavoriting {accessory}");
+            ui.SetFavorite(false);
         }
     }
 }

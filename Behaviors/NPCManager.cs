@@ -5,6 +5,7 @@ using CarolCustomizer.Utils;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Recipes;
 
 namespace CarolCustomizer.Behaviors;
 internal class NPCManager 

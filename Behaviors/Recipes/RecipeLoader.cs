@@ -8,11 +8,11 @@ using CarolCustomizer.Utils;
 using MonoMod.Utils;
 using Newtonsoft.Json;
 
-namespace CarolCustomizer.Behaviors;
+namespace CarolCustomizer.Behaviors.Recipes;
 internal static class RecipeLoader
 {
     public static string[] GetRecipeFilePaths()
-    { 
+    {
         return Directory.GetFiles(Constants.RecipeFolderPath, $"*{Constants.RecipeExtension}", SearchOption.TopDirectoryOnly);
     }
 
@@ -32,7 +32,7 @@ internal static class RecipeLoader
     {
         string json;
         var results = new ValidationResults { Status = Recipe.Status.NoError, Recipe = null };
-        
+
         try { json = GetRecipeJson(filePath); }
         catch { results.Status = Recipe.Status.FileError; return results; }
 
@@ -60,11 +60,11 @@ internal static class RecipeLoader
                     break;
             }
         }
-        catch (Exception ex) 
-        { 
-            ex.LogDetailed(); 
-            results.Status = Recipe.Status.InvalidJson; 
-            return results; 
+        catch (Exception ex)
+        {
+            ex.LogDetailed();
+            results.Status = Recipe.Status.InvalidJson;
+            return results;
         }
 
         if (results.Recipe is null) { results.Status = Recipe.Status.InvalidJson; return results; }

@@ -1,5 +1,4 @@
-﻿using CarolCustomizer.Behaviors;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -15,6 +14,7 @@ using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.UI.Main;
+using CarolCustomizer.Behaviors.Recipes;
 
 namespace CarolCustomizer.UI.Recipes;
 public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions

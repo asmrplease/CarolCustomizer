@@ -122,16 +122,21 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
         else outfitManager.DisableAccessory(accessory);
     }
 
-    private void ToggleFavorite()
+    public void SetFavorite(bool favorited)
     {
-        Settings.Favorites.ToggleFavorite(new AccessoryDescriptor(accessory));
-        favoriteIcon.enabled = Settings.Favorites.IsInFavorites(accessory);
+        var description = new AccessoryDescriptor(accessory);//TODO: idr why we can't just pass the existing AD
+        if (favorited) Settings.Favorites.AddToFavorites(description); 
+        else Settings.Favorites.RemoveFromFavorites(description);
+        favoriteIcon.enabled = favorited;
     }
 
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         bool currentlyFavorite = Settings.Favorites.IsInFavorites(accessory);
-        return new List<(string, UnityAction)> { (currentlyFavorite ? "Remove from Favorites" : "Add to favorites", ToggleFavorite) };
+        return new List<(string, UnityAction)> { 
+            (currentlyFavorite ? "Remove from Favorites" : "Add to favorites", 
+            () => SetFavorite(!currentlyFavorite)) 
+        };
     }
     #endregion
 }

@@ -1,8 +1,8 @@
-﻿using CarolCustomizer.Behaviors;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using CarolCustomizer.Behaviors.Recipes;
 
 namespace CarolCustomizer.Models.Recipes;
 public record Recipe

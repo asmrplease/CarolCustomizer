@@ -103,7 +103,7 @@ public class ConfigUI : MonoBehaviour
     {
         Log.Debug("ConfirmClearFavorites()");
         dialoge.Show(
-            "Are you sure you want to permanently clear your favorites?",
+            "Are you sure you want to remove everything from the favorites list?",
             "Yes.", Settings.Favorites.ResetFavorites,
             "Cancel!", null);
     }

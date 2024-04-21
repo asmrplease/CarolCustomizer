@@ -11,7 +11,7 @@ using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Behaviors.Carol;
 
-namespace CarolCustomizer.Behaviors;
+namespace CarolCustomizer.Behaviors.Recipes;
 internal static class RecipeApplier
 {
     public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor20 recipe)
@@ -87,6 +87,6 @@ internal static class RecipeApplier
 
     public static IEnumerable<string> GetMissingSources(RecipeDescriptor20 recipe)
     {
-        return GetSources(recipe).Where(x=> OutfitAssetManager.GetOutfitByAssetName(x) is null);
+        return GetSources(recipe).Where(x => OutfitAssetManager.GetOutfitByAssetName(x) is null);
     }
 }

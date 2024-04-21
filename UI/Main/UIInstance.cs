@@ -8,6 +8,7 @@ using CarolCustomizer.UI.Recipes;
 using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.UI.Materials;
 using CarolCustomizer.UI.Config;
+using CarolCustomizer.Behaviors.Recipes;
 
 namespace CarolCustomizer.UI.Main;
 

@@ -3,7 +3,7 @@ using System.IO;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Models.Recipes;
 
-namespace CarolCustomizer.Behaviors;
+namespace CarolCustomizer.Behaviors.Recipes;
 internal static class RecipeSaver
 {
     public static string RecipeFilenameToPath(string fileName)

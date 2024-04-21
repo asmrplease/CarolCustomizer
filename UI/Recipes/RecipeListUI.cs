@@ -1,5 +1,4 @@
-﻿using CarolCustomizer.Behaviors;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CarolCustomizer.Utils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +8,7 @@ using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.UI.Main;
+using CarolCustomizer.Behaviors.Recipes;
 
 namespace CarolCustomizer.UI.Recipes;
 public class RecipeListUI : MonoBehaviour

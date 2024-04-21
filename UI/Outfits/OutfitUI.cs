@@ -9,10 +9,10 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static ModelData;
 using CarolCustomizer.Utils;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.UI.Main;
+using CarolCustomizer.Behaviors.Recipes;
 
 namespace CarolCustomizer.UI.Outfits;
 public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions

@@ -10,6 +10,7 @@ public class FavoritesManager : IDisposable
 {
     ConfigFile config;
     ConfigEntry<string> favoritesConfig;
+    public Action OnFavoritesCleared;
     public HashSet<AccessoryDescriptor> favorites { get; private set; }
 
     public FavoritesManager(ConfigFile config)
@@ -37,12 +38,9 @@ public class FavoritesManager : IDisposable
 
     public void ResetFavorites()
     {
-        Log.Warning("Called ResetFavorites() but the behavior is not yet implemented.");
-        foreach (var favorite in favorites)
-        {
-            //notify the UI to unfavorite this accessory
-        }
-        //favorites.Clear(); //don't call this until we're updating the UI
+        OnFavoritesCleared?.Invoke();
+        favorites.Clear();
+        SaveFavorites();
     }
 
     public bool IsInFavorites(AccessoryDescriptor descriptor) => favorites.Contains(descriptor);

@@ -22,7 +22,6 @@ public class KeyCodeDropDown : MonoBehaviour
 
     public KeyCodeDropDown Constructor(ConfigEntry<KeyCode> keycodeConfig)
     {
-        Log.Debug("ConfigUI.Constructor()");
         this.keycodeConfig = keycodeConfig;
 
         dropdown = GetComponent<Dropdown>();
@@ -33,7 +32,6 @@ public class KeyCodeDropDown : MonoBehaviour
 
         foreach (var key in keys)
         {
-            Log.Debug($"adding keycode: {key}");
             Dropdown.OptionData idk = new();
             idk.text = key.ToString();
             dropdown.options.Add(idk);

@@ -1,7 +1,4 @@
 ﻿using CarolCustomizer.Models.Accessories;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CarolCustomizer.Events;
 public class AccessoryChangedEvent
@@ -16,8 +13,5 @@ public class AccessoryChangedEvent
         this.Visible = visible;
     }
 
-    public override string ToString()
-    {
-        return $"Accessory Event: {Target} set to {Visible}";
-    }
+    public override string ToString() => $"Accessory Event: {Target} set to {Visible}";
 }
