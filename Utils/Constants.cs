@@ -61,6 +61,7 @@ internal static class Constants
     public const float CarolDefaultMass = 0.01f;
     public const KeyCode DefaultReload = KeyCode.Alpha8;
 
+    public static readonly Version v210 = new("2.1.0");
     public static readonly Version v200 = new("2.0.0");
     public static readonly Version v100 = new("1.0.0");
 

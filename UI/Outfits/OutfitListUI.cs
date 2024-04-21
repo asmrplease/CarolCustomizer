@@ -71,7 +71,8 @@ public class OutfitListUI : MonoBehaviour
         activeFilter = transform.Find(filtersAddress + "/Active").GetComponent<Toggle>();
         activeFilter.onValueChanged.AddListener(ProcessFilters);
         showHideBase = transform.Find(showHideAddress).GetComponent<Button>();
-        showHideBase.onClick.AddListener(outfitManager.ToggleBaseVisibility);
+        showHideBase.gameObject.SetActive(false);
+        //showHideBase.onClick.AddListener(outfitManager.ToggleBaseVisibility);
 
         listRoot = transform.Find(listRootAddress);
 

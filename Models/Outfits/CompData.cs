@@ -12,6 +12,7 @@ public class CompData : MonoBehaviour
 
     [SerializeField]
     Animator animator;
+    public Animator Animator => animator;
     public RuntimeAnimatorController GetRAC() => controller;
 
     Dictionary<Type, Component> parentComponents = new();

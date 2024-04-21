@@ -83,7 +83,8 @@ public class PelvisWatchdog : MonoBehaviour
         where ResultType : PelvisWatchdog
     {
         try { if (!predicate.Invoke(this)) return false; }
-        catch (NullReferenceException e) { Log.Warning("predicate caused an exception:"); e.LogDetailed(); return false; }
+        catch (NullReferenceException e) 
+        { Log.Warning($"{nameof(ResultType)} predicate caused an exception: {e.Message}"); return false; }
 
         var component = compData.GetParentComponent(typeof(SearchType));
         if (!component) return false;
@@ -96,10 +97,18 @@ public class PelvisWatchdog : MonoBehaviour
     }
 
     public virtual void SetBaseOutfit(Outfit outfit) { }
+
+    public void SetAnimator(Outfit outfit)
+    {
+        Log.Debug($"Setting animator from {outfit}");
+        var animator = outfit.compData.GetRAC();
+        Log.Debug($"");
+        this.compData.Animator.runtimeAnimatorController = animator;
+    }
     public virtual void SetBaseVisibility(bool visible)
     {
         Log.Debug("PelvisWatchdog.SetBaseVisibility()");
-        foreach (var mesh in MeshData?.baseMeshes) { mesh.gameObject.SetActive(false); }//TODO: not this
+        foreach (var mesh in MeshData?.baseMeshes) { mesh.gameObject.SetActive(visible); }
     }
 
     public override string ToString() => $"{GetType()}@{rootName}->{grandparentName}({Guid})";

@@ -66,6 +66,6 @@ public class CarolInstance : IDisposable
         NotifySpawned(previousTargets.Last(x => x));
         return true;
     }
-    public void RefreshBaseVisibility() => outfitManager.RefreshBaseVisibility();
+    public void RefreshBaseVisibility() => outfitManager.HideBase();
     #endregion
 }

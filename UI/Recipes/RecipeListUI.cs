@@ -88,6 +88,6 @@ public class RecipeListUI : MonoBehaviour
 
     private void OnNewSave()
     {
-        fileDialogue.Show(new RecipeDescriptor20(outfitManager), RecipeSaver.Save);
+        fileDialogue.Show(new RecipeDescriptor21(outfitManager), RecipeSaver.Save);
     }
 }

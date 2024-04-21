@@ -123,11 +123,9 @@ public class CCPlugin : BaseUnityPlugin
             SceneManager
                 .GetActiveScene()
                 .GetRootGameObjects()
-                .First
-                (x => x.name == "MenuCarolLoader")
+                .First(x => x.name == "MenuCarolLoader")
                 .transform
-                .RecursiveFindTransform
-                (x => x.name == "CarolPelvis")
+                .RecursiveFindTransform(x => x.name == "CarolPelvis")
                 .gameObject
                 .AddComponent<PelvisWatchdog>();
             return;
@@ -139,8 +137,7 @@ public class CCPlugin : BaseUnityPlugin
         {
             player
                 .transform
-                .RecursiveFindTransform
-                (x => x.name == "CarolPelvis")
+                .RecursiveFindTransform(x => x.name == "CarolPelvis")
                 .gameObject
                 .AddComponent<PelvisWatchdog>();
         }

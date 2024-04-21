@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Hooks.Watchdogs;
+﻿using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Hooks.Watchdogs;
 using System;
 using UnityEngine;
 

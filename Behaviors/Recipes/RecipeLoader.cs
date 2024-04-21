@@ -24,7 +24,7 @@ internal static class RecipeLoader
         return results;
     }
 
-    public struct ValidationResults { public Recipe.Status Status; public RecipeDescriptor20 Recipe; }
+    public struct ValidationResults { public Recipe.Status Status; public RecipeDescriptor21 Recipe; }
 
     public static ValidationResults ValidateRecipeFile(string filePath)
     {
@@ -33,28 +33,25 @@ internal static class RecipeLoader
 
         try { json = GetRecipeJson(filePath); }
         catch { results.Status = Recipe.Status.FileError; return results; }
-
+        
+        Version version;
         try
         {
-            var version = JsonConvert.DeserializeObject<VersionedObject>(json)?.version;
-            if (version is null) { results.Status = Recipe.Status.InvalidJson; return results; }
-
+            version = JsonConvert.DeserializeObject<VersionedObject>(json)?.version;
+            version ??= Constants.v100;
+        }
+        catch { version = Constants.v100; }
+        try
+        {
             switch (version)
             {
                 case var x when x > Constants.v200:
                     Log.Debug("VRF dectected recipe version as > 2.0.0");
-                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor20>(json);
-                    break;
-                case var x when x == Constants.v200:
-                    Log.Debug("VRF dectected recipe version as exactly 2.0.0");
-                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor20>(json);
-                    break;
-                case var x when x == Constants.v100:
-                    Log.Debug("VRF recipe version detected as 1.0.0, presumed 2.0.0");
-                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor20>(json);
+                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor21>(json);
                     break;
                 default:
-                    Log.Error($"Unable to handle recipe version: {version}.");
+                    Log.Debug("Legacy descriptor");
+                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor20>(json).ToVersion210();
                     break;
             }
         }

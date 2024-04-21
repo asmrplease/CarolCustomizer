@@ -12,9 +12,9 @@ using CarolCustomizer.Behaviors.Carol;
 namespace CarolCustomizer.Behaviors.Recipes;
 internal static class RecipeApplier
 {
-    public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor20 recipe)
+    public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor21 recipe)
     {
-        outfitManager.SetBaseVisibility(false);
+        outfitManager.HideBase();
         outfitManager.DisableAllAccessories();
         foreach (var accessory in recipe.ActiveAccessories) { SetAccessory(outfitManager, accessory); }
 
@@ -73,17 +73,17 @@ internal static class RecipeApplier
         outfitManager.PaintAccessory(accessory, liveMaterial, index);
     }
 
-    public static IEnumerable<string> GetSources(RecipeDescriptor20 recipe)
+    public static IEnumerable<string> GetSources(RecipeDescriptor21 recipe)
     {
         Log.Debug("GetSources()");
         if (recipe.ActiveAccessories is null) { Log.Error("no accessories in recipe!"); return new List<string>(); };
         var accSources = recipe.ActiveAccessories.Select(x => x.Source);
         var matSources = recipe.ActiveAccessories.SelectMany(x => x.Materials).Select(x => x.Source);
-        var baseSource = recipe.BaseOutfitName;
-        return accSources.Concat(matSources).AddItem(baseSource).Distinct();
+        var animatorSource = recipe.AnimatorSource;
+        return accSources.Concat(matSources).AddItem(animatorSource).Distinct();
     }
 
-    public static IEnumerable<string> GetMissingSources(RecipeDescriptor20 recipe)
+    public static IEnumerable<string> GetMissingSources(RecipeDescriptor21 recipe)
     {
         return GetSources(recipe).Where(x => OutfitAssetManager.GetOutfitByAssetName(x) is null);
     }

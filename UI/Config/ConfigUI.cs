@@ -3,7 +3,6 @@ using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

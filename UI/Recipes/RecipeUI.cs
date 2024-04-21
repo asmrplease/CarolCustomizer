@@ -92,7 +92,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     private void Overwrite()
     {
-        RecipeSaver.Save(new RecipeDescriptor20(outfitManager), recipe.Path);
+        RecipeSaver.Save(new RecipeDescriptor21(outfitManager), recipe.Path);
     }
 
     private void OnContextMenuLoad()
@@ -133,7 +133,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         messageDialogue.Show(message, cancelText: "Done");
     }
 
-    private void OnRename(RecipeDescriptor20 unused, string newName)
+    private void OnRename(RecipeDescriptor21 unused, string newName)
     {
         if (newName.Trim() == "") return;
         foreach (var character in Path.GetInvalidFileNameChars()) { if (newName.Contains(character)) return; }

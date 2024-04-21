@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CarolCustomizer.Assets;
-using CarolCustomizer.Models;
-using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Events;
 using CarolCustomizer.Hooks.Watchdogs;
-using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Utils;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace CarolCustomizer.Behaviors.Carol;
 /// <summary>
@@ -16,21 +17,22 @@ namespace CarolCustomizer.Behaviors.Carol;
 public class OutfitManager : IDisposable
 {
     #region Dependencies
-    private SkeletonManager skeletonManager;
-    private CarolInstance playerManager;
-    public PelvisWatchdog pelvis { get; private set; }
-    Outfit BaseOutfit;
+    SkeletonManager skeletonManager;
+    CarolInstance playerManager;
     #endregion
 
     #region State Management
-    private Dictionary<StoredAccessory, LiveAccessory> instantiatedAccessories = new();
+    Dictionary<StoredAccessory, LiveAccessory> instantiatedAccessories = new();
+    Outfit animatorSource;
     #endregion
 
     #region Public Interface
-    public string BaseOutfitName => BaseOutfit is not null ? BaseOutfit.AssetName : Constants.Pyjamas;
-    public bool BaseVisible { get; private set; }
-    public int BaseAccessorySlot => 0;
+    public PelvisWatchdog pelvis { get; private set; }
     public Action<AccessoryChangedEvent> AccessoryChanged;
+    public string AnimatorSource => 
+        animatorSource is not null ? 
+        animatorSource.AssetName: 
+        Constants.Pyjamas;
     public IEnumerable<StoredAccessory> ActiveAccessories =>
             instantiatedAccessories
             .Where(x => x.Value.isActive)
@@ -40,7 +42,6 @@ public class OutfitManager : IDisposable
     {
         this.skeletonManager = skeletonManager;
         playerManager = player;
-        BaseVisible = true;
 
         playerManager.SpawnEvent += RefreshSMRs;
         playerManager.SpawnEvent += OnSpawn;
@@ -117,28 +118,22 @@ public class OutfitManager : IDisposable
         liveAcc.Refresh();
     }
 
-    public void ToggleBaseVisibility()
-    {
-        BaseVisible = false;//!this.BaseVisible;
-        RefreshBaseVisibility();
-    }
-
     private void OnSpawn(PelvisWatchdog pelvis)
     {
         this.pelvis = pelvis;
-        SetBaseVisibility(false);
-        RefreshBaseVisibility();
+        HideBase();
     }
 
-    public void RefreshBaseVisibility() => SetBaseVisibility(BaseVisible); //TODO: better approach
+    public void HideBase() => SetBaseVisibility(false);
 
     public void SetBaseVisibility(bool visible) => pelvis?.SetBaseVisibility(visible);
 
-    public void SetBaseOutfit(Outfit outfit)
+    public void SetAnimator(Outfit outfit)
     {
-        if (!pelvis) { Log.Warning("Tried to swap outfits with no pelviswatchdog instantiated."); return; }
-        pelvis.SetBaseOutfit(outfit);
-        BaseOutfit = outfit;
+        if (!pelvis) { Log.Warning("Tried to swap animators with no pelviswatchdog instantiated."); return; }
+        Log.Debug($"changing animator to {outfit.DisplayName}");
+        pelvis.SetAnimator(outfit);
+        this.animatorSource = outfit;
     }
 
     private void OnOutfitUnloaded(Outfit outfit)
