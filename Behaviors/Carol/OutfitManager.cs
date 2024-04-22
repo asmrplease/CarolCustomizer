@@ -122,6 +122,8 @@ public class OutfitManager : IDisposable
     {
         this.pelvis = pelvis;
         HideBase();
+        if (animatorSource is null) return;
+        SetAnimator(animatorSource);
     }
 
     public void HideBase() => SetBaseVisibility(false);

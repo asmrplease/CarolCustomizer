@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,7 @@ public class RecipeDescriptor21
 
     public RecipeDescriptor21(OutfitManager manager)
     {
+        BaseOutfitName = Constants.Pyjamas;
         AnimatorSource = manager.AnimatorSource;
         ActiveAccessories = manager.ActiveAccessories
             .Select(x => new AccessoryDescriptor(x));

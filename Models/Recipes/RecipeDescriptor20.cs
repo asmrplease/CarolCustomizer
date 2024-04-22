@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace CarolCustomizer.Models.Recipes;
-public class RecipeDescriptor20 : IRecipeDescriptor
+public class RecipeDescriptor20
 {
     public string BaseOutfitName;
     public bool BaseVisible;
