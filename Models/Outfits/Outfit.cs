@@ -24,7 +24,6 @@ public class Outfit : IDisposable, IComparable<Outfit>
     virtual public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = new();
 
     PelvisWatchdog prefabWatchdog;
-    public MeshData meshData => prefabWatchdog.MeshData;
     public BoneData boneData => prefabWatchdog.BoneData;
     public CompData compData => prefabWatchdog.CompData;
 
@@ -72,8 +71,8 @@ public class Outfit : IDisposable, IComparable<Outfit>
         prefabWatchdog.Awake();
 
         Log.Debug($"Setting up accessories: {storedAsset.name}.");
-        if (!prefabWatchdog.MeshData) Log.Warning("Failed to instantiate meshdata in time.");
-        var smrs = prefabWatchdog?.MeshData?.baseMeshes;
+        if (!prefabWatchdog.CompData) Log.Warning("Failed to instantiate meshdata in time.");
+        var smrs = prefabWatchdog?.CompData?.baseMeshes;
         if (smrs is null) { Log.Error("no smrs found in watchdog mesh data."); return; }
         foreach (var smr in smrs)
         {
@@ -88,7 +87,6 @@ public class Outfit : IDisposable, IComparable<Outfit>
     public void Dispose()
     {
         if (!prefabWatchdog) return;
-        if (prefabWatchdog.MeshData) UnityEngine.Object.DestroyImmediate(prefabWatchdog.MeshData);
         if (prefabWatchdog.BoneData) UnityEngine.Object.DestroyImmediate(prefabWatchdog.BoneData);
         if (prefabWatchdog.CompData) UnityEngine.Object.DestroyImmediate(prefabWatchdog.CompData);
         UnityEngine.Object.DestroyImmediate(prefabWatchdog);

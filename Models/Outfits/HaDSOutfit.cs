@@ -21,6 +21,15 @@ public class HaDSOutfit : Outfit
         BuildVariants();
     }
 
+    //How do we change the behavior to recognize player variants?
+        //coopmodeltoggle has data about which player it's associated with
+        //every coopmodeltoggle has a set of objects that change state with the toggle
+            //typically these objects are
+    //How do we present these options to the player?
+        //list of each permutation, 4 players, 2 acc states = 8 variants
+            //this probably isn't too bad, might have an issue with getting cut off near screen edges
+        //player color preference setting?
+
     private void BuildVariants()
     {
         if (modelData?.accessories is null) { Log.Error("mda was null during build variants"); return; }

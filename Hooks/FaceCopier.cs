@@ -30,7 +30,7 @@ public class FaceCopier : MonoBehaviour
     SkinnedMeshRenderer baseFace;
     public void UpdateBaseFace(PelvisWatchdog watchdog)
     {
-        this.baseFace = watchdog.MeshData.BaseFace;
+        this.baseFace = watchdog.CompData.BaseFace;
     }
     #endregion
 

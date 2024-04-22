@@ -133,6 +133,7 @@ public class OutfitManager : IDisposable
     public void SetAnimator(Outfit outfit)
     {
         if (!pelvis) { Log.Warning("Tried to swap animators with no pelviswatchdog instantiated."); return; }
+        if (outfit is null) { Log.Warning("Tried to load animator from null outfit"); return; }
         Log.Debug($"changing animator to {outfit.DisplayName}");
         pelvis.SetAnimator(outfit);
         this.animatorSource = outfit;

@@ -17,10 +17,10 @@ internal static class RecipeApplier
         outfitManager.HideBase();
         outfitManager.DisableAllAccessories();
         foreach (var accessory in recipe.ActiveAccessories) { SetAccessory(outfitManager, accessory); }
-
-        //var baseOutfit = OutfitAssetManager.GetOutfitByAssetName(recipe.BaseOutfitName);
-        //if (baseOutfit is not null) outfitManager.SetBaseOutfit(baseOutfit);
-        //outfitManager.SetBaseVisibility(recipe.BaseVisible);
+        outfitManager.SetAnimator(
+            OutfitAssetManager
+            .GetOutfitByAssetName(
+            recipe.AnimatorSource));
     }
 
     public static void ActivateVariant(OutfitManager outfitManager, HaDSOutfit outfit, string variantName)

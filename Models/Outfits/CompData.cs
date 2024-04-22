@@ -9,17 +9,29 @@ public class CompData : MonoBehaviour
 {
     [SerializeField]
     RuntimeAnimatorController controller;
+    public RuntimeAnimatorController Controller => controller;
 
     [SerializeField]
     Animator animator;
     public Animator Animator => animator;
-    public RuntimeAnimatorController GetRAC() => controller;
+
+    [SerializeField]
+    public List<SkinnedMeshRenderer> baseMeshes;
+
+    public SkinnedMeshRenderer BaseFace => baseMeshes.FirstOrDefault(x => x.name == "tete");
 
     Dictionary<Type, Component> parentComponents = new();
     public CoopModelToggle[] coopToggles { get; private set; }
 
+    //foreach coop player, list the SMRs associated with that player
+
     public CompData Constructor()
     {
+        baseMeshes = transform
+            .parent
+            .GetComponentsInChildren<SkinnedMeshRenderer>(true)
+            .ToList();
+
         animator ??= GetComponentsInParent<Animator>(true)?
             .FirstOrDefault(x => x.runtimeAnimatorController);
         if (!animator) Log.Warning("no animator found during CD.Constructor()");
@@ -27,11 +39,9 @@ public class CompData : MonoBehaviour
         if (!controller) Log.Warning("no RAC found during CD.Constructor()");
 
         coopToggles = transform.parent.GetComponentsInChildren<CoopModelToggle>(true);
-        Log.Debug(coopToggles.Count().ToString());
-        foreach (var toggle in coopToggles) { toggle.enabled = false; }
-
+        Log.Debug($"{coopToggles.Count()} cooptoggles found.");
+        foreach (var toggle in coopToggles) {toggle.enabled = false;}
         RefreshParentComponents();
-
         return this;
     }
 
@@ -47,10 +57,7 @@ public class CompData : MonoBehaviour
             .ToDictionaryOverwrite(x => x.GetType());
     }
 
-    public void OnTransformParentChanged()
-    {
-        //Constructor();
-    }
+    //public void OnTransformParentChanged() => Constructor();
 
     public void SetRAC(RuntimeAnimatorController controller)
     {

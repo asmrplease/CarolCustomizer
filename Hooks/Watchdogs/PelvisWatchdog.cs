@@ -18,10 +18,6 @@ public class PelvisWatchdog : MonoBehaviour
     public BoneData BoneData { get { return boneData; } }
 
     [SerializeField]
-    MeshData meshData;
-    public MeshData MeshData { get { return meshData; } }
-
-    [SerializeField]
     CompData compData;
     public CompData CompData { get { return compData; } }
 
@@ -35,10 +31,9 @@ public class PelvisWatchdog : MonoBehaviour
     virtual public PelvisWatchdog BuildFromExisting(PelvisWatchdog watchdog, Component typeComponent)
     {
         Log.Debug("Watchdog.CopyFromExisting");
-        if (!watchdog.BoneData || !watchdog.MeshData) Log.Warning($"{watchdog} was missing data when constructing {this}.");
+        if (!watchdog.BoneData || !watchdog.CompData) Log.Warning($"{watchdog} was missing data when constructing {this}.");
         SourceGuid = watchdog.Guid;
         boneData = watchdog.BoneData;
-        meshData = watchdog.MeshData;
         compData = watchdog.CompData;
         return this;
     }
@@ -47,7 +42,6 @@ public class PelvisWatchdog : MonoBehaviour
     {
         Log.Debug($"{this}.Awake()");
         if (!boneData) boneData = this.gameObject.AddComponent<BoneData>().Constructor();
-        if (!meshData) meshData = this.gameObject.AddComponent<MeshData>().Constructor();
         if (!compData) compData = this.gameObject.AddComponent<CompData>().Constructor();
         DetectType();
     }
@@ -101,14 +95,14 @@ public class PelvisWatchdog : MonoBehaviour
     public void SetAnimator(Outfit outfit)
     {
         Log.Debug($"Setting animator from {outfit}");
-        var animator = outfit.compData.GetRAC();
+        var animator = outfit.compData.Controller;
         Log.Debug($"");
         this.compData.Animator.runtimeAnimatorController = animator;
     }
     public virtual void SetBaseVisibility(bool visible)
     {
         Log.Debug("PelvisWatchdog.SetBaseVisibility()");
-        foreach (var mesh in MeshData?.baseMeshes) { mesh.gameObject.SetActive(visible); }
+        foreach (var mesh in CompData?.baseMeshes) { mesh.gameObject.SetActive(visible); }
     }
 
     public override string ToString() => $"{GetType()}@{rootName}->{grandparentName}({Guid})";
