@@ -6,16 +6,17 @@ using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Behaviors.Settings;
 
 namespace CarolCustomizer.Behaviors;
 internal class NPCManager 
 {
-    private static RecipesManager recipesManager;
+    static RecipesManager recipesManager;
 
-    private static Dictionary<PelvisWatchdog, CarolInstance> liveBots = new();
+    static Dictionary<PelvisWatchdog, CarolInstance> liveBots = new();
     public static CarolInstance shezaraInstance { get; private set; }
 
-    private static GameObject folder;
+    static GameObject folder;
 
     public static void Constructor(GameObject folder, RecipesManager recipesManager)
     {
@@ -29,13 +30,8 @@ internal class NPCManager
         Log.Debug("OnBotSpawn()");
         var botInstance = new CarolInstance(folder);
         liveBots.Add(pelvis, botInstance);
-
         liveBots[pelvis].NotifySpawned(pelvis);
-
-        Log.Debug("applying random recipe");
-        var randomRecipe = NPCManager.GetRandomOutfit();
-        RecipeApplier.ActivateRecipe(botInstance.outfitManager, randomRecipe.Descriptor);
-        pelvis.SetBotName(randomRecipe.Name);
+        pelvis.CustomizeBot(GetRandomOutfit(), botInstance.outfitManager);
     }
 
     public static void OnShezaraAwake(PelvisWatchdog pelvis)

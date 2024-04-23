@@ -109,16 +109,11 @@ public class NPCInstanceCreator : IDisposable
 
         var watchdog = botPrefab
             .transform
-            .RecursiveFindTransform(x => x.name == "CarolPelvis")
+            .RecursiveFindTransform
+            (x => x.name == "CarolPelvis")
             .gameObject
             .AddComponent<PelvisWatchdog>();
 
         carolBotPrefabs.Add(watchdog);
-    }
-
-    private static void FindMaterials()
-    {
-        var materials = Resources.FindObjectsOfTypeAll<Material>();
-        foreach (var material in materials) { Log.Debug(material.name); }
     }
 }

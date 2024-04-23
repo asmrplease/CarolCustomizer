@@ -1,4 +1,8 @@
 ﻿using CarolCustomizer.Behaviors;
+using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using System.Linq;
 
@@ -10,7 +14,11 @@ public class BotWatchdog : PelvisWatchdog
         base.Awake();
         NPCManager.OnBotSpawn(this);
     }
-    public virtual void SetBotName(string botName) { }
+    public virtual void CustomizeBot(Recipe recipe, OutfitManager outfit) 
+    {
+        if (!Settings.Plugin.customCampaignBots.Value) return;
+        RecipeApplier.ActivateRecipe(outfit, recipe.Descriptor);
+    }
 
     public override void SetBaseVisibility(bool visible)
     {

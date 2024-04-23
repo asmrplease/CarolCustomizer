@@ -5,19 +5,19 @@ using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 using UnityEngine.SceneManagement;
 
-namespace CarolCustomizer.Behaviors;
+namespace CarolCustomizer.Behaviors.Carol;
 public class MaterialManager
 {
     public MaterialDescriptor clipboard;
 
     GameObject currentTarget;
-    
+
     public List<MaterialDescriptor> currentMaterials { get; private set; }
 
     public void OnNewTarget(GameObject newObject)
     {
         if (!newObject) return;
-        this.currentTarget = newObject;
+        currentTarget = newObject;
     }
 
     public List<MaterialDescriptor> ListMaterials()
@@ -38,7 +38,7 @@ public class MaterialManager
         string sceneName = SceneManager.GetActiveScene().name;
 
         Log.Debug($"Found {materials.Count} materials in {currentTarget.name}.");
-        currentMaterials = materials.Select(x=> new MaterialDescriptor(x, sceneName, MaterialDescriptor.SourceType.World )).ToList();
+        currentMaterials = materials.Select(x => new MaterialDescriptor(x, sceneName, MaterialDescriptor.SourceType.World)).ToList();
         Log.Debug($"Current material count: {currentMaterials.Count()}");
         return currentMaterials;
     }
@@ -49,5 +49,11 @@ public class MaterialManager
         if (currentMaterials is null) { Log.Debug("no materials exist on current object"); return null; }
 
         return currentMaterials[0];
+    }
+
+    public static void FindMaterials()
+    {
+        var materials = Resources.FindObjectsOfTypeAll<Material>();
+        foreach (var material in materials) { Log.Debug(material.name); }
     }
 }

@@ -11,11 +11,11 @@ public static class Settings
     static public PluginConfig Plugin { get; private set; }
     static public void Constructor(ConfigFile config)
     {
-        Settings.Config = config;
-        Settings.HotKeys = new(config);
-        Settings.Favorites = new(config);
-        Settings.Game = new(config);
-        Settings.Plugin = new(config);
+        Settings.Config     = config;
+        Settings.HotKeys    = new(config);
+        Settings.Favorites  = new(config);
+        Settings.Game       = new(config);
+        Settings.Plugin     = new(config);
     }
 
     static public void Dispose()

@@ -1,4 +1,8 @@
-﻿using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Models.Recipes;
+using CarolCustomizer.Utils;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
@@ -12,13 +16,20 @@ public class MPBotWatchdog : BotWatchdog
         return base.BuildFromExisting(watchdog, typeComponent);
     }
 
-    public override void SetBotName(string botName)
+    public override void CustomizeBot(Recipe recipe, OutfitManager outfit)
     {
-        if (botName is null) { Log.Debug("SetBotName passed null name"); return; }
+        if (!Settings.Plugin.customMPBots.Value) return;
+        RecipeApplier.ActivateRecipe(outfit, recipe.Descriptor);
+        SetMPName(recipe.Name);
+    }
+
+    private void SetMPName(string name)
+    {
+        if (name is null) { Log.Debug("SetBotName passed null name"); return; }
         virtualCarol ??= GetComponentInParent<VirtualCarol>(true);
         if (!virtualCarol) { Log.Warning("VirtualCarol null during SetBotName"); return; }
         MultiplayerManager.PlayerStats stats = virtualCarol?.GetPlayerStats();
         if (stats is null) { Log.Error("didn't find stats from virtualCarol"); return; }
-        stats.name = botName;
+        stats.name = name;
     }
 }

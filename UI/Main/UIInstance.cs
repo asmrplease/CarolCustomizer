@@ -1,5 +1,4 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.UI.Config;
