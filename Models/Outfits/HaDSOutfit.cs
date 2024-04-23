@@ -2,7 +2,9 @@
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using UnityEngine;
+using static System.Linq.Enumerable;
 
 namespace CarolCustomizer.Models.Outfits;
 public class HaDSOutfit : Outfit
@@ -18,17 +20,8 @@ public class HaDSOutfit : Outfit
     {
         modelData = this.storedAsset.gameObject.GetComponent<ModelData>();
         if (!modelData) { Log.Error("No ModelData component was found during HaDS constructor."); return; }
-        BuildVariants();
+        BuildVariants3();
     }
-
-    //How do we change the behavior to recognize player variants?
-        //coopmodeltoggle has data about which player it's associated with
-        //every coopmodeltoggle has a set of objects that change state with the toggle
-            //typically these objects are
-    //How do we present these options to the player?
-        //list of each permutation, 4 players, 2 acc states = 8 variants
-            //this probably isn't too bad, might have an issue with getting cut off near screen edges
-        //player color preference setting?
 
     private void BuildVariants()
     {
@@ -59,6 +52,55 @@ public class HaDSOutfit : Outfit
             Variants[mda.name].AddRange(nonToggleables);
         }
         Log.Debug("Variants dict complete. ");
+    }
+
+    private void BuildVariants3()
+    {
+        foreach (int i in Range(0, modelData.accessories.Count))
+        {
+            if (compData. coopToggles.Count() == 0)
+            {
+                Variants[modelData.accessories[i].name] = BuildVariant(i, -1);
+                continue;
+            }
+            foreach (int j in Range(0, compData.coopMeshes.Count()))
+            {
+                string variantName = $"P({j + 1}) {modelData.accessories[i].name}";
+                Variants[variantName] = BuildVariant(i, j);
+            }
+        }
+    }
+
+    private List<StoredAccessory> BuildVariant(int accessoryGroup, int coopToggle)
+    {
+        var results = Accessories.ToDictionary(x=>x, y=>true);
+
+        Log.Debug("setting acc variants");
+        foreach (int i in Range(0, modelData.accessories.Count))
+        {
+            foreach (var acc in modelData.accessories[i].objects
+                .Select(x=> x? GetAccessory(x.name) : null))
+            {
+                if (acc is null) continue;
+                if (!results[acc]) continue;//if it's already been disabled, don't turn it back on
+                results[acc] = (i == accessoryGroup);
+            }
+        }
+
+        if (coopToggle == -1) { return results.Where(x => x.Value).Select(x => x.Key).ToList(); }
+
+        Log.Debug("setting coop variants");
+        foreach (int j in Range(0, compData.coopMeshes.Count()))
+        {
+            foreach (var acc in compData.coopMeshes[j]
+                .Select(x => GetAccessory(new AccessoryDescriptor(x, AssetName))))
+            {
+                if (!results[acc]) continue;//if it's already been disabled, don't turn it back on
+                results[acc] = (j == coopToggle);
+            }
+        }
+
+        return results.Where(x=>x.Value).Select(x=>x.Key).ToList();
     }
     #endregion
 }

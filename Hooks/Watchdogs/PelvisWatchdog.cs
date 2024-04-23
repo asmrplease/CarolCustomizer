@@ -102,7 +102,7 @@ public class PelvisWatchdog : MonoBehaviour
     public virtual void SetBaseVisibility(bool visible)
     {
         Log.Debug("PelvisWatchdog.SetBaseVisibility()");
-        foreach (var mesh in CompData?.baseMeshes) { mesh.gameObject.SetActive(visible); }
+        foreach (var mesh in CompData?.allSMRs) { mesh.gameObject.SetActive(visible); }
     }
 
     public override string ToString() => $"{GetType()}@{rootName}->{grandparentName}({Guid})";

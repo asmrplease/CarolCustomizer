@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static System.Linq.Enumerable;
 
 namespace CarolCustomizer.Models.Outfits;
 public class CompData : MonoBehaviour
@@ -16,18 +17,24 @@ public class CompData : MonoBehaviour
     public Animator Animator => animator;
 
     [SerializeField]
-    public List<SkinnedMeshRenderer> baseMeshes;
+    public List<SkinnedMeshRenderer> allSMRs;
 
-    public SkinnedMeshRenderer BaseFace => baseMeshes.FirstOrDefault(x => x.name == "tete");
+    public SkinnedMeshRenderer BaseFace => allSMRs.FirstOrDefault(x => x.name == "tete");
 
     Dictionary<Type, Component> parentComponents = new();
     public CoopModelToggle[] coopToggles { get; private set; }
 
     //foreach coop player, list the SMRs associated with that player
+    public List<SkinnedMeshRenderer>[] coopMeshes
+        { get; private set; }
+        = new List<SkinnedMeshRenderer>[Constants.MaxCoopPlayers];
+    public List<SkinnedMeshRenderer> allCoopMeshes
+        { get; private set; }
+        = new();
 
     public CompData Constructor()
     {
-        baseMeshes = transform
+        allSMRs = transform
             .parent
             .GetComponentsInChildren<SkinnedMeshRenderer>(true)
             .ToList();
@@ -40,9 +47,26 @@ public class CompData : MonoBehaviour
 
         coopToggles = transform.parent.GetComponentsInChildren<CoopModelToggle>(true);
         Log.Debug($"{coopToggles.Count()} cooptoggles found.");
-        foreach (var toggle in coopToggles) {toggle.enabled = false;}
+        SetCoopVariants();
+        coopToggles.ForEach(x => x.enabled = false);
         RefreshParentComponents();
         return this;
+    }
+
+    private void SetCoopVariants()
+    {
+        foreach (int i in Range(0, Constants.MaxCoopPlayers))
+        {
+            var playerToggles = coopToggles.Where(x=>x.playerNumberToggle == i);
+            coopMeshes[i] = new();
+            if (playerToggles is null) continue;
+            foreach (var toggle in playerToggles)
+            {
+                var smrs = toggle.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+                coopMeshes[i].AddRange(smrs);
+                allCoopMeshes.AddRange(smrs);
+            }
+        }
     }
 
     public Component GetParentComponent(Type type)

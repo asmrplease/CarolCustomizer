@@ -21,7 +21,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
     virtual public string Author => "Crimson Tales";
     public List<StoredAccessory> Accessories => AccDict.Values.ToList();
     private Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = new();
-    virtual public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = new();
+    public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = new();
 
     PelvisWatchdog prefabWatchdog;
     public BoneData boneData => prefabWatchdog.BoneData;
@@ -72,7 +72,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
 
         Log.Debug($"Setting up accessories: {storedAsset.name}.");
         if (!prefabWatchdog.CompData) Log.Warning("Failed to instantiate meshdata in time.");
-        var smrs = prefabWatchdog?.CompData?.baseMeshes;
+        var smrs = prefabWatchdog?.CompData?.allSMRs;
         if (smrs is null) { Log.Error("no smrs found in watchdog mesh data."); return; }
         foreach (var smr in smrs)
         {

@@ -4,6 +4,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace CarolCustomizer.Models.Accessories;
 [Serializable]
@@ -25,6 +27,21 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
     {
         Name = name;
         Source = source;
+        //does having an empty list of materials cause problems here?
+        //only thing that uses this is LiveAccessory
+    }
+
+    public AccessoryDescriptor(SkinnedMeshRenderer smr, string source)
+    {
+        Name = smr.name;
+        Source = source;
+        Materials = new MaterialDescriptor[smr.materials.Length];
+
+        int index = 0;
+        foreach (var material in smr.materials)
+        {
+            Materials[index++] = new(material, source, MaterialDescriptor.SourceType.AssetBundle);
+        }
     }
 
     public AccessoryDescriptor(AccessoryDescriptor existing)

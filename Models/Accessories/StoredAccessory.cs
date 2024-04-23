@@ -15,19 +15,11 @@ public class StoredAccessory : AccessoryDescriptor
     public string GetSource() => Source;
 
     public StoredAccessory(Outfit outfit, SkinnedMeshRenderer smr)
-        : base(smr.name, outfit.AssetName)
+        : base(smr, outfit.AssetName)
     {
         this.outfit = outfit;
         referenceSMR = smr;
         isFace = smr.name == "tete";
-
-        Materials = new MaterialDescriptor[referenceSMR.materials.Length];
-
-        int index = 0;
-        foreach (var material in referenceSMR.materials)
-        {
-            Materials[index++] = new(material, this.outfit.AssetName, MaterialDescriptor.SourceType.AssetBundle);
-        }
     }
 
     public LiveAccessory BringLive(SkeletonManager skeleton, Transform folder)

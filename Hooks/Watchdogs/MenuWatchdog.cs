@@ -12,7 +12,7 @@ public class MenuWatchdog : PelvisWatchdog
     public override PelvisWatchdog BuildFromExisting(PelvisWatchdog watchdog, Component typeComponent)
     {
         Log.Debug("MenuWatchdog.Constructor");
-        Log.Debug($"{watchdog.CompData.baseMeshes.Count()}");
+        Log.Debug($"{watchdog.CompData.allSMRs.Count()}");
         Log.Debug($"ctor BoneData exists: {(bool)BoneData}");
         menuSwitchOutfit = typeComponent as MenuSwitchOutfit;
         return base.BuildFromExisting(watchdog, typeComponent);
@@ -26,7 +26,7 @@ public class MenuWatchdog : PelvisWatchdog
     {
         while (true)
         {
-            if (CompData.baseMeshes.Any(x => x.gameObject.activeSelf))
+            if (CompData.allSMRs.Any(x => x.gameObject.activeSelf))
             {
                 Log.Debug("MainMenuFix RefreshBaseVisibility");
                 base.SetBaseVisibility(false);

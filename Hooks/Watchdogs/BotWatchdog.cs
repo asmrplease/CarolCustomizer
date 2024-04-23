@@ -14,7 +14,7 @@ public class BotWatchdog : PelvisWatchdog
 
     public override void SetBaseVisibility(bool visible)
     {
-        foreach (var mesh in CompData?.baseMeshes.Where(x=>x.name != Constants.RobotHead)) 
+        foreach (var mesh in CompData?.allSMRs.Where(x=>x.name != Constants.RobotHead)) 
             { mesh.gameObject.SetActive(visible); }
     }
 
