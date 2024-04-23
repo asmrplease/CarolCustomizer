@@ -7,17 +7,8 @@ namespace CarolCustomizer.Behaviors.Settings;
 public class GameSettings : IDisposable
 {
     ConfigFile config;
-    public bool RunInBackground
-    {
-        set
-        {
-            RunInBackgroundCE.Value = value;
-            Application.runInBackground = value;
-        }
-        get { return RunInBackgroundCE.Value; }
-    }
 
-    readonly ConfigEntry<bool> RunInBackgroundCE;
+    public readonly ConfigEntry<bool> RunInBackgroundCE;
     public readonly ConfigEntry<KeyCode> Reload;
 
     public GameSettings(ConfigFile config)
@@ -28,11 +19,21 @@ public class GameSettings : IDisposable
             "Run In Background",
             true,
             "Allows the game to continue when focus is lost");
+        RunInBackgroundCE.SettingChanged += OnSettingChanged;
+
         Reload = config.Bind(
             Constants.Preferences,
             "Stage Reload Hotkey",
             KeyCode.KeypadMinus,
             "Changes the stage reload key to prevent accidental level reloads when typing");
+    }
+
+    private void OnSettingChanged(object sender, EventArgs e)
+    {
+        Log.Debug("OnSettingChanged");
+        var idk = e as SettingChangedEventArgs;
+        var wtf = idk.ChangedSetting as ConfigEntry<bool>;
+        Application.runInBackground = wtf.Value;
     }
 
     public void ApplySettings()

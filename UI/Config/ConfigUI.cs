@@ -1,9 +1,11 @@
-﻿using CarolCustomizer.Behaviors.Settings;
+﻿using BepInEx.Configuration;
+using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System.ComponentModel;
 using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -20,52 +22,31 @@ public class ConfigUI : MonoBehaviour
     const string ClearFavoritesButtonAddress = "ClearFavorites";
 
     const string RunInBackgroundToggleAddress = "RunInBackground/Toggle";
+    const string MultiplayerBotToggleAddress = "CustomMPBots/Toggle";
+    const string CampaignBotToggleAddress = "CustomCampaignBots/Toggle";
     const string RightMouseButtonToggle = "MouseButton/Toggles/Right";
     const string MenuSpeedToggleGroupAddress = "Menu Speed";
     #endregion
-
+    #region Dependencies
     MessageDialogue dialoge;
-
+    #endregion
+    #region Setup
     public void Constructor(MessageDialogue dialogue)
     {
         this.dialoge = dialogue;
 
-        transform
-            .Find(LogFolderButtonAddress)
-            .GetComponent<Button>()
-            .onClick
-            .AddListener(OpenLogFolder);
+        SetupButton(LogFileButtonAddress, OpenLogFolder);
+        SetupButton(LogFileButtonAddress, OpenLogFile);
+        SetupButton(ClearFavoritesButtonAddress, ConfirmClearFavorites);
+
+        SetupToggle(RunInBackgroundToggleAddress, Settings.Game.RunInBackgroundCE);
+        SetupToggle(CampaignBotToggleAddress, Settings.Plugin.customCampaignBots);
+        SetupToggle(MultiplayerBotToggleAddress, Settings.Plugin.customMPBots);
+
+        SetupDropdown(KeyboardToggleAddress, Settings.HotKeys.keyboardMenuToggle);
+        SetupDropdown(MouseToggleAddress, Settings.HotKeys.mouseMenuToggle);
+        SetupDropdown(ReloadStageAddress, Settings.Game.Reload);
         
-        transform 
-            .Find(LogFileButtonAddress)
-            .GetComponent<Button>()
-            .onClick
-            .AddListener(OpenLogFile);
-
-        transform
-            .Find(ClearFavoritesButtonAddress)
-            .GetComponent<Button>()
-            .onClick
-            .AddListener(ConfirmClearFavorites);
-
-        transform
-            .Find(KeyboardToggleAddress)
-            .gameObject
-            .AddComponent<KeyCodeDropDown>()
-            .Constructor(Settings.HotKeys.keyboardMenuToggle);
-
-        transform
-            .Find(MouseToggleAddress)
-            .gameObject
-            .AddComponent<KeyCodeDropDown>()
-            .Constructor(Settings.HotKeys.mouseMenuToggle);
-
-        transform
-            .Find(ReloadStageAddress)
-            .gameObject
-            .AddComponent<KeyCodeDropDown>()
-            .Constructor(Settings.Game.Reload);
-
         var toggles = transform
             .Find(MenuSpeedToggleGroupAddress)
             .GetComponentsInChildren<Toggle>(true);
@@ -86,19 +67,41 @@ public class ConfigUI : MonoBehaviour
         RMBToggle
             .SetIsOnWithoutNotify(
             Settings.HotKeys.mouseContextMenu.Value == PointerEventData.InputButton.Right);
-
-        var runInBackground = transform
-            .Find(RunInBackgroundToggleAddress)
-            .GetComponent<Toggle>();
-        runInBackground
-            .onValueChanged
-            .AddListener
-            ((x) => Settings.Game.RunInBackground = x);
-        runInBackground
-            .SetIsOnWithoutNotify(
-            Settings.Game.RunInBackground);         
     }
 
+    private void SetupDropdown(string address, ConfigEntry<KeyCode> setting)
+    {
+        transform
+            .Find(address)
+            .gameObject
+            .AddComponent<KeyCodeDropDown>()
+            .Constructor(setting);
+    }
+
+    private void SetupToggle(string address, ConfigEntry<bool> setting)
+    {
+        var toggle = transform
+            .Find(address)
+            .GetComponent<Toggle>();
+        toggle
+            .onValueChanged
+            .AddListener
+            ((x) => setting.Value = x);
+        toggle
+            .SetIsOnWithoutNotify
+            (setting.Value);
+    }
+
+    private void SetupButton(string address, UnityAction callback)
+    {
+        transform
+            .Find(address)
+            .GetComponent<Button>()
+            .onClick
+            .AddListener(callback);
+    }
+    #endregion
+    #region Callbacks
     private void OnMenuSpeedToggleChanged(bool state)
     {
         Log.Debug("OnMenuSpeedToggleChanged");
@@ -138,4 +141,5 @@ public class ConfigUI : MonoBehaviour
         try { Process.Start(Constants.LogFilePath); }
         catch (Win32Exception e) { Log.Warning(e.Message); }
     }
+    #endregion
 }
