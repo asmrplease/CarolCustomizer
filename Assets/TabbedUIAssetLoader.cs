@@ -3,23 +3,26 @@ using UnityEngine;
 using CarolCustomizer.Utils;
 using System.Globalization;
 using System.IO;
+using UnityEngine.UI;
 
 namespace CarolCustomizer.Assets;
 public class TabbedUIAssetLoader : IDisposable
 {
-    private static readonly string assetBundleName = "tabui.ui";
-    private static readonly string folderName = "Mods";
+    const string assetBundleName = "tabui.ui";
+    const string folderName = "Mods";
+    const string uiContainerAddress = "Assets/Mods/TabUI/Accessory Canvas.prefab";
+    const string accessoryButtonAddress = "Assets/Mods/TabUI/Blank Accessory.prefab";
+    const string outfitButtonAddress = "Assets/Mods/TabUI/Blank Outfit.prefab";
+    const string contextMenuAddress = "Assets/Mods/TabUI/Context Menu.prefab";
+    const string outfitViewAddress = "Assets/Mods/TabUI/OutfitView.prefab";
+    const string materialsViewAddress = "Assets/Mods/TabUI/MaterialsView.prefab";
+    const string recipesViewAddress = "Assets/Mods/TabUI/RecipesView.prefab";
+    const string settingsViewAddress = "Assets/Mods/TabUI/SettingsView.prefab";
+    const string filenameDialogueAddress = "Assets/Mods/TabUI/FilenameDialogue.prefab";
+    const string messageDialogueAddress = "Assets/Mods/TabUI/MessageDialogue.prefab";
+    const string pirateIconAddress = "assets/mods/tabui/pirateicon.png";
 
-    private static readonly string uiContainerAddress = "Assets/Mods/TabUI/Accessory Canvas.prefab";
-    private static readonly string accessoryButtonAddress = "Assets/Mods/TabUI/Blank Accessory.prefab";
-    private static readonly string outfitButtonAddress = "Assets/Mods/TabUI/Blank Outfit.prefab";
-    private static readonly string contextMenuAddress = "Assets/Mods/TabUI/Context Menu.prefab";
-    private static readonly string outfitViewAddress = "Assets/Mods/TabUI/OutfitView.prefab";
-    private static readonly string materialsViewAddress = "Assets/Mods/TabUI/MaterialsView.prefab";
-    private static readonly string recipesViewAddress = "Assets/Mods/TabUI/RecipesView.prefab";
-    private static readonly string settingsViewAddress = "Assets/Mods/TabUI/SettingsView.prefab";
-    private static readonly string filenameDialogueAddress = "Assets/Mods/TabUI/FilenameDialogue.prefab";
-    private static readonly string messageDialogueAddress = "Assets/Mods/TabUI/MessageDialogue.prefab";
+    AssetBundle assetBundle;
 
     public GameObject UIContainer { get; private set; }
     public GameObject AccessoryListElement { get; private set; }
@@ -32,13 +35,11 @@ public class TabbedUIAssetLoader : IDisposable
     public GameObject SettingsView { get; private set; }
     public GameObject FilenameDialogue { get; private set; }
     public GameObject MessageDialogue { get; private set; }
-
-    AssetBundle assetBundle;
+    public Sprite PirateIcon { get; private set; }
 
     public TabbedUIAssetLoader()
     {
-        Log.Debug("loading tabbed UI assets");
-
+        Log.Info("Loading UI assets.");
         try { Load(); }
         catch (Exception e)
         {
@@ -46,18 +47,21 @@ public class TabbedUIAssetLoader : IDisposable
             Dispose();
             return;
         }
-
-        Log.Debug("done");
+        Log.Info("UI loaded successfully.");
     }
 
     public void Dispose()
     {
         if (assetBundle) assetBundle.Unload(false);
+        Log.Info("UI unloaded.");
     }
 
     private void Load()
     {
-        assetBundle = LoadAssetBundle();
+        string applicationPath = Directory.GetParent(Application.dataPath).FullName;
+        string relativePath = Path.Combine(folderName, assetBundleName);
+        string path = Path.Combine(applicationPath, relativePath).ToLower(CultureInfo.InvariantCulture);
+        assetBundle = AssetBundle.LoadFromFile(path);
         if (!assetBundle) { Log.Error("Failed to load TabbedUI AssetBundle."); return; }
 
         UIContainer = assetBundle.LoadAsset<GameObject>(uiContainerAddress);
@@ -70,18 +74,7 @@ public class TabbedUIAssetLoader : IDisposable
         SettingsView = assetBundle.LoadAsset<GameObject>(settingsViewAddress);
         FilenameDialogue = assetBundle.LoadAsset<GameObject>(filenameDialogueAddress);
         MessageDialogue = assetBundle.LoadAsset<GameObject>(messageDialogueAddress);
-
+        PirateIcon = assetBundle.LoadAsset<Sprite>(pirateIconAddress);
         ContextMenuButton = ContextMenu.transform.GetChild(0).gameObject;
     }
-
-    private AssetBundle LoadAssetBundle()
-    {
-        string applicationPath = Directory.GetParent(Application.dataPath).FullName;
-        string relativePath = Path.Combine(folderName, assetBundleName);
-
-        string path = Path.Combine(applicationPath, relativePath).ToLower(CultureInfo.InvariantCulture);
-
-        return AssetBundle.LoadFromFile(path);
-    }
-
 }

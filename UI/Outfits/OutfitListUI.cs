@@ -16,31 +16,28 @@ namespace CarolCustomizer.UI.Outfits;
 public class OutfitListUI : MonoBehaviour
 {
     #region Static Constants
-    private readonly string SearchModeHint = "Click here to search!";
-    private static readonly string searchBoxAddress = "Search Box";
-    private static readonly string searchBoxHintAddress = "Search Box/Text";
-    private static readonly string listRootAddress = "Scroll View/Viewport/Content";
-    string showHideAddress = "Buttons/Toggle Base";
-    private static readonly string uncheckAllAddress = "Buttons/Uncheck All";
-    private string filtersAddress = "Filters";
+    const string SearchModeHint = "Click here to search!";
+    const string searchBoxAddress = "Search Box";
+    const string listRootAddress = "Scroll View/Viewport/Content";
+    const string uncheckAllAddress = "Uncheck All";
+    const string filtersAddress = "Filters";
     #endregion
 
-    private TabbedUIAssetLoader loader;
-    private OutfitManager outfitManager;
+    TabbedUIAssetLoader loader;
+    OutfitManager outfitManager;
+    DynamicContextMenu contextMenu;
     public CarolInstance playerManager { get; private set; }
     public MaterialManager materialManager { get; private set; }
-
-    private DynamicContextMenu contextMenu;
+    
 
     public string searchString { get; private set; } = "";
-    private Transform listRoot;
-    private InputField searchBox;
-    private Text searchBoxHint;
-    private Toggle favoriteFilter;
-    private Toggle activeFilter;
+    Transform listRoot;
+    InputField searchBox;
+    Text searchBoxHint;
+    Toggle favoriteFilter;
+    Toggle activeFilter;
 
     Button deselectAll;
-    Button showHideBase;
 
     SortedList<Outfit, OutfitUI> outfitUIs = new();
     Dictionary<AccessoryDescriptor, AccessoryUI> accessoryUIs = new();
@@ -69,9 +66,7 @@ public class OutfitListUI : MonoBehaviour
         favoriteFilter.onValueChanged.AddListener(ProcessFilters);
         activeFilter = transform.Find(filtersAddress + "/Active").GetComponent<Toggle>();
         activeFilter.onValueChanged.AddListener(ProcessFilters);
-        showHideBase = transform.Find(showHideAddress).GetComponent<Button>();
-        showHideBase.gameObject.SetActive(false);
-        //showHideBase.onClick.AddListener(outfitManager.ToggleBaseVisibility);
+        
 
         listRoot = transform.Find(listRootAddress);
 
@@ -157,7 +152,6 @@ public class OutfitListUI : MonoBehaviour
         Outfit outfit = OutfitAssetManager.GetOutfitByAssetName(accessoryDescriptor.Source);
         Log.Debug($"BuildAccUI: source: {accessoryDescriptor.Source} outfit.assetname: {outfit.AssetName}");
         StoredAccessory accessory = outfit.GetAccessory(accessoryDescriptor);
-        //does this line use the outfit name comparison?
         var outfitUI = outfitUIs[outfit];
 
         var accInstance = Instantiate(loader.AccessoryListElement, outfitUI.transform);
@@ -173,10 +167,8 @@ public class OutfitListUI : MonoBehaviour
     private MaterialUI BuildMatUI(AccMatSlot location, MaterialDescriptor material)
     {
         var accessoryUI = accessoryUIs[location.accessory];
-        if (!accessoryUI)
-        {
-            accessoryUI = BuildAccUI(location.accessory);
-        }
+        if (!accessoryUI) { accessoryUI = BuildAccUI(location.accessory); }
+
         var matInstance = Instantiate(loader.AccessoryListElement, accessoryUI.transform.parent);
         if (!matInstance) { Log.Error("Failed to instantiate material UI prefab."); return null; }
 

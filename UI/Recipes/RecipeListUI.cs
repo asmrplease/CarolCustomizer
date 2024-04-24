@@ -74,7 +74,7 @@ public class RecipeListUI : MonoBehaviour
         //add a RecipeUI component
         var recipeUI = uiInstance.AddComponent<RecipeUI>();
         if (!recipeUI) { Log.Warning("failed to instantiate recipeUI component"); return; }
-        recipeUI.Constructor(newRecipe, this, outfitManager, contextMenu, fileDialogue, messageDialogue);
+        recipeUI.Constructor(newRecipe, loader, outfitManager, contextMenu, fileDialogue, messageDialogue);
 
         //add to list of recipeUIs
         recipeUIs.Add(newRecipe.Path, recipeUI);

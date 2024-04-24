@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
@@ -18,7 +19,6 @@ namespace CarolCustomizer.UI.Recipes;
 public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
     Recipe recipe;
-    RecipeListUI ui;
     OutfitManager outfitManager;
     DynamicContextMenu contextMenu;
     FilenameDialogue filenameDialogue;
@@ -35,13 +35,12 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     public void Constructor(
         Recipe recipe,
-        RecipeListUI ui,
+        TabbedUIAssetLoader loader,
         OutfitManager outfitManager,
         DynamicContextMenu contextMenu,
         FilenameDialogue filenameDialogue,
         MessageDialogue messageDialogue)
     {
-        this.ui = ui;
         this.recipe = recipe;
         this.outfitManager = outfitManager;
         this.contextMenu = contextMenu;
@@ -50,7 +49,9 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         name = this.recipe.Name;
 
         displayImage = transform.Find(displayImageAddress)?.GetComponent<Image>();
-        displayImage.enabled = false;
+        displayImage.sprite = loader.PirateIcon;
+        displayImage.enabled = Settings.Plugin.shezaraRecipe.Value == recipe.Name;
+        Settings.Plugin.shezaraRecipe.SettingChanged += OnShezaraChanged;
 
         displayName = transform.Find(outfitNameAddress)?.GetComponentInChildren<Text>();
         displayName.text = this.recipe.Name;
@@ -60,6 +61,16 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
         pickupLocation = transform.Find(pickupLocationAddress)?.GetComponent<Text>();
         pickupLocation.text = GetStatusMessage();
+    }
+
+    void OnDestroy()
+    {
+        Settings.Plugin.shezaraRecipe.SettingChanged -= OnShezaraChanged;
+    }
+
+    private void OnShezaraChanged(object sender, EventArgs e)
+    {
+        displayImage.enabled = (e.AsConfigEntry<string>().Value == recipe.Name);
     }
 
     private string GetStatusMessage()
@@ -120,10 +131,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         messageDialogue.Show(message, cancelText: "Wait, no.", confirmText: "Delete!", confirmAction: DeleteRecipe);
     }
 
-    private void DeleteRecipe()
-    {
-        File.Delete(recipe.Path);
-    }
+    private void DeleteRecipe() => File.Delete(recipe.Path);
 
     void SetAsShezara()
     {
