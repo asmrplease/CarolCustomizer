@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Recipes;
-using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.Behaviors.Recipes;
-using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Utils;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace CarolCustomizer.Behaviors;
 internal class NPCManager 

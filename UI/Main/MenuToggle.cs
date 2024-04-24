@@ -28,18 +28,22 @@ public class MenuToggle : MonoBehaviour
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneChange;
+        if (currentScene.name != Constants.MenuSceneName) return;
+        MainMenuSetMenuState(false);
     }
     private void Start()
     {
         uiInstance.Hide();
         currentScene = SceneManager.GetActiveScene();
-        if (currentScene.name == Constants.MenuSceneName) { StartCoroutine(OnMainMenuLoaded()); }
+        if (currentScene.name != Constants.MenuSceneName) return;
+        StartCoroutine(OnMainMenuLoaded());
     }
 
     private void OnSceneChange(Scene newScene, LoadSceneMode mode)
     {
         currentScene = newScene;
-        if (currentScene.name == Constants.MenuSceneName) { StartCoroutine(OnMainMenuLoaded()); }
+        if (currentScene.name == Constants.MenuSceneName) return;
+        StartCoroutine(OnMainMenuLoaded()); 
     }
 
     private void Update()

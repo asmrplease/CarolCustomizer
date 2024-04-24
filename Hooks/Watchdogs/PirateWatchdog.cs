@@ -1,9 +1,17 @@
 ﻿using CarolCustomizer.Behaviors;
+using CarolCustomizer.Behaviors.Settings;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 internal class PirateWatchdog : PelvisWatchdog
 {
-    void OnEnable() => NPCManager.OnShezaraAwake(this);
+    bool pirateEnabled;
+    public override void Awake()
+    {
+        base.Awake();
+        pirateEnabled = Settings.Plugin.customShezara.Value;
+    }
 
-    void OnDestory() => NPCManager.shezaraInstance?.RestorePrevious(this);
+    void OnEnable() { if (pirateEnabled) NPCManager.OnShezaraAwake(this); }
+
+    void OnDestory() { if (pirateEnabled) NPCManager.shezaraInstance?.RestorePrevious(this); }
 }

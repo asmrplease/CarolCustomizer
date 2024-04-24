@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BepInEx.Configuration;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -139,5 +140,12 @@ public static class MiscExtensions
         {
             action(item);
         }
+    }
+
+    public static ConfigEntry<T> AsConfigEntry<T>(this EventArgs e)
+    {
+        var idk = e as SettingChangedEventArgs;
+        var wtf = idk.ChangedSetting as ConfigEntry<T>;
+        return wtf;
     }
 }

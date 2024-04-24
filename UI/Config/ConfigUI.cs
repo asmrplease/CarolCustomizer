@@ -7,6 +7,7 @@ using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace CarolCustomizer.UI.Config;
@@ -24,6 +25,8 @@ public class ConfigUI : MonoBehaviour
     const string RunInBackgroundToggleAddress = "RunInBackground/Toggle";
     const string MultiplayerBotToggleAddress = "CustomMPBots/Toggle";
     const string CampaignBotToggleAddress = "CustomCampaignBots/Toggle";
+    const string CustomShezaraToggleAddress = "CustomShezara/Toggle";
+
     const string RightMouseButtonToggle = "MouseButton/Toggles/Right";
     const string MenuSpeedToggleGroupAddress = "Menu Speed";
     #endregion
@@ -35,13 +38,16 @@ public class ConfigUI : MonoBehaviour
     {
         this.dialoge = dialogue;
 
-        SetupButton(LogFileButtonAddress, OpenLogFolder);
+        SetupButton(LogFolderButtonAddress, OpenLogFolder);
         SetupButton(LogFileButtonAddress, OpenLogFile);
         SetupButton(ClearFavoritesButtonAddress, ConfirmClearFavorites);
 
         SetupToggle(RunInBackgroundToggleAddress, Settings.Game.RunInBackgroundCE);
         SetupToggle(CampaignBotToggleAddress, Settings.Plugin.customCampaignBots);
         SetupToggle(MultiplayerBotToggleAddress, Settings.Plugin.customMPBots);
+        
+        SetupToggle(CustomShezaraToggleAddress, Settings.Plugin.customShezara);
+        Settings.Plugin.customShezara.SettingChanged += OnShezaraEnabledChange;
 
         SetupDropdown(KeyboardToggleAddress, Settings.HotKeys.keyboardMenuToggle);
         SetupDropdown(MouseToggleAddress, Settings.HotKeys.mouseMenuToggle);
@@ -101,7 +107,18 @@ public class ConfigUI : MonoBehaviour
             .AddListener(callback);
     }
     #endregion
+
     #region Callbacks
+    private void OnShezaraEnabledChange(object sender, System.EventArgs e)
+    {
+        if (SceneManager.GetActiveScene().name == Constants.MenuSceneName) return;
+
+        Log.Debug("Showing player setting popup");
+        dialoge.Show(
+            "This setting change will take effect after the level reloads.",
+            cancelText: "Okay.");
+    }
+
     private void OnMenuSpeedToggleChanged(bool state)
     {
         Log.Debug("OnMenuSpeedToggleChanged");

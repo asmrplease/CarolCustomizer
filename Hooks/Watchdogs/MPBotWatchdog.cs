@@ -26,10 +26,13 @@ public class MPBotWatchdog : BotWatchdog
     private void SetMPName(string name)
     {
         if (name is null) { Log.Debug("SetBotName passed null name"); return; }
+
         virtualCarol ??= GetComponentInParent<VirtualCarol>(true);
         if (!virtualCarol) { Log.Warning("VirtualCarol null during SetBotName"); return; }
+
         MultiplayerManager.PlayerStats stats = virtualCarol?.GetPlayerStats();
         if (stats is null) { Log.Error("didn't find stats from virtualCarol"); return; }
+
         stats.name = name;
     }
 }

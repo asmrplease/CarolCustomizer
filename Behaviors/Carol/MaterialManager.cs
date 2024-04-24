@@ -30,10 +30,7 @@ public class MaterialManager
         if (renderers.Count() == 0) { Log.Warning("no smrs were found in target."); return null; }
 
         List<Material> materials = new();
-        foreach (var renderer in renderers)
-        {
-            materials.AddRange(renderer.materials);
-        }
+        foreach (var renderer in renderers) { materials.AddRange(renderer.materials); }
 
         string sceneName = SceneManager.GetActiveScene().name;
 

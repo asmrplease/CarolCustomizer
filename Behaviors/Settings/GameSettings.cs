@@ -6,14 +6,11 @@ using UnityEngine;
 namespace CarolCustomizer.Behaviors.Settings;
 public class GameSettings : IDisposable
 {
-    ConfigFile config;
-
     public readonly ConfigEntry<bool> RunInBackgroundCE;
     public readonly ConfigEntry<KeyCode> Reload;
 
     public GameSettings(ConfigFile config)
     {
-        this.config = config;
         RunInBackgroundCE = config.Bind(
             Constants.Preferences,
             "Run In Background",
@@ -31,9 +28,7 @@ public class GameSettings : IDisposable
     private void OnSettingChanged(object sender, EventArgs e)
     {
         Log.Debug("OnSettingChanged");
-        var idk = e as SettingChangedEventArgs;
-        var wtf = idk.ChangedSetting as ConfigEntry<bool>;
-        Application.runInBackground = wtf.Value;
+        Application.runInBackground = e.AsConfigEntry<bool>().Value;
     }
 
     public void ApplySettings()
