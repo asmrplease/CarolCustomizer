@@ -1,6 +1,5 @@
 ﻿using BepInEx;
 using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;

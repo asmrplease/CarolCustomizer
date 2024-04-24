@@ -41,9 +41,9 @@ public class CompData : MonoBehaviour
 
         animator ??= GetComponentsInParent<Animator>(true)?
             .FirstOrDefault(x => x.runtimeAnimatorController);
-        if (!animator) Log.Warning("no animator found during CD.Constructor()");
+        //if (!animator) Log.Warning("no animator found during CD.Constructor()");
         controller ??= animator?.runtimeAnimatorController;
-        if (!controller) Log.Warning("no RAC found during CD.Constructor()");
+        //if (!controller) Log.Warning("no RAC found during CD.Constructor()");
 
         coopToggles = transform.parent.GetComponentsInChildren<CoopModelToggle>(true);
         Log.Debug($"{coopToggles.Count()} cooptoggles found.");

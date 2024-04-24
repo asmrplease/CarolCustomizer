@@ -1,5 +1,4 @@
-﻿using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.Behaviors.Recipes;
+﻿using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
@@ -7,8 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace CarolCustomizer.Behaviors;
-internal class NPCManager 
+namespace CarolCustomizer.Behaviors.Carol;
+internal class NPCManager
 {
     static RecipesManager recipesManager;
 
@@ -35,9 +34,13 @@ internal class NPCManager
 
     public static void OnShezaraAwake(PelvisWatchdog pelvis)
     {
-        var shezaraRecipe = recipesManager.Recipes.First(x => x.Name == Constants.Shezara);
-        if (shezaraRecipe is null) { Log.Warning("didn't find shezara recipe"); return; }
+        string recipeName = Settings.Settings.Plugin.shezaraRecipe.Value;
+        var shezaraRecipe = recipesManager.Recipes
+            .First
+            (x => x.Name == recipeName);
+        if (shezaraRecipe is null) { Log.Warning($"didn't find shezara recipe {recipeName}"); return; }
         shezaraInstance.NotifySpawned(pelvis);
+        Log.Info($"applying {shezaraRecipe.Name} to shezara");
         RecipeApplier.ActivateRecipe(shezaraInstance.outfitManager, shezaraRecipe.Descriptor);
     }
 
@@ -52,7 +55,7 @@ internal class NPCManager
     public static Recipe GetRandomOutfit()
     {
         var random = new System.Random();
-        var recipes = recipesManager.Recipes.Where(x=>x.Error == Recipe.Status.NoError);
+        var recipes = recipesManager.Recipes.Where(x => x.Error == Recipe.Status.NoError);
         if (recipes.Count() == 0) return null;
         int index = random.Next(recipes.Count());
         return recipes.ElementAt(index);

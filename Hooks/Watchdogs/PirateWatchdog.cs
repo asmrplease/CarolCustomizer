@@ -1,4 +1,4 @@
-﻿using CarolCustomizer.Behaviors;
+﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 
 namespace CarolCustomizer.Hooks.Watchdogs;

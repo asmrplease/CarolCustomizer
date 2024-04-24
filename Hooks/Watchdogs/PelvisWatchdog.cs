@@ -94,9 +94,11 @@ public class PelvisWatchdog : MonoBehaviour
 
     public void SetAnimator(Outfit outfit)
     {
+        if (this.compData?.Animator is null) { Log.Warning($"null animator when trying to set animator on {this}"); return; }
         Log.Debug($"Setting animator from {outfit}");
-        var animator = outfit.compData.Controller;
-        Log.Debug($"");
+        var animator = outfit?.compData?.Controller;
+        if (!animator) { Log.Warning("failed to get animator from outfit"); return; }
+        
         this.compData.Animator.runtimeAnimatorController = animator;
     }
     public virtual void SetBaseVisibility(bool visible)

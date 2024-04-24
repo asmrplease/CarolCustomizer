@@ -125,6 +125,12 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         File.Delete(recipe.Path);
     }
 
+    void SetAsShezara()
+    {
+        Log.Debug($"Setting {recipe.Name} as shezara recipe");
+        Settings.Plugin.shezaraRecipe.Value = recipe.Name;
+    }
+
     private void OnContextMenuListMissing()
     {
         var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
@@ -157,6 +163,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             output.Add(("Overwrite", OnContextMenuOverwrite));
             output.Add(("Delete", OnContextMenuDelete));
             output.Add(("Rename", OnContextMenuRename));
+            output.Add(("Set Shezara", SetAsShezara));
         }
         if (recipe.Error == Recipe.Status.NoError)
         {
