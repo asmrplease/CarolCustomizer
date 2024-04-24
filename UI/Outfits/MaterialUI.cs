@@ -16,6 +16,8 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
     #region Static Addresses
     static string defaultMaterialTextAddress = "Text/Accessory Name";
     static string currentMaterialTextAddress = "Text/Material Name";
+    static string toggleAddress = "Toggle";
+
     static string favoriteAddress = "Favorite";
     #endregion
 
@@ -56,6 +58,10 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
         currentMaterialName.text = CurrentLiveMaterial().Name;
 
         name = "MatUI: " + defaultMaterial.Name;
+
+        var toggle = transform.Find(toggleAddress).gameObject;
+        GameObject.Destroy(toggle.GetComponent<Toggle>());
+        GameObject.Destroy(toggle);
 
         favoriteIcon = transform.Find(favoriteAddress)?.GetComponent<Image>();
         favoriteIcon.enabled = false;

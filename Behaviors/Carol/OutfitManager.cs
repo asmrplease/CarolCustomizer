@@ -53,12 +53,13 @@ public class OutfitManager : IDisposable
     public void Dispose()
     {
         Log.Debug("OutfitManager.Dispose");
-        SetBaseVisibility(true);//Ensure the player is visible when we leave.
-        foreach (var liveAcc in instantiatedAccessories.Values) { liveAcc.Dispose(); }
 
         playerManager.SpawnEvent -= RefreshSMRs;
         playerManager.SpawnEvent -= OnSpawn;
         OutfitAssetManager.OnOutfitUnloaded -= OnOutfitUnloaded;
+
+        SetBaseVisibility(true);//Ensure the player is visible when we leave.
+        foreach (var liveAcc in instantiatedAccessories.Values) { liveAcc?.Dispose(); } 
     }
 
     private void RefreshSMRs(PelvisWatchdog pelvis)

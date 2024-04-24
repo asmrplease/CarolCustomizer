@@ -12,9 +12,10 @@ using UnityEngine.UI;
 namespace CarolCustomizer.UI.Materials;
 internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
-    private static readonly string displayNameAddress = "Text/Accessory Name";
-    private static readonly string materialNameAddress = "Text/Material Name";
-    private static readonly string favoriteAddress = "Favorite";
+    const string displayNameAddress = "Text/Accessory Name";
+    const string materialNameAddress = "Text/Material Name";
+    const string favoriteAddress = "Favorite";
+    const string toggleAddress = "Toggle";
 
     DynamicContextMenu contextMenu;
     MaterialManager materialManager;
@@ -35,6 +36,10 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
 
         materialName = transform.Find(materialNameAddress).GetComponent<Text>();
         materialName.text = "";
+
+        var toggle = transform.Find(toggleAddress).gameObject;
+        GameObject.Destroy(toggle.GetComponent<Toggle>());
+        GameObject.Destroy(toggle);
 
         favoriteIcon = transform.Find(favoriteAddress)?.GetComponent<Image>();
         favoriteIcon.enabled = false;
