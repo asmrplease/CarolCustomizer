@@ -23,6 +23,18 @@ internal static class RecipeApplier
             recipe.AnimatorSource));
     }
 
+    public static void ActivateVariant(OutfitManager outfitManager, string outfitName, int variantIndex)
+    {
+        Log.Debug("ActivateVariant(OM, string, int");
+        if (variantIndex < 0) { Log.Warning($"ActivateVariant() was passed a negative variant index: {variantIndex}"); return; }
+        HaDSOutfit outfit = OutfitAssetManager.GetOutfitByAssetName(outfitName);
+        if (outfit is null) { Log.Debug($"Didn't find outfit named: {outfitName}"); return; }
+        if (variantIndex > outfit.Variants.Count) { Log.Warning($"Index[{variantIndex}] is out of bounts for {outfit.DisplayName}, count: {outfit.Variants.Count}."); return; }
+            
+        var variant = outfit.Variants.ElementAt(variantIndex).Key;
+        ActivateVariant(outfitManager, outfit, variant);
+    }
+
     public static void ActivateVariant(OutfitManager outfitManager, HaDSOutfit outfit, string variantName)
     {
         Log.Debug("ActivateVariant()");

@@ -28,14 +28,21 @@ internal class AutoSaver
     public void Load()
     {
         var recipe = CCPlugin.recipesManager.GetRecipeByFilename(AutoSaveFile);
-        if (recipe is null) { Log.Warning("Couldn't find autosave recipe"); return; }
-        if (recipe.Error != Recipe.Status.NoError) { Log.Warning($"AutoLoad recipe error: {recipe.Error}"); return; }
-        CCPlugin.uiInstances.First().StartCoroutine(LoadRoutine(recipe));//TODO: put this on a proper gameobject
+        CCPlugin.uiInstances.First().StartCoroutine(LoadRecipeRoutine(recipe));//TODO: put this on a proper gameobject
     }
 
-    private IEnumerator LoadRoutine(Recipe recipe)
+    private IEnumerator LoadRecipeRoutine(Recipe recipe)
     {
         if (!outfitManager.pelvis) yield return new WaitUntil(() => outfitManager.pelvis);
+        if (recipe is null 
+            || recipe.Error == Recipe.Status.FileError
+            || recipe.Error == Recipe.Status.InvalidJson)
+        {
+            Log.Warning("Loading pyjamas instead of autosave");
+            RecipeApplier.ActivateVariant(outfitManager, Constants.Pyjamas, 0);
+            yield break;
+        }
+        Log.Info("Loading autosave recipe");
         RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
         Log.Debug("Load completed succesfully");
         yield break;

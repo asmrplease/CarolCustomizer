@@ -26,6 +26,7 @@ public class RecipesManager : IDisposable
 
     public RecipesManager(string path)
     {
+        Directory.CreateDirectory(path);
         watcher = new FileSystemWatcher(path);
         watcher.Filter = $"*{Constants.RecipeExtension}";
         watcher.Created += HandleRecipeFileCreated;
