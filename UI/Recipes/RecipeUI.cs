@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Assets;
+﻿using BepInEx.Configuration;
+using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
@@ -65,11 +66,18 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     void OnDestroy()
     {
+        Log.Info($"RecipeUI: {this.recipe.Name}.OnDestroy()");
         Settings.Plugin.shezaraRecipe.SettingChanged -= OnShezaraChanged;
+        //TODO: why do these callbacks sometimes appear to continue to get called after recipes are removed?
+        //is the event getting registered repeatedly?
+        //is the wrong event being removed?
+        //is the event not being removed?
+        //do i misunderstand the nature of the problem?
     }
 
     private void OnShezaraChanged(object sender, EventArgs e)
     {
+        if (!displayImage) { return; }       
         displayImage.enabled = (e.AsConfigEntry<string>().Value == recipe.Name);
     }
 

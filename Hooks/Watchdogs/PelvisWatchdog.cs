@@ -92,7 +92,7 @@ public class PelvisWatchdog : MonoBehaviour
 
     public virtual void SetBaseOutfit(Outfit outfit) { }
 
-    public void SetAnimator(Outfit outfit)
+    public virtual void SetAnimator(Outfit outfit)
     {
         if (this.compData?.Animator is null) { Log.Warning($"null animator when trying to set animator on {this}"); return; }
         Log.Debug($"Setting animator from {outfit}");

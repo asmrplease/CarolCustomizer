@@ -61,6 +61,7 @@ public class CarolInstance : IDisposable
 
     public bool RestorePrevious(PelvisWatchdog pelvis)
     {
+        if (disposing) { Log.Warning("Entered restoreprevios during disposal"); return false; }
         if (targetPelvis != pelvis) return false;
         if (previousTargets is null) return false;
         if (!previousTargets.Any(x => x)) return false;

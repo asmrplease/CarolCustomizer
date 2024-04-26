@@ -39,7 +39,7 @@ public class ConfigUI : MonoBehaviour
         this.dialoge = dialogue;
 
         SetupButton(LogFolderButtonAddress, OpenLogFolder);
-        SetupButton(LogFileButtonAddress, OpenLogFile);
+        SetupButton(LogFileButtonAddress, OpenDataFolder);
         SetupButton(ClearFavoritesButtonAddress, ConfirmClearFavorites);
 
         SetupToggle(RunInBackgroundToggleAddress, Settings.Game.RunInBackgroundCE);
@@ -150,6 +150,12 @@ public class ConfigUI : MonoBehaviour
     {
         //string argument = @"/select, " + "\"" + Constants.LogFileName + "\""; //TODO get highlighting the file working?
         try { Process.Start(Constants.BepInExFolderPath); }
+        catch (Win32Exception e) { Log.Warning(e.Message); }
+    }
+
+    private void OpenDataFolder()
+    {
+        try { Process.Start(Application.persistentDataPath); }
         catch (Win32Exception e) { Log.Warning(e.Message); }
     }
 

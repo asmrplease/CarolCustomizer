@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Utils;
 using System;
 using UnityEngine;
 
@@ -32,7 +33,9 @@ public class PlayerCarolInstance : CarolInstance
 
     public override void Dispose()
     {
+        Log.Debug("autosaving...");
         autoSaver.Save();
+        Log.Debug("disposing PCI");
         base.Dispose();
     }
 }

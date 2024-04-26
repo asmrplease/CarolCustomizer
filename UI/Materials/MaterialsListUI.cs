@@ -1,5 +1,5 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;

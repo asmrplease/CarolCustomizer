@@ -5,7 +5,7 @@ using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 using UnityEngine.SceneManagement;
 
-namespace CarolCustomizer.Behaviors.Carol;
+namespace CarolCustomizer.Behaviors;
 public class MaterialManager
 {
     public MaterialDescriptor clipboard;

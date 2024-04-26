@@ -82,7 +82,7 @@ public class RecipeListUI : MonoBehaviour
 
     public void OnRecipeDeleted(Recipe removedRecipe)
     {
-        Destroy(recipeUIs[removedRecipe.Path].gameObject);
+        GameObject.Destroy(recipeUIs[removedRecipe.Path].gameObject);
         recipeUIs.Remove(removedRecipe.Path);
     }
 
