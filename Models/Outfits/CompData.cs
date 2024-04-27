@@ -46,7 +46,7 @@ public class CompData : MonoBehaviour
         //if (!controller) Log.Warning("no RAC found during CD.Constructor()");
 
         coopToggles = transform.parent.GetComponentsInChildren<CoopModelToggle>(true);
-        Log.Debug($"{coopToggles.Count()} cooptoggles found.");
+        //Log.Debug($"{coopToggles.Count()} cooptoggles found.");
         SetCoopVariants();
         coopToggles.ForEach(x => x.enabled = false);
         RefreshParentComponents();
@@ -81,14 +81,17 @@ public class CompData : MonoBehaviour
             .ToDictionaryOverwrite(x => x.GetType());
     }
 
-    //public void OnTransformParentChanged() => Constructor();
-
     public void SetRAC(RuntimeAnimatorController controller)
     {
         if (!animator) { Log.Warning("No animator component"); return; }
         if (!controller) { Log.Warning("tried to set RAC as null"); return; }
 
         animator.runtimeAnimatorController = controller;
+    }
+
+    public int CountOnPelvis<T>() where T : Component
+    {
+        return this.transform.GetComponentsInChildren<T>().Count();
     }
 
     void OnDestory()

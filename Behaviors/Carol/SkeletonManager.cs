@@ -30,15 +30,15 @@ public class SkeletonManager : IDisposable
     #endregion
 
     #region Dependencies
-    private CarolInstance playerManager;
+    CarolInstance playerManager;
     public readonly FaceCopier faceCopier;
     #endregion
 
     #region Instance Variables
-    private PelvisWatchdog targetPelvis;
-    private DynamicBone headDynamicBone;
-    private Dictionary<string, Transform> liveStandardBones = new();
-    private Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = new();
+    PelvisWatchdog targetPelvis;
+    DynamicBone headDynamicBone;
+    Dictionary<string, Transform> liveStandardBones = new();
+    Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = new();
     #endregion
 
     #region Lifecycle
@@ -62,28 +62,22 @@ public class SkeletonManager : IDisposable
     private void SetNewPelvis(PelvisWatchdog newPelvis)
     {
         targetPelvis = newPelvis;
-        RebuildBones();
 
-        var head = liveStandardBones["Bn_CarolHead"];
-        if (!head) { Log.Warning("didn't find head bone!?"); return; }
-
-        var headDyn = head.GetComponent<DynamicBone>();
-        if (!headDyn) { Log.Warning("didn't find dyn component on head"); return; }
-
-        headDynamicBone = headDyn;
-        headDynamicBone.RestartHairJiggle();
-    }
-
-    private void RebuildBones()
-    {
-        var activeOutfits = outfitBoneDicts.Keys.ToList();
+        //var activeOutfits = outfitBoneDicts.Keys.ToList();
+        var activeOutfits = playerManager.outfitManager.ActiveOutfits;
         liveStandardBones.Clear();
         outfitBoneDicts.Clear();
 
         liveStandardBones = targetPelvis.BoneData.StandardBones;
         FixMissingStandardBones();
 
+        var head = liveStandardBones["Bn_CarolHead"]?
+            .GetComponent<DynamicBone>();
+
+        if (!head) { Log.Warning("didn't find dyn component on head");}
+        headDynamicBone = head;
         foreach (var outfit in activeOutfits) { AddBespokeBones(outfit); }
+        //headDynamicBone.RestartHairJiggle();
     }
     #endregion
 

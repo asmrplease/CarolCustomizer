@@ -57,6 +57,7 @@ public class CCPlugin : BaseUnityPlugin
         var cleanBoneFolder = new GameObject().transform;
         cleanBoneFolder.name = "Cleaned Bones";
         cleanBoneFolder.parent = transform;
+        cleanBoneFolder.gameObject.SetActive(false); 
         BespokeBone.SetCleanFolder(cleanBoneFolder);
 
         //Instantiate Static Assets

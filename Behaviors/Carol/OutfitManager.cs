@@ -21,7 +21,7 @@ public class OutfitManager : IDisposable
     #endregion
 
     #region State Management
-    Dictionary<StoredAccessory, LiveAccessory> instantiatedAccessories = new();
+    Dictionary<StoredAccessory, LiveAccessory> liveAccessories = new();
     Outfit animatorSource;
     #endregion
 
@@ -33,9 +33,14 @@ public class OutfitManager : IDisposable
         animatorSource.AssetName: 
         Constants.Pyjamas;
     public IEnumerable<StoredAccessory> ActiveAccessories =>
-            instantiatedAccessories
+            liveAccessories
             .Where(x => x.Value.isActive)
             .Select(x => x.Key);
+
+    public IEnumerable<Outfit> ActiveOutfits =>
+        ActiveAccessories
+        .Select(x => x.outfit)
+        .Distinct();
 
     public OutfitManager(CarolInstance player, SkeletonManager skeletonManager, OutfitAssetManager dynamicAssetManager)
     {
@@ -59,61 +64,61 @@ public class OutfitManager : IDisposable
         OutfitAssetManager.OnOutfitUnloaded -= OnOutfitUnloaded;
 
         SetBaseVisibility(true);//Ensure the player is visible when we leave.
-        foreach (var liveAcc in instantiatedAccessories.Values) { liveAcc?.Dispose(); } 
+        foreach (var liveAcc in liveAccessories.Values) { liveAcc?.Dispose(); } 
     }
 
     private void RefreshSMRs(PelvisWatchdog pelvis)
     {
-        foreach (var accessory in ActiveAccessories) { instantiatedAccessories[accessory].Refresh(); }
+        foreach (var accessory in ActiveAccessories) { liveAccessories[accessory].Refresh(); }
     }
 
     public void EnableAccessory(StoredAccessory accessory)
     {
-        if (!instantiatedAccessories.ContainsKey(accessory)) { Instantiate(accessory); }
-        instantiatedAccessories[accessory].Enable();
-        var liveAccessory = instantiatedAccessories[accessory] as AccessoryDescriptor;
+        if (!liveAccessories.ContainsKey(accessory)) { Instantiate(accessory); }
+        liveAccessories[accessory].Enable();
+        var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, true));
     }
 
     public bool IsEnabled(StoredAccessory accessory)
     {
-        if (!instantiatedAccessories.ContainsKey(accessory)) { return false; }
-        return instantiatedAccessories[accessory].isActive;
+        if (!liveAccessories.ContainsKey(accessory)) { return false; }
+        return liveAccessories[accessory].isActive;
     }
 
     public void DisableAccessory(StoredAccessory accessory)
     {
-        if (!instantiatedAccessories.ContainsKey(accessory)) { Log.Warning("Tried to disable an accessory that was never instantiated."); return; }
-        instantiatedAccessories[accessory].Disable();
-        var liveAccessory = instantiatedAccessories[accessory] as AccessoryDescriptor;
+        if (!liveAccessories.ContainsKey(accessory)) { Log.Warning("Tried to disable an accessory that was never instantiated."); return; }
+        liveAccessories[accessory].Disable();
+        var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, false));
     }
 
     public void DisableAllAccessories()
     {
         //TODO: only call this on active accessories
-        foreach (var accessory in instantiatedAccessories.Keys) { DisableAccessory(accessory); }
+        foreach (var accessory in liveAccessories.Keys) { DisableAccessory(accessory); }
     }
 
     public void PaintAccessory(StoredAccessory accessory, MaterialDescriptor material, int index)
     {
         EnableAccessory(accessory);
-        instantiatedAccessories[accessory].ApplyMaterial(material, index);
-        var liveAccessory = instantiatedAccessories[accessory] as AccessoryDescriptor;
+        liveAccessories[accessory].ApplyMaterial(material, index);
+        var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, true));
     }
 
     public MaterialDescriptor[] GetLiveMaterials(StoredAccessory accessory)
     {
-        if (!instantiatedAccessories.ContainsKey(accessory)) { return null; }
-        return instantiatedAccessories[accessory].Materials;
+        if (!liveAccessories.ContainsKey(accessory)) { return null; }
+        return liveAccessories[accessory].Materials;
     }
     #endregion
 
     private void Instantiate(StoredAccessory accessory)
     {
         var liveAcc = accessory.BringLive(skeletonManager, OutfitAssetManager.liveFolder);
-        instantiatedAccessories.Add(accessory, liveAcc);
+        liveAccessories.Add(accessory, liveAcc);
         liveAcc.Enable();
         liveAcc.Refresh();
     }
@@ -144,10 +149,10 @@ public class OutfitManager : IDisposable
         //for each accessory in the outfit, find any live accessories and remove them from the dict
         foreach (var storedAcc in outfit.Accessories)
         {
-            if (!instantiatedAccessories.ContainsKey(storedAcc)) continue;
-            var liveAcc = instantiatedAccessories[storedAcc];
+            if (!liveAccessories.ContainsKey(storedAcc)) continue;
+            var liveAcc = liveAccessories[storedAcc];
             if (liveAcc is not null) { liveAcc.Dispose(); }
-            instantiatedAccessories.Remove(storedAcc);
+            liveAccessories.Remove(storedAcc);
         }
     }
 }
