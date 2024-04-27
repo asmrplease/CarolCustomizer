@@ -40,6 +40,7 @@ public class CCPlugin : BaseUnityPlugin
     OutfitAssetManager dynamicAssetManager;
     NPCInstanceCreator npcInstances;
     IntroCutsceneFixBehavior introFix;
+    HaDSOutfitLoader outfitLoader;
     #endregion
 
     #region Setup
@@ -63,6 +64,7 @@ public class CCPlugin : BaseUnityPlugin
 
         //Instantiate Dynamic Assets  
         dynamicAssetManager = new(transform);
+        outfitLoader = new();
         introFix = new(this.gameObject);
         recipesManager = new(Constants.RecipeFolderPath);
 
@@ -105,8 +107,8 @@ public class CCPlugin : BaseUnityPlugin
         Settings.Game.ApplySettings();
 
         Log.Debug("starting hads coroutine");
-        OutfitAssetManager.OnHaDSOutfitsLoaded += LoadInitialWatchdogs;
-        StartCoroutine(dynamicAssetManager.LoadAllHaDSOutfits());
+        OutfitAssetManager.OnOutfitSetLoaded += LoadInitialWatchdogs;
+        StartCoroutine(outfitLoader.LoadAllHaDSOutfits());
 
         Log.Debug("Invoking CCPlugin.Start() callbacks");
         OnSetupComplete?.Invoke(this);

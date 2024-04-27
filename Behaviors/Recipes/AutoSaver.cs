@@ -15,7 +15,7 @@ internal class AutoSaver
     public AutoSaver(PlayerCarolInstance player)
     {
         outfitManager = player.outfitManager;
-        OutfitAssetManager.OnHaDSOutfitsLoaded += Load;
+        OutfitAssetManager.OnOutfitSetLoaded += Load;
     }
 
     public void Save()

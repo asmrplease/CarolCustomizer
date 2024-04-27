@@ -35,7 +35,7 @@ public class RecipesManager : IDisposable
         watcher.Renamed += HandleRecipeFileRenamed;
         watcher.EnableRaisingEvents = true;
 
-        OutfitAssetManager.OnHaDSOutfitsLoaded += RefreshAll;
+        OutfitAssetManager.OnOutfitSetLoaded += RefreshAll;
     }
 
     public void Dispose() => this.DisposeFields();
