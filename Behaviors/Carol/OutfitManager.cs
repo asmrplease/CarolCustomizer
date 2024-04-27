@@ -37,6 +37,13 @@ public class OutfitManager : IDisposable
             .Where(x => x.Value.isActive)
             .Select(x => x.Key);
 
+    public IEnumerable<AccessoryDescriptor> LiveAccessoryDescriptors =>
+        liveAccessories
+        .Values
+        .Where(x => x.isActive)
+        .Select(x => new AccessoryDescriptor(x));
+        
+
     public IEnumerable<Outfit> ActiveOutfits =>
         ActiveAccessories
         .Select(x => x.outfit)
