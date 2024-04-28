@@ -19,7 +19,6 @@ public class ConfigUI : MonoBehaviour
     const string ReloadStageAddress = "Reload Stage Replacement Key/Dropdown";
 
     const string LogFolderButtonAddress = "OpenLogFolder";
-    const string LogFileButtonAddress = "OpenLogFile";
     const string ClearFavoritesButtonAddress = "ClearFavorites";
 
     const string RunInBackgroundToggleAddress = "RunInBackground/Toggle";
@@ -39,7 +38,6 @@ public class ConfigUI : MonoBehaviour
         this.dialoge = dialogue;
 
         SetupButton(LogFolderButtonAddress, OpenLogFolder);
-        SetupButton(LogFileButtonAddress, OpenDataFolder);
         SetupButton(ClearFavoritesButtonAddress, ConfirmClearFavorites);
 
         SetupToggle(RunInBackgroundToggleAddress, Settings.Game.RunInBackgroundCE);
@@ -107,7 +105,6 @@ public class ConfigUI : MonoBehaviour
             .AddListener(callback);
     }
     #endregion
-
     #region Callbacks
     private void OnShezaraEnabledChange(object sender, System.EventArgs e)
     {
@@ -149,13 +146,11 @@ public class ConfigUI : MonoBehaviour
     private void OpenLogFolder()
     {
         //string argument = @"/select, " + "\"" + Constants.LogFileName + "\""; //TODO get highlighting the file working?
-        try { Process.Start(Constants.BepInExFolderPath); }
-        catch (Win32Exception e) { Log.Warning(e.Message); }
-    }
-
-    private void OpenDataFolder()
-    {
-        try { Process.Start(Application.persistentDataPath); }
+        try 
+        { 
+            if (!Input.GetKey(KeyCode.LeftControl)) Process.Start(Constants.BepInExFolderPath);
+            else Process.Start(Application.persistentDataPath);
+        }
         catch (Win32Exception e) { Log.Warning(e.Message); }
     }
 

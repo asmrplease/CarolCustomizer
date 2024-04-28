@@ -19,5 +19,11 @@ internal class Log
     public static void Warning(string message) => i.LogWarning(message);
     public static void Error(string message) => i.LogError(message);    
     public static void Fatal(string message) => i.LogFatal(message);
+
+    public static bool WarnOnNull(object obj, string message = "Object Null") 
+    {
+        if (obj is null) { Warning(message); return true; }
+        return false;
+    }
     #endregion
 }

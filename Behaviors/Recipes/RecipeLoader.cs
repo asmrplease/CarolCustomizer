@@ -11,7 +11,7 @@ internal static class RecipeLoader
 {
     public static string[] GetRecipeFilePaths()
     {
-        return Directory.GetFiles(Constants.RecipeFolderPath, $"*{Constants.RecipeExtension}", SearchOption.TopDirectoryOnly);
+        return Directory.GetFiles(Constants.RecipeFolderPath, $"*{Constants.RecipeExtension}", SearchOption.AllDirectories);
     }
 
     public static string GetRecipeJson(string path)

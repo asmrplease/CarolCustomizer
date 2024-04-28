@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
@@ -26,7 +27,7 @@ public class CCPlugin : BaseUnityPlugin
     public static List<CarolInstance> playerManagers = new();
     public static List<UIInstance> uiInstances = new();
     public static CarolInstance cutscenePlayer;
-    private static TabbedUIAssetLoader uiAssetLoader;
+    private static UIAssetLoader uiAssetLoader;
     public static Action<CCPlugin> OnSetupComplete;
     public static GameManagerRewrite gmRewrite;
     public static RecipesManager recipesManager { get; private set; }
@@ -41,6 +42,7 @@ public class CCPlugin : BaseUnityPlugin
     NPCInstanceCreator npcInstances;
     IntroCutsceneFixBehavior introFix;
     HaDSOutfitLoader outfitLoader;
+    SaveDataAdjuster saveAdjuster;
     #endregion
 
     #region Setup
@@ -50,6 +52,7 @@ public class CCPlugin : BaseUnityPlugin
         Log.Message("Logger Ready!");
 
         Settings.Constructor(Config);
+        saveAdjuster = new();
 
         gmRewrite = gameObject.AddComponent<GameManagerRewrite>();
 
@@ -110,6 +113,7 @@ public class CCPlugin : BaseUnityPlugin
         Log.Debug("starting hads coroutine");
         OutfitAssetManager.OnOutfitSetLoaded += LoadInitialWatchdogs;
         StartCoroutine(outfitLoader.LoadAllHaDSOutfits());
+        StartCoroutine(SaveDataAdjuster.EnsurePyjamas());
 
         Log.Debug("Invoking CCPlugin.Start() callbacks");
         OnSetupComplete?.Invoke(this);
@@ -145,9 +149,9 @@ public class CCPlugin : BaseUnityPlugin
         }
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
-        Log.Info("Plugin OnDestroy()");
+        Log.Info("Plugin OnDisable()");
         Config.Save();
         HarmonyInstance?.UnpatchSelf();
         Settings.Dispose();

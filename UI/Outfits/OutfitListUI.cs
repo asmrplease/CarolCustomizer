@@ -24,7 +24,7 @@ public class OutfitListUI : MonoBehaviour
     const string filtersAddress = "Filters";
     #endregion
 
-    TabbedUIAssetLoader loader;
+    UIAssetLoader loader;
     OutfitManager outfitManager;
     DynamicContextMenu contextMenu;
     public CarolInstance playerManager { get; private set; }
@@ -45,7 +45,7 @@ public class OutfitListUI : MonoBehaviour
     Dictionary<AccMatSlot, MaterialUI> materialUIs = new();
 
     public void Constructor(
-        TabbedUIAssetLoader loader,
+        UIAssetLoader loader,
         CarolInstance playerManager,
         MaterialManager materialManager,
         DynamicContextMenu contextMenu)
