@@ -24,7 +24,7 @@ public class UIInstance : MonoBehaviour
     #endregion
 
     #region Dependencies
-    TabbedUIAssetLoader loader;
+    UIAssetLoader loader;
     public PlayerCarolInstance playerManager { get; private set; }
     public DynamicContextMenu contextMenu { get; private set; }
     public MaterialManager materialManager { get; private set; }
@@ -57,7 +57,7 @@ public class UIInstance : MonoBehaviour
 
     #region Public Interface
     public void Constructor(
-        TabbedUIAssetLoader loader,
+        UIAssetLoader loader,
         PlayerCarolInstance player,
         RecipesManager recipesManager)
     {

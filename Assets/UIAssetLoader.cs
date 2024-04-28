@@ -6,10 +6,8 @@ using System.IO;
 using UnityEngine.UI;
 
 namespace CarolCustomizer.Assets;
-public class TabbedUIAssetLoader : IDisposable
+public class UIAssetLoader : IDisposable
 {
-    const string assetBundleName = "tabui.ui";
-    const string folderName = "Mods";
     const string uiContainerAddress = "Assets/Mods/TabUI/Accessory Canvas.prefab";
     const string accessoryButtonAddress = "Assets/Mods/TabUI/Blank Accessory.prefab";
     const string outfitButtonAddress = "Assets/Mods/TabUI/Blank Outfit.prefab";
@@ -37,7 +35,7 @@ public class TabbedUIAssetLoader : IDisposable
     public GameObject MessageDialogue { get; private set; }
     public Sprite PirateIcon { get; private set; }
 
-    public TabbedUIAssetLoader()
+    public UIAssetLoader()
     {
         Log.Info("Loading UI assets.");
         try { Load(); }
@@ -58,11 +56,8 @@ public class TabbedUIAssetLoader : IDisposable
 
     private void Load()
     {
-        string applicationPath = Directory.GetParent(Application.dataPath).FullName;
-        string relativePath = Path.Combine(folderName, assetBundleName);
-        string path = Path.Combine(applicationPath, relativePath).ToLower(CultureInfo.InvariantCulture);
-        assetBundle = AssetBundle.LoadFromFile(path);
-        if (!assetBundle) { Log.Error("Failed to load TabbedUI AssetBundle."); return; }
+        assetBundle = AssetBundle.LoadFromFile(Constants.UIAssetPath);
+        if (!assetBundle) { Log.Error($"Failed to load TabbedUI AssetBundle from {Constants.AssetFolderPath}"); return; }
 
         UIContainer = assetBundle.LoadAsset<GameObject>(uiContainerAddress);
         AccessoryListElement = assetBundle.LoadAsset<GameObject>(accessoryButtonAddress);

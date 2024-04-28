@@ -42,7 +42,7 @@ internal static class Constants
         "CAROL_Zombie"
     };
     public static readonly Color DefaultColor = new(0.1882353f, 0.0f, 0.3647059f, 1.0f);
-    public static readonly Color Highlight = new(0.6f, 0.2039f, 0.7373f, 0.728f);//new(0.4641f, 0f, 0.4706f, 1f);
+    public static readonly Color Highlight = new(0.6f, 0.2039f, 0.7373f, 0.728f);
     public static readonly Color Vanilla = new(0, 0.1294f, 0.3647f, 1f);
     public static readonly Color Teal = new(0, 0.1961f, 0.1373f, 1f);
     public static readonly Dictionary<string, float> MenuSpeeds = new()
@@ -64,18 +64,24 @@ internal static class Constants
     public static readonly Version v210 = new("2.1.0");
     public static readonly Version v200 = new("2.0.0");
     public static readonly Version v100 = new("1.0.0");
-
+    
     public const string RecipeExtension = ".json";
     public const string RecipeFolderName = "Recipes";
-    public const string LogFolderRelativePath = "BepInEx";
+    public const string BepInExFolder = "BepInEx";
+    public const string PluginsFolder = "plugins";
+    public const string UIAssetName = "tabui.ui";
+    public const string LogFileName = "LogOutput.log";
+    public const string AssetFolderName = "CarolCustomizer";
     public const string Preferences = "Preferences";
+
     public static readonly string ApplicationPath = Directory.GetParent(Application.dataPath).FullName;
-    public static readonly string RecipeFolderPath = Path.Combine(Constants.ApplicationPath, Constants.RecipeFolderName);
-    public static readonly string BepInExFolderPath = Path.Combine(Constants.ApplicationPath, Constants.LogFolderRelativePath);
-    public static readonly string LogFileName = "LogOutput.log";
+    public static readonly string RecipeFolderPath = Path.Combine(ApplicationPath, RecipeFolderName);
+    public static readonly string BepInExFolderPath = Path.Combine(ApplicationPath, BepInExFolder);
+    public static readonly string PluginsFolderPath = Path.Combine(BepInExFolderPath, PluginsFolder);
+    public static readonly string AssetFolderPath = Path.Combine(PluginsFolderPath, AssetFolderName);
+    public static readonly string UIAssetPath = Path.Combine(AssetFolderPath, UIAssetName);
     public static readonly string LogFilePath = Path.Combine(BepInExFolderPath, LogFileName);
-
-
+    
     public static readonly Vector3 OutOfTheWay = new(-10000, -10000, -10000);
     public const float PhoneHideTime = 1.75f;
     public const int MaxCoopPlayers = 4;

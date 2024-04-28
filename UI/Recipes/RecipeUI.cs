@@ -36,7 +36,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     public void Constructor(
         Recipe recipe,
-        TabbedUIAssetLoader loader,
+        UIAssetLoader loader,
         OutfitManager outfitManager,
         DynamicContextMenu contextMenu,
         FilenameDialogue filenameDialogue,

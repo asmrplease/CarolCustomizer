@@ -11,14 +11,14 @@ internal class MaterialsListUI : MonoBehaviour
     private static readonly string listRootAddress = "Scroll View/Viewport/Content";
 
     MaterialManager materialManager;
-    TabbedUIAssetLoader loader;
+    UIAssetLoader loader;
     DynamicContextMenu contextMenu;
 
     Transform listRoot;
 
     List<ReadOnlyMatUI> materialUIs = new();
 
-    public void Constructor(TabbedUIAssetLoader loader, MaterialManager materialManager, DynamicContextMenu contextMenu)
+    public void Constructor(UIAssetLoader loader, MaterialManager materialManager, DynamicContextMenu contextMenu)
     {
         this.materialManager = materialManager;
         this.loader = loader;

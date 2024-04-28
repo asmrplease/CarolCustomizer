@@ -27,7 +27,7 @@ public class CCPlugin : BaseUnityPlugin
     public static List<CarolInstance> playerManagers = new();
     public static List<UIInstance> uiInstances = new();
     public static CarolInstance cutscenePlayer;
-    private static TabbedUIAssetLoader uiAssetLoader;
+    private static UIAssetLoader uiAssetLoader;
     public static Action<CCPlugin> OnSetupComplete;
     public static GameManagerRewrite gmRewrite;
     public static RecipesManager recipesManager { get; private set; }

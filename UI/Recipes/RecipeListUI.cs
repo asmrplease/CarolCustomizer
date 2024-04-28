@@ -14,7 +14,7 @@ public class RecipeListUI : MonoBehaviour
     private static readonly string listRootAddress = "Scroll View/Viewport/Content";
     private static readonly string newRecipeAddress = "New Recipe";
 
-    private TabbedUIAssetLoader loader;
+    private UIAssetLoader loader;
     private OutfitManager outfitManager;
     private DynamicContextMenu contextMenu;
     private FilenameDialogue fileDialogue;
@@ -28,7 +28,7 @@ public class RecipeListUI : MonoBehaviour
     private Dictionary<string, RecipeUI> recipeUIs = new();
 
     public void Constructor(
-        TabbedUIAssetLoader loader,
+        UIAssetLoader loader,
         RecipesManager recipesManager,
         OutfitManager outfitManager,
         DynamicContextMenu contextMenu,
