@@ -92,7 +92,6 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     public List<(string, UnityAction)> GetContextMenuItems()
     {
-        //return new List<(string, UnityAction)> { ( "Set Outfit", () => ui.SetBaseOutfit(this.outfit) ) };
         var results = new List<(string, UnityAction)>();
         var hads = outfit as HaDSOutfit; //TODO: idk but anything but this
         results.Add(("Use Animator", () => ui.playerManager.outfitManager.SetAnimator(outfit)));
