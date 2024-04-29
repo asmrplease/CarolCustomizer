@@ -1,6 +1,7 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Models.Outfits;
+using System.Linq;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 internal class PirateWatchdog : PelvisWatchdog
@@ -10,6 +11,12 @@ internal class PirateWatchdog : PelvisWatchdog
     {
         base.Awake();
         pirateEnabled = Settings.Plugin.customShezara.Value;
+    }
+
+    public override void SetBaseVisibility(bool visible)
+    {
+        if (pirateEnabled is not true) return;
+        base.SetBaseVisibility(visible);
     }
 
     public override void SetAnimator(Outfit outfit) { }

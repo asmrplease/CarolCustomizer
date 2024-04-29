@@ -3,6 +3,7 @@ using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
+using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
@@ -14,6 +15,12 @@ public class MPBotWatchdog : BotWatchdog
     {
         virtualCarol = typeComponent as VirtualCarol;
         return base.BuildFromExisting(watchdog, typeComponent);
+    }
+
+    public override void SetBaseVisibility(bool visible)
+    {
+        if (Settings.Plugin.customMPBots.Value is not true) return;
+        foreach (var mesh in CompData?.allSMRs) { mesh.gameObject.SetActive(visible); }
     }
 
     public override void CustomizeBot(Recipe recipe, OutfitManager outfit)
