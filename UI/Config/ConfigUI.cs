@@ -42,10 +42,11 @@ public class ConfigUI : MonoBehaviour
 
         SetupToggle(RunInBackgroundToggleAddress, Settings.Game.RunInBackgroundCE);
         SetupToggle(CampaignBotToggleAddress, Settings.Plugin.customCampaignBots);
-        SetupToggle(MultiplayerBotToggleAddress, Settings.Plugin.customMPBots);
-        
+        SetupToggle(MultiplayerBotToggleAddress, Settings.Plugin.customMPBots);        
         SetupToggle(CustomShezaraToggleAddress, Settings.Plugin.customShezara);
-        Settings.Plugin.customShezara.SettingChanged += OnShezaraEnabledChange;
+        Settings.Plugin.customShezara.SettingChanged += ShowLevelReloadPopup;
+        Settings.Plugin.customCampaignBots.SettingChanged += ShowLevelReloadPopup;
+        Settings.Plugin.customMPBots.SettingChanged += ShowLevelReloadPopup;
 
         SetupDropdown(KeyboardToggleAddress, Settings.HotKeys.keyboardMenuToggle);
         SetupDropdown(MouseToggleAddress, Settings.HotKeys.mouseMenuToggle);
@@ -106,7 +107,7 @@ public class ConfigUI : MonoBehaviour
     }
     #endregion
     #region Callbacks
-    private void OnShezaraEnabledChange(object sender, System.EventArgs e)
+    private void ShowLevelReloadPopup(object sender, System.EventArgs e)
     {
         if (SceneManager.GetActiveScene().name == Constants.MenuSceneName) return;
 
