@@ -135,8 +135,8 @@ public class SkeletonManager : IDisposable
         {
             if (!boneList[i]) continue;
             var boneName = boneList[i].name;
-            if (liveStandardBones.ContainsKey(boneName)) { output[i] = liveStandardBones[boneName]; continue; }
             if (bespokeBones.ContainsKey(boneName)) { output[i] = bespokeBones[boneName]; continue; }
+            if (liveStandardBones.ContainsKey(boneName)) { output[i] = liveStandardBones[boneName]; continue; }
             Log.Warning($"Neither dict found {boneName}.");
         }
         return output;

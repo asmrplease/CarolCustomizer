@@ -23,6 +23,12 @@ public class LiveAccessory : AccessoryDescriptor
 
     public Action OnAccessoryStateChanged;
 
+    virtual public void Enable() => liveSMR.gameObject.SetActive(true);
+
+    virtual public void Disable() => liveSMR.gameObject.SetActive(false);
+
+    public bool isActive => liveSMR.gameObject.activeSelf;
+
 
     public LiveAccessory(StoredAccessory acc, SkeletonManager skeleton, Transform folder)
         : base(acc.GetName(), acc.GetSource())
@@ -59,12 +65,6 @@ public class LiveAccessory : AccessoryDescriptor
 
         liveSMR.rootBone = skeleton.GetLiveStandardBone(rootBoneName);
     }
-
-    virtual public void Enable() => liveSMR.gameObject.SetActive(true);
-
-    virtual public void Disable() => liveSMR.gameObject.SetActive(false);
-
-    public bool isActive => liveSMR.gameObject.activeSelf;
 
     public void Dispose()
     {

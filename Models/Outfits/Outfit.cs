@@ -19,6 +19,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
     virtual public string DisplayName { get; private set; }
     virtual public Sprite Sprite => null;
     virtual public string Author => "Crimson Tales";
+    
     public List<StoredAccessory> Accessories => AccDict.Values.ToList();
     private Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = new();
     public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = new();
@@ -27,24 +28,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
     public BoneData boneData => prefabWatchdog.BoneData;
     public CompData compData => prefabWatchdog.CompData;
 
-    public int CompareTo(Outfit other)
-    {
-        int displayNameComparison = DisplayName.CompareTo(other.DisplayName);
-        if (displayNameComparison != 0) return displayNameComparison;
-        return AssetName.CompareTo(other.AssetName);
-    }
-
-    public StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
-    {
-        AccDict.TryGetValue(descriptor, out StoredAccessory result);
-        result ??= GetAccessory(descriptor.Name);
-        return result;
-    }
-
-    public StoredAccessory GetAccessory(string name)
-    {
-        return AccDict.Values.FirstOrDefault(x => x.Name == name);
-    }
+    virtual public Func<SkinnedMeshRenderer, bool> FaceDefinition => (x) => x.name == "tete";
 
     #endregion
 
@@ -82,6 +66,25 @@ public class Outfit : IDisposable, IComparable<Outfit>
             foreach (var newMat in newAcc.Materials) { if (newMat is not null) MaterialDescriptors.Add(newMat); }
         }
         Log.Debug($"{DisplayName} Outfit constructed.");
+    }
+
+    public int CompareTo(Outfit other)
+    {
+        int displayNameComparison = DisplayName.CompareTo(other.DisplayName);
+        if (displayNameComparison != 0) return displayNameComparison;
+        return AssetName.CompareTo(other.AssetName);
+    }
+
+    public StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
+    {
+        AccDict.TryGetValue(descriptor, out StoredAccessory result);
+        result ??= GetAccessory(descriptor.Name);
+        return result;
+    }
+
+    public StoredAccessory GetAccessory(string name)
+    {
+        return AccDict.Values.FirstOrDefault(x => x.Name == name);
     }
 
     public void Dispose()

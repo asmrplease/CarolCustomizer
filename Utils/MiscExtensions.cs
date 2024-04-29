@@ -120,26 +120,44 @@ public static class MiscExtensions
         return assets;
     }
 
-    public static Dictionary<TKey,TValue> ToDictionaryOverwrite<TKey, TValue>(this IEnumerable<TValue> enumerator, Func<TValue, TKey> keySelector)
+    public static Dictionary<TKey,TValue> ToDictionaryOverwrite<TKey, TValue>(this IEnumerable<TValue> enumerable, Func<TValue, TKey> keySelector)
     {
         var results = new Dictionary<TKey, TValue>();
-        foreach (var item in enumerator)
+        foreach (var item in enumerable)
         {
             results[keySelector(item)] = item;
         }
         return results;
     }
 
+    public static Dictionary<TKey, TValue> ToDictionaryRename<TKey, TValue>(
+        this IEnumerable<TValue> enumerator, 
+        Func<TValue, TKey> keySelector, 
+        Action<TValue> rename,
+        int retryCount = 5)
+        where TValue : class
+    {
+        var results = new Dictionary<TKey, TValue>();
+        foreach (var item in enumerator)
+        {
+            var temp = item;
+            foreach (int i in Enumerable.Range(0, retryCount+1))
+            {
+                var key = keySelector(temp);
+                results.TryGetValue(key, out var existing);
+                if (existing is null) { results[key] = temp; break; }
+                if (existing == temp) { break; }
+                if (i != retryCount) rename(temp);
+                else { Log.Error($"failed to rekey"); break; }
+            }
+        }
+        return results;
+    }
+
     public static void ForEach<T>(this IEnumerable<T> sequence, Action<T> action)
     {
-        if (action == null)
-        {
-            throw new ArgumentNullException(nameof(action));
-        }
-        foreach (T item in sequence)
-        {
-            action(item);
-        }
+        if (action == null) throw new ArgumentNullException(nameof(action));
+        foreach (T item in sequence) action(item);
     }
 
     public static ConfigEntry<T> AsConfigEntry<T>(this EventArgs e)
