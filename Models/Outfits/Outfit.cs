@@ -19,9 +19,10 @@ public class Outfit : IDisposable, IComparable<Outfit>
     virtual public string DisplayName { get; private set; }
     virtual public Sprite Sprite => null;
     virtual public string Author => "Crimson Tales";
-    
+
+    protected Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = new();
+
     public List<StoredAccessory> Accessories => AccDict.Values.ToList();
-    private Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = new();
     public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = new();
 
     PelvisWatchdog prefabWatchdog;
