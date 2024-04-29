@@ -21,6 +21,10 @@ internal static class RecipeApplier
             OutfitAssetManager
             .GetOutfitByAssetName(
             recipe.AnimatorSource));
+        outfitManager.SetConfiguration(
+            OutfitAssetManager
+            .GetOutfitByAssetName(
+               recipe.BaseOutfitName));
     }
 
     public static void ActivateVariant(OutfitManager outfitManager, string outfitName, int variantIndex)

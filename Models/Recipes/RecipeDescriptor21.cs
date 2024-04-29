@@ -23,7 +23,7 @@ public class RecipeDescriptor21
 
     public RecipeDescriptor21(OutfitManager manager)
     {
-        BaseOutfitName = Constants.Pyjamas;
+        BaseOutfitName = manager.ConfigurationSource;
         AnimatorSource = manager.AnimatorSource;
         ActiveAccessories = manager.LiveAccessoryDescriptors;
         Version = PluginInfo.PLUGIN_VERSION;

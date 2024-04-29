@@ -23,15 +23,15 @@ public class OutfitManager : IDisposable
     #region State Management
     Dictionary<StoredAccessory, LiveAccessory> liveAccessories = new();
     Outfit animatorSource;
+    HaDSOutfit configurationSource;
     #endregion
 
     #region Public Interface
     public PelvisWatchdog pelvis { get; private set; }
     public Action<AccessoryChangedEvent> AccessoryChanged;
-    public string AnimatorSource => 
-        animatorSource is not null ? 
-        animatorSource.AssetName: 
-        Constants.Pyjamas;
+    public string AnimatorSource => animatorSource.AssetName;
+    public string ConfigurationSource => configurationSource.AssetName;
+
     public IEnumerable<StoredAccessory> ActiveAccessories =>
             liveAccessories
             .Where(x => x.Value.isActive)
@@ -53,6 +53,7 @@ public class OutfitManager : IDisposable
     {
         this.skeletonManager = skeletonManager;
         playerManager = player;
+        animatorSource = configurationSource = OutfitAssetManager.GetOutfitByAssetName(Constants.Pyjamas);
 
         playerManager.SpawnEvent += RefreshSMRs;
         playerManager.SpawnEvent += OnSpawn;
@@ -122,7 +123,7 @@ public class OutfitManager : IDisposable
     }
     #endregion
 
-    private void Instantiate(StoredAccessory accessory)
+    void Instantiate(StoredAccessory accessory)
     {
         var liveAcc = accessory.BringLive(skeletonManager, OutfitAssetManager.liveFolder);
         liveAccessories.Add(accessory, liveAcc);
@@ -130,7 +131,7 @@ public class OutfitManager : IDisposable
         liveAcc.Refresh();
     }
 
-    private void OnSpawn(PelvisWatchdog pelvis)
+    void OnSpawn(PelvisWatchdog pelvis)
     {
         this.pelvis = pelvis;
         HideBase();
@@ -149,6 +150,12 @@ public class OutfitManager : IDisposable
         Log.Debug($"changing animator to {outfit.DisplayName}");
         pelvis.SetAnimator(outfit);
         this.animatorSource = outfit;
+    }
+
+    public void SetConfiguration(HaDSOutfit outfit) 
+    {
+        //TODO: figure out how the modeldata offset works
+        this.configurationSource = outfit;
     }
 
     private void OnOutfitUnloaded(Outfit outfit)

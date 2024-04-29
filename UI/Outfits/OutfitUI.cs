@@ -92,13 +92,17 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     public List<(string, UnityAction)> GetContextMenuItems()
     {
-        var results = new List<(string, UnityAction)>();
         var hads = outfit as HaDSOutfit; //TODO: idk but anything but this
-        results.Add(("Use Animator", () => ui.playerManager.outfitManager.SetAnimator(outfit)));
+        var results = new List<(string, UnityAction)>() 
+        {
+            ("Use Animator", () => ui.playerManager.outfitManager.SetAnimator(outfit)),
+            ("Use Measurements", () => ui.playerManager.outfitManager.SetConfiguration(hads))
+        };
+
+        //results.Add
         foreach (var entry in hads.Variants)
         {
-            var idk = () => RecipeApplier.ActivateVariant(ui.playerManager.outfitManager, hads, entry.Key);
-            results.Add(($"Load: {entry.Key}", new UnityAction(idk)));
+            results.Add(($"Load: {entry.Key}", () => RecipeApplier.ActivateVariant(ui.playerManager.outfitManager, hads, entry.Key)));
         }
         return results;
     }
