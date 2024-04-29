@@ -29,7 +29,7 @@ public static class OnirismExtensions
     /// Updates dynbone components to support adding arbitrary bones, requires reflection calls. 
     /// </summary>
     /// <param name="dBone">Dynamic Bone to restart.</param>
-    public static void RestartHairJiggle(this DynamicBone dBone)
+    public static void RestartDynamicBone(this DynamicBone dBone)
     {
         //TODO: can we cache these MethodInfo objects to make this faster?
         if (dBone == null) { Log.Warning("Couldn't find hair DynamicBone!"); return; }//TODO: try to instantiate if null? for now just don't NRE on the next line

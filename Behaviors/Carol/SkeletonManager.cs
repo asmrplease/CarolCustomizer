@@ -108,7 +108,7 @@ public class SkeletonManager : IDisposable
         }
 
         outfitBoneDicts[outfit] = boneDict;
-        headDynamicBone.RestartHairJiggle();
+        headDynamicBone.RestartDynamicBone();
     }
 
     private Transform InstantiateAt(Transform objectToInstantiate, string parentName)
