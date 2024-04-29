@@ -126,13 +126,8 @@ public class CCPlugin : BaseUnityPlugin
     {
         if (MainMenuManager.manager)
         {
-            SceneManager
-                .GetActiveScene()
-                .GetRootGameObjects()
-                .First(x => x.name == "MenuCarolLoader")
-                .transform
-                .RecursiveFindTransform(x => x.name == "CarolPelvis")
-                .gameObject
+            OnirismExtensions
+                .GetMenuCarolPelvis()
                 .AddComponent<PelvisWatchdog>();
             return;
         }

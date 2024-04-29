@@ -26,7 +26,7 @@ public class PelvisWatchdog : MonoBehaviour
     string rootName => transform.root?.name ?? "none";
 
     List<(Func<Predicate<PelvisWatchdog>, bool>,
-    Predicate<PelvisWatchdog>)> checks;
+            Predicate<PelvisWatchdog>)> checks;
 
     virtual public PelvisWatchdog BuildFromExisting(PelvisWatchdog watchdog, Component typeComponent)
     {

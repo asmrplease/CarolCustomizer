@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace CarolCustomizer.Utils;
 public static class OnirismExtensions
@@ -45,5 +46,16 @@ public static class OnirismExtensions
         //foreach (var mp in MultiplayerManager.manager.players) { Log.Debug(mp.name); } 
         return MultiplayerManager.manager.players
             .FirstOrDefault(x => x.player == virtualCarol.entity);
+    }
+
+    public static GameObject GetMenuCarolPelvis()
+    {
+        return SceneManager
+            .GetActiveScene()
+            .GetRootGameObjects()
+            .First(x => x.name == "MenuCarolLoader")
+            .transform
+            .RecursiveFindTransform(x => x.name == "CarolPelvis")
+            .gameObject;
     }
 }

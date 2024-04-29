@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 
 namespace CarolCustomizer.Utils;
-internal static class Constants
+public static class Constants
 {
     public static readonly List<string> freeOutfits = new List<string>
     {

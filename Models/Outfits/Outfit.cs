@@ -25,7 +25,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
     public List<StoredAccessory> Accessories => AccDict.Values.ToList();
     public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = new();
 
-    PelvisWatchdog prefabWatchdog;
+    public PelvisWatchdog prefabWatchdog { get; private set; }
     public BoneData boneData => prefabWatchdog.BoneData;
     public CompData compData => prefabWatchdog.CompData;
 
@@ -83,10 +83,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
         return result;
     }
 
-    public StoredAccessory GetAccessory(string name)
-    {
-        return AccDict.Values.FirstOrDefault(x => x.Name == name);
-    }
+    public StoredAccessory GetAccessory(string name) => AccDict.Values.FirstOrDefault(x => x.Name == name);
 
     public void Dispose()
     {
