@@ -73,6 +73,7 @@ internal static class Constants
     public const string LogFileName = "LogOutput.log";
     public const string AssetFolderName = "CarolCustomizer";
     public const string Preferences = "Preferences";
+    public const string AutoSave = "AutoSave";
 
     public static readonly string ApplicationPath = Directory.GetParent(Application.dataPath).FullName;
     public static readonly string RecipeFolderPath = Path.Combine(ApplicationPath, RecipeFolderName);

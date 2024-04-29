@@ -55,7 +55,11 @@ internal class NPCManager
     public static Recipe GetRandomOutfit()
     {
         var random = new System.Random();
-        var recipes = recipesManager.Recipes.Where(x => x.Error == Recipe.Status.NoError);
+        var recipes = recipesManager
+            .Recipes
+            .Where(x => 
+            x.Error == Recipe.Status.NoError
+            && x.Name != Constants.AutoSave);
         if (recipes.Count() == 0) return null;
         int index = random.Next(recipes.Count());
         return recipes.ElementAt(index);

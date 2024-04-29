@@ -9,7 +9,7 @@ using UnityEngine;
 namespace CarolCustomizer.Behaviors.Recipes;
 internal class AutoSaver
 {
-    const string AutoSaveFile = "AutoSave";
+
     OutfitManager outfitManager;
 
     public AutoSaver(PlayerCarolInstance player)
@@ -21,13 +21,13 @@ internal class AutoSaver
     public void Save()
     {
         var descriptor = new RecipeDescriptor21(outfitManager);
-        var path = RecipeSaver.RecipeFilenameToPath(AutoSaveFile);
+        var path = RecipeSaver.RecipeFilenameToPath(Constants.AutoSave);
         RecipeSaver.Save(descriptor, path);
     }
 
     public void Load()
     {
-        var recipe = CCPlugin.recipesManager.GetRecipeByFilename(AutoSaveFile);
+        var recipe = CCPlugin.recipesManager.GetRecipeByFilename(Constants.AutoSave);
         CCPlugin.uiInstances.First().StartCoroutine(LoadRecipeRoutine(recipe));//TODO: put this on a proper gameobject
     }
 
