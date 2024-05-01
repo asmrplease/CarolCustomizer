@@ -3,6 +3,7 @@ using UnityEngine;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Carol;
+using System.Linq;
 
 namespace CarolCustomizer.Models.Accessories;
 public class LiveAccessory : AccessoryDescriptor
@@ -52,18 +53,30 @@ public class LiveAccessory : AccessoryDescriptor
         if (!liveSMR) { Log.Error($"{storedAcc.referenceSMR.name} was instantiated without an SMR."); return; }
     }
 
-    virtual public void Refresh()
+    public void Refresh()
     {
         var liveBoneArray = skeleton.Mount(this);
         if (liveBoneArray is null) { Log.Error($"Failed to get live bones for {liveSMR.name}."); return; }
+        if (liveBoneArray.Contains(null)) { Log.Warning($"Null bone was returned, {this.Name} may not appear as expected"); }
 
         liveSMR.bones = liveBoneArray;
-        string rootBoneName;
+        string rootBoneName = "CarolPelvis";
         if (storedAcc.referenceSMR.rootBone) { rootBoneName = storedAcc.referenceSMR.rootBone.name; }
-        else { rootBoneName = "CarolPelvis"; }
 
+        var newRoot = skeleton.GetLiveStandardBone(rootBoneName);
+        if (!newRoot || newRoot is null) { Log.Warning($"Failed to find {this.Name}'s rootbone: {rootBoneName}"); }
+        liveSMR.rootBone = newRoot;
+    }
 
-        liveSMR.rootBone = skeleton.GetLiveStandardBone(rootBoneName);
+    public Transform[] GetReferenceBones()
+    {
+        return storedAcc.referenceSMR.bones;
+    }
+
+    public void SetLiveBones(Transform[] liveBones, Transform rootBone)
+    {
+        liveSMR.bones = liveBones;
+        liveSMR.rootBone = rootBone;
     }
 
     public void Dispose()

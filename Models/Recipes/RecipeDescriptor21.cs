@@ -15,8 +15,8 @@ public class RecipeDescriptor21
     [JsonConstructor]
     public RecipeDescriptor21(string animatorSource, string baseOutfitName, IEnumerable<AccessoryDescriptor> activeAccessories, string version)
     {
-        AnimatorSource = animatorSource;
-        BaseOutfitName = baseOutfitName;
+        AnimatorSource = animatorSource ??= Constants.Pyjamas;
+        BaseOutfitName = baseOutfitName ??= Constants.Pyjamas;
         ActiveAccessories = activeAccessories;
         Version = version;
     }

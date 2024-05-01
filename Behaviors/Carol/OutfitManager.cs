@@ -8,6 +8,7 @@ using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Carol;
@@ -30,10 +31,12 @@ public class OutfitManager : IDisposable
     #region Public Interface
     public PelvisWatchdog pelvis { get; private set; }
     public Action<AccessoryChangedEvent> AccessoryChanged;
-    public string AnimatorSource => animatorSource.AssetName;
+    public string AnimatorSource => 
+        animatorSource is not null?
+        animatorSource.AssetName : Constants.Pyjamas;
     public string ConfigurationSource => 
         configurationSource is not null? 
-        configurationSource.AssetName : "";
+        configurationSource.AssetName : Constants.Pyjamas;
 
     public IEnumerable<StoredAccessory> ActiveAccessories =>
             liveAccessories
@@ -85,10 +88,16 @@ public class OutfitManager : IDisposable
 
     public void EnableAccessory(StoredAccessory accessory)
     {
+        liveAccessories.TryGetValue(accessory, out var live);
+        if (live is null) { live = Instantiate(accessory); }
+        live.Enable();
+        AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, live, true));
+        /*
         if (!liveAccessories.ContainsKey(accessory)) { Instantiate(accessory); }
         liveAccessories[accessory].Enable();
         var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, true));
+        */
     }
 
     public bool IsEnabled(StoredAccessory accessory)
@@ -126,12 +135,13 @@ public class OutfitManager : IDisposable
     }
     #endregion
 
-    void Instantiate(StoredAccessory accessory)
+    LiveAccessory Instantiate(StoredAccessory accessory)
     {
-        var liveAcc = accessory.BringLive(skeletonManager, OutfitAssetManager.liveFolder);
+        var liveAcc = accessory.MakeLive(skeletonManager, OutfitAssetManager.liveFolder);
         liveAccessories.Add(accessory, liveAcc);
         liveAcc.Enable();
         liveAcc.Refresh();
+        return liveAcc;
     }
 
     void OnSpawn(PelvisWatchdog pelvis)
@@ -159,18 +169,16 @@ public class OutfitManager : IDisposable
     public void SetConfiguration(HaDSOutfit outfit) 
     {
         Log.Debug("SetConfiguration()");
+        if (outfit is null) { Log.Warning("outfit is null"); return; }
         this.configurationSource = outfit;
         ApplyConfig();
     }
 
     void ApplyConfig()
     {
-        Log.Debug("ApplyConfig");
-        if (!pelvis) Log.Warning("No pelvis during ApplyConfig");
-        var prefabRoot = pelvis.transform.parent.parent.parent;
-        if (!prefabRoot) { Log.Warning("prefabRoot was null in SetConfiguration"); return; }
-        Log.Debug($"ApplyConfig() {prefabRoot.name}");
-        prefabRoot.localPosition = Vector3.up * configurationSource.modelData.height;
+        if (!pelvis) return;
+        if (configurationSource is null) return;
+        pelvis.SetHeightOffset(configurationSource.modelData.height);
     }
 
     private void OnOutfitUnloaded(Outfit outfit)

@@ -21,7 +21,7 @@ public class StoredAccessory : AccessoryDescriptor
         referenceSMR = smr;
     }
 
-    public LiveAccessory BringLive(SkeletonManager skeleton, Transform folder)
+    public LiveAccessory MakeLive(SkeletonManager skeleton, Transform folder)
     {
         if (outfit.FaceDefinition.Invoke(this.referenceSMR)) return new LiveFace(this, skeleton, folder);
         return new LiveAccessory(this, skeleton, folder);

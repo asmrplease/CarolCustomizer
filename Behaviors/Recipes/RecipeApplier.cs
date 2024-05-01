@@ -1,22 +1,22 @@
-﻿using CarolCustomizer.Models;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Models;
+using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Models.Recipes;
+using CarolCustomizer.Utils;
+using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
-using CarolCustomizer.Utils;
-using CarolCustomizer.Assets;
-using HarmonyLib;
-using CarolCustomizer.Models.Recipes;
-using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Models.Accessories;
-using CarolCustomizer.Behaviors.Carol;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 internal static class RecipeApplier
 {
     public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor21 recipe)
     {
-        outfitManager.HideBase();
         outfitManager.DisableAllAccessories();
         foreach (var accessory in recipe.ActiveAccessories) { SetAccessory(outfitManager, accessory); }
+        /*
         outfitManager.SetAnimator(
             OutfitAssetManager
             .GetOutfitByAssetName(
@@ -25,6 +25,7 @@ internal static class RecipeApplier
             OutfitAssetManager
             .GetOutfitByAssetName(
                recipe.BaseOutfitName));
+        */
     }
 
     public static void ActivateVariant(OutfitManager outfitManager, string outfitName, int variantIndex)

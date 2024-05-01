@@ -14,11 +14,11 @@ public class PelvisWatchdog : MonoBehaviour
     protected Guid SourceGuid;
 
     [SerializeField]
-    BoneData boneData;
+    protected BoneData boneData;
     public BoneData BoneData { get { return boneData; } }
 
     [SerializeField]
-    CompData compData;
+    protected CompData compData;
     public CompData CompData { get { return compData; } }
 
     string parentName => transform.parent?.name ?? "none";
@@ -92,19 +92,15 @@ public class PelvisWatchdog : MonoBehaviour
 
     public virtual void SetBaseOutfit(Outfit outfit) { }
 
-    public virtual void SetAnimator(Outfit outfit)
-    {
-        if (this.compData?.Animator is null) { Log.Warning($"null animator when trying to set animator on {this}"); return; }
-        Log.Debug($"Setting animator from {outfit}");
-        var animator = outfit?.compData?.Controller;
-        if (!animator) { Log.Warning("failed to get animator from outfit"); return; }
-        
-        this.compData.Animator.runtimeAnimatorController = animator;
-    }
+    public virtual void SetAnimator(Outfit outfit) { }
+
+    public virtual void SetHeightOffset(float height) { }
+    
     public virtual void SetBaseVisibility(bool visible)
     {
         Log.Debug("PelvisWatchdog.SetBaseVisibility()");
-        foreach (var mesh in CompData?.allSMRs) {if (mesh?.gameObject) mesh.gameObject.SetActive(visible); }
+        if (compData?.allSMRs is null) return;
+        foreach (var mesh in CompData.allSMRs) {if (mesh?.gameObject) mesh.gameObject.SetActive(visible); }
     }
 
     public override string ToString() => $"{GetType()}@{rootName}->{grandparentName}({Guid})";

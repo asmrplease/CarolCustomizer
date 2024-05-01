@@ -96,6 +96,27 @@ public class PlayerWatchdog : PelvisWatchdog
 
     public bool ManagesPlayer(Entity playerEntity) => carolEntity == playerEntity;
 
+    public override void SetAnimator(Outfit outfit)
+    {
+        if (this.compData?.Animator is null) { Log.Warning($"null animator when trying to set animator on {this}"); return; }
+        Log.Debug($"Setting animator from {outfit}");
+        var animator = outfit?.compData?.Controller;
+        if (!animator) { Log.Warning("failed to get animator from outfit"); return; }
+
+        this.compData.Animator.runtimeAnimatorController = animator;
+    }
+
+    public override void SetHeightOffset(float height)
+    {
+        Log.Debug("SetHeightOffset");
+        //var prefabRoot = pelvis.transform.parent.parent.parent;
+        var prefabRoot = transform.parent;
+        if (!prefabRoot) { Log.Warning("prefabRoot was null in SetHeightOffset"); return; }
+
+        Log.Debug($"SetHeightOffset() {prefabRoot.name}");
+        prefabRoot.localPosition = Vector3.up * height;
+    }
+
     public bool CanOpenMenu()
     {
         if (!carolController)   return false;

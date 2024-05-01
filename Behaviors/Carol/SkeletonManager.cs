@@ -69,7 +69,7 @@ public class SkeletonManager : IDisposable
         outfitBoneDicts.Clear();
 
         liveStandardBones = targetPelvis.BoneData.StandardBones;
-        FixMissingStandardBones();
+        //FixMissingStandardBones();
 
         var head = liveStandardBones["Bn_CarolHead"]?
             .GetComponent<DynamicBone>();
@@ -92,11 +92,11 @@ public class SkeletonManager : IDisposable
     #endregion
 
     #region Private Implementation
-    private void AddBespokeBones(Outfit outfit)
+    Dictionary<string, Transform> AddBespokeBones(Outfit outfit)
     {
-        if (outfitBoneDicts.ContainsKey(outfit)) return;
+        if (outfitBoneDicts.TryGetValue(outfit, out var dict)) return dict;
+        
         Dictionary<string, Transform> boneDict = new();
-
         foreach (var bespokeBone in outfit.boneData.BespokeBones)
         {
             if (!bespokeBone.cleanedBone) { Log.Warning($"no cleanedbone, outfit: {outfit.DisplayName}   "); continue; }
@@ -109,9 +109,38 @@ public class SkeletonManager : IDisposable
 
         outfitBoneDicts[outfit] = boneDict;
         headDynamicBone.RestartDynamicBone();
+        return boneDict;
     }
 
-    private Transform InstantiateAt(Transform objectToInstantiate, string parentName)
+    void AssignLiveBones(ref LiveAccessory acc)
+    {
+        if (acc is null) { Log.Error("Requested bones for null accessory"); return; }
+        outfitBoneDicts.TryGetValue(acc.outfit, out var bespokeDict);
+        if (bespokeDict is null) bespokeDict = AddBespokeBones(acc.outfit);
+
+
+        Transform[] liveBones = new Transform[acc.GetReferenceBones().Length];
+    }
+
+    Transform[] GetLiveBoneArray(Outfit outfit, Transform[] boneList)
+    {
+        Transform[] output = new Transform[boneList.Length];
+
+        if (!outfitBoneDicts.ContainsKey(outfit)) { Log.Error($"Tried to get bones when {outfit.DisplayName} wasn't in custom bone table"); return output; }
+        var bespokeBones = outfitBoneDicts[outfit];
+
+        for (int i = 0; i < boneList.Length; i++)
+        {
+            if (!boneList[i]) { Log.Warning($"No input bone at index {i}."); continue; }
+            var boneName = boneList[i].name;
+            if (bespokeBones.ContainsKey(boneName)) { output[i] = bespokeBones[boneName]; continue; }
+            if (liveStandardBones.ContainsKey(boneName)) { output[i] = liveStandardBones[boneName]; continue; }
+            Log.Warning($"Neither dict found {boneName}.");
+        }
+        return output;
+    }
+
+    Transform InstantiateAt(Transform objectToInstantiate, string parentName)
     {
         if (!liveStandardBones.ContainsKey(parentName))
         { Log.Error($"Could not find {objectToInstantiate.name}'s parent, {parentName}."); return null; }
@@ -124,25 +153,7 @@ public class SkeletonManager : IDisposable
         return newBone;
     }
 
-    private Transform[] GetLiveBoneArray(Outfit outfit, Transform[] boneList)
-    {
-        Transform[] output = new Transform[boneList.Length];
-
-        if (!outfitBoneDicts.ContainsKey(outfit)) { Log.Error($"Tried to get bones when {outfit.DisplayName} wasn't in custom bone table"); return output; }
-        var bespokeBones = outfitBoneDicts[outfit];
-
-        for (int i = 0; i < boneList.Length; i++)
-        {
-            if (!boneList[i]) continue;
-            var boneName = boneList[i].name;
-            if (bespokeBones.ContainsKey(boneName)) { output[i] = bespokeBones[boneName]; continue; }
-            if (liveStandardBones.ContainsKey(boneName)) { output[i] = liveStandardBones[boneName]; continue; }
-            Log.Warning($"Neither dict found {boneName}.");
-        }
-        return output;
-    }
-
-    private void FixMissingStandardBones()
+    void FixMissingStandardBones()
     {
         var missingBones = CommonBones
             .Where(x => !liveStandardBones.ContainsKey(x.Key))
