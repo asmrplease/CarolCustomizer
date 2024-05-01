@@ -58,40 +58,48 @@ public class SkeletonManager : IDisposable
     }
     #endregion
 
-    #region Update Target
-    private void SetNewPelvis(PelvisWatchdog newPelvis)
+
+    #region Public Interface
+    public void AssignLiveBones(LiveAccessory acc)
+    {
+        if (acc is null) { Log.Error("Requested bones for null accessory"); return; }
+        outfitBoneDicts.TryGetValue(acc.outfit, out var bespokeDict);
+        if (bespokeDict is null) bespokeDict = AddBespokeBones(acc.outfit);
+
+        var referenceBones = acc.bones;
+        Transform[] liveBones = new Transform[referenceBones.Length];
+
+        foreach (var i in Enumerable.Range(0, referenceBones.Length))
+        {
+            if (!referenceBones[i]) { Log.Warning($"No input bone at index {i}."); continue; }
+            string boneName = referenceBones[i].name;
+            if (bespokeDict.ContainsKey(boneName)) { liveBones[i] = bespokeDict[boneName]; continue; }
+            if (liveStandardBones.ContainsKey(boneName)) { liveBones[i] = liveStandardBones[boneName]; continue; }
+        }
+
+        acc.SetLiveBones(liveBones, liveStandardBones[acc.RootBoneName]);
+    }
+    #endregion
+
+    #region Private Implementation
+    void SetNewPelvis(PelvisWatchdog newPelvis)
     {
         targetPelvis = newPelvis;
 
-        //var activeOutfits = outfitBoneDicts.Keys.ToList();
         var activeOutfits = playerManager.outfitManager.ActiveOutfits;
         liveStandardBones.Clear();
         outfitBoneDicts.Clear();
 
         liveStandardBones = targetPelvis.BoneData.StandardBones;
-        //FixMissingStandardBones();
 
         var head = liveStandardBones["Bn_CarolHead"]?
             .GetComponent<DynamicBone>();
 
-        if (!head) { Log.Warning("didn't find dyn component on head");}
+        if (!head) { Log.Warning("didn't find dyn component on head"); }
         headDynamicBone = head;
         foreach (var outfit in activeOutfits) { AddBespokeBones(outfit); }
-        //headDynamicBone.RestartHairJiggle();
-    }
-    #endregion
-
-    #region Public Interface
-    public Transform[] Mount(LiveAccessory acc)
-    {
-        AddBespokeBones(acc.outfit);
-        return GetLiveBoneArray(acc.outfit, acc.bones);
     }
 
-    public Transform GetLiveStandardBone(string name) => liveStandardBones[name];
-    #endregion
-
-    #region Private Implementation
     Dictionary<string, Transform> AddBespokeBones(Outfit outfit)
     {
         if (outfitBoneDicts.TryGetValue(outfit, out var dict)) return dict;
@@ -112,34 +120,6 @@ public class SkeletonManager : IDisposable
         return boneDict;
     }
 
-    void AssignLiveBones(ref LiveAccessory acc)
-    {
-        if (acc is null) { Log.Error("Requested bones for null accessory"); return; }
-        outfitBoneDicts.TryGetValue(acc.outfit, out var bespokeDict);
-        if (bespokeDict is null) bespokeDict = AddBespokeBones(acc.outfit);
-
-
-        Transform[] liveBones = new Transform[acc.GetReferenceBones().Length];
-    }
-
-    Transform[] GetLiveBoneArray(Outfit outfit, Transform[] boneList)
-    {
-        Transform[] output = new Transform[boneList.Length];
-
-        if (!outfitBoneDicts.ContainsKey(outfit)) { Log.Error($"Tried to get bones when {outfit.DisplayName} wasn't in custom bone table"); return output; }
-        var bespokeBones = outfitBoneDicts[outfit];
-
-        for (int i = 0; i < boneList.Length; i++)
-        {
-            if (!boneList[i]) { Log.Warning($"No input bone at index {i}."); continue; }
-            var boneName = boneList[i].name;
-            if (bespokeBones.ContainsKey(boneName)) { output[i] = bespokeBones[boneName]; continue; }
-            if (liveStandardBones.ContainsKey(boneName)) { output[i] = liveStandardBones[boneName]; continue; }
-            Log.Warning($"Neither dict found {boneName}.");
-        }
-        return output;
-    }
-
     Transform InstantiateAt(Transform objectToInstantiate, string parentName)
     {
         if (!liveStandardBones.ContainsKey(parentName))
@@ -151,22 +131,6 @@ public class SkeletonManager : IDisposable
         var newBone = UnityEngine.Object.Instantiate(objectToInstantiate.gameObject, parentBone.transform).transform;
         newBone.DeCloneName();
         return newBone;
-    }
-
-    void FixMissingStandardBones()
-    {
-        var missingBones = CommonBones
-            .Where(x => !liveStandardBones.ContainsKey(x.Key))
-            .ToDictionary(x => x.Key, x => x.Value);
-        var parents = missingBones
-            .Where(x => !missingBones.Values.Contains(x.Value.parent));
-
-        foreach (var bone in parents)
-        {
-            var newBone = InstantiateAt(bone.Value, bone.Value.transform.parent.name);
-            liveStandardBones[newBone.name] = newBone;
-            foreach (var child in newBone.SkeletonToList()) { liveStandardBones[child.name] = child; }
-        }
     }
     #endregion
 }

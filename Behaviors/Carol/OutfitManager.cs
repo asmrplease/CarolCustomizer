@@ -77,8 +77,7 @@ public class OutfitManager : IDisposable
         playerManager.SpawnEvent -= OnSpawn;
         OutfitAssetManager.OnOutfitUnloaded -= OnOutfitUnloaded;
 
-        SetBaseVisibility(true);//Ensure the player is visible when we leave.
-        foreach (var liveAcc in liveAccessories.Values) { liveAcc?.Dispose(); } 
+        SetBaseVisibility(true);//Ensure the player is visible when we leave. 
     }
 
     void RefreshSMRs(PelvisWatchdog pelvis)
@@ -90,14 +89,12 @@ public class OutfitManager : IDisposable
     {
         liveAccessories.TryGetValue(accessory, out var live);
         if (live is null) { live = Instantiate(accessory); }
-        live.Enable();
+        else
+        {
+            live.Enable();
+            live.Refresh();
+        }
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, live, true));
-        /*
-        if (!liveAccessories.ContainsKey(accessory)) { Instantiate(accessory); }
-        liveAccessories[accessory].Enable();
-        var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
-        AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, true));
-        */
     }
 
     public bool IsEnabled(StoredAccessory accessory)
@@ -187,7 +184,7 @@ public class OutfitManager : IDisposable
         {
             if (!liveAccessories.ContainsKey(storedAcc)) continue;
             var liveAcc = liveAccessories[storedAcc];
-            if (liveAcc is not null) { liveAcc.Dispose(); }
+            if (liveAcc is not null) { liveAcc.DestroyGameObject(); }
             liveAccessories.Remove(storedAcc);
         }
     }
