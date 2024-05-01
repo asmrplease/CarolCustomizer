@@ -8,6 +8,7 @@ using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Carol;
 /// <summary>
@@ -30,7 +31,9 @@ public class OutfitManager : IDisposable
     public PelvisWatchdog pelvis { get; private set; }
     public Action<AccessoryChangedEvent> AccessoryChanged;
     public string AnimatorSource => animatorSource.AssetName;
-    public string ConfigurationSource => configurationSource.AssetName;
+    public string ConfigurationSource => 
+        configurationSource is not null? 
+        configurationSource.AssetName : "";
 
     public IEnumerable<StoredAccessory> ActiveAccessories =>
             liveAccessories
@@ -61,7 +64,7 @@ public class OutfitManager : IDisposable
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
     }
 
-    private void DebugAccChanged(AccessoryChangedEvent e) => Log.Debug(e.ToString());
+    void DebugAccChanged(AccessoryChangedEvent e) => Log.Debug(e.ToString());
 
     public void Dispose()
     {
@@ -75,7 +78,7 @@ public class OutfitManager : IDisposable
         foreach (var liveAcc in liveAccessories.Values) { liveAcc?.Dispose(); } 
     }
 
-    private void RefreshSMRs(PelvisWatchdog pelvis)
+    void RefreshSMRs(PelvisWatchdog pelvis)
     {
         foreach (var accessory in ActiveAccessories) { liveAccessories[accessory].Refresh(); }
     }
@@ -137,6 +140,7 @@ public class OutfitManager : IDisposable
         HideBase();
         if (animatorSource is null) return;
         SetAnimator(animatorSource);
+        ApplyConfig();
     }
 
     public void HideBase() => SetBaseVisibility(false);
@@ -154,13 +158,23 @@ public class OutfitManager : IDisposable
 
     public void SetConfiguration(HaDSOutfit outfit) 
     {
-        //TODO: figure out how the modeldata offset works
+        Log.Debug("SetConfiguration()");
         this.configurationSource = outfit;
+        ApplyConfig();
+    }
+
+    void ApplyConfig()
+    {
+        Log.Debug("ApplyConfig");
+        if (!pelvis) Log.Warning("No pelvis during ApplyConfig");
+        var prefabRoot = pelvis.transform.parent.parent.parent;
+        if (!prefabRoot) { Log.Warning("prefabRoot was null in SetConfiguration"); return; }
+        Log.Debug($"ApplyConfig() {prefabRoot.name}");
+        prefabRoot.localPosition = Vector3.up * configurationSource.modelData.height;
     }
 
     private void OnOutfitUnloaded(Outfit outfit)
     {
-        //for each accessory in the outfit, find any live accessories and remove them from the dict
         foreach (var storedAcc in outfit.Accessories)
         {
             if (!liveAccessories.ContainsKey(storedAcc)) continue;

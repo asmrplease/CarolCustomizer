@@ -24,7 +24,6 @@ public class CompData : MonoBehaviour
     Dictionary<Type, Component> parentComponents = new();
     public CoopModelToggle[] coopToggles { get; private set; }
 
-    //foreach coop player, list the SMRs associated with that player
     public List<SkinnedMeshRenderer>[] coopMeshes
         { get; private set; }
         = new List<SkinnedMeshRenderer>[Constants.MaxCoopPlayers];
