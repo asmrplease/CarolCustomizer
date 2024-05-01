@@ -16,7 +16,6 @@ internal static class RecipeApplier
     {
         outfitManager.DisableAllAccessories();
         foreach (var accessory in recipe.ActiveAccessories) { SetAccessory(outfitManager, accessory); }
-        /*
         outfitManager.SetAnimator(
             OutfitAssetManager
             .GetOutfitByAssetName(
@@ -25,7 +24,6 @@ internal static class RecipeApplier
             OutfitAssetManager
             .GetOutfitByAssetName(
                recipe.BaseOutfitName));
-        */
     }
 
     public static void ActivateVariant(OutfitManager outfitManager, string outfitName, int variantIndex)
@@ -96,8 +94,12 @@ internal static class RecipeApplier
         if (recipe.ActiveAccessories is null) { Log.Error("no accessories in recipe!"); return new List<string>(); };
         var accSources = recipe.ActiveAccessories.Select(x => x.Source);
         var matSources = recipe.ActiveAccessories.SelectMany(x => x.Materials).Select(x => x.Source);
-        var animatorSource = recipe.AnimatorSource;
-        return accSources.Concat(matSources).AddItem(animatorSource).Distinct();
+
+        return accSources
+            .Concat(matSources)
+            .AddItem(recipe.AnimatorSource)
+            .AddItem(recipe.BaseOutfitName)
+            .Distinct();
     }
 
     public static IEnumerable<string> GetMissingSources(RecipeDescriptor21 recipe)

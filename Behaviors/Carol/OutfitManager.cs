@@ -8,8 +8,6 @@ using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Carol;
 /// <summary>
