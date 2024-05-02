@@ -29,12 +29,8 @@ public class OutfitManager : IDisposable
     #region Public Interface
     public PelvisWatchdog pelvis { get; private set; }
     public Action<AccessoryChangedEvent> AccessoryChanged;
-    public string AnimatorSource => 
-        animatorSource is not null?
-        animatorSource.AssetName : Constants.Pyjamas;
-    public string ConfigurationSource => 
-        configurationSource is not null? 
-        configurationSource.AssetName : Constants.Pyjamas;
+    public string AnimatorSource => animatorSource?.AssetName ?? Constants.Pyjamas;
+    public string ConfigurationSource => configurationSource?.AssetName ?? Constants.Pyjamas;
 
     public IEnumerable<StoredAccessory> ActiveAccessories =>
             liveAccessories
@@ -69,13 +65,8 @@ public class OutfitManager : IDisposable
 
     public void Dispose()
     {
-        Log.Debug("OutfitManager.Dispose");
-
-        playerManager.SpawnEvent -= RefreshSMRs;
-        playerManager.SpawnEvent -= OnSpawn;
-        OutfitAssetManager.OnOutfitUnloaded -= OnOutfitUnloaded;
-
         SetBaseVisibility(true);//Ensure the player is visible when we leave. 
+        Log.Debug("OutfitManager.Dispose() complete.");
     }
 
     void RefreshSMRs(PelvisWatchdog pelvis)
@@ -150,7 +141,10 @@ public class OutfitManager : IDisposable
 
     public void HideBase() => SetBaseVisibility(false);
 
-    public void SetBaseVisibility(bool visible) => pelvis?.SetBaseVisibility(visible);
+    public void SetBaseVisibility(bool visible)
+    {
+        if (pelvis) pelvis.SetBaseVisibility(visible);
+    }
 
     public void SetAnimator(Outfit outfit)
     {

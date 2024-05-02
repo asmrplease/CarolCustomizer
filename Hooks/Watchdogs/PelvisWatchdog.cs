@@ -1,10 +1,10 @@
-﻿using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Utils;
+using Slate;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Slate;
-using CarolCustomizer.Assets;
-using CarolCustomizer.Models.Outfits;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PelvisWatchdog : MonoBehaviour

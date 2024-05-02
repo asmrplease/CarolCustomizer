@@ -101,11 +101,12 @@ public class PlayerWatchdog : PelvisWatchdog
     public override void SetAnimator(Outfit outfit)
     {
         if (this.compData?.Animator is null) { Log.Warning($"null animator when trying to set animator on {this}"); return; }
-        Log.Debug($"Setting animator from {outfit}");
+        Log.Debug($"Setting animator from {outfit.DisplayName}");
         var animator = outfit?.compData?.Controller;
         if (!animator) { Log.Warning("failed to get animator from outfit"); return; }
 
         this.compData.Animator.runtimeAnimatorController = animator;
+        Log.Debug("Done");
     }
 
     public override void SetHeightOffset(float height)

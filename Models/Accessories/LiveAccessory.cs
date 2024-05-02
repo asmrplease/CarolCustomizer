@@ -1,9 +1,8 @@
-﻿using System;
-using UnityEngine;
-using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Behaviors.Carol;
-using System.Linq;
+using CarolCustomizer.Utils;
+using System;
+using UnityEngine;
 
 namespace CarolCustomizer.Models.Accessories;
 public class LiveAccessory : AccessoryDescriptor

@@ -39,7 +39,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
         if (!storedAsset) { Log.Error("Outfit constructor was passed a null transform."); return; }
         Log.Debug($"Constructing {storedAsset.name}");
         this.storedAsset = storedAsset;
-        DisplayName = LocalizationIndex.index.GetLine(this.storedAsset.gameObject.name);
+        DisplayName = LocalizationIndex.index.GetLine(this.storedAsset.gameObject.name).Replace("CAROL_", "");
 
         var pelvis = storedAsset.RecursiveFindTransform(x => x.name == "CarolPelvis");
         if (!pelvis) { Log.Error("failed to find pelvis during Outfit construction."); return; }

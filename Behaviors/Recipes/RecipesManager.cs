@@ -39,7 +39,12 @@ public class RecipesManager : IDisposable
         OutfitAssetManager.OnOutfitSetLoaded += RefreshAll;
     }
 
-    public void Dispose() => this.DisposeFields();
+
+    public void Dispose()
+    {
+        watcher.EnableRaisingEvents = false;
+        this.DisposeFields();
+    }
 
     public void RefreshAll()
     {
