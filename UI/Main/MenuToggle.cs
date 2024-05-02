@@ -25,13 +25,13 @@ public class MenuToggle : MonoBehaviour
         this.uiInstance = uiInstance;
         SceneManager.sceneLoaded += OnSceneChange;
     }
-    private void OnDestroy()
+    void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneChange;
         if (currentScene.name != Constants.MenuSceneName) return;
         MainMenuSetMenuState(false);
     }
-    private void Start()
+    void Start()
     {
         uiInstance.Hide();
         currentScene = SceneManager.GetActiveScene();
@@ -39,27 +39,27 @@ public class MenuToggle : MonoBehaviour
         StartCoroutine(OnMainMenuLoaded());
     }
 
-    private void OnSceneChange(Scene newScene, LoadSceneMode mode)
+    void OnSceneChange(Scene newScene, LoadSceneMode mode)
     {
         currentScene = newScene;
         if (currentScene.name == Constants.MenuSceneName) return;
         StartCoroutine(OnMainMenuLoaded()); 
     }
 
-    private void Update()
+    void Update()
     {
         if (!uiInstance) return;
         if (PauseDiary.manager) { GameplayUpdate(); return; }
         if (currentScene.name == Constants.MenuSceneName) { MainMenuUpdate(); return; }
     }
 
-    private bool CheckInput()
+    bool CheckInput()
     {
         return Input.GetKeyDown(Settings.HotKeys.MenuToggleMouse)
              || Input.GetKeyDown(Settings.HotKeys.MenuToggleKeyboard);
     }
 
-    private IEnumerator OnMainMenuLoaded()
+    IEnumerator OnMainMenuLoaded()
     {
         yield return new WaitUntil(() => MainMenuManager.manager);
         Log.Debug("OnMainMenuLoaded()");
@@ -69,7 +69,7 @@ public class MenuToggle : MonoBehaviour
         if (pagesFolder) { mainMenuPages = pagesFolder.gameObject; }
     }
 
-    private void MainMenuUpdate()
+    void MainMenuUpdate()
     {
         if (!mainMenuPages) return;
 
@@ -77,7 +77,7 @@ public class MenuToggle : MonoBehaviour
         if (isVisible && Input.GetKeyDown(KeyCode.Escape)) { MainMenuSetMenuState(false); return; }
     }
 
-    private void MainMenuSetMenuState(bool newVisibility)
+    void MainMenuSetMenuState(bool newVisibility)
     {
         //if we're told to switch to the state we're already in, don't do anything lol
         if (newVisibility == isVisible) { return; }
@@ -104,7 +104,7 @@ public class MenuToggle : MonoBehaviour
         isVisible = newVisibility;
     }
 
-    private void GameplayUpdate()
+    void GameplayUpdate()
     {
         //if we're in a cutscene, exit menu regardless of any other conditions
         if (isVisible && GameManager.manager.isInCutscene) { GameplaySetMenuState(false); return; }

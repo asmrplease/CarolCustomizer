@@ -26,7 +26,7 @@ public class OutfitListUI : MonoBehaviour
 
     UIAssetLoader loader;
     OutfitManager outfitManager;
-    DynamicContextMenu contextMenu;
+    Main.ContextMenu contextMenu;
     public CarolInstance playerManager { get; private set; }
     public MaterialManager materialManager { get; private set; }
     
@@ -44,11 +44,11 @@ public class OutfitListUI : MonoBehaviour
     Dictionary<AccessoryDescriptor, AccessoryUI> accessoryUIs = new();
     Dictionary<AccMatSlot, MaterialUI> materialUIs = new();
 
-    public void Constructor(
+    public OutfitListUI Constructor(
         UIAssetLoader loader,
         CarolInstance playerManager,
         MaterialManager materialManager,
-        DynamicContextMenu contextMenu)
+        Main.ContextMenu contextMenu)
     {
         this.loader = loader;
         this.materialManager = materialManager;
@@ -76,6 +76,7 @@ public class OutfitListUI : MonoBehaviour
 
         searchBoxHint = searchBox.transform.GetChild(1).GetComponent<Text>();
         searchBoxHint.text = SearchModeHint;
+        return this;
     }
 
     private void OnDestroy()

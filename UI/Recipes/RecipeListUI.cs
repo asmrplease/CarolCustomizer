@@ -16,7 +16,7 @@ public class RecipeListUI : MonoBehaviour
 
     private UIAssetLoader loader;
     private OutfitManager outfitManager;
-    private DynamicContextMenu contextMenu;
+    private Main.ContextMenu contextMenu;
     private FilenameDialogue fileDialogue;
     private MessageDialogue messageDialogue;
     private RecipesManager recipesManager;
@@ -27,11 +27,11 @@ public class RecipeListUI : MonoBehaviour
 
     private Dictionary<string, RecipeUI> recipeUIs = new();
 
-    public void Constructor(
+    public RecipeListUI Constructor(
         UIAssetLoader loader,
         RecipesManager recipesManager,
         OutfitManager outfitManager,
-        DynamicContextMenu contextMenu,
+        Main.ContextMenu contextMenu,
         MessageDialogue messageDialogue)
     {
         this.loader = loader;
@@ -54,7 +54,10 @@ public class RecipeListUI : MonoBehaviour
         this.recipesManager.OnRecipeCreated += OnRecipeCreated;
         this.recipesManager.OnRecipeDeleted += OnRecipeDeleted;
 
-        this.recipesManager.RefreshAll();
+        //this.recipesManager.RefreshAll();
+        gameObject.SetActive(false);
+
+        return this;
     }
 
     private void OnDestroy()

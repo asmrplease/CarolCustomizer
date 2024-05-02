@@ -6,7 +6,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace CarolCustomizer.UI.Main;
-public class DynamicContextMenu : MonoBehaviour
+public class ContextMenu : MonoBehaviour
 {
     #region Dependencies
     GameObject buttonPrefab;
@@ -24,10 +24,12 @@ public class DynamicContextMenu : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void Constructor(GameObject buttonPrefab)
+    public ContextMenu Constructor(GameObject buttonPrefab)
     {
         this.buttonPrefab = buttonPrefab;
         buttonContainer = transform;
+        this.gameObject.SetActive(false);
+        return this;
     }
     #endregion
 
@@ -49,9 +51,19 @@ public class DynamicContextMenu : MonoBehaviour
             buttonComponent.onClick.AddListener(Hide);
             buttonList.Add(buttonComponent);
         }
-
-        transform.position = Input.mousePosition;
         gameObject.SetActive(true);
+        transform.position = Input.mousePosition;
+        Canvas.ForceUpdateCanvases();
+
+        var rect = transform as RectTransform;
+        var yOffscreen = rect.anchoredPosition.y - rect.sizeDelta.y;
+        Log.Debug($"{rect.anchoredPosition.y} - {rect.sizeDelta.y} = {yOffscreen}");
+        if (yOffscreen >= 0) return;
+        Log.Debug("Context Menu is at least partially offscreen, adjusting");
+        var position = rect.anchoredPosition;
+        position.y = rect.sizeDelta.y;
+        rect.anchoredPosition = position;
+        Log.Debug($"new y position = {position.y}");
     }
 
     public void Hide()
@@ -61,7 +73,7 @@ public class DynamicContextMenu : MonoBehaviour
         buttonList.Clear();
     }
 
-    private void Update()
+    void Update()
     {
         if (Input.GetMouseButtonUp(0)
             || Input.GetMouseButtonUp(1)

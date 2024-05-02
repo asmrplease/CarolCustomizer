@@ -19,7 +19,7 @@ public class MessageDialogue : MonoBehaviour
     Button cancelButton;
     Text cancelText;
 
-    public void Constructor()
+    public MessageDialogue Constructor()
     {
         message = transform.Find(messageAddress).GetComponent<Text>();
 
@@ -31,6 +31,8 @@ public class MessageDialogue : MonoBehaviour
 
         confirmButton.onClick.AddListener(Close);
         cancelButton.onClick.AddListener(Close);
+        this.gameObject.SetActive(false);
+        return this;
     }
 
     public void Show

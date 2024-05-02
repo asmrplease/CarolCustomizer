@@ -5,7 +5,6 @@ using CarolCustomizer.Utils;
 using System.ComponentModel;
 using System.Diagnostics;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -33,12 +32,12 @@ public class ConfigUI : MonoBehaviour
     MessageDialogue dialoge;
     #endregion
     #region Setup
-    public void Constructor(MessageDialogue dialogue)
+    public ConfigUI Constructor(MessageDialogue dialogue)
     {
         this.dialoge = dialogue;
 
-        SetupButton(LogFolderButtonAddress, OpenLogFolder);
-        SetupButton(ClearFavoritesButtonAddress, ConfirmClearFavorites);
+        transform.SetupButton(LogFolderButtonAddress, OpenLogFolder);
+        transform.SetupButton(ClearFavoritesButtonAddress, ConfirmClearFavorites);
 
         SetupToggle(RunInBackgroundToggleAddress, Settings.Game.RunInBackgroundCE);
         SetupToggle(CampaignBotToggleAddress, Settings.Plugin.customCampaignBots);
@@ -72,6 +71,7 @@ public class ConfigUI : MonoBehaviour
         RMBToggle
             .SetIsOnWithoutNotify(
             Settings.HotKeys.mouseContextMenu.Value == PointerEventData.InputButton.Right);
+        return this;
     }
 
     private void SetupDropdown(string address, ConfigEntry<KeyCode> setting)
@@ -97,14 +97,7 @@ public class ConfigUI : MonoBehaviour
             (setting.Value);
     }
 
-    private void SetupButton(string address, UnityAction callback)
-    {
-        transform
-            .Find(address)
-            .GetComponent<Button>()
-            .onClick
-            .AddListener(callback);
-    }
+
     #endregion
     #region Callbacks
     private void ShowLevelReloadPopup(object sender, System.EventArgs e)
@@ -152,12 +145,6 @@ public class ConfigUI : MonoBehaviour
             if (!Input.GetKey(KeyCode.LeftControl)) Process.Start(Constants.BepInExFolderPath);
             else Process.Start(Application.persistentDataPath);
         }
-        catch (Win32Exception e) { Log.Warning(e.Message); }
-    }
-
-    private void OpenLogFile()
-    {
-        try { Process.Start(Constants.LogFilePath); }
         catch (Win32Exception e) { Log.Warning(e.Message); }
     }
     #endregion

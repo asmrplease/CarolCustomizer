@@ -27,7 +27,7 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
     OutfitUI outfitUI;
     public StoredAccessory accessory { get; private set; }
     OutfitListUI ui;
-    DynamicContextMenu contextMenu;
+    Main.ContextMenu contextMenu;
     OutfitManager outfitManager;
     #endregion
 
@@ -53,7 +53,7 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
         OutfitUI outfitUI,
         StoredAccessory accessory,
         OutfitListUI ui,
-        DynamicContextMenu contextMenu,
+        Main.ContextMenu contextMenu,
         OutfitManager outfitManager)
     {
         this.outfitUI = outfitUI;

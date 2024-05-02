@@ -25,7 +25,7 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
     OutfitListUI ui;
     AccessoryUI accessoryUI;
     MaterialDescriptor defaultMaterial;
-    DynamicContextMenu contextMenu;
+    Main.ContextMenu contextMenu;
     OutfitManager outfitManager;
 
     public int index { get; private set; }
@@ -38,7 +38,7 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
     RectTransform rect;
     #endregion
 
-    public void Constructor(AccessoryUI accessory, MaterialDescriptor material, int index, OutfitListUI ui, DynamicContextMenu contextMenu, OutfitManager outfitManager)
+    public void Constructor(AccessoryUI accessory, MaterialDescriptor material, int index, OutfitListUI ui, Main.ContextMenu contextMenu, OutfitManager outfitManager)
     {
         accessoryUI = accessory;
         defaultMaterial = material;

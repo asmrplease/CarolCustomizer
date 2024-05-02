@@ -21,7 +21,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
     Recipe recipe;
     OutfitManager outfitManager;
-    DynamicContextMenu contextMenu;
+    Main.ContextMenu contextMenu;
     FilenameDialogue filenameDialogue;
     MessageDialogue messageDialogue;
 
@@ -38,7 +38,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         Recipe recipe,
         UIAssetLoader loader,
         OutfitManager outfitManager,
-        DynamicContextMenu contextMenu,
+        Main.ContextMenu contextMenu,
         FilenameDialogue filenameDialogue,
         MessageDialogue messageDialogue)
     {

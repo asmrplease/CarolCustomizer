@@ -7,7 +7,9 @@ using CarolCustomizer.UI.Materials;
 using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.UI.Recipes;
 using CarolCustomizer.Utils;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace CarolCustomizer.UI.Main;
@@ -24,148 +26,90 @@ public class UIInstance : MonoBehaviour
     #endregion
 
     #region Dependencies
-    UIAssetLoader loader;
     public PlayerCarolInstance playerManager { get; private set; }
-    public DynamicContextMenu contextMenu { get; private set; }
     public MaterialManager materialManager { get; private set; }
-    #endregion
-
-    #region Gameobjects
-    private GameObject uiObject;
-    private GameObject contextMenuGO;
-    private GameObject outfitViewGO;
-    private GameObject materialsViewGO;
-    private GameObject recipesViewGO;
-    private GameObject settingsViewGO;
-    private GameObject messageDialogueGO;
     #endregion
 
     Button outfitsButton;
     Button recipesButton;
     Button materialsButton;
-    Button settingsButton;
+    Button configButton;
 
     #region Common Component References
     Canvas canvas;
-    OutfitListUI outfitView;
-    RecipeListUI recipesView;
-    MaterialsListUI materialsView;
-    ConfigUI configView;
-    MessageDialogue messageDialogue;
-    Transform viewRoot;
+    List<Component> Views;
+    List<Button> Buttons;
     #endregion
 
     #region Public Interface
-    public void Constructor(
-        UIAssetLoader loader,
-        PlayerCarolInstance player,
-        RecipesManager recipesManager)
+    public void Constructor(UIAssetLoader loader, PlayerCarolInstance player, RecipesManager recipesManager)
     {
-        this.loader = loader;
         playerManager = player;
         materialManager = new();
 
-        uiObject = Instantiate(this.loader.UIContainer, transform);
-        viewRoot = uiObject.transform.Find(viewRootAddress);
+        var mainTransform = Instantiate(loader.UIContainer, transform).transform;
+        mainTransform
+            .Find(versionAddress)
+            .GetComponent<Text>()
+            .text = PluginInfo.PLUGIN_VERSION.ToString();
 
-        contextMenuGO = Instantiate(this.loader.ContextMenu, uiObject.transform);
-        contextMenu = contextMenuGO.AddComponent<DynamicContextMenu>();
-        contextMenu.Constructor(this.loader.ContextMenuButton);
-        contextMenuGO.SetActive(false);
-
-        messageDialogueGO = Instantiate(this.loader.MessageDialogue, uiObject.transform);
-        messageDialogue = messageDialogueGO.AddComponent<MessageDialogue>();
-        messageDialogue.Constructor();
-        messageDialogueGO.SetActive(false);
-
-        outfitViewGO = Instantiate(this.loader.OutfitView, viewRoot);
-        outfitView = outfitViewGO.AddComponent<OutfitListUI>();
-        outfitView.Constructor(this.loader, player, materialManager, contextMenu);
-
-        outfitsButton = uiObject.transform.Find(outfitsButtonAddress).GetComponent<Button>();
-        outfitsButton.onClick.AddListener(OnOutfitButton);
-
-        recipesViewGO = Instantiate(this.loader.RecipesView, viewRoot);
-        recipesView = recipesViewGO.AddComponent<RecipeListUI>();
-        recipesView.Constructor(this.loader, recipesManager, player.outfitManager, contextMenu, messageDialogue);
-
-        recipesButton = uiObject.transform.Find(recipesButtonAddress).GetComponent<Button>();
-        recipesButton.onClick.AddListener(OnRecipeButton);
-
-        materialsViewGO = Instantiate(this.loader.MaterialsView, viewRoot);
-        materialsView = materialsViewGO.AddComponent<MaterialsListUI>();
-        materialsView.Constructor(this.loader, materialManager, contextMenu);
-
-        materialsButton = uiObject.transform.Find(materialsButtonAddress).GetComponent<Button>();
-        materialsButton.onClick.AddListener(OnMaterialsButton);
-
-        settingsViewGO = Instantiate(this.loader.SettingsView, viewRoot);
-        configView = settingsViewGO.AddComponent<ConfigUI>();
-        configView.Constructor(messageDialogue);
-
-        settingsButton = uiObject.transform.Find(settingsButtonAddress).GetComponent<Button>();
-        settingsButton.onClick.AddListener(OnSettingsButton);
-
-        canvas = uiObject.GetComponent<Canvas>();
+        canvas = mainTransform.GetComponent<Canvas>();
         canvas.enabled = true;
 
-        OnOutfitButton();
+        var viewRoot = mainTransform.Find(viewRootAddress);
 
-        var versionText = uiObject.transform.Find(versionAddress).GetComponent<Text>();
-        versionText.text = PluginInfo.PLUGIN_VERSION.ToString();
+        var contextMenu = Instantiate(loader.ContextMenu, mainTransform)
+            .AddComponent<ContextMenu>()
+            .Constructor(loader.ContextMenuButton);
+        var messageDialogue = Instantiate(loader.MessageDialogue, mainTransform)
+            .AddComponent<MessageDialogue>()
+            .Constructor();
+
+        var outfitView = Instantiate(loader.OutfitView, viewRoot)
+            .AddComponent<OutfitListUI>()
+            .Constructor(loader, player, materialManager, contextMenu);
+        var recipesView = Instantiate(loader.RecipesView, viewRoot)
+            .AddComponent<RecipeListUI>()
+            .Constructor(loader, recipesManager, player.outfitManager, contextMenu, messageDialogue);
+        var materialsView = Instantiate(loader.MaterialsView, viewRoot)
+            .AddComponent<MaterialsListUI>()
+            .Constructor(loader, materialManager, contextMenu);
+        var configView = Instantiate(loader.SettingsView, viewRoot)
+            .AddComponent<ConfigUI>()
+            .Constructor(messageDialogue);
+
+        outfitsButton =   mainTransform.SetupButton(outfitsButtonAddress, 
+            () => ChangeTab(outfitsButton, outfitView.gameObject));
+        recipesButton =   mainTransform.SetupButton(recipesButtonAddress, 
+            () => ChangeTab(recipesButton, recipesView.gameObject ));
+        materialsButton = mainTransform.SetupButton(materialsButtonAddress,
+            () => ChangeTab(materialsButton, materialsView.gameObject));
+        configButton =  mainTransform.SetupButton(settingsButtonAddress,
+            () => ChangeTab(configButton, configView.gameObject));
+
+        Views = new List<Component>() { outfitView, recipesView, materialsView, configView };
+        Buttons = new List<Button> { outfitsButton, recipesButton, materialsButton, configButton };
     }
 
-    public void Show() => canvas.enabled = true;
+    public void Show()
+    {
+        canvas.enabled = true;
+    }
     //TODO: Animate ui opening/closing
 
-    public void Hide() => canvas.enabled = false;
+    public void Hide()
+    {
+        EventSystem.current.SetSelectedGameObject(null);
+        canvas.enabled = false;
+    }
     #endregion
 
-    private void OnOutfitButton()
+    void ChangeTab(Button button, GameObject view)
     {
-        HideViews();
-        LowlightButtons();
-        outfitsButton.GetComponent<Image>().color = Constants.Highlight;
-        outfitViewGO.SetActive(true);
-    }
-
-    private void OnRecipeButton()
-    {
-        HideViews();
-        LowlightButtons();
-        recipesButton.GetComponent<Image>().color = Constants.Highlight;
-        recipesViewGO.SetActive(true);
-    }
-
-    private void OnMaterialsButton()
-    {
-        HideViews();
-        LowlightButtons();
-        materialsButton.GetComponent<Image>().color = Constants.Highlight;
-        materialsViewGO.SetActive(true);
-    }
-
-    private void OnSettingsButton()
-    {
-        HideViews();
-        LowlightButtons();
-        settingsButton.GetComponent<Image>().color = Constants.Highlight;
-        settingsViewGO.SetActive(true);
-    }
-
-    private void HideViews()
-    {
-        outfitViewGO.SetActive(false);
-        settingsViewGO.SetActive(false);
-        recipesViewGO.SetActive(false);
-        materialsViewGO.SetActive(false);
-    }
-
-    private void LowlightButtons()
-    {
-        outfitsButton.GetComponent<Image>().color = Constants.DefaultColor;
-        settingsButton.GetComponent<Image>().color = Constants.DefaultColor;
-        recipesButton.GetComponent<Image>().color = Constants.DefaultColor;
-        materialsButton.GetComponent<Image>().color = Constants.DefaultColor;
+        Log.Debug($"{button.name}");
+        Views.ForEach(x => x.gameObject.SetActive(false));
+        Buttons.ForEach(x => x.GetComponent<Image>().color = Constants.DefaultColor);
+        button.GetComponent<Image>().color = Constants.Highlight;
+        view.SetActive(true);
     }
 }

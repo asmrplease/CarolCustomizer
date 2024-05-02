@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Events;
+using Button = UnityEngine.UI.Button;
 
 namespace CarolCustomizer.Utils;
 /// <summary>
@@ -165,5 +167,14 @@ public static class MiscExtensions
         var idk = e as SettingChangedEventArgs;
         var wtf = idk.ChangedSetting as ConfigEntry<T>;
         return wtf;
+    }
+
+    public static Button SetupButton(this Transform transform, string address, UnityAction callback)
+    {
+        var button = transform
+            .Find(address)
+            .GetComponent<Button>();
+        button.onClick.AddListener(callback);
+        return button;
     }
 }

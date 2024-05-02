@@ -17,7 +17,7 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
     const string favoriteAddress = "Favorite";
     const string toggleAddress = "Toggle";
 
-    DynamicContextMenu contextMenu;
+    Main.ContextMenu contextMenu;
     MaterialManager materialManager;
     MaterialDescriptor material;
 
@@ -25,7 +25,7 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
     Text materialName;
     Image favoriteIcon;
 
-    public void Constructor(MaterialDescriptor material, MaterialManager materialManager, DynamicContextMenu contextMenu)
+    public void Constructor(MaterialDescriptor material, MaterialManager materialManager, Main.ContextMenu contextMenu)
     {
         this.material = material;
         this.materialManager = materialManager;

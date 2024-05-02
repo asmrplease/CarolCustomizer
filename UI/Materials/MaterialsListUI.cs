@@ -12,19 +12,20 @@ internal class MaterialsListUI : MonoBehaviour
 
     MaterialManager materialManager;
     UIAssetLoader loader;
-    DynamicContextMenu contextMenu;
+    Main.ContextMenu contextMenu;
 
     Transform listRoot;
 
     List<ReadOnlyMatUI> materialUIs = new();
 
-    public void Constructor(UIAssetLoader loader, MaterialManager materialManager, DynamicContextMenu contextMenu)
+    public MaterialsListUI Constructor(UIAssetLoader loader, MaterialManager materialManager, Main.ContextMenu contextMenu)
     {
         this.materialManager = materialManager;
         this.loader = loader;
         this.contextMenu = contextMenu;
 
         listRoot = transform.Find(listRootAddress);
+        return this;
     }
 
     private void OnEnable()

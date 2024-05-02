@@ -18,7 +18,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     #region Dependencies
     public Outfit outfit { get; private set; }
     OutfitListUI ui;
-    DynamicContextMenu contextMenu;
+    Main.ContextMenu contextMenu;
     #endregion
 
     #region Component Refrerences
@@ -40,7 +40,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     #endregion
 
     #region Setup
-    public void Constructor(Outfit outfit, OutfitListUI ui, DynamicContextMenu contextMenu)
+    public void Constructor(Outfit outfit, OutfitListUI ui, Main.ContextMenu contextMenu)
     {
         this.outfit = outfit;
         this.ui = ui;
