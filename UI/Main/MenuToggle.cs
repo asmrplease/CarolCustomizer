@@ -110,8 +110,7 @@ public class MenuToggle : MonoBehaviour
         if (isVisible && GameManager.manager.isInCutscene) { GameplaySetMenuState(false); return; }
 
         //don't change the menu state if we're already in a state change
-        var player = uiInstance.playerManager;
-        if (!player.CanOpenMenu()) return;
+        if (!uiInstance.playerManager.CanOpenMenu()) return;
 
         //hide the menu if it's visible and we pause
         if (isVisible && (Input.GetKeyDown(KeyCode.Escape) || CheckInput()))

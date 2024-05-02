@@ -119,6 +119,7 @@ public class PlayerWatchdog : PelvisWatchdog
 
     public bool CanOpenMenu()
     {
+        if (Busy)               return false;
         if (!carolController)   return false;
         if (!isGrounded)        return false;
         if (isSwimming)         return false;

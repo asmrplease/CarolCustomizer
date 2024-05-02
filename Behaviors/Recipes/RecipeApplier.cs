@@ -47,6 +47,8 @@ internal static class RecipeApplier
         if (variant is null) { Log.Warning($"variant {variantName} not found in {outfit.DisplayName}"); return; }
 
         foreach (var acc in variant) SetAccessory(outfitManager, acc);
+        outfitManager.SetAnimator(outfit);
+        outfitManager.SetConfiguration(outfit);
     }
 
     private static void SetAccessory(OutfitManager outfitManager, AccessoryDescriptor accessoryDescription)

@@ -10,6 +10,9 @@ public class PlayerCarolInstance : CarolInstance
     PlayerWatchdog player;
     static Type playerWatchdogType = typeof(PlayerWatchdog);
     AutoSaver autoSaver;
+
+    public bool Busy => player?.Busy ?? false;
+
     public PlayerCarolInstance(GameObject parent) : base(parent)
     {
         autoSaver = new(this);
@@ -25,8 +28,7 @@ public class PlayerCarolInstance : CarolInstance
 
     public bool CanOpenMenu() => player?.CanOpenMenu() ?? true;
 
-    public bool ManagesPlayer(Entity playerEntity)
-        => player ? player.ManagesPlayer(playerEntity) : false;
+    public bool ManagesPlayer(Entity playerEntity) => player?.ManagesPlayer(playerEntity) ?? false;
 
     public void LockPlayer() => player?.LockPlayer();
     public void UnlockPlayer() => player?.UnlockPlayer();
