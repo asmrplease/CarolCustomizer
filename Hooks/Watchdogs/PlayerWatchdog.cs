@@ -38,6 +38,8 @@ public class PlayerWatchdog : PelvisWatchdog
 
     public void UnlockPlayer() => StartCoroutine(UnlockRoutine());
 
+    protected override void OnTransformParentChanged() { }
+
     public override void SetBaseOutfit(Outfit outfit)
     {
         Log.Debug("Changing outfit via Entity.Swapmodel");

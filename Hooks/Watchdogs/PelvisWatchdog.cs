@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Slate;
 using CarolCustomizer.Assets;
-using MonoMod.Utils;
 using CarolCustomizer.Models.Outfits;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
