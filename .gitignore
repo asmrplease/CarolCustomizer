@@ -19,6 +19,9 @@ mono_crash.*
 # Lib files
 [Ll]ib/
 
+# Release archive
+*.rar
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

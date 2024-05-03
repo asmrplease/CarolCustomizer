@@ -1,0 +1,93 @@
+{
+  "AnimatorSource": "CAROL_PyjamaBasic",
+  "BaseOutfitName": "CAROL_PyjamaBasic",
+  "ActiveAccessories": [
+    {
+      "Name": "Cutesweater",
+      "Source": "CAROL_Cutesweater4",
+      "Materials": [
+        {
+          "Name": "Carol_Cutesweater1_Material _1749_BaseMap 3 (Instance)",
+          "Source": "CAROL_Cutesweater4",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Sunglasses",
+      "Source": "CAROL_Cutesweater4",
+      "Materials": [
+        {
+          "Name": "Carol_Class_Infiltrator_Material _1750_AlbedoTransparency 2 (Instance)",
+          "Source": "CAROL_Cutesweater4",
+          "Type": 0
+        },
+        {
+          "Name": "glasses (Instance)",
+          "Source": "CAROL_Cutesweater4",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "tete",
+      "Source": "CAROL_Heavymetal1",
+      "Materials": [
+        {
+          "Name": "Carol_HeadR_Eyebags (Instance)",
+          "Source": "CAROL_Heavymetal1",
+          "Type": 0
+        },
+        {
+          "Name": "Default-Diffuse (Instance)",
+          "Source": "CAROL_Heavymetal1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Hair_pigtails",
+      "Source": "CAROL_Heavymetal1",
+      "Materials": [
+        {
+          "Name": "carol_hair_new 12 (Instance)",
+          "Source": "CAROL_Heavymetal1",
+          "Type": 0
+        },
+        {
+          "Name": "Carol_Heavymetal_Material _1537_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Heavymetal1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "NewEyes (3)",
+      "Source": "CAROL_Cutesweater4",
+      "Materials": [
+        {
+          "Name": "EyesRework_P4 (Instance)",
+          "Source": "CAROL_Cutesweater4",
+          "Type": 0
+        },
+        {
+          "Name": "Carol_Eyelense (Instance)",
+          "Source": "CAROL_Cutesweater4",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Crl_Newhands",
+      "Source": "CAROL_2021Halloween",
+      "Materials": [
+        {
+          "Name": "Crl_Newhands Fishnet (Instance)",
+          "Source": "CAROL_2021Halloween",
+          "Type": 0
+        }
+      ]
+    }
+  ],
+  "Version": "2.1.0"
+}

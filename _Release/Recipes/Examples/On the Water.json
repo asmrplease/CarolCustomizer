@@ -1,0 +1,110 @@
+{
+  "AnimatorSource": "CAROL_FrozenPrincess",
+  "BaseOutfitName": "CAROL_PyjamaBasic",
+  "ActiveAccessories": [
+    {
+      "Name": "crl_swimsuit002",
+      "Source": "CAROL_Summer1",
+      "Materials": [
+        {
+          "Name": "Carol_Summer2022_Material _1354_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Summer1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Sunglasses",
+      "Source": "CAROL_Tourist1",
+      "Materials": [
+        {
+          "Name": "Carol_Tourist_Material _9737_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Tourist1",
+          "Type": 0
+        },
+        {
+          "Name": "Material #9752 (Instance)",
+          "Source": "CAROL_Tourist1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "TouristCap",
+      "Source": "CAROL_Tourist1",
+      "Materials": [
+        {
+          "Name": "Carol_Tourist_Material _9737_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Tourist1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "TouristJacket",
+      "Source": "CAROL_Tourist1",
+      "Materials": [
+        {
+          "Name": "Carol_Tourist_Material _9737_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Tourist1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "tete",
+      "Source": "CAROL_Tourist1",
+      "Materials": [
+        {
+          "Name": "Carol_HeadRework_Carol_NewFace_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Tourist1",
+          "Type": 0
+        },
+        {
+          "Name": "Default-Diffuse (Instance)",
+          "Source": "CAROL_Tourist1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Hair_Flowing",
+      "Source": "CAROL_Tourist1",
+      "Materials": [
+        {
+          "Name": "carol_hair_untied (Instance)",
+          "Source": "CAROL_Tourist1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "NewEyes",
+      "Source": "CAROL_Summer1",
+      "Materials": [
+        {
+          "Name": "EyesRework_P1 (Instance)",
+          "Source": "CAROL_Summer1",
+          "Type": 0
+        },
+        {
+          "Name": "Carol_Eyelense (Instance)",
+          "Source": "CAROL_Summer1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Crl_Newhands",
+      "Source": "CAROL_Summer1",
+      "Materials": [
+        {
+          "Name": "Crl_Newhands (Instance)",
+          "Source": "CAROL_Summer1",
+          "Type": 0
+        }
+      ]
+    }
+  ],
+  "Version": "2.1.0"
+}

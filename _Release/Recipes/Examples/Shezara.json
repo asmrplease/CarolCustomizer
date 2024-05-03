@@ -1,0 +1,110 @@
+{
+  "AnimatorSource": "CAROL_PyjamaBasic",
+  "BaseOutfitName": "CAROL_PyjamaBasic",
+  "ActiveAccessories": [
+    {
+      "Name": "tete",
+      "Source": "CAROL_SummerDress1",
+      "Materials": [
+        {
+          "Name": "Carol_HeadRework_Carol_NewFace_tanned (Instance)",
+          "Source": "CAROL_SummerDress1",
+          "Type": 0
+        },
+        {
+          "Name": "Default-Diffuse (Instance)",
+          "Source": "CAROL_SummerDress1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Crl_Newhands",
+      "Source": "CAROL_SummerDress1",
+      "Materials": [
+        {
+          "Name": "Crl_Newhands 1 (Instance)",
+          "Source": "CAROL_SummerDress1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Pirate",
+      "Source": "CAROL_Pirate1",
+      "Materials": [
+        {
+          "Name": "Carol_Pirate1_Material _9763_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Pirate1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "PirateCoat",
+      "Source": "CAROL_Pirate1",
+      "Materials": [
+        {
+          "Name": "Carol_Pirate1_Material _9763_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Pirate1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Hair_Piratehair",
+      "Source": "CAROL_Pirate1",
+      "Materials": [
+        {
+          "Name": "carol_hair_untied 1 (Instance)",
+          "Source": "CAROL_Pirate1",
+          "Type": 0
+        },
+        {
+          "Name": "Carol_Pirate1_Material _9763_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Pirate1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "NewEyes (1)",
+      "Source": "CAROL_SummerDress1",
+      "Materials": [
+        {
+          "Name": "EyesRework_P2 (Instance)",
+          "Source": "CAROL_SummerDress1",
+          "Type": 0
+        },
+        {
+          "Name": "Carol_Eyelense (Instance)",
+          "Source": "CAROL_SummerDress1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Tricorn_Hat",
+      "Source": "CAROL_Pirate1",
+      "Materials": [
+        {
+          "Name": "Carol_Pirate1_Material _9763_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Pirate1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Elfear",
+      "Source": "CAROL_Pirate1",
+      "Materials": [
+        {
+          "Name": "carol_face (Instance)",
+          "Source": "CAROL_Pirate1",
+          "Type": 0
+        }
+      ]
+    }
+  ],
+  "Version": "2.1.0"
+}

@@ -1,0 +1,88 @@
+{
+  "AnimatorSource": "CAROL_Heavymetal2",
+  "BaseOutfitName": "CAROL_Heavymetal2",
+  "ActiveAccessories": [
+    {
+      "Name": "earrings",
+      "Source": "CAROL_Heavymetal2",
+      "Materials": [
+        {
+          "Name": "metalicsilver (Instance)",
+          "Source": "CAROL_Heavymetal2",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "tete",
+      "Source": "CAROL_Heavymetal2",
+      "Materials": [
+        {
+          "Name": "Carol_HeadR_Glam (Instance)",
+          "Source": "CAROL_Heavymetal2",
+          "Type": 0
+        },
+        {
+          "Name": "Default-Diffuse (Instance)",
+          "Source": "CAROL_Heavymetal2",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "NewEyes",
+      "Source": "CAROL_Heavymetal2",
+      "Materials": [
+        {
+          "Name": "EyesRework_P1 (Instance)",
+          "Source": "CAROL_Heavymetal2",
+          "Type": 0
+        },
+        {
+          "Name": "Carol_Eyelense (Instance)",
+          "Source": "CAROL_Heavymetal2",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Hair_pigtails",
+      "Source": "CAROL_Heavymetal2",
+      "Materials": [
+        {
+          "Name": "carol_hair_new 18 (Instance)",
+          "Source": "CAROL_Heavymetal2",
+          "Type": 0
+        },
+        {
+          "Name": "Carol_Heavymetal_Material _1537_AlbedoTransparency 1 (Instance)",
+          "Source": "CAROL_Heavymetal2",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "hoodie_main001",
+      "Source": "CAROL_Skater1",
+      "Materials": [
+        {
+          "Name": "Carol_skater_Material _1461_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Skater1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Crl_Newhands",
+      "Source": "CAROL_Skater1",
+      "Materials": [
+        {
+          "Name": "Crl_Newhands (Instance)",
+          "Source": "CAROL_Skater1",
+          "Type": 0
+        }
+      ]
+    }
+  ],
+  "Version": "2.1.0"
+}

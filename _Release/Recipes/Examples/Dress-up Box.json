@@ -1,0 +1,176 @@
+{
+  "AnimatorSource": "CAROL_PyjamaBasic",
+  "BaseOutfitName": "CAROL_PyjamaBasic",
+  "ActiveAccessories": [
+    {
+      "Name": "Frenchiehat",
+      "Source": "CAROL_Artist",
+      "Materials": [
+        {
+          "Name": "Carol_Artist (Instance)",
+          "Source": "CAROL_Artist",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Glasses",
+      "Source": "CAROL_Victorian3",
+      "Materials": [
+        {
+          "Name": "Carol_victorian_Material _1491_AlbedoTransparency 2 (Instance)",
+          "Source": "CAROL_Victorian3",
+          "Type": 0
+        },
+        {
+          "Name": "Material #1492 (Instance)",
+          "Source": "CAROL_Victorian3",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Coat",
+      "Source": "CAROL_WitchStudent1",
+      "Materials": [
+        {
+          "Name": "Carol_Witchstudent_Material _1789_AlbedoTransparency (Instance)",
+          "Source": "CAROL_WitchStudent1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "crl_swimsuit002",
+      "Source": "CAROL_Summer1",
+      "Materials": [
+        {
+          "Name": "Carol_Summer2022_Material _1354_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Summer1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "tete",
+      "Source": "CAROL_Summer1",
+      "Materials": [
+        {
+          "Name": "Carol_HeadRework_Carol_NewFace_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Summer1",
+          "Type": 0
+        },
+        {
+          "Name": "Default-Diffuse (Instance)",
+          "Source": "CAROL_Summer1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "NewEyes",
+      "Source": "CAROL_Summer1",
+      "Materials": [
+        {
+          "Name": "EyesRework_P1 (Instance)",
+          "Source": "CAROL_Summer1",
+          "Type": 0
+        },
+        {
+          "Name": "Carol_Eyelense (Instance)",
+          "Source": "CAROL_Summer1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Crl_NewhandsBigGlovesSmall",
+      "Source": "CAROL_FireFighter2",
+      "Materials": [
+        {
+          "Name": "Crl_Biggloves 3 (Instance)",
+          "Source": "CAROL_FireFighter2",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Ladybun_Scarf",
+      "Source": "CAROL_Ladybun",
+      "Materials": [
+        {
+          "Name": "Carol_Ladybun_Material _1736_AlbedoTransparency 1 (Instance)",
+          "Source": "CAROL_Ladybun",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Sunflower",
+      "Source": "CAROL_Overall4",
+      "Materials": [
+        {
+          "Name": "Carol_SummerDress_Material _9737_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Overall4",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "gasmask001",
+      "Source": "CAROL_FireFighter3",
+      "Materials": [
+        {
+          "Name": "Carol_Firefighter3 (Instance)",
+          "Source": "CAROL_FireFighter3",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Ponytail_hair",
+      "Source": "CAROL_Summer1",
+      "Materials": [
+        {
+          "Name": "carol_hair_new 4 (Instance)",
+          "Source": "CAROL_Summer1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Earmuffs",
+      "Source": "CAROL_Wintercoa3t",
+      "Materials": [
+        {
+          "Name": "Carol_wintercoat_Material _1472_AlbedoTransparency 2 (Instance)",
+          "Source": "CAROL_Wintercoa3t",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Crown",
+      "Source": "CAROL_Barbarian1",
+      "Materials": [
+        {
+          "Name": "Carol_Barbarian_Material _9621_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Barbarian1",
+          "Type": 0
+        }
+      ]
+    },
+    {
+      "Name": "Backpack",
+      "Source": "CAROL_Xmas2022",
+      "Materials": [
+        {
+          "Name": "Xmas2022_Accessories_Material _9782_AlbedoTransparency (Instance)",
+          "Source": "CAROL_Xmas2022",
+          "Type": 0
+        }
+      ]
+    }
+  ],
+  "Version": "2.1.0"
+}
