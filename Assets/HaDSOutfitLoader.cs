@@ -10,7 +10,7 @@ using UnityEngine;
 namespace CarolCustomizer.Assets;
 internal class HaDSOutfitLoader : IDisposable
 {
-    private static string ListName = "HaDS Outfits";
+    static string ListName = "HaDS Outfits";
     static Dictionary<string, HaDSOutfit> HaDSOutfits = new();
 
     public HaDSOutfitLoader()
@@ -36,7 +36,7 @@ internal class HaDSOutfitLoader : IDisposable
         OutfitAssetManager.OnOutfitSetLoaded?.Invoke();
     }
 
-    private void LoadHaDSOutfit(ModelData outfit)
+    void LoadHaDSOutfit(ModelData outfit)
     {
         if (outfit.GetComponentInChildren<PelvisWatchdog>()) { return; }
 

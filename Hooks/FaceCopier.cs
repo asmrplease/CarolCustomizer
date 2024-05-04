@@ -5,6 +5,8 @@ using CarolCustomizer.Utils;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Assets;
+using CarolCustomizer.Models.Outfits;
 
 namespace CarolCustomizer.Hooks;
 public class FaceCopier : MonoBehaviour
@@ -18,6 +20,12 @@ public class FaceCopier : MonoBehaviour
     {
         this.playerManager = playerManager;
         this.playerManager.SpawnEvent += UpdateBaseFace;
+        OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
+    }
+
+    void OnOutfitUnloaded(Outfit outfit)
+    {
+        targets.RemoveWhere(x => x.outfit == outfit);
     }
 
     private void OnDestroy()

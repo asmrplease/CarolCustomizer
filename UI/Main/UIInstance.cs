@@ -93,12 +93,14 @@ public class UIInstance : MonoBehaviour
 
     public void Show()
     {
+        if (!canvas) { Log.Error("Canvas missing on UIInstance.Show()"); return; }
         canvas.enabled = true;
     }
     //TODO: Animate ui opening/closing
 
     public void Hide()
     {
+        if (!canvas) { Log.Error("Canvas missing on UIInstance.Hide()"); return; }
         EventSystem.current.SetSelectedGameObject(null);
         canvas.enabled = false;
     }
@@ -109,7 +111,7 @@ public class UIInstance : MonoBehaviour
         Log.Debug($"{button.name}");
         Views.ForEach(x => x.gameObject.SetActive(false));
         Buttons.ForEach(x => x.GetComponent<Image>().color = Constants.DefaultColor);
-        button.GetComponent<Image>().color = Constants.Highlight;
         view.SetActive(true);
+        button.GetComponent<Image>().color = Constants.Highlight;
     }
 }
