@@ -153,5 +153,6 @@ public class CCPlugin : BaseUnityPlugin
         npcInstances.Dispose();
         introFix.Dispose();
         outfitLoader.Dispose();
+        Log.Info("Customizer unloaded.");
     }
 }

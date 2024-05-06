@@ -65,7 +65,7 @@ public class OutfitManager : IDisposable
 
     public void Dispose()
     {
-        SetBaseVisibility(true);//Ensure the player is visible when we leave. 
+        //SetBaseVisibility(true);//Ensure the player is visible when we leave. 
         Log.Debug("OutfitManager.Dispose() complete.");
     }
 

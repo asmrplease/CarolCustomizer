@@ -14,17 +14,18 @@ public class SkeletonManager : IDisposable
 {
     #region Static Fields
     public static Dictionary<string, Transform> CommonBones { get; private set; }
+    static List<string> HairBones = new() { "Carol_TAIL_TOP", "Carol_TAIL_HIGH_MID", "Carol_TAIL_LOW_MID", "Carol_TAIL_END", "Carol_ENDBone001", "Carol_ENDBone001Bone001", "Carol_ENDBone001Bone001Bone001", "Carol_ENDBone001Bone001Bone001Bone001", "Carol_ENDBone001Bone001Bone001Bone001Bone001" };
     public static void SetCommonBones()
     {
         if (CommonBones is not null) { Log.Error("tried to replace standard bone names"); return; }
 
-        var pjs = GameManager.manager.GetOutfit(Constants.Pyjamas);
-        if (!pjs) { Log.Debug("didn't find pjs"); return; }
-
-        var pelvis = pjs.transform.RecursiveFindTransform(x => x.name == "CarolPelvis");
-        if (!pelvis) { Log.Debug("didn't find pelvis"); return; }
-
-        CommonBones = pelvis.SkeletonToList().ToDictionary(keySelector: x => x.name, elementSelector: x => x);
+        CommonBones = GameManager.manager
+            .GetOutfit(Constants.Pyjamas)
+            .transform
+            .RecursiveFindTransform(x => x.name == "CarolPelvis")
+            .SkeletonToList()
+            .ToDictionary(keySelector: x => x.name, elementSelector: x => x);
+        foreach (var bone in HairBones) { CommonBones.Remove(bone); }
         Log.Info($"Found {CommonBones.Count} of expected 69 standard bones.");
     }
     #endregion

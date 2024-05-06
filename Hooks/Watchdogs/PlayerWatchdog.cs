@@ -3,6 +3,7 @@ using CarolCustomizer.Utils;
 using System.Collections;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Assets;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PlayerWatchdog : PelvisWatchdog

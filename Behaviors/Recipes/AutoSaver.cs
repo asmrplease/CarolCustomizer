@@ -5,8 +5,6 @@ using CarolCustomizer.Utils;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.TextCore.Text;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 internal class AutoSaver
@@ -17,7 +15,6 @@ internal class AutoSaver
     {
         outfitManager = player.outfitManager;
         OutfitAssetManager.OnOutfitSetLoaded += Load;
-        SceneManager.activeSceneChanged
     }
 
     public void Save()

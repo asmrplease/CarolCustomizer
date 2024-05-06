@@ -20,9 +20,9 @@ public class PelvisWatchdog : MonoBehaviour
     protected CompData compData;
     public CompData CompData { get { return compData; } }
 
-    string parentName => transform.parent?.name ?? "none";
-    string grandparentName => transform.parent?.parent?.name ?? "none";
-    string rootName => transform.root?.name ?? "none";
+    protected string parentName => transform.parent?.name ?? "none";
+    protected string grandparentName => transform.parent?.parent?.name ?? "none";
+    protected string rootName => transform.root?.name ?? "none";
 
     List<(Func<Predicate<PelvisWatchdog>, bool>,
             Predicate<PelvisWatchdog>)> checks;
@@ -99,7 +99,8 @@ public class PelvisWatchdog : MonoBehaviour
     {
         Log.Debug("PelvisWatchdog.SetBaseVisibility()");
         if (compData?.allSMRs is null) return;
-        foreach (var mesh in CompData.allSMRs) {if (mesh?.gameObject) mesh.gameObject.SetActive(visible); }
+        foreach (var mesh in CompData.allSMRs) { if (mesh?.gameObject) mesh.gameObject.SetActive(visible); }
+        Log.Debug("done");
     }
 
     public override string ToString() => $"{GetType()}@{rootName}->{grandparentName}({Guid})";
