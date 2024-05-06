@@ -6,7 +6,6 @@ using CarolCustomizer.Events;
 using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +28,6 @@ public class OutfitListUI : MonoBehaviour
     Main.ContextMenu contextMenu;
     public CarolInstance playerManager { get; private set; }
     public MaterialManager materialManager { get; private set; }
-    
 
     public string searchString { get; private set; } = "";
     Transform listRoot;
