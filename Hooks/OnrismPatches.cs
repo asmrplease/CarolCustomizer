@@ -52,10 +52,9 @@ public static class OnrismPatches
                 .manager.data[SaveManager.manager.saveSlotCurrent]
                 .players[0].inventory.accessory;//TODO: this line will fail in coop
 
-            RecipeApplier.ActivateVariant(
+            RecipeApplier.ActivateFirstVariant(
                 CCPlugin.cutscenePlayer.outfitManager,
-                OutfitAssetManager.GetOutfitByAssetName(modelData.name),
-                modelData.accessories[variant].name);
+                OutfitAssetManager.GetOutfitByAssetName(modelData.name).AssetName);
             return false;
         }
     }

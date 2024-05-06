@@ -39,7 +39,7 @@ internal class AutoSaver
             || recipe.Error == Recipe.Status.InvalidJson)
         {
             Log.Warning("Loading pyjamas instead of autosave");
-            RecipeApplier.ActivateVariant(outfitManager, Constants.Pyjamas, 0);
+            RecipeApplier.ActivateFirstVariant(outfitManager, Constants.Pyjamas);
             yield break;
         }
         Log.Info("Loading autosave recipe");

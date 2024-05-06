@@ -26,15 +26,14 @@ internal static class RecipeApplier
                recipe.BaseOutfitName));
     }
 
-    public static void ActivateVariant(OutfitManager outfitManager, string outfitName, int variantIndex)
+    public static void ActivateFirstVariant(OutfitManager outfitManager, string outfitName)
     {
         Log.Debug("ActivateVariant(OM, string, int");
-        if (variantIndex < 0) { Log.Warning($"ActivateVariant() was passed a negative variant index: {variantIndex}"); return; }
+        
         HaDSOutfit outfit = OutfitAssetManager.GetOutfitByAssetName(outfitName);
         if (outfit is null) { Log.Debug($"Didn't find outfit named: {outfitName}"); return; }
-        if (variantIndex > outfit.Variants.Count) { Log.Warning($"Index[{variantIndex}] is out of bounts for {outfit.DisplayName}, count: {outfit.Variants.Count}."); return; }
             
-        var variant = outfit.Variants.ElementAt(variantIndex).Key;
+        var variant = outfit.Variants.First().Key;
         ActivateVariant(outfitManager, outfit, variant);
     }
 
@@ -51,7 +50,7 @@ internal static class RecipeApplier
         outfitManager.SetConfiguration(outfit);
     }
 
-    private static void SetAccessory(OutfitManager outfitManager, AccessoryDescriptor accessoryDescription)
+    static void SetAccessory(OutfitManager outfitManager, AccessoryDescriptor accessoryDescription)
     {
         Log.Debug($"Setting accessory {accessoryDescription.Source}:{accessoryDescription.Name}...");
         var outfit = OutfitAssetManager.GetOutfitByAssetName(accessoryDescription.Source);
@@ -72,7 +71,7 @@ internal static class RecipeApplier
         }
     }
 
-    private static void SetMaterial(OutfitManager outfitManager, StoredAccessory accessory, MaterialDescriptor materialDescription, int index)
+    static void SetMaterial(OutfitManager outfitManager, StoredAccessory accessory, MaterialDescriptor materialDescription, int index)
     {
         Log.Debug("setting material...");
         if (materialDescription.Type == MaterialDescriptor.SourceType.World)

@@ -86,10 +86,11 @@ public class UIInstance : MonoBehaviour
             () => ChangeTab(materialsButton, materialsView.gameObject));
         configButton =  mainTransform.SetupButton(settingsButtonAddress,
             () => ChangeTab(configButton, configView.gameObject));
-        ChangeTab(outfitsButton, outfitView.gameObject);
 
         Views = new List<Component>() { outfitView, recipesView, materialsView, configView };
-        Buttons = new List<Button> { outfitsButton, recipesButton, materialsButton, configButton };  
+        Buttons = new List<Button> { outfitsButton, recipesButton, materialsButton, configButton };
+        
+        ChangeTab(outfitsButton, outfitView.gameObject);
     }
 
     public void Show()
