@@ -31,11 +31,8 @@ public class NPCInstanceCreator : IDisposable
         SceneManager.sceneLoaded -= FindDedicatedActresses;
         SceneManager.sceneLoaded -= FindBotEntities;
 
-
         foreach (var actress in dedicatedActresses) { if (actress) GameObject.Destroy(actress); }
         foreach (var botPrefab in carolBotPrefabs) { if (botPrefab) GameObject.Destroy(botPrefab); }
-
-        this.DisposeFields();
     }
     #endregion
 
@@ -71,7 +68,7 @@ public class NPCInstanceCreator : IDisposable
         }
     }
 
-    private static IEnumerable<Transform> FindPelvisesInRootObject(Scene scene, string rootObjectName)
+    static IEnumerable<Transform> FindPelvisesInRootObject(Scene scene, string rootObjectName)
     {
         var componentless = new List<Transform>();
         var roots = scene.GetRootGameObjects();
@@ -99,7 +96,7 @@ public class NPCInstanceCreator : IDisposable
         foreach (var entity in entities) { OnCarolBotDetected(entity.gameObject); }
     }
 
-    private static void OnCarolBotDetected(GameObject botPrefab)
+    static void OnCarolBotDetected(GameObject botPrefab)
     {
         //remove voice componenets which are spamming console
         var voices = botPrefab.GetComponents<Voice>();

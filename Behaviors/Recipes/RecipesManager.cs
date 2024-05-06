@@ -4,6 +4,7 @@ using System.IO;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Assets;
 using CarolCustomizer.Models.Recipes;
+using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 public class RecipesManager : IDisposable
@@ -37,13 +38,14 @@ public class RecipesManager : IDisposable
         watcher.EnableRaisingEvents = true;
 
         OutfitAssetManager.OnOutfitSetLoaded += RefreshAll;
+        Application.quitting += Dispose;
     }
 
 
     public void Dispose()
     {
         watcher.EnableRaisingEvents = false;
-        this.DisposeFields();
+        watcher.Dispose();
     }
 
     public void RefreshAll()

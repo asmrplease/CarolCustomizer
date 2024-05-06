@@ -65,23 +65,6 @@ public static class MiscExtensions
         }
     }
 
-    /// <summary>
-    /// Automatically calls IDisposable.Dispose() on any fields in the object
-    /// </summary>
-    public static void DisposeFields(this object target)
-    {
-        Log.Debug("reflective dispose");
-        var fields = target.GetType().GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-        var disposables = fields.Where(x => typeof(IDisposable).IsAssignableFrom(x.FieldType));
-
-        foreach (var field in disposables)
-        {
-            Log.Debug($"Disposing: {field.Name}:");
-            var disposable = (IDisposable)field.GetValue(target);
-            if (disposable is not null) disposable.Dispose();
-        }
-    }
-
     public static void ReplaceMaterialAtIndex(this SkinnedMeshRenderer smr, Material material, int index)
     {
         Log.Debug($"Setting {smr.name}[{index}] material to {material.name}");

@@ -8,9 +8,11 @@ namespace CarolCustomizer.Assets;
 public class OutfitAssetManager : IDisposable
 {
     public static Transform liveFolder { get; private set; }
+    //TODO: make these Events
     public static Action<Outfit> OnOutfitLoaded;
     public static Action<Outfit> OnOutfitUnloaded;
     public static Action OnOutfitSetLoaded;
+    public static Action OnOutfitSetUnloaded;
     public static Dictionary<string, Dictionary<string, HaDSOutfit>> outfitSets = new();
 
     public OutfitAssetManager(Transform parent)
@@ -37,6 +39,5 @@ public class OutfitAssetManager : IDisposable
     public void Dispose()
     {  
         GameObject.Destroy(liveFolder);
-        this.DisposeFields();
     }
 }

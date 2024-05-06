@@ -1,9 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using CarolCustomizer.Utils;
-using System.Globalization;
-using System.IO;
-using UnityEngine.UI;
 
 namespace CarolCustomizer.Assets;
 public class UIAssetLoader : IDisposable
@@ -54,7 +51,7 @@ public class UIAssetLoader : IDisposable
         Log.Info("UI unloaded.");
     }
 
-    private void Load()
+    void Load()
     {
         assetBundle = AssetBundle.LoadFromFile(Constants.UIAssetPath);
         if (!assetBundle) { Log.Error($"Failed to load TabbedUI AssetBundle from {Constants.AssetFolderPath}"); return; }

@@ -24,7 +24,6 @@ public class CarolInstance : IDisposable
 
     #region Events
     public Action<PelvisWatchdog> SpawnEvent { get; set; }
-    bool disposing = false;
     #endregion
 
     #region Lifecycle
@@ -36,16 +35,14 @@ public class CarolInstance : IDisposable
 
     public virtual void Dispose()
     {
-        disposing = true;
         outfitManager.Dispose();
-        this.DisposeFields();
+        skeletonManager.Dispose();
     }
     #endregion
 
     #region Notifications
     public virtual void NotifySpawned(PelvisWatchdog pelvis)
     {
-        if (disposing) { Log.Warning("Entered NotifySpawned during disposal"); return; }
         if (!pelvis) { Log.Error("Null pelviswatchdog on NotifySpawned()"); return; }
         if (pelvis == targetPelvis) { Log.Warning("PlayerManager was given its existing pelvis as a target."); }
         else
@@ -61,7 +58,6 @@ public class CarolInstance : IDisposable
 
     public bool RestorePrevious(PelvisWatchdog pelvis)
     {
-        if (disposing) { Log.Warning("Entered restoreprevios during disposal"); return false; }
         if (targetPelvis != pelvis) return false;
         if (previousTargets is null) return false;
         if (!previousTargets.Any(x => x)) return false;

@@ -5,17 +5,19 @@ using CarolCustomizer.Utils;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.TextCore.Text;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 internal class AutoSaver
 {
-
     OutfitManager outfitManager;
 
     public AutoSaver(PlayerCarolInstance player)
     {
         outfitManager = player.outfitManager;
         OutfitAssetManager.OnOutfitSetLoaded += Load;
+        SceneManager.activeSceneChanged
     }
 
     public void Save()
@@ -31,7 +33,7 @@ internal class AutoSaver
         CCPlugin.uiInstances.First().StartCoroutine(LoadRecipeRoutine(recipe));//TODO: put this on a proper gameobject
     }
 
-    private IEnumerator LoadRecipeRoutine(Recipe recipe)
+    IEnumerator LoadRecipeRoutine(Recipe recipe)
     {
         if (!outfitManager.pelvis) yield return new WaitUntil(() => outfitManager.pelvis);
         if (recipe is null 

@@ -1,6 +1,5 @@
 ﻿using BepInEx;
 using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
@@ -13,9 +12,7 @@ using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace CarolCustomizer;
 
@@ -27,7 +24,6 @@ public class CCPlugin : BaseUnityPlugin
     public static List<CarolInstance> playerManagers = new();
     public static List<UIInstance> uiInstances = new();
     public static CarolInstance cutscenePlayer;
-    private static UIAssetLoader uiAssetLoader;
     public static Action<CCPlugin> OnSetupComplete;
     public static GameManagerRewrite gmRewrite;
     public static RecipesManager recipesManager { get; private set; }
@@ -38,11 +34,12 @@ public class CCPlugin : BaseUnityPlugin
 
     #region Instance Components
     Harmony HarmonyInstance;
-    OutfitAssetManager dynamicAssetManager;
+    OutfitAssetManager outfitAssetManager;
     NPCInstanceCreator npcInstances;
     IntroCutsceneFixBehavior introFix;
     HaDSOutfitLoader outfitLoader;
     SaveDataAdjuster saveAdjuster;
+    UIAssetLoader uiAssetLoader;
     #endregion
 
     #region Setup
@@ -67,7 +64,7 @@ public class CCPlugin : BaseUnityPlugin
         uiAssetLoader = new();
 
         //Instantiate Dynamic Assets  
-        dynamicAssetManager = new(transform);
+        outfitAssetManager = new(transform);
         outfitLoader = new();
         introFix = new(this.gameObject);
         recipesManager = new(Constants.RecipeFolderPath);
@@ -122,7 +119,7 @@ public class CCPlugin : BaseUnityPlugin
     }
     #endregion
 
-    private void LoadInitialWatchdogs()
+    void LoadInitialWatchdogs()
     {
         if (MainMenuManager.manager)
         {
@@ -144,12 +141,17 @@ public class CCPlugin : BaseUnityPlugin
         }
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         Log.Info("Plugin OnDisable()");
         Config.Save();
         HarmonyInstance?.UnpatchSelf();
         Settings.Dispose();
-        this.DisposeFields();
+        foreach(var player in playerManagers) { if (player is not null) player.Dispose(); }
+        uiAssetLoader.Dispose();
+        outfitAssetManager.Dispose();
+        npcInstances.Dispose();
+        introFix.Dispose();
+        outfitLoader.Dispose();
     }
 }
