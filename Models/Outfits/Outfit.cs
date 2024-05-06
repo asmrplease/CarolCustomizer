@@ -15,7 +15,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
     #endregion
 
     #region Public Interface
-    virtual public string AssetName => storedAsset.name;
+    public string AssetName { get; protected set; }
     virtual public string DisplayName { get; private set; }
     virtual public Sprite Sprite => null;
     virtual public string Author => "Crimson Tales";
@@ -39,6 +39,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
         if (!storedAsset) { Log.Error("Outfit constructor was passed a null transform."); return; }
         Log.Debug($"Constructing {storedAsset.name}");
         this.storedAsset = storedAsset;
+        AssetName = storedAsset.name;
         DisplayName = LocalizationIndex.index.GetLine(this.storedAsset.gameObject.name).Replace("CAROL_", "");
 
         var pelvis = storedAsset.RecursiveFindTransform(x => x.name == "CarolPelvis");

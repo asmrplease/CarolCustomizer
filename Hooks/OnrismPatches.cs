@@ -59,4 +59,14 @@ public static class OnrismPatches
             return false;
         }
     }
+    [HarmonyPatch(typeof(CostumeSwapUI), nameof(CostumeSwapUI.ToggleAccessory))]
+    public class AccessoryTogglePatch
+    {
+        [HarmonyPrefix]
+        public static bool Prefix()
+        {
+            return false;
+        } 
+    }
+
 }

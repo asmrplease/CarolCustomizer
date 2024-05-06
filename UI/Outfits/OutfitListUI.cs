@@ -79,20 +79,20 @@ public class OutfitListUI : MonoBehaviour
         return this;
     }
 
-    private void OnDestroy()
+    void OnDestroy()
     {
         OutfitAssetManager.OnOutfitLoaded -= OnOutfitLoaded;
         OutfitAssetManager.OnOutfitUnloaded -= OnOutfitUnloaded;
         outfitManager.AccessoryChanged -= HandleAccessoryChanged;
     }
 
-    private void OnSearchBoxChanged(string searchString)
+    void OnSearchBoxChanged(string searchString)
     {
         this.searchString = searchString;
         ProcessFilters();
     }
 
-    private void ProcessFilters(bool unused = true)
+    void ProcessFilters(bool unused = true)
     {
         bool favorites = favoriteFilter.isOn;
         bool active = activeFilter.isOn;
@@ -122,8 +122,9 @@ public class OutfitListUI : MonoBehaviour
         { SetAccUIVisible(acc, true); }
     }
 
-    private void OnOutfitLoaded(Outfit outfit)
+    void OnOutfitLoaded(Outfit outfit)
     {
+        Log.Debug($"OutfitListUI.OnOutfitLoaded({outfit.AssetName})");
         var uiInstance = Instantiate(loader.OutfitListElement, listRoot);
         if (!uiInstance) { Log.Error("Failed to instantiate outfit UI prefab."); return; }
 
@@ -141,15 +142,16 @@ public class OutfitListUI : MonoBehaviour
         }
     }
 
-    private void OnOutfitUnloaded(Outfit outfit)
+    void OnOutfitUnloaded(Outfit outfit)
     {
+        Log.Debug($"OutfitList.OnOutfitUnloaded({outfit.AssetName})");
         if (!outfitUIs.ContainsKey(outfit)) { Log.Warning("UI instance was asked to remove a UI element that was not in it's dict"); return; }
         var outfitUI = outfitUIs[outfit];
         outfitUIs.Remove(outfit);
         Destroy(outfitUI.gameObject);
     }
 
-    private AccessoryUI BuildAccUI(AccessoryDescriptor accessoryDescriptor)
+    AccessoryUI BuildAccUI(AccessoryDescriptor accessoryDescriptor)
     {
         Outfit outfit = OutfitAssetManager.GetOutfitByAssetName(accessoryDescriptor.Source);
         Log.Debug($"BuildAccUI: source: {accessoryDescriptor.Source} outfit.assetname: {outfit.AssetName}");
@@ -163,10 +165,11 @@ public class OutfitListUI : MonoBehaviour
         if (!accUI) { Log.Error("Failed to add AccUI component"); return null; }
         accUI.Constructor(outfitUI, accessory, this, contextMenu, outfitManager);
         accessoryUIs[accessoryDescriptor] = accUI;
+        Log.Debug("Done"); 
         return accUI;
     }
 
-    private MaterialUI BuildMatUI(AccMatSlot location, MaterialDescriptor material)
+    MaterialUI BuildMatUI(AccMatSlot location, MaterialDescriptor material)
     {
         var accessoryUI = accessoryUIs[location.accessory];
         if (!accessoryUI) { accessoryUI = BuildAccUI(location.accessory); }
@@ -208,7 +211,7 @@ public class OutfitListUI : MonoBehaviour
         foreach (var mat in accessory.Materials) SetMatUIVisible(new AccMatSlot { accessory = accessory, index = index++ }, expanded);
     }
 
-    private void SetMatUIVisible(AccMatSlot material, bool visible)
+    void SetMatUIVisible(AccMatSlot material, bool visible)
     {
         var uiInstance = materialUIs[material];
         if (!visible) { uiInstance?.gameObject.SetActive(false); return; }
@@ -221,7 +224,7 @@ public class OutfitListUI : MonoBehaviour
         uiInstance.gameObject.SetActive(true);
     }
 
-    private void SetAccUIVisible(AccessoryDescriptor accessory, bool visible)
+    void SetAccUIVisible(AccessoryDescriptor accessory, bool visible)
     {
         if (!accessoryUIs.ContainsKey(accessory)) { Log.Warning($"Missing {accessory.Name}, {accessory.Source} is likely missing."); return; }
         var uiInstance = accessoryUIs[accessory];
@@ -237,9 +240,9 @@ public class OutfitListUI : MonoBehaviour
     }
 
     //TODO: there may be an issue here with some StoredAccessories not actually being unique enough on their own
-    private record AccMatSlot { public StoredAccessory accessory; public int index; }
+    record AccMatSlot { public StoredAccessory accessory; public int index; }
 
-    private void HandleAccessoryChanged(AccessoryChangedEvent e)
+    void HandleAccessoryChanged(AccessoryChangedEvent e)
     {
         Log.Debug("OutfitListUI.OnAccessoryStateChanged");
         if (!accessoryUIs.ContainsKey(e.Target)) { Log.Error($"Key {e.Target} was not found in dict."); return; }
@@ -257,7 +260,7 @@ public class OutfitListUI : MonoBehaviour
         }
     }
 
-    private void UnfavoriteAllAccessories()
+    void UnfavoriteAllAccessories()
     {
         foreach (var accessory in Settings.Favorites.favorites.ToList())
         {

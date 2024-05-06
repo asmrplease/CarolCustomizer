@@ -11,8 +11,6 @@ public class StoredAccessory : AccessoryDescriptor
     public readonly Outfit outfit;
     public readonly SkinnedMeshRenderer referenceSMR;
     public string DisplayName => Name.Split('_').Last();
-    public string GetName() => Name;
-    public string GetSource() => Source;
 
     public StoredAccessory(Outfit outfit, SkinnedMeshRenderer smr)
         : base(smr, outfit.AssetName)

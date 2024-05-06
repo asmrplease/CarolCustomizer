@@ -12,6 +12,7 @@ public class SaveDataAdjuster
         foreach (var save in SaveManager.manager.data)
         {
             save.players[0].inventory.outfit = Constants.Pyjamas;
+            save.players[0].inventory.accessory = 0;
         }
         Log.Info("Save file outfit overwritten.");
     }

@@ -34,7 +34,7 @@ public class LiveAccessory : AccessoryDescriptor
 
 
     public LiveAccessory(StoredAccessory acc, SkeletonManager skeleton, Transform folder)
-        : base(acc.GetName(), acc.GetSource())
+        : base(acc.Name, acc.Source)
     {
         this.skeleton = skeleton;
         this.folder = folder;

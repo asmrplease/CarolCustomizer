@@ -11,8 +11,8 @@ namespace CarolCustomizer.Models.Accessories;
 [Serializable]
 public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
 {
-    public string Name;
-    public string Source;
+    public readonly string Name;
+    public readonly string Source;
     public MaterialDescriptor[] Materials;
 
     [JsonConstructor]
@@ -56,7 +56,9 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return Name.DeInstance() == other.Name.DeInstance() && Source == other.Source && Materials.SequenceEqual(other.Materials);
+        return Name.DeInstance() == other.Name.DeInstance() 
+            && Source == other.Source 
+            && Materials.SequenceEqual(other.Materials);
     }
 
     public override bool Equals(object other)
