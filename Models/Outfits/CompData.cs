@@ -19,7 +19,7 @@ public class CompData : MonoBehaviour
     [SerializeField]
     public List<SkinnedMeshRenderer> allSMRs;
 
-    public SkinnedMeshRenderer BaseFace => allSMRs.FirstOrDefault(x => x.name == "tete");
+    public SkinnedMeshRenderer BaseFace => allSMRs.FirstOrDefault(x => x && x.name == "tete");
 
     Dictionary<Type, Component> parentComponents = new();
     public CoopModelToggle[] coopToggles { get; private set; }
