@@ -15,6 +15,9 @@ public class FaceCopier : MonoBehaviour
     CarolInstance playerManager;
     #endregion
 
+    HashSet<LiveFace> targets = new();
+    SkinnedMeshRenderer baseFace;
+
     #region Lifecycle
     public void Constructor(CarolInstance playerManager)
     {
@@ -25,17 +28,16 @@ public class FaceCopier : MonoBehaviour
 
     void OnOutfitUnloaded(Outfit outfit)
     {
-        targets.RemoveWhere(x => x.outfit == outfit);
+        targets.RemoveWhere(x => x is null || x.outfit == outfit);
     }
 
-    private void OnDestroy()
+    void OnDestroy()
     {
         playerManager.SpawnEvent -= UpdateBaseFace;
     }
     #endregion
 
     #region Source Management
-    SkinnedMeshRenderer baseFace;
     public void UpdateBaseFace(PelvisWatchdog watchdog)
     {
         this.baseFace = watchdog.CompData.BaseFace;
@@ -43,7 +45,6 @@ public class FaceCopier : MonoBehaviour
     #endregion
 
     #region Target Management
-    HashSet<LiveFace> targets = new();
     public void AddTarget(LiveFace target) => targets.Add(target);
 
     public void RemoveTarget(LiveFace target)
@@ -53,12 +54,12 @@ public class FaceCopier : MonoBehaviour
     #endregion
 
     #region Apply Source to Targets
-    private void Update()
+    void Update()
     {
         if (!baseFace) return;
         float[] values = baseFace.GetAllBlendshapes();
         
-        foreach (var target in targets.Where(x=>x.isActive))
+        foreach (var target in targets.Where(x=> x is not null && x.isActive))
         {
             target.SetAllBlendshapes(values);
         }

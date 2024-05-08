@@ -19,10 +19,9 @@ public class LiveAccessory : AccessoryDescriptor
 
     #region Public Interface
     public Transform[] bones => storedAcc.referenceSMR.bones;
-    public string RootBoneName => storedAcc.referenceSMR.rootBone?
-        storedAcc.referenceSMR.rootBone.name
-        :"CarolPelvis";
-    public Outfit outfit => storedAcc.outfit;
+    public string RootBoneName => storedAcc.referenceSMR.rootBone?.name ?? "CarolPelvis";
+
+    public Outfit outfit => storedAcc?.outfit;
 
     public Action OnAccessoryStateChanged;
 
@@ -30,8 +29,11 @@ public class LiveAccessory : AccessoryDescriptor
 
     virtual public void Disable() => liveSMR.gameObject.SetActive(false);
 
-    public bool isActive => liveSMR.gameObject.activeSelf;
-
+    public bool isActive { get 
+        { 
+            if (liveSMR) return liveSMR.gameObject.activeSelf;
+            return false;
+        } }
 
     public LiveAccessory(StoredAccessory acc, SkeletonManager skeleton, Transform folder)
         : base(acc.Name, acc.Source)
