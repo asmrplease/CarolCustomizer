@@ -149,6 +149,22 @@ public class OutfitListUI : MonoBehaviour
         Destroy(outfitUI.gameObject);
     }
 
+    public void OnAccessoryUnloaded(StoredAccessory accessory)
+    {
+        if (!accessoryUIs.TryGetValue(accessory, out var accUI)) return;
+        accessoryUIs.Remove(accessory);
+        int i = 0;
+        foreach (var mat in accessory.Materials)
+        {
+            materialUIs.TryGetValue(new AccMatSlot(accessory, i++), out var matUI);
+            if (!matUI) continue;
+            GameObject.Destroy(matUI.gameObject);
+            Log.Debug($"Removed {mat.Name}'s UI element");
+        }
+        Log.Debug($"Removed {accessory.DisplayName}'s UI element");
+
+    }
+
     AccessoryUI BuildAccUI(AccessoryDescriptor accessoryDescriptor)
     {
         Outfit outfit = OutfitAssetManager.GetOutfitByAssetName(accessoryDescriptor.Source);
@@ -195,7 +211,7 @@ public class OutfitListUI : MonoBehaviour
 
     public void OnMaterialLoaded(StoredAccessory accessory, MaterialDescriptor material, int index)
     {
-        materialUIs[new AccMatSlot { accessory = accessory, index = index }] = null;
+        materialUIs[new AccMatSlot (accessory, index)] = null;
     }
 
     public void SetOutfitExpanded(Outfit outfit, bool expanded)
@@ -206,7 +222,7 @@ public class OutfitListUI : MonoBehaviour
     public void SetAccessoryExpanded(StoredAccessory accessory, bool expanded)
     {
         int index = 0;
-        foreach (var mat in accessory.Materials) SetMatUIVisible(new AccMatSlot { accessory = accessory, index = index++ }, expanded);
+        foreach (var mat in accessory.Materials) SetMatUIVisible(new AccMatSlot(accessory, index++), expanded);
     }
 
     void SetMatUIVisible(AccMatSlot material, bool visible)
@@ -237,9 +253,6 @@ public class OutfitListUI : MonoBehaviour
         uiInstance.gameObject.SetActive(true);
     }
 
-    //TODO: there may be an issue here with some StoredAccessories not actually being unique enough on their own
-    record AccMatSlot { public StoredAccessory accessory; public int index; }
-
     void HandleAccessoryChanged(AccessoryChangedEvent e)
     {
         Log.Debug("OutfitListUI.OnAccessoryStateChanged");
@@ -251,7 +264,7 @@ public class OutfitListUI : MonoBehaviour
         int index = 0;
         foreach (var materialState in e.State.Materials)
         {
-            var accMatSlot = new AccMatSlot { accessory = e.Target, index = index };
+            var accMatSlot = new AccMatSlot(e.Target, index);
             if (!materialUIs[accMatSlot]) BuildMatUI(accMatSlot, e.Target.Materials[index]);
             materialUIs[accMatSlot].UpdateActiveMaterial(materialState);
             index++;
@@ -267,5 +280,19 @@ public class OutfitListUI : MonoBehaviour
             Log.Debug($"Unfavoriting {accessory}");
             ui.SetFavorite(false);
         }
+    }
+
+    //TODO: there may be an issue here with some StoredAccessories not actually being unique enough on their own
+    record AccMatSlot
+    {
+        public StoredAccessory accessory; 
+        public int index; 
+        public AccMatSlot(StoredAccessory accessory, int index)
+        {
+            this.accessory = accessory;
+            this.index = index;
+        }
+
+
     }
 }

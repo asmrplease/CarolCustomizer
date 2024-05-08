@@ -43,7 +43,7 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
     #endregion
 
     #region Lists
-    private List<MaterialUI> materials = new();
+    List<MaterialUI> materials = new();
     #endregion
 
     public string DisplayName => accessory.DisplayName;
@@ -99,18 +99,18 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
         if (eventData.button == PointerEventData.InputButton.Left) { OnLeftClick(); return; }
     }
 
-    private void OnLeftClick()
+    void OnLeftClick()
     {
         expanded.Flip();
         SetMaterialVisibity(expanded);
     }
 
-    private void SetMaterialVisibity(bool state)
+    void SetMaterialVisibity(bool state)
     {
         ui.SetAccessoryExpanded(accessory, state);
     }
 
-    private void OnContextClick() => contextMenu.Show(this);
+    void OnContextClick() => contextMenu.Show(this);
 
     public void OnToggle(bool state)
     {

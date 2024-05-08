@@ -35,7 +35,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     #endregion
 
     #region State Variables
-    private List<AccessoryUI> Accessories = new();
+    List<AccessoryUI> Accessories = new();
     public bool expanded = false;
     #endregion
 
@@ -93,7 +93,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         var hads = outfit as HaDSOutfit; //TODO: idk, but not this
-        var results = new List<(string, UnityAction)>() 
+        var results = new List<(string, UnityAction)>()
         {
             ("Use Animator",     () => ui.playerManager.outfitManager.SetAnimator(outfit)),
             ("Use Measurements", () => ui.playerManager.outfitManager.SetConfiguration(hads))
@@ -106,4 +106,13 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         return results;
     }
     #endregion
+
+    void OnDestroy()
+    {
+        foreach(var accUI in Accessories)
+        {
+            ui.OnAccessoryUnloaded(accUI.accessory);
+            GameObject.Destroy(accUI.gameObject);
+        }
+    }
 }
