@@ -46,7 +46,7 @@ public class PlayerWatchdog : PelvisWatchdog
         carolEntity.SwapModel(outfit.storedAsset.gameObject);
     }
 
-    pIEnumerator LockRoutine(float initialDelay = 0f)
+    IEnumerator LockRoutine(float initialDelay = 0f)
     {
         float speed = LockSpeed * Settings.Plugin.MenuSpeed;
         Log.Debug($"Locking player, speed: {speed}");
