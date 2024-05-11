@@ -26,7 +26,7 @@ public class SkeletonManager : IDisposable
             .SkeletonToList()
             .ToDictionary(keySelector: x => x.name, elementSelector: x => x);
         foreach (var bone in HairBones) { CommonBones.Remove(bone); }
-        Log.Info($"Found {CommonBones.Count} of expected 69 standard bones.");
+        Log.Info($"Found {CommonBones.Count} of expected 60 standard bones.");
     }
     #endregion
 
@@ -58,7 +58,6 @@ public class SkeletonManager : IDisposable
         UnityEngine.Object.Destroy(faceCopier);
     }
     #endregion
-
 
     #region Public Interface
     public void AssignLiveBones(LiveAccessory acc)

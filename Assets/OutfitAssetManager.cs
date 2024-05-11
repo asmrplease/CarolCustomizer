@@ -23,6 +23,8 @@ public class OutfitAssetManager : IDisposable
         liveFolder.position = Constants.OutOfTheWay;
     }
 
+    public static HaDSOutfit GetPyjamas() => GetOutfitByAssetName(Constants.Pyjamas);
+
     public static HaDSOutfit GetOutfitByAssetName(string assetName)
     {
         if (outfitSets is null) { Log.Error("outfitSets was null when searching for asset"); return null; }

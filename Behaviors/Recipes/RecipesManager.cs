@@ -41,7 +41,6 @@ public class RecipesManager : IDisposable
         Application.quitting += Dispose;
     }
 
-
     public void Dispose()
     {
         watcher.EnableRaisingEvents = false;
@@ -59,7 +58,7 @@ public class RecipesManager : IDisposable
         }
     }
 
-    private void OnRecipeFileCreated(Recipe newRecipe)
+    void OnRecipeFileCreated(Recipe newRecipe)
     {
         Log.Debug($"OnRecipeFileCreated({newRecipe.Name})");
         recipes[newRecipe.Path] = newRecipe;
@@ -67,14 +66,14 @@ public class RecipesManager : IDisposable
         OnRecipeCreated?.Invoke(newRecipe);
     }
 
-    private void OnRecipeFileRemoved(Recipe removedRecipe)
+    void OnRecipeFileRemoved(Recipe removedRecipe)
     {
         Log.Debug($"OnRecipeFileRemoved({removedRecipe.Name})");
         recipes.Remove(removedRecipe.Path);
         OnRecipeDeleted?.Invoke(removedRecipe);
     }
 
-    private void HandleRecipeFileCreated(object sender, FileSystemEventArgs e)
+    void HandleRecipeFileCreated(object sender, FileSystemEventArgs e)
     {
         Log.Debug("HandleRecipeFileCreated");
         var newRecipe = new Recipe(e.FullPath);
@@ -82,21 +81,21 @@ public class RecipesManager : IDisposable
         OnRecipeFileCreated(newRecipe);
     }
 
-    private void HandleRecipeFileChanged(object sender, FileSystemEventArgs e)
+    void HandleRecipeFileChanged(object sender, FileSystemEventArgs e)
     {
         Log.Debug("HandleRecipeFileChanged");
         OnRecipeFileRemoved(recipes[e.FullPath]);
         OnRecipeFileCreated(new Recipe(e.FullPath));
     }
 
-    private void HandleRecipeFileRenamed(object sender, RenamedEventArgs e)
+    void HandleRecipeFileRenamed(object sender, RenamedEventArgs e)
     {
         Log.Debug("HandleRecipeFileRenamed");
         OnRecipeFileRemoved(recipes[e.OldName]);
         OnRecipeFileCreated(new Recipe(e.FullPath));
     }
 
-    private void HandleRecipeFileRemoved(object sender, FileSystemEventArgs e)
+    void HandleRecipeFileRemoved(object sender, FileSystemEventArgs e)
     {
         Log.Debug("HandleRecipeFileRemoved");
         if (!recipes.ContainsKey(e.FullPath)) return;

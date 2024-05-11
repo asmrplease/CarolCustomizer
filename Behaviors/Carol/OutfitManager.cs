@@ -53,7 +53,7 @@ public class OutfitManager : IDisposable
     {
         this.skeletonManager = skeletonManager;
         playerManager = player;
-        animatorSource = configurationSource = OutfitAssetManager.GetOutfitByAssetName(Constants.Pyjamas);
+        animatorSource = configurationSource = OutfitAssetManager.GetPyjamas();
 
         playerManager.SpawnEvent += RefreshSMRs;
         playerManager.SpawnEvent += OnSpawn;
@@ -170,7 +170,7 @@ public class OutfitManager : IDisposable
         pelvis.SetHeightOffset(configurationSource.modelData.height);
     }
 
-    private void OnOutfitUnloaded(Outfit outfit)
+    void OnOutfitUnloaded(Outfit outfit)
     {
         foreach (var storedAcc in outfit.Accessories)
         {

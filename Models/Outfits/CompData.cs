@@ -52,7 +52,7 @@ public class CompData : MonoBehaviour
         return this;
     }
 
-    private void SetCoopVariants()
+    void SetCoopVariants()
     {
         foreach (int i in Range(0, Constants.MaxCoopPlayers))
         {

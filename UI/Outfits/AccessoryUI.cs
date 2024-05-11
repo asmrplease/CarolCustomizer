@@ -2,7 +2,6 @@
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Accessories;
-using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;

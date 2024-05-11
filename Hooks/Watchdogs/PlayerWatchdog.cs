@@ -3,7 +3,6 @@ using CarolCustomizer.Utils;
 using System.Collections;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Settings;
-using CarolCustomizer.Assets;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PlayerWatchdog : PelvisWatchdog
@@ -47,7 +46,7 @@ public class PlayerWatchdog : PelvisWatchdog
         carolEntity.SwapModel(outfit.storedAsset.gameObject);
     }
 
-    private IEnumerator LockRoutine(float initialDelay = 0f)
+    pIEnumerator LockRoutine(float initialDelay = 0f)
     {
         float speed = LockSpeed * Settings.Plugin.MenuSpeed;
         Log.Debug($"Locking player, speed: {speed}");
@@ -76,7 +75,7 @@ public class PlayerWatchdog : PelvisWatchdog
         yield break;
     }
 
-    private IEnumerator UnlockRoutine()
+    IEnumerator UnlockRoutine()
     {
         float speed = UnlockSpeed * Settings.Plugin.MenuSpeed;
         Log.Debug("Unlocking player");
@@ -103,7 +102,7 @@ public class PlayerWatchdog : PelvisWatchdog
     {
         if (this.compData?.Animator is null) { Log.Warning($"null animator when trying to set animator on {this}"); return; }
         Log.Debug($"Setting animator from {outfit.DisplayName}");
-        var animator = outfit?.compData?.Controller;
+        var animator = outfit?.RuntimeAnimator;
         if (!animator) { Log.Warning("failed to get animator from outfit"); return; }
 
         this.compData.Animator.runtimeAnimatorController = animator;

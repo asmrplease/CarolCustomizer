@@ -20,6 +20,8 @@ public class Outfit : IDisposable, IComparable<Outfit>
     virtual public Sprite Sprite => null;
     virtual public string Author => "Crimson Tales";
 
+    virtual public RuntimeAnimatorController RuntimeAnimator => null;
+
     protected Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = new();
 
     public List<StoredAccessory> Accessories => AccDict.Values.ToList();

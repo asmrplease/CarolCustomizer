@@ -10,7 +10,7 @@ public class HaDSOutfit : Outfit
 {
     #region ModelData Handling 
     public override Sprite Sprite => modelData.portraitShop;
-
+    public override RuntimeAnimatorController RuntimeAnimator => modelData?.controller;
     public ModelData modelData { get; protected set; }
 
     public Dictionary<string, List<StoredAccessory>> Variants { get; private set; } = new();
@@ -27,7 +27,7 @@ public class HaDSOutfit : Outfit
         Log.Debug("HaDS Variants");
         foreach (int i in Range(0, modelData.accessories.Count))
         {
-            if (compData. coopToggles.Count() == 0)
+            if (compData.coopToggles.Count() == 0)
             {
                 Variants[modelData.accessories[i].name] = BuildVariant(i, -1);
                 continue;
@@ -40,7 +40,7 @@ public class HaDSOutfit : Outfit
         }
     }
 
-    private List<StoredAccessory> BuildVariant(int accessoryGroup, int coopToggle)
+    List<StoredAccessory> BuildVariant(int accessoryGroup, int coopToggle)
     {
         var results = Accessories.ToDictionary(x=>x, y=>true);
 
