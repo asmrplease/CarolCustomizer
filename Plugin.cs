@@ -110,7 +110,6 @@ public class CCPlugin : BaseUnityPlugin
         Log.Debug("starting hads coroutine");
         OutfitAssetManager.OnOutfitSetLoaded += LoadInitialWatchdogs;
         StartCoroutine(outfitLoader.LoadAllHaDSOutfits());
-        StartCoroutine(SaveDataAdjuster.EnsurePyjamas());
 
         Log.Debug("Invoking CCPlugin.Start() callbacks");
         OnSetupComplete?.Invoke(this);

@@ -50,8 +50,11 @@ public static class OnirismPatches
             Log.Debug($"CostumeSwapUI: {modelData.name}");
 
             RecipeApplier.ActivateFirstVariant(
-                CCPlugin.cutscenePlayer.outfitManager,
-                OutfitAssetManager.GetOutfitByAssetName(modelData.name).AssetName);
+                CCPlugin
+                    .cutscenePlayer
+                    .outfitManager,
+                OutfitAssetManager
+                    .GetOutfitByAssetName(modelData.name).AssetName);
             return false;
         }
     }
@@ -63,6 +66,13 @@ public static class OnirismPatches
         {
             return false;
         } 
+    }
+
+    [HarmonyPatch(typeof(SaveManager), nameof(SaveManager.Load))]
+    public static class SetPyjamasInSave
+    {
+        [HarmonyPostfix]
+        public static void Postfix() => SaveDataAdjuster.SetPyjamas();
     }
 
 }
