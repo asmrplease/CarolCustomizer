@@ -7,7 +7,7 @@ using CarolCustomizer.Assets;
 
 namespace CarolCustomizer.Hooks;
 
-public static class OnrismPatches
+public static class OnirismPatches
 {
     [HarmonyPatch(typeof(Projectile), "OnTriggerEnter")]
     public class ProjectileCollision
