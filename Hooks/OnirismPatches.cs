@@ -48,9 +48,6 @@ public static class OnirismPatches
                 out var modelData);
             if (!modelData) return false;
             Log.Debug($"CostumeSwapUI: {modelData.name}");
-            int variant = SaveManager
-                .manager.data[SaveManager.manager.saveSlotCurrent]
-                .players[0].inventory.accessory;//TODO: this line will fail in coop
 
             RecipeApplier.ActivateFirstVariant(
                 CCPlugin.cutscenePlayer.outfitManager,
