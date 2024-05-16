@@ -42,8 +42,6 @@ public static class OnirismExtensions
     {
         if (MultiplayerManager.manager?.players is null) return null;
         if (!virtualCarol) return null;
-        //Log.Debug($"Getting Player: {virtualCarol.name} from:");
-        //foreach (var mp in MultiplayerManager.manager.players) { Log.Debug(mp.name); } 
         return MultiplayerManager.manager.players
             .FirstOrDefault(x => x.player == virtualCarol.entity);
     }
