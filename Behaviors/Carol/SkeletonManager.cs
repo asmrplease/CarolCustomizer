@@ -84,6 +84,7 @@ public class SkeletonManager : IDisposable
     #region Private Implementation
     void SetNewPelvis(PelvisWatchdog newPelvis)
     {
+        if (newPelvis == targetPelvis) { Log.Debug("SkeletonManager was given it's existing pelvis"); return; }
         targetPelvis = newPelvis;
 
         var activeOutfits = playerManager.outfitManager.ActiveOutfits;
@@ -97,13 +98,17 @@ public class SkeletonManager : IDisposable
 
         if (!head) { Log.Warning("didn't find dyn component on head"); }
         headDynamicBone = head;
+
+        Log.Debug("SkeletonManager.SetNewPelvis() AddBespokeBones");
         foreach (var outfit in activeOutfits) { AddBespokeBones(outfit); }
     }
 
     Dictionary<string, Transform> AddBespokeBones(Outfit outfit)
     {
+        Log.Debug($"AddBespokeBones({outfit.DisplayName})");
         if (outfitBoneDicts.TryGetValue(outfit, out var dict)) return dict;
-        
+
+        Log.Debug("Adding bones");
         Dictionary<string, Transform> boneDict = new();
         foreach (var bespokeBone in outfit.boneData.BespokeBones)
         {
