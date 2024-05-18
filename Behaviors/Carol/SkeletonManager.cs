@@ -64,7 +64,7 @@ public class SkeletonManager : IDisposable
     {
         if (acc is null) { Log.Error("Requested bones for null accessory"); return; }
         outfitBoneDicts.TryGetValue(acc.outfit, out var bespokeDict);
-        if (bespokeDict is null) bespokeDict = AddBespokeBones(acc.outfit);
+        bespokeDict ??= AddBespokeBones(acc.outfit);
 
         var referenceBones = acc.bones;
         Transform[] liveBones = new Transform[referenceBones.Length];
@@ -73,11 +73,15 @@ public class SkeletonManager : IDisposable
         {
             if (!referenceBones[i]) { Log.Warning($"No input bone at index {i}."); continue; }
             string boneName = referenceBones[i].name;
-            if (bespokeDict.ContainsKey(boneName)) { liveBones[i] = bespokeDict[boneName]; continue; }
+            if (bespokeDict.ContainsKey(boneName))       { liveBones[i] = bespokeDict[boneName]; continue; }
             if (liveStandardBones.ContainsKey(boneName)) { liveBones[i] = liveStandardBones[boneName]; continue; }
         }
+        Transform rootBone = null;
+        if (liveStandardBones.ContainsKey(acc.RootBoneName)) rootBone = liveStandardBones[acc.RootBoneName];
+        if (bespokeDict.ContainsKey(acc.RootBoneName)) rootBone = bespokeDict[acc.RootBoneName];
+        rootBone ??= liveStandardBones["CarolPelvis"];
 
-        acc.SetLiveBones(liveBones, liveStandardBones[acc.RootBoneName]);
+        acc.SetLiveBones(liveBones, rootBone);
     }
     #endregion
 

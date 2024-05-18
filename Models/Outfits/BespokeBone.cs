@@ -10,7 +10,7 @@ namespace CarolCustomizer.Models.Outfits;
 public class BespokeBone
 {
     #region Static Parent Folder
-    private static Transform cleanFolder;
+    static Transform cleanFolder;
     public static void SetCleanFolder(Transform folder)
     {
         if (cleanFolder) { Log.Error("Tried to reset clean folder"); return; }
@@ -33,7 +33,9 @@ public class BespokeBone
     {
         this.referenceBone = referenceBone;
 
-        cleanedBone = UnityEngine.Object.Instantiate(referenceBone, cleanFolder);
+        cleanedBone = GameObject.Instantiate(referenceBone, cleanFolder);
+
+        cleanedBone.GetComponentsInChildren<Behaviour>();
         var unusualComponents = cleanedBone.GetComponentsInChildren<Component>(true);
         foreach (var component in unusualComponents.
             Where(x => x.GetType() != typeof(Transform)
@@ -41,7 +43,7 @@ public class BespokeBone
                     && x.GetType() != typeof(RectTransform)
                  ))
         {
-            UnityEngine.Object.Destroy(component);
+            GameObject.Destroy(component);
         }
     }
     #endregion

@@ -15,7 +15,6 @@ public class BoneData : MonoBehaviour
     List<Transform> standardBones;
 
     public Dictionary<string, Transform> StandardBones => standardBones.ToDictionaryOverwrite(x => x.name);
-    //public Dictionary<string, Transform> StandardBones => standardBones.ToDictionaryRename(x => x.name, x=> x.name += "2");
     public List<BespokeBone> BespokeBones { get; private set; } = new();
 
     public BoneData Constructor()
