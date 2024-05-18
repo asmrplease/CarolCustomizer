@@ -86,5 +86,4 @@ public static class OnirismPatches
         [HarmonyPostfix]
         public static void Postfix() => SaveDataAdjuster.SetPyjamas();
     }
-
 }

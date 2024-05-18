@@ -60,8 +60,7 @@ internal static class AccessoryDissolver
         [HarmonyPostfix]
         static void Postfix(Entity.DeathType deathType, Entity __instance)
         {
-            Log.Warning("Die postfix");
-            Log.Debug(Enum.GetName(typeof(Entity.DeathType), deathType));
+            Log.Debug("Die postfix");
             if (!(deathType == Entity.DeathType.Fire || deathType == Entity.DeathType.InstantFire)) return;
 
             var player = CCPlugin.playerManagers.FirstOrDefault(x=>x.ManagesPlayer(__instance));
