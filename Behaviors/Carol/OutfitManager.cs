@@ -8,6 +8,7 @@ using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Carol;
 /// <summary>
@@ -100,6 +101,12 @@ public class OutfitManager
         liveAccessories[accessory].ApplyMaterial(material, index);
         var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, true));
+    }
+
+    public void PaintAccessoryShared(StoredAccessory accessory, List<Material> materials)
+    {
+        EnableAccessory(accessory);
+        liveAccessories[accessory].ApplySharedMaterials(materials);
     }
 
     public MaterialDescriptor[] GetLiveMaterials(StoredAccessory accessory)

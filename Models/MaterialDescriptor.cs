@@ -34,7 +34,8 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>
     public enum SourceType
     {
         AssetBundle = 0,
-        World = 1
+        World = 1,
+        Resources = 2
     }
 
     public bool Equals(MaterialDescriptor other)

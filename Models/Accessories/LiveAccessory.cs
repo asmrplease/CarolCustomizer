@@ -2,6 +2,8 @@
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Models.Accessories;
@@ -71,6 +73,11 @@ public class LiveAccessory : AccessoryDescriptor
         Materials[index] = material;
         liveSMR.ReplaceMaterialAtIndex(material.referenceMaterial, index);
         Log.Debug($"The material is now {liveSMR.materials[index]}.");
+    }
+
+    internal void ApplySharedMaterials(List<Material> materials)
+    {
+        liveSMR.SetSharedMaterials(materials);
     }
 
     public void DestroyGameObject()

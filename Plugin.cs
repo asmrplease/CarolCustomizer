@@ -21,7 +21,8 @@ namespace CarolCustomizer;
 public class CCPlugin : BaseUnityPlugin
 {
     #region Static Global Components
-    public static List<CarolInstance> playerManagers = new();
+    public static MonoBehaviour CoroutineRunner;
+    public static List<PlayerCarolInstance> playerManagers = new();
     public static List<UIInstance> uiInstances = new();
     public static CarolInstance cutscenePlayer;
     public static Action<CCPlugin> OnSetupComplete;
@@ -47,6 +48,7 @@ public class CCPlugin : BaseUnityPlugin
     {
         new Log(Logger);
         Log.Message("Logger Ready!");
+        CoroutineRunner = this;
 
         Settings.Constructor(Config);
         saveAdjuster = new();
