@@ -58,6 +58,7 @@ public static class OnirismPatches
             return false;
         }
     }
+
     [HarmonyPatch(typeof(CostumeSwapUI), nameof(CostumeSwapUI.ToggleAccessory))]
     public class AccessoryTogglePatch
     {
@@ -66,6 +67,17 @@ public static class OnirismPatches
         {
             return false;
         } 
+    }
+
+    [HarmonyPatch(typeof(SwapCostumeTrigger), "OnTriggerEnter")]
+    public class DisableSwapCostumeTrigger
+    {
+        [HarmonyPrefix]
+        public static bool Prefix(Collider intrus)
+        {
+            var entity = intrus.GetComponent<Entity>();
+            return !CCPlugin.playerManagers.Any(x => x.ManagesPlayer(entity));
+        }
     }
 
     [HarmonyPatch(typeof(SaveManager), nameof(SaveManager.Load))]
