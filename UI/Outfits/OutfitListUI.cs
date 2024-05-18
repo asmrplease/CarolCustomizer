@@ -65,7 +65,6 @@ public class OutfitListUI : MonoBehaviour
         favoriteFilter.onValueChanged.AddListener(ProcessFilters);
         activeFilter = transform.Find(filtersAddress + "/Active").GetComponent<Toggle>();
         activeFilter.onValueChanged.AddListener(ProcessFilters);
-        
 
         listRoot = transform.Find(listRootAddress);
 
@@ -162,7 +161,6 @@ public class OutfitListUI : MonoBehaviour
             Log.Debug($"Removed {mat.Name}'s UI element");
         }
         Log.Debug($"Removed {accessory.DisplayName}'s UI element");
-
     }
 
     AccessoryUI BuildAccUI(AccessoryDescriptor accessoryDescriptor)
@@ -292,7 +290,5 @@ public class OutfitListUI : MonoBehaviour
             this.accessory = accessory;
             this.index = index;
         }
-
-
     }
 }

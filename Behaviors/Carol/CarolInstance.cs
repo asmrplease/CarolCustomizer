@@ -35,7 +35,6 @@ public class CarolInstance : IDisposable
 
     public virtual void Dispose()
     {
-        outfitManager.Dispose();
         skeletonManager.Dispose();
     }
     #endregion

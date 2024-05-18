@@ -8,6 +8,7 @@ using static System.Linq.Enumerable;
 namespace CarolCustomizer.Models.Outfits;
 public class CompData : MonoBehaviour
 {
+    static HashSet<string> foundComponents = new HashSet<string>();
     [SerializeField]
     RuntimeAnimatorController controller;
     public RuntimeAnimatorController Controller => controller;
@@ -49,6 +50,7 @@ public class CompData : MonoBehaviour
         SetCoopVariants();
         coopToggles.ForEach(x => x.enabled = false);
         RefreshParentComponents();
+        //ListChildComponents();
         return this;
     }
 
@@ -78,6 +80,14 @@ public class CompData : MonoBehaviour
     {
         parentComponents = GetComponentsInParent<Component>(true)
             .ToDictionaryOverwrite(x => x.GetType());
+    }
+
+    void ListChildComponents()
+    {
+        GetComponentsInChildren<Component>(true)
+            .Select(x => x.GetType().Name)
+            .ForEach(
+                x=> foundComponents.Add(x));
     }
 
     public void SetRAC(RuntimeAnimatorController controller)

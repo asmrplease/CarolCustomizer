@@ -13,7 +13,7 @@ namespace CarolCustomizer.Behaviors.Carol;
 /// <summary>
 /// Responsible for the clothing of one Carol Instance. 
 /// </summary>
-public class OutfitManager : IDisposable
+public class OutfitManager 
 {
     #region Dependencies
     SkeletonManager skeletonManager;
@@ -28,7 +28,7 @@ public class OutfitManager : IDisposable
 
     #region Public Interface
     public PelvisWatchdog pelvis { get; private set; }
-    public Action<AccessoryChangedEvent> AccessoryChanged;
+    public event Action<AccessoryChangedEvent> AccessoryChanged;
     public string AnimatorSource => animatorSource?.AssetName ?? Constants.Pyjamas;
     public string ConfigurationSource => configurationSource?.AssetName ?? Constants.Pyjamas;
 
@@ -63,12 +63,6 @@ public class OutfitManager : IDisposable
 
     void DebugAccChanged(AccessoryChangedEvent e) => Log.Debug(e.ToString());
 
-    public void Dispose()
-    {
-        //SetBaseVisibility(true);//Ensure the player is visible when we leave. 
-        Log.Debug("OutfitManager.Dispose() complete.");
-    }
-
     void RefreshSMRs(PelvisWatchdog pelvis)
     {
         foreach (var accessory in ActiveAccessories) { liveAccessories[accessory].Refresh(); }
@@ -84,12 +78,6 @@ public class OutfitManager : IDisposable
             live.Refresh();
         }
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, live, true));
-    }
-
-    public bool IsEnabled(StoredAccessory accessory)
-    {
-        if (!liveAccessories.ContainsKey(accessory)) { return false; }
-        return liveAccessories[accessory].isActive;
     }
 
     public void DisableAccessory(StoredAccessory accessory)
@@ -133,17 +121,10 @@ public class OutfitManager : IDisposable
     void OnSpawn(PelvisWatchdog pelvis)
     {
         this.pelvis = pelvis;
-        HideBase();
+        pelvis.SetBaseVisibility(false);
         if (animatorSource is null) return;
         SetAnimator(animatorSource);
         ApplyConfig();
-    }
-
-    public void HideBase() => SetBaseVisibility(false);
-
-    public void SetBaseVisibility(bool visible)
-    {
-        if (pelvis) pelvis.SetBaseVisibility(visible);
     }
 
     public void SetAnimator(Outfit outfit)
@@ -174,9 +155,9 @@ public class OutfitManager : IDisposable
     {
         foreach (var storedAcc in outfit.Accessories)
         {
-            if (!liveAccessories.ContainsKey(storedAcc)) continue;
-            var liveAcc = liveAccessories[storedAcc];
-            if (liveAcc is not null) { liveAcc.DestroyGameObject(); }
+            liveAccessories.TryGetValue(storedAcc, out var liveAcc);
+            if (liveAcc is null) continue;
+            liveAcc.DestroyGameObject();
             liveAccessories.Remove(storedAcc);
         }
     }
