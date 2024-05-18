@@ -3,6 +3,7 @@ using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Utils;
 using HarmonyLib;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,13 +13,17 @@ using static System.Linq.Enumerable;
 namespace CarolCustomizer.Behaviors;
 internal static class AccessoryDissolver
 {
+    const string DissolveAmount = "_DissolveAmount";
+    const string FireDissolveAddress = "Materials/Deathdissolvefire";
+    
     static Coroutine ActiveDissolve;
     static bool SceneExitComplete = false;
-    const string DissolveAmount = "_DissolveAmount";
+    static Material FireDissolve;
 
     static AccessoryDissolver()
     {
         SceneManager.activeSceneChanged += HandleSceneChanged;
+        FireDissolve = Resources.Load<Material>(FireDissolveAddress);
     }
 
     static void HandleSceneChanged(Scene arg0, Scene arg1)
@@ -46,6 +51,26 @@ internal static class AccessoryDissolver
                 .CoroutineRunner
                 .StartCoroutine(
                     Dissolve(player.outfitManager, __instance.dissolveMaterial, __instance.dissolveTime));
+        }
+    }
+
+    [HarmonyPatch(typeof(Entity), "Die")]
+    class DeathPatch
+    {
+        [HarmonyPostfix]
+        static void Postfix(Entity.DeathType deathType, Entity __instance)
+        {
+            Log.Warning("Die postfix");
+            Log.Debug(Enum.GetName(typeof(Entity.DeathType), deathType));
+            if (!(deathType == Entity.DeathType.Fire || deathType == Entity.DeathType.InstantFire)) return;
+
+            var player = CCPlugin.playerManagers.FirstOrDefault(x=>x.ManagesPlayer(__instance));
+            if (player is null) return;
+
+            ActiveDissolve = CCPlugin
+                .CoroutineRunner
+                .StartCoroutine(
+                    Dissolve(player.outfitManager, FireDissolve, 0.25f));
         }
     }
 
