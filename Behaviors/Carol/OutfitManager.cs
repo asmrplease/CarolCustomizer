@@ -161,10 +161,10 @@ public class OutfitManager
     public void SetEffects(Outfit outfit, bool enabled)
     {
         if (!pelvis || outfit is null) return;
-        if (!outfit.compData.OutfitEffects.Any()) return;
+        if (!outfit.Effects.Any()) return;
 
         skeletonManager.AddBespokeBones(outfit);
-        foreach (var effect in outfit.compData.OutfitEffects)
+        foreach (var effect in outfit.Effects)
         {
             var transform = pelvis.transform.Find(effect.RelativePath);
             switch (effect.Type)

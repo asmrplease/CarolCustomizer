@@ -2,7 +2,6 @@
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +13,11 @@ using UnityEngine.UI;
 namespace CarolCustomizer.UI.Outfits;
 public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
+    #region Addresses
+    static readonly string displayImageAddress = "Outfit Header/Icon";
+    static readonly string outfitNameAddress = "Outfit Header/Text/Outfit Name";
+    static readonly string pickupLocationAddress = "Outfit Header/Text/Pickup Location";
+    #endregion
 
     #region Dependencies
     public Outfit outfit { get; private set; }
@@ -22,16 +26,10 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     #endregion
 
     #region Component Refrerences
-    private Image background;
-    private Image displayImage;
-    private Text displayName;
-    private Text pickupLocation;
-    #endregion
-
-    #region Addresses
-    static readonly string displayImageAddress = "Outfit Header/Icon";
-    static readonly string outfitNameAddress = "Outfit Header/Text/Outfit Name";
-    static readonly string pickupLocationAddress = "Outfit Header/Text/Pickup Location";
+    Image background;
+    Image displayImage;
+    Text displayName;
+    Text pickupLocation;
     #endregion
 
     #region State Variables
@@ -76,13 +74,13 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         if (eventData.button == PointerEventData.InputButton.Left) { OnLeftClick(); }
     }
 
-    private void OnLeftClick()
+    void OnLeftClick()
     {
         expanded.Flip();
         ui.SetOutfitExpanded(outfit, expanded);
     }
 
-    private void OnContextClick() => contextMenu.Show(this);
+    void OnContextClick() => contextMenu.Show(this);
 
     public void OnAccessoryToggled()
     {
@@ -95,15 +93,16 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         var hads = outfit as HaDSOutfit; //TODO: idk, but not this
         var results = new List<(string, UnityAction)>()
         {
-            ("Use Animator",     () => ui.playerManager.outfitManager.SetAnimator(outfit)),
-            ("Use Measurements", () => ui.playerManager.outfitManager.SetConfiguration(hads)),
-            ("Activate Effects", () => ui.playerManager.outfitManager.SetEffects(outfit, true)),
-            ("Disable Effects",  () => ui.playerManager.outfitManager.SetEffects(outfit, false))
+             ("Use Animator",     () => ui.playerManager.outfitManager.SetAnimator(outfit))
+            ,("Use Measurements", () => ui.playerManager.outfitManager.SetConfiguration(hads))
+            ,("Activate Effects", () => ui.playerManager.outfitManager.SetEffects(outfit, true))
+            ,("Disable Effects",  () => ui.playerManager.outfitManager.SetEffects(outfit, false))
         };
 
         foreach (var entry in hads.Variants)
         {
-            results.Add(($"Load: {entry.Key}", () => RecipeApplier.ActivateVariant(ui.playerManager.outfitManager, hads, entry.Key)));
+            results.Add(
+                ($"Load: {entry.Key}", () => RecipeApplier.ActivateVariant(ui.playerManager.outfitManager, hads, entry.Key)));
         }
         return results;
     }

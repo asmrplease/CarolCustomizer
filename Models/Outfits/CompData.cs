@@ -18,7 +18,6 @@ public class CompData : MonoBehaviour
         ,typeof(CompData)
         ,typeof(DynamicBone)
         ,typeof(DynamicBoneCollider)
-        //,typeof(Animator)
     };
 
     [SerializeField]
@@ -32,7 +31,8 @@ public class CompData : MonoBehaviour
     [SerializeField]
     public List<SkinnedMeshRenderer> allSMRs;
 
-    public List<OutfitEffect> OutfitEffects = new();
+    public List<GameObject> EffectGameObjects { get; private set; }
+    public List<Behaviour> EffectBehaviours { get; private set; }
 
     public SkinnedMeshRenderer BaseFace => allSMRs.FirstOrDefault(x => x && x.name == "tete");
 
@@ -80,7 +80,7 @@ public class CompData : MonoBehaviour
                 !SkipTypes
                 .Contains(x.GetType()));
 
-        var effectBehaviours = 
+        EffectBehaviours = 
             effectComponents
             .Where(x => x
                 .GetType()
@@ -90,14 +90,14 @@ public class CompData : MonoBehaviour
 
         var nonBehaviors = 
             effectComponents
-            .Except(effectBehaviours)
+            .Except(EffectBehaviours)
             .Select(x => x.transform)
             .Where(x => 
                 !SkeletonManager
                 .CommonBones
                 .ContainsKey(x.name));
 
-        var effectGameObjects = 
+        EffectGameObjects = 
             nonBehaviors
             .Where(x =>
                 !nonBehaviors
@@ -105,20 +105,14 @@ public class CompData : MonoBehaviour
             .Select(x => x.gameObject)
             .ToList();
         
-        foreach (var behaviour in effectBehaviours)
+        foreach (var behaviour in EffectBehaviours)
         {
             behaviour.enabled = false;
-            OutfitEffects.Add(new OutfitEffect(
-                behaviour.transform.GetAddressRelativeTo(this.transform), 
-                OutfitEffect.ComponentType.Behavior));
         }
 
-        foreach (var go in effectGameObjects)
+        foreach (var go in EffectGameObjects)
         {
             go.SetActive(false);
-            OutfitEffects.Add(new OutfitEffect(
-                go.transform.GetAddressRelativeTo(this.transform),
-                OutfitEffect.ComponentType.Component));
         }
     }
 

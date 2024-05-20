@@ -25,6 +25,9 @@ public class Outfit : IDisposable, IComparable<Outfit>
     protected Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = new();
 
     public List<StoredAccessory> Accessories => AccDict.Values.ToList();
+    public List<OutfitEffect> Effects
+        { get; protected set; }
+        = new();
     public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = new();
 
     public PelvisWatchdog prefabWatchdog { get; private set; }
@@ -62,6 +65,7 @@ public class Outfit : IDisposable, IComparable<Outfit>
         if (!prefabWatchdog.CompData) Log.Warning("Failed to instantiate meshdata in time.");
         var smrs = prefabWatchdog?.CompData?.allSMRs;
         if (smrs is null) { Log.Error("no smrs found in watchdog mesh data."); return; }
+
         foreach (var smr in smrs)
         {
             var newAcc = new StoredAccessory(this, smr);
@@ -69,7 +73,24 @@ public class Outfit : IDisposable, IComparable<Outfit>
 
             foreach (var newMat in newAcc.Materials) { if (newMat is not null) MaterialDescriptors.Add(newMat); }
         }
-        
+        foreach (var effect in compData.EffectBehaviours)
+        {
+            Effects.Add(
+                new OutfitEffect(
+                    effect.transform.GetAddressRelativeTo(prefabWatchdog.transform),
+                    OutfitEffect.ComponentType.Behavior,
+                    AssetName)
+                );
+        }
+        foreach (var effect in compData.EffectGameObjects)
+        {
+            Effects.Add(
+                new OutfitEffect(
+                    effect.transform.GetAddressRelativeTo(prefabWatchdog.transform),
+                    OutfitEffect.ComponentType.Component,
+                    AssetName)
+                );
+        }
 
         Log.Debug($"{DisplayName} Outfit constructed.");
     }
