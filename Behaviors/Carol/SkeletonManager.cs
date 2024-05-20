@@ -55,7 +55,7 @@ public class SkeletonManager : IDisposable
     public void Dispose()
     {
         playerManager.SpawnEvent -= SetNewPelvis;
-        UnityEngine.Object.Destroy(faceCopier);
+        GameObject.Destroy(faceCopier);
     }
     #endregion
 
@@ -76,6 +76,7 @@ public class SkeletonManager : IDisposable
             if (bespokeDict.ContainsKey(boneName))       { liveBones[i] = bespokeDict[boneName]; continue; }
             if (liveStandardBones.ContainsKey(boneName)) { liveBones[i] = liveStandardBones[boneName]; continue; }
         }
+
         Transform rootBone = null;
         if (liveStandardBones.ContainsKey(acc.RootBoneName)) rootBone = liveStandardBones[acc.RootBoneName];
         if (bespokeDict.ContainsKey(acc.RootBoneName)) rootBone = bespokeDict[acc.RootBoneName];
@@ -88,23 +89,24 @@ public class SkeletonManager : IDisposable
     #region Private Implementation
     void SetNewPelvis(PelvisWatchdog newPelvis)
     {
-        if (newPelvis == targetPelvis) { Log.Debug("SkeletonManager was given it's existing pelvis"); return; }
-        targetPelvis = newPelvis;
+        Log.Info("SkeletonManager.SetNewPelvis()");
+        if (newPelvis == targetPelvis) { Log.Debug("SkeletonManager was given its existing pelvis"); return; }
 
-        var activeOutfits = playerManager.outfitManager.ActiveOutfits;
-        liveStandardBones.Clear();
+        outfitBoneDicts
+            .Keys
+            .ToList()
+            .ForEach(RemoveBespokeBones);
         outfitBoneDicts.Clear();
 
+        targetPelvis = newPelvis;
         liveStandardBones = targetPelvis.BoneData.StandardBones;
-
-        var head = liveStandardBones["Bn_CarolHead"]?
-            .GetComponent<DynamicBone>();
-
-        if (!head) { Log.Warning("didn't find dyn component on head"); }
-        headDynamicBone = head;
+        headDynamicBone = liveStandardBones["Bn_CarolHead"].GetComponent<DynamicBone>();
 
         Log.Debug("SkeletonManager.SetNewPelvis() AddBespokeBones");
-        foreach (var outfit in activeOutfits) { AddBespokeBones(outfit); }
+        playerManager
+            .outfitManager
+            .ActiveOutfits
+            .ForEach(x => AddBespokeBones(x));
     }
 
     public Dictionary<string, Transform> AddBespokeBones(Outfit outfit)
@@ -126,6 +128,17 @@ public class SkeletonManager : IDisposable
         outfitBoneDicts[outfit] = boneDict;
         headDynamicBone.RestartDynamicBone();
         return boneDict;
+    }
+
+    void RemoveBespokeBones(Outfit outfit)
+    {
+        if (!outfitBoneDicts.TryGetValue(outfit, out var dict)) return;
+
+        dict.Values
+            .Where(x => x)
+            .Select(x => x.gameObject)
+            .ToList()
+            .ForEach(GameObject.DestroyImmediate);
     }
 
     Transform InstantiateAt(Transform objectToInstantiate, string parentName)

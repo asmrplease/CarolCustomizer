@@ -35,7 +35,6 @@ public class CCPlugin : BaseUnityPlugin
     Harmony HarmonyInstance;
     OutfitAssetManager outfitAssetManager;
     NPCInstanceCreator npcInstances;
-    IntroCutsceneFixBehavior introFix;
     HaDSOutfitLoader outfitLoader;
     SaveDataAdjuster saveAdjuster;
     UIAssetLoader uiAssetLoader;
@@ -50,18 +49,12 @@ public class CCPlugin : BaseUnityPlugin
         Settings.Constructor(Config);
         saveAdjuster = new();
         uiAssetLoader = new();
-
-        //Instantiate Dynamic Assets  
         outfitAssetManager = new(transform);
         outfitLoader = new();
-        introFix = new(this.gameObject);
         recipesManager = new(Constants.RecipeFolderPath);
-
-        //Set up NPC manager
         NPCManager.Constructor(gameObject, recipesManager);
         npcInstances = new(transform);
 
-        //Instantiate Player Managers
         for (int i = 1; i <= numPlayers; i++)
         {
             Log.Debug($"Making playerManager[{i}]...");
@@ -110,9 +103,10 @@ public class CCPlugin : BaseUnityPlugin
     {
         if (MainMenuManager.manager)
         {
-            OnirismExtensions
-                .GetMenuCarolPelvis()
-                .AddComponent<PelvisWatchdog>();
+            var menu = OnirismExtensions.GetMenuCarolPelvis();
+            if (menu.GetComponent<PelvisWatchdog>()) return;
+
+            menu.AddComponent<PelvisWatchdog>();
             return;
         }
 
@@ -138,7 +132,6 @@ public class CCPlugin : BaseUnityPlugin
         uiAssetLoader.Dispose();
         outfitAssetManager.Dispose();
         npcInstances.Dispose();
-        introFix.Dispose();
         outfitLoader.Dispose();
         Log.Info("Customizer unloaded.");
     }

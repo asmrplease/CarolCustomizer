@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Hooks;
 
 namespace CarolCustomizer.Assets;
 public class OutfitAssetManager : IDisposable
@@ -38,8 +39,5 @@ public class OutfitAssetManager : IDisposable
         return null;
     }
 
-    public void Dispose()
-    {  
-        GameObject.Destroy(liveFolder);
-    }
+    public void Dispose() => GameObject.Destroy(liveFolder);
 }

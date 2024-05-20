@@ -1,14 +1,17 @@
 ﻿using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Models.Outfits;
 
-public class Outfit : IDisposable, IComparable<Outfit>
+public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
 {
     #region Dependencies
     public Transform storedAsset { get; protected set; }
@@ -95,13 +98,6 @@ public class Outfit : IDisposable, IComparable<Outfit>
         Log.Debug($"{DisplayName} Outfit constructed.");
     }
 
-    public int CompareTo(Outfit other)
-    {
-        int displayNameComparison = DisplayName.CompareTo(other.DisplayName);
-        if (displayNameComparison != 0) return displayNameComparison;
-        return AssetName.CompareTo(other.AssetName);
-    }
-
     public StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
     {
         AccDict.TryGetValue(descriptor, out StoredAccessory result);
@@ -117,6 +113,36 @@ public class Outfit : IDisposable, IComparable<Outfit>
         if (prefabWatchdog.BoneData) UnityEngine.Object.DestroyImmediate(prefabWatchdog.BoneData);
         if (prefabWatchdog.CompData) UnityEngine.Object.DestroyImmediate(prefabWatchdog.CompData);
         UnityEngine.Object.DestroyImmediate(prefabWatchdog);
+    }
+    #endregion
+
+    #region Equality & Comparison
+    public int CompareTo(Outfit other)
+    {
+        int displayNameComparison = DisplayName.CompareTo(other.DisplayName);
+        if (displayNameComparison != 0) return displayNameComparison;
+        return AssetName.CompareTo(other.AssetName);
+    }
+    public bool Equals(Outfit other)
+    {
+        return this.AssetName == other.AssetName;
+    }
+
+    public override bool Equals(object other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        if (other.GetType() != GetType()) return false;
+
+        return Equals((Outfit)other);
+    }
+
+    public static bool operator ==(Outfit lhs, Outfit rhs) => Equals(rhs, lhs);
+    public static bool operator !=(Outfit lhs, Outfit rhs) => !Equals(rhs, lhs);
+
+    public override int GetHashCode()
+    {
+        return this.AssetName.GetHashCode();
     }
     #endregion
 }
