@@ -1,6 +1,5 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Utils;
 using System.Linq;
 using UnityEngine;
 

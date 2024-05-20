@@ -57,8 +57,8 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
         pickupLocation = transform.Find(pickupLocationAddress)?.GetComponent<Text>();
         pickupLocation.text = "";
-
     }
+
     public void AddAccessory(AccessoryUI accessory)
     {
         if (!accessory) { return; }
@@ -95,8 +95,8 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         {
              ("Use Animator",     () => ui.playerManager.outfitManager.SetAnimator(outfit))
             ,("Use Measurements", () => ui.playerManager.outfitManager.SetConfiguration(hads))
-            ,("Activate Effects", () => ui.playerManager.outfitManager.SetEffects(outfit, true))
-            ,("Disable Effects",  () => ui.playerManager.outfitManager.SetEffects(outfit, false))
+            ,("Activate Effects", () => ui.playerManager.outfitManager.SetEffect(outfit, true))
+            ,("Disable Effects",  () => ui.playerManager.outfitManager.SetEffect(outfit, false))
         };
 
         foreach (var entry in hads.Variants)

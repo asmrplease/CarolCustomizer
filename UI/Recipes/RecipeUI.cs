@@ -1,5 +1,4 @@
-﻿using BepInEx.Configuration;
-using CarolCustomizer.Assets;
+﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
@@ -19,20 +18,20 @@ using UnityEngine.UI;
 namespace CarolCustomizer.UI.Recipes;
 public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
+    static readonly string displayImageAddress = "Outfit Header/Icon";
+    static readonly string outfitNameAddress = "Outfit Header/Text/Outfit Name";
+    static readonly string pickupLocationAddress = "Outfit Header/Text/Pickup Location";
+
     Recipe recipe;
     OutfitManager outfitManager;
     Main.ContextMenu contextMenu;
     FilenameDialogue filenameDialogue;
     MessageDialogue messageDialogue;
 
-    private Image background;
-    private Image displayImage;
-    private Text displayName;
-    private Text pickupLocation;
-
-    static readonly string displayImageAddress = "Outfit Header/Icon";
-    static readonly string outfitNameAddress = "Outfit Header/Text/Outfit Name";
-    static readonly string pickupLocationAddress = "Outfit Header/Text/Pickup Location";
+    Image background;
+    Image displayImage;
+    Text displayName;
+    Text pickupLocation;
 
     public void Constructor(
         Recipe recipe,
@@ -75,13 +74,13 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         //do i misunderstand the nature of the problem?
     }
 
-    private void OnShezaraChanged(object sender, EventArgs e)
+    void OnShezaraChanged(object sender, EventArgs e)
     {
         if (!displayImage) { return; }       
         displayImage.enabled = (e.AsConfigEntry<string>().Value == recipe.Name);
     }
 
-    private string GetStatusMessage()
+    string GetStatusMessage()
     {
         switch (recipe.Error)
         {
@@ -92,7 +91,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         }
     }
 
-    private Color GetUIColor()
+    Color GetUIColor()
     {
         switch (recipe.Error)
         {
@@ -103,23 +102,23 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         }
     }
 
-    private void OnContextMenuOverwrite()
+    void OnContextMenuOverwrite()
     {
         string message = "Are you sure you'd like to overwrite this recipe?";
         messageDialogue.Show(message, confirmText: "Yes!", confirmAction: Overwrite);
     }
 
-    private void Overwrite()
+    void Overwrite()
     {
-        RecipeSaver.Save(new RecipeDescriptor21(outfitManager), recipe.Path);
+        RecipeSaver.Save(new RecipeDescriptor22(outfitManager), recipe.Path);
     }
 
-    private void OnContextMenuLoad()
+    void OnContextMenuLoad()
     {
         RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
     }
 
-    private void OnContextMenuWarningLoad()
+    void OnContextMenuWarningLoad()
     {
         string message = "Some of the resources for this recipe aren't available: " + Environment.NewLine; ;
         var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
@@ -127,19 +126,19 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         messageDialogue.Show(message, cancelText: "Nevermind", confirmText: "Load Anyway", confirmAction: OnContextMenuLoad);
     }
 
-    private void OnContextMenuRename()
+    void OnContextMenuRename()
     {
         Log.Debug("OnRename");
         filenameDialogue.Show(null, OnRename);
     }
 
-    private void OnContextMenuDelete()
+    void OnContextMenuDelete()
     {
         string message = "Are you sure you want to delete this recipe!?";
         messageDialogue.Show(message, cancelText: "Wait, no.", confirmText: "Delete!", confirmAction: DeleteRecipe);
     }
 
-    private void DeleteRecipe() => File.Delete(recipe.Path);
+    void DeleteRecipe() => File.Delete(recipe.Path);
 
     void SetAsShezara()
     {
@@ -147,7 +146,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         Settings.Plugin.shezaraRecipe.Value = recipe.Name;
     }
 
-    private void OnContextMenuListMissing()
+    void OnContextMenuListMissing()
     {
         var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
         string message = string.Empty;
@@ -155,7 +154,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         messageDialogue.Show(message, cancelText: "Done");
     }
 
-    private void OnRename(RecipeDescriptor21 unused, string newName)
+    void OnRename(RecipeDescriptor22 unused, string newName)
     {
         if (newName.Trim() == "") return;
         foreach (var character in Path.GetInvalidFileNameChars()) { if (newName.Contains(character)) return; }

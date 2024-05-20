@@ -19,7 +19,7 @@ internal class AutoSaver
 
     public void Save()
     {
-        var descriptor = new RecipeDescriptor21(outfitManager);
+        var descriptor = new RecipeDescriptor22(outfitManager);
         var path = RecipeSaver.RecipeFilenameToPath(Constants.AutoSave);
         RecipeSaver.Save(descriptor, path);
     }

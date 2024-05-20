@@ -23,6 +23,7 @@ public class OutfitManager
 
     #region State Management
     Dictionary<StoredAccessory, LiveAccessory> liveAccessories = new();
+    HashSet<Outfit> outfitEffects = new();
     Outfit animatorSource;
     HaDSOutfit configurationSource;
     #endregion
@@ -44,11 +45,14 @@ public class OutfitManager
         .Where(x => x.isActive)
         .Select(x => new AccessoryDescriptor(x));
         
-
     public IEnumerable<Outfit> ActiveOutfits =>
         ActiveAccessories
         .Select(x => x.outfit)
         .Distinct();
+
+    public IEnumerable<string> ActiveEffects =>
+        outfitEffects
+        .Select(x => x.AssetName);
 
     public OutfitManager(CarolInstance player, SkeletonManager skeletonManager, OutfitAssetManager dynamicAssetManager)
     {
@@ -81,18 +85,14 @@ public class OutfitManager
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, live, true));
     }
 
+    public void DisableAllAccessories() => ActiveAccessories.ForEach(DisableAccessory);
+
     public void DisableAccessory(StoredAccessory accessory)
     {
         if (!liveAccessories.ContainsKey(accessory)) { Log.Warning("Tried to disable an accessory that was never instantiated."); return; }
         liveAccessories[accessory].Disable();
         var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, false));
-    }
-
-    public void DisableAllAccessories()
-    {
-        //TODO: only call this on active accessories
-        foreach (var accessory in liveAccessories.Keys) { DisableAccessory(accessory); }
     }
 
     public void PaintAccessory(StoredAccessory accessory, MaterialDescriptor material, int index)
@@ -129,9 +129,9 @@ public class OutfitManager
     {
         this.pelvis = pelvis;
         pelvis.SetBaseVisibility(false);
-        if (animatorSource is null) return;
-        SetAnimator(animatorSource);
-        ApplyConfig();
+        if (outfitEffects.Any()) RefreshEffects();
+        if (animatorSource is not null) SetAnimator(animatorSource);
+        if (configurationSource is not null) ApplyConfig();
     }
 
     public void SetAnimator(Outfit outfit)
@@ -158,25 +158,50 @@ public class OutfitManager
         pelvis.SetHeightOffset(configurationSource.modelData.height);
     }
 
-    public void SetEffects(Outfit outfit, bool enabled)
+    public void SetEffect(Outfit outfit, bool enabled)
     {
+        Log.Debug($"SetEffect({outfit.DisplayName}, {enabled});");
         if (!pelvis || outfit is null) return;
         if (!outfit.Effects.Any()) return;
 
+        Log.Debug("Setting effect...");
         skeletonManager.AddBespokeBones(outfit);
         foreach (var effect in outfit.Effects)
         {
             var transform = pelvis.transform.Find(effect.RelativePath);
+            if (!transform) continue;
+
             switch (effect.Type)
             {
                 case OutfitEffect.ComponentType.Behavior:
-                    transform.GetComponents<Behaviour>().ForEach(x => x.enabled = enabled);
+                    transform
+                        .GetComponents<Behaviour>()
+                        .ForEach(x => x.enabled = enabled);
                     break;
                 case OutfitEffect.ComponentType.Component:
-                    transform.gameObject.SetActive(enabled);
+                    transform
+                        .gameObject
+                        .SetActive(enabled);
                     break;
             }
         }
+
+        if ( enabled) outfitEffects.Add(outfit);
+        if (!enabled) outfitEffects.Remove(outfit);
+    }
+
+    void RefreshEffects()
+    {
+        outfitEffects
+            .ForEach(x =>
+               SetEffect(x, true));
+    }
+
+    public void DisableAllEffects()
+    {
+        outfitEffects
+            .ToList()
+            .ForEach(x=> SetEffect(x, false));
     }
 
     void OnOutfitUnloaded(Outfit outfit)

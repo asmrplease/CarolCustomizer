@@ -12,10 +12,24 @@ using System.Linq;
 namespace CarolCustomizer.Behaviors.Recipes;
 internal static class RecipeApplier
 {
-    public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor21 recipe)
+    public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor22 recipe)
     {
         outfitManager.DisableAllAccessories();
-        foreach (var accessory in recipe.ActiveAccessories) { SetAccessory(outfitManager, accessory); }
+        outfitManager.DisableAllEffects();
+
+        recipe
+            .ActiveAccessories
+            .ForEach(x => 
+                SetAccessory(outfitManager, x));
+        recipe
+            .ActiveEffects
+            .Select(
+                OutfitAssetManager
+                .GetOutfitByAssetName)
+            .Where(x => x is not null)
+            .ForEach(x => 
+                outfitManager
+                .SetEffect(x, true));
         outfitManager.SetAnimator(
             OutfitAssetManager
             .GetOutfitByAssetName(
@@ -41,11 +55,13 @@ internal static class RecipeApplier
     {
         Log.Debug("ActivateVariant()");
         outfitManager.DisableAllAccessories();
+        outfitManager.DisableAllEffects();
 
         outfit.Variants.TryGetValue(variantName, out var variant);
         if (variant is null) { Log.Warning($"variant {variantName} not found in {outfit.DisplayName}"); return; }
 
         foreach (var acc in variant) SetAccessory(outfitManager, acc);
+        outfitManager.SetEffect(outfit, true);
         outfitManager.SetAnimator(outfit);
         outfitManager.SetConfiguration(outfit);
     }
@@ -82,29 +98,36 @@ internal static class RecipeApplier
         Log.Debug("found outfit again...");
         if (outfit.MaterialDescriptors is null) { Log.Warning($"failed to get {materialDescription.Source} MaterialDescriptors"); return; }
 
-        MaterialDescriptor liveMaterial;
-        outfit.MaterialDescriptors.TryGetValue(materialDescription, out liveMaterial);
+        outfit.MaterialDescriptors.TryGetValue(materialDescription, out var liveMaterial);
         if (liveMaterial is null) { Log.Warning($"failed to find {materialDescription.Name} in source"); return; }
 
         outfitManager.PaintAccessory(accessory, liveMaterial, index);
     }
 
-    public static IEnumerable<string> GetSources(RecipeDescriptor21 recipe)
+    public static IEnumerable<string> GetSources(RecipeDescriptor22 recipe)
     {
-        Log.Debug("GetSources()");
-        if (recipe.ActiveAccessories is null) { Log.Error("no accessories in recipe!"); return new List<string>(); };
-        var accSources = recipe.ActiveAccessories.Select(x => x.Source);
-        var matSources = recipe.ActiveAccessories.SelectMany(x => x.Materials).Select(x => x.Source);
+        var accSources = recipe
+            .ActiveAccessories
+            .Select(x => x.Source);
+        var matSources = recipe
+            .ActiveAccessories
+            .SelectMany(x => x.Materials)
+            .Select(x => x.Source);
 
         return accSources
             .Concat(matSources)
+            .Concat(recipe.ActiveEffects)
             .AddItem(recipe.AnimatorSource)
             .AddItem(recipe.BaseOutfitName)
             .Distinct();
     }
 
-    public static IEnumerable<string> GetMissingSources(RecipeDescriptor21 recipe)
+    public static IEnumerable<string> GetMissingSources(RecipeDescriptor22 recipe)
     {
-        return GetSources(recipe).Where(x => OutfitAssetManager.GetOutfitByAssetName(x) is null);
+        return GetSources(recipe)
+            .Where(x => 
+                OutfitAssetManager
+                .GetOutfitByAssetName(x) 
+                is null);
     }
 }

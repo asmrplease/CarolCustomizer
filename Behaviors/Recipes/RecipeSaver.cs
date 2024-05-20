@@ -13,7 +13,7 @@ internal static class RecipeSaver
         return path;
     }
 
-    public static void Save(RecipeDescriptor21 recipe, string filePath)
+    public static void Save(RecipeDescriptor22 recipe, string filePath)
     {
         string json = JsonConvert.SerializeObject(recipe, Formatting.Indented);
         Log.Debug(json);

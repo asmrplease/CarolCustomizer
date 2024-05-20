@@ -11,21 +11,21 @@ using UnityEngine.UI;
 namespace CarolCustomizer.UI.Recipes;
 public class RecipeListUI : MonoBehaviour
 {
-    private static readonly string listRootAddress = "Scroll View/Viewport/Content";
-    private static readonly string newRecipeAddress = "New Recipe";
+    static readonly string listRootAddress = "Scroll View/Viewport/Content";
+    static readonly string newRecipeAddress = "New Recipe";
 
-    private UIAssetLoader loader;
-    private OutfitManager outfitManager;
-    private Main.ContextMenu contextMenu;
-    private FilenameDialogue fileDialogue;
-    private MessageDialogue messageDialogue;
-    private RecipesManager recipesManager;
+    UIAssetLoader loader;
+    OutfitManager outfitManager;
+    Main.ContextMenu contextMenu;
+    FilenameDialogue fileDialogue;
+    MessageDialogue messageDialogue;
+    RecipesManager recipesManager;
 
-    private Transform listRoot;
-    private GameObject filenameDialogueGO;
-    private Button newRecipeButton;
+    Transform listRoot;
+    GameObject filenameDialogueGO;
+    Button newRecipeButton;
 
-    private Dictionary<string, RecipeUI> recipeUIs = new();
+    Dictionary<string, RecipeUI> recipeUIs = new();
 
     public RecipeListUI Constructor(
         UIAssetLoader loader,
@@ -54,13 +54,12 @@ public class RecipeListUI : MonoBehaviour
         this.recipesManager.OnRecipeCreated += OnRecipeCreated;
         this.recipesManager.OnRecipeDeleted += OnRecipeDeleted;
 
-        //this.recipesManager.RefreshAll();
         gameObject.SetActive(false);
 
         return this;
     }
 
-    private void OnDestroy()
+    void OnDestroy()
     {
         Log.Debug("ReceiptListUI.OnDestroy()");
         recipesManager.OnRecipeCreated -= OnRecipeCreated;
@@ -70,16 +69,14 @@ public class RecipeListUI : MonoBehaviour
     public void OnRecipeCreated(Recipe newRecipe)
     {
         Log.Debug("RecipeListUI.OnRecipeCreated");
-        //instantiate a outfit ui object
+
         var uiInstance = Instantiate(loader.OutfitListElement, listRoot);
         if (!uiInstance) { Log.Error("Failed to instantiate outfit UI prefab for a recipeUI."); return; }
 
-        //add a RecipeUI component
         var recipeUI = uiInstance.AddComponent<RecipeUI>();
         if (!recipeUI) { Log.Warning("failed to instantiate recipeUI component"); return; }
         recipeUI.Constructor(newRecipe, loader, outfitManager, contextMenu, fileDialogue, messageDialogue);
 
-        //add to list of recipeUIs
         recipeUIs.Add(newRecipe.Path, recipeUI);
     }
 
@@ -89,8 +86,8 @@ public class RecipeListUI : MonoBehaviour
         recipeUIs.Remove(removedRecipe.Path);
     }
 
-    private void OnNewSave()
+    void OnNewSave()
     {
-        fileDialogue.Show(new RecipeDescriptor21(outfitManager), RecipeSaver.Save);
+        fileDialogue.Show(new RecipeDescriptor22(outfitManager), RecipeSaver.Save);
     }
 }

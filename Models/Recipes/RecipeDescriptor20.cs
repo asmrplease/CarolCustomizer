@@ -11,7 +11,11 @@ public class RecipeDescriptor20
     public string Version;
 
     [JsonConstructor]
-    public RecipeDescriptor20(string baseOutfitName, bool baseVisible, IEnumerable<AccessoryDescriptor> activeAccessories, string version)
+    public RecipeDescriptor20(
+        string baseOutfitName, 
+        bool baseVisible, 
+        IEnumerable<AccessoryDescriptor> activeAccessories, 
+        string version)
     {
         BaseOutfitName = baseOutfitName;
         BaseVisible = baseVisible;
