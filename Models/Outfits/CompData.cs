@@ -1,4 +1,6 @@
-﻿using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,17 @@ using static System.Linq.Enumerable;
 namespace CarolCustomizer.Models.Outfits;
 public class CompData : MonoBehaviour
 {
-    static HashSet<string> foundComponents = new HashSet<string>();
+    static readonly HashSet<Type> SkipTypes = new HashSet<Type>() 
+    {
+         typeof(Transform)
+        ,typeof(PelvisWatchdog)
+        ,typeof(BoneData)
+        ,typeof(CompData)
+        ,typeof(DynamicBone)
+        ,typeof(DynamicBoneCollider)
+        //,typeof(Animator)
+    };
+
     [SerializeField]
     RuntimeAnimatorController controller;
     public RuntimeAnimatorController Controller => controller;
@@ -19,6 +31,8 @@ public class CompData : MonoBehaviour
 
     [SerializeField]
     public List<SkinnedMeshRenderer> allSMRs;
+
+    public List<OutfitEffect> OutfitEffects = new();
 
     public SkinnedMeshRenderer BaseFace => allSMRs.FirstOrDefault(x => x && x.name == "tete");
 
@@ -41,17 +55,71 @@ public class CompData : MonoBehaviour
 
         animator ??= GetComponentsInParent<Animator>(true)?
             .FirstOrDefault(x => x.runtimeAnimatorController);
-        //if (!animator) Log.Warning("no animator found during CD.Constructor()");
-        controller ??= animator?.runtimeAnimatorController;
-        //if (!controller) Log.Warning("no RAC found during CD.Constructor()");
 
+        controller ??= animator?.runtimeAnimatorController;
         coopToggles = transform.parent.GetComponentsInChildren<CoopModelToggle>(true);
-        //Log.Debug($"{coopToggles.Count()} cooptoggles found.");
+
         SetCoopVariants();
         coopToggles.ForEach(x => x.enabled = false);
         RefreshParentComponents();
-        //ListChildComponents();
+        EffectSetup();
         return this;
+    }
+
+    void EffectSetup()
+    {
+        var allComponents = GetComponentsInChildren<Component>(true);
+
+        GetComponentsInChildren<Animator>(true)
+            .ForEach(x =>
+                x.cullingMode = AnimatorCullingMode.AlwaysAnimate);
+
+        var effectComponents = 
+            allComponents
+            .Where(x => 
+                !SkipTypes
+                .Contains(x.GetType()));
+
+        var effectBehaviours = 
+            effectComponents
+            .Where(x => x
+                .GetType()
+                .IsAssignableFrom(typeof(Behaviour)))
+            .Select(x => x as Behaviour)
+            .ToList();
+
+        var nonBehaviors = 
+            effectComponents
+            .Except(effectBehaviours)
+            .Select(x => x.transform)
+            .Where(x => 
+                !SkeletonManager
+                .CommonBones
+                .ContainsKey(x.name));
+
+        var effectGameObjects = 
+            nonBehaviors
+            .Where(x =>
+                !nonBehaviors
+                .Contains(x.parent))
+            .Select(x => x.gameObject)
+            .ToList();
+        
+        foreach (var behaviour in effectBehaviours)
+        {
+            behaviour.enabled = false;
+            OutfitEffects.Add(new OutfitEffect(
+                behaviour.transform.GetAddressRelativeTo(this.transform), 
+                OutfitEffect.ComponentType.Behavior));
+        }
+
+        foreach (var go in effectGameObjects)
+        {
+            go.SetActive(false);
+            OutfitEffects.Add(new OutfitEffect(
+                go.transform.GetAddressRelativeTo(this.transform),
+                OutfitEffect.ComponentType.Component));
+        }
     }
 
     void SetCoopVariants()
@@ -82,29 +150,8 @@ public class CompData : MonoBehaviour
             .ToDictionaryOverwrite(x => x.GetType());
     }
 
-    void ListChildComponents()
-    {
-        GetComponentsInChildren<Component>(true)
-            .Select(x => x.GetType().Name)
-            .ForEach(
-                x=> foundComponents.Add(x));
-    }
-
-    public void SetRAC(RuntimeAnimatorController controller)
-    {
-        if (!animator) { Log.Warning("No animator component"); return; }
-        if (!controller) { Log.Warning("tried to set RAC as null"); return; }
-
-        animator.runtimeAnimatorController = controller;
-    }
-
-    public int CountOnPelvis<T>() where T : Component
-    {
-        return this.transform.GetComponentsInChildren<T>().Count();
-    }
-
     void OnDestory()
     {
-        foreach (var toggle in coopToggles) toggle.enabled = true;
+        coopToggles.ForEach(x => x.enabled = true);
     }
 }

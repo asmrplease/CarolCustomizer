@@ -5,7 +5,6 @@ using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Hooks;
 using CarolCustomizer.Hooks.Watchdogs;
-using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using HarmonyLib;
@@ -26,7 +25,6 @@ public class CCPlugin : BaseUnityPlugin
     public static List<UIInstance> uiInstances = new();
     public static CarolInstance cutscenePlayer;
     public static Action<CCPlugin> OnSetupComplete;
-    public static GameManagerRewrite gmRewrite;
     public static RecipesManager recipesManager { get; private set; }
     #endregion
 
@@ -44,25 +42,13 @@ public class CCPlugin : BaseUnityPlugin
     #endregion
 
     #region Setup
-    private void Awake()
+    void Awake()
     {
         new Log(Logger);
         Log.Message("Logger Ready!");
         CoroutineRunner = this;
-
         Settings.Constructor(Config);
         saveAdjuster = new();
-
-        gmRewrite = gameObject.AddComponent<GameManagerRewrite>();
-
-        //Set up clean bone folder
-        var cleanBoneFolder = new GameObject().transform;
-        cleanBoneFolder.name = "Cleaned Bones";
-        cleanBoneFolder.parent = transform;
-        cleanBoneFolder.gameObject.SetActive(false); 
-        BespokeBone.SetCleanFolder(cleanBoneFolder);
-
-        //Instantiate Static Assets
         uiAssetLoader = new();
 
         //Instantiate Dynamic Assets  
@@ -99,7 +85,7 @@ public class CCPlugin : BaseUnityPlugin
         Log.Info("CCPlugin.Awake() success.");
     }
 
-    private IEnumerator Start()
+    IEnumerator Start()
     {
         Log.Debug("waiting for gamemanager and localization index");
         yield return new WaitUntil(() => GameManager.manager && LocalizationIndex.index is not null);

@@ -96,7 +96,9 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         var results = new List<(string, UnityAction)>()
         {
             ("Use Animator",     () => ui.playerManager.outfitManager.SetAnimator(outfit)),
-            ("Use Measurements", () => ui.playerManager.outfitManager.SetConfiguration(hads))
+            ("Use Measurements", () => ui.playerManager.outfitManager.SetConfiguration(hads)),
+            ("Activate Effects", () => ui.playerManager.outfitManager.SetEffects(outfit, true)),
+            ("Disable Effects",  () => ui.playerManager.outfitManager.SetEffects(outfit, false))
         };
 
         foreach (var entry in hads.Variants)

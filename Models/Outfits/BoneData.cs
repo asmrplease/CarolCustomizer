@@ -15,7 +15,7 @@ public class BoneData : MonoBehaviour
     List<Transform> standardBones;
 
     public Dictionary<string, Transform> StandardBones => standardBones.ToDictionaryOverwrite(x => x.name);
-    public List<BespokeBone> BespokeBones { get; private set; } = new();
+    public List<Transform> BespokeBones { get; private set; } = new();
 
     public BoneData Constructor()
     {
@@ -33,7 +33,7 @@ public class BoneData : MonoBehaviour
         filteringList.RemoveAll
             (x => !SkeletonManager.CommonBones.Keys.Contains(x.transform.parent.name));
 
-        BespokeBones = filteringList.Select(x => new BespokeBone(x)).ToList();
+        BespokeBones = filteringList.ToList();
         return this;
     }
 }

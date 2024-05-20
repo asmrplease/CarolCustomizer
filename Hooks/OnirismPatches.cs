@@ -25,18 +25,6 @@ public static class OnirismPatches
         }
     }
 
-    [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadAssetsFunction))]
-    public static class LoadAssetsReplacement
-    {
-        [HarmonyPrefix]
-        public static bool Prefix()
-        {
-            Log.Info("LoadAssetsPrefix");
-            if (CCPlugin.gmRewrite) { CCPlugin.gmRewrite.LoadAssetsFunction(); return false; }
-            return true;
-        }
-    }
-
     [HarmonyPatch(typeof(CostumeSwapUI), nameof(CostumeSwapUI.ChangeCostume))]
     public static class CostumeSwapPatch
     {

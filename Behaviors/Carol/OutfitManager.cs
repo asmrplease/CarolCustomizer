@@ -158,6 +158,27 @@ public class OutfitManager
         pelvis.SetHeightOffset(configurationSource.modelData.height);
     }
 
+    public void SetEffects(Outfit outfit, bool enabled)
+    {
+        if (!pelvis || outfit is null) return;
+        if (!outfit.compData.OutfitEffects.Any()) return;
+
+        skeletonManager.AddBespokeBones(outfit);
+        foreach (var effect in outfit.compData.OutfitEffects)
+        {
+            var transform = pelvis.transform.Find(effect.RelativePath);
+            switch (effect.Type)
+            {
+                case OutfitEffect.ComponentType.Behavior:
+                    transform.GetComponents<Behaviour>().ForEach(x => x.enabled = enabled);
+                    break;
+                case OutfitEffect.ComponentType.Component:
+                    transform.gameObject.SetActive(enabled);
+                    break;
+            }
+        }
+    }
+
     void OnOutfitUnloaded(Outfit outfit)
     {
         foreach (var storedAcc in outfit.Accessories)

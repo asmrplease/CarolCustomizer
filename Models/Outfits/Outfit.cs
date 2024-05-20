@@ -69,6 +69,8 @@ public class Outfit : IDisposable, IComparable<Outfit>
 
             foreach (var newMat in newAcc.Materials) { if (newMat is not null) MaterialDescriptors.Add(newMat); }
         }
+        
+
         Log.Debug($"{DisplayName} Outfit constructed.");
     }
 

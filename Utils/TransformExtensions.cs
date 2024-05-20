@@ -164,4 +164,20 @@ public static class TransformExtensions
         target.transform.localRotation = Quaternion.identity;
         target.transform.localPosition = Vector3.zero;
     }
+
+
+    //start at the child and recurse up the tree until we reach the parent
+    public static string GetAddressRelativeTo(this Transform target, Transform ancestor, string start = "")
+    {
+        if (!target) return "no target";
+        if (!ancestor) return "no ancestor";
+        if (!target.root) return "no root";
+        if (target.root == target) return "target is root";
+
+        if (ancestor == target) return start;
+        return GetAddressRelativeTo(target.parent, ancestor, 
+            start == "" ? 
+            target.name 
+            : $"{target.name}/{start}");
+    }
 }

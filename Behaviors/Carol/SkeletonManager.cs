@@ -71,7 +71,7 @@ public class SkeletonManager : IDisposable
 
         foreach (var i in Enumerable.Range(0, referenceBones.Length))
         {
-            if (!referenceBones[i]) { Log.Warning($"No input bone at index {i}."); continue; }
+            if (!referenceBones[i]) continue;
             string boneName = referenceBones[i].name;
             if (bespokeDict.ContainsKey(boneName))       { liveBones[i] = bespokeDict[boneName]; continue; }
             if (liveStandardBones.ContainsKey(boneName)) { liveBones[i] = liveStandardBones[boneName]; continue; }
@@ -107,7 +107,7 @@ public class SkeletonManager : IDisposable
         foreach (var outfit in activeOutfits) { AddBespokeBones(outfit); }
     }
 
-    Dictionary<string, Transform> AddBespokeBones(Outfit outfit)
+    public Dictionary<string, Transform> AddBespokeBones(Outfit outfit)
     {
         Log.Debug($"AddBespokeBones({outfit.DisplayName})");
         if (outfitBoneDicts.TryGetValue(outfit, out var dict)) return dict;
@@ -116,9 +116,8 @@ public class SkeletonManager : IDisposable
         Dictionary<string, Transform> boneDict = new();
         foreach (var bespokeBone in outfit.boneData.BespokeBones)
         {
-            if (!bespokeBone.cleanedBone) { Log.Warning($"no cleanedbone, outfit: {outfit.DisplayName}   "); continue; }
-            if (!bespokeBone.referenceBone.parent) { Log.Warning($"referencebone {bespokeBone.referenceBone.name} has no parent"); continue; }
-            var newBone = InstantiateAt(bespokeBone.cleanedBone, bespokeBone.referenceBone.parent.name);
+            if (!bespokeBone.parent) { Log.Warning($"BespokeBone {bespokeBone.name} has no parent"); continue; }
+            var newBone = InstantiateAt(bespokeBone, bespokeBone.parent.name);
             if (!newBone) continue;
 
             foreach (var bone in newBone.SkeletonToList()) { boneDict[bone.name] = bone; }
@@ -137,7 +136,7 @@ public class SkeletonManager : IDisposable
         var parentBone = liveStandardBones[parentName];
         if (!parentBone) { Log.Error($"failed to find parent bone when instantiating {objectToInstantiate.name}"); return null; }
 
-        var newBone = UnityEngine.Object.Instantiate(objectToInstantiate.gameObject, parentBone.transform).transform;
+        var newBone = GameObject.Instantiate(objectToInstantiate.gameObject, parentBone.transform).transform;
         newBone.DeCloneName();
         return newBone;
     }
