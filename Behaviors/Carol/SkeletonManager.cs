@@ -100,7 +100,8 @@ public class SkeletonManager : IDisposable
 
         targetPelvis = newPelvis;
         liveStandardBones = targetPelvis.BoneData.StandardBones;
-        headDynamicBone = liveStandardBones["Bn_CarolHead"].GetComponent<DynamicBone>();
+        //TODO: tell magica about new bones?
+
 
         Log.Debug("SkeletonManager.SetNewPelvis() AddBespokeBones");
         playerManager
@@ -119,16 +120,42 @@ public class SkeletonManager : IDisposable
         foreach (var bespokeBone in outfit.boneData.BespokeBones)
         {
             if (!bespokeBone.parent) { Log.Warning($"BespokeBone {bespokeBone.name} has no parent"); continue; }
-            var newBone = InstantiateAt(bespokeBone, bespokeBone.parent.name);
+            string parentName = bespokeBone.parent.name;
+            var newBone = InstantiateAt(bespokeBone, parentName);
             if (!newBone) continue;
 
             foreach (var bone in newBone.SkeletonToList()) { boneDict[bone.name] = bone; }
         }
 
+        var newHairRoots = outfit
+            .boneData
+            .MagicaBones
+            .Where(x => 
+                boneDict.ContainsKey(x.name))
+            .Select(x =>
+                boneDict[x.name]);
+
+        Log.Debug("New Hair roots:");
+        newHairRoots.ForEach(x => Log.Debug(x.name));
+
+        targetPelvis
+            .CompData
+            .magicaCloth
+            .SerializeData
+            .rootBones
+            .AddRange(newHairRoots);
+
+        targetPelvis
+            .CompData
+            .magicaCloth
+            .SetParameterChange();
+
         outfitBoneDicts[outfit] = boneDict;
-        headDynamicBone.RestartDynamicBone();
+
         return boneDict;
     }
+
+    
 
     void RemoveBespokeBones(Outfit outfit)
     {
@@ -138,7 +165,7 @@ public class SkeletonManager : IDisposable
             .Where(x => x)
             .Select(x => x.gameObject)
             .ToList()
-            .ForEach(GameObject.DestroyImmediate);
+            .ForEach(GameObject.Destroy);
     }
 
     Transform InstantiateAt(Transform objectToInstantiate, string parentName)

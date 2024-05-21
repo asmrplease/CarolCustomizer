@@ -171,13 +171,15 @@ public static class TransformExtensions
     {
         if (!target) return "no target";
         if (!ancestor) return "no ancestor";
-        if (!target.root) return "no root";
-        if (target.root == target) return "target is root";
+        if (!target.IsChildOf(ancestor)) return "not related";
 
         if (ancestor == target) return start;
-        return GetAddressRelativeTo(target.parent, ancestor, 
+
+        return GetAddressRelativeTo(
+            target.parent, 
+            ancestor, 
             start == "" ? 
-            target.name 
-            : $"{target.name}/{start}");
+                target.name 
+                : $"{target.name}/{start}");
     }
 }

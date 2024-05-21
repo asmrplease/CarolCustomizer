@@ -4,7 +4,7 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<AssemblyName>CarolCustomizer</AssemblyName>
 		<Description>Build your own Carol!</Description>
-		<Version>2.2.0</Version>
+		<Version>2.2.1</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
@@ -28,6 +28,9 @@
 		</Reference>
 		<Reference Include="Newtonsoft.Json">
 			<HintPath>lib\Newtonsoft.Json.dll</HintPath>
+		</Reference>
+		<Reference Include ="MagicaClothV2">
+			<HintPath>lib\MagicaClothV2.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 

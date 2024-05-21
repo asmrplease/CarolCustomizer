@@ -1,6 +1,8 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Utils;
+using FuseBox.External.MagicaCloth2;
+using MagicaCloth2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,15 +12,19 @@ using static System.Linq.Enumerable;
 namespace CarolCustomizer.Models.Outfits;
 public class CompData : MonoBehaviour
 {
-    static readonly HashSet<Type> SkipTypes = new HashSet<Type>() 
+    static readonly HashSet<Type> SkipTypes = new() 
     {
          typeof(Transform)
         ,typeof(PelvisWatchdog)
         ,typeof(BoneData)
         ,typeof(CompData)
         ,typeof(DynamicBone)
-        ,typeof(DynamicBoneCollider)
+        ,typeof(MagicaCapsuleCollider)
+        ,typeof(MagicaClothCompanion)
+        ,typeof(MagicaCloth)
+        ,typeof(SkinnedMeshRenderer)
     };
+
 
     [SerializeField]
     RuntimeAnimatorController controller;
@@ -30,6 +36,12 @@ public class CompData : MonoBehaviour
 
     [SerializeField]
     public List<SkinnedMeshRenderer> allSMRs;
+
+    [SerializeField]
+    public MagicaClothCompanion ClothCompanion;
+
+    [SerializeField]
+    public MagicaCloth magicaCloth;
 
     public List<GameObject> EffectGameObjects { get; private set; }
     public List<Behaviour> EffectBehaviours { get; private set; }
@@ -53,8 +65,15 @@ public class CompData : MonoBehaviour
             .GetComponentsInChildren<SkinnedMeshRenderer>(true)
             .ToList();
 
+        
+
         animator ??= GetComponentsInParent<Animator>(true)?
             .FirstOrDefault(x => x.runtimeAnimatorController);
+
+        ClothCompanion = GetComponentInParent<MagicaClothCompanion>(true);
+        magicaCloth = transform
+            .parent
+            .GetComponentInChildren<MagicaCloth>(true);
 
         controller ??= animator?.runtimeAnimatorController;
         coopToggles = transform.parent.GetComponentsInChildren<CoopModelToggle>(true);

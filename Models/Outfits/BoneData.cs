@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Utils;
+using MagicaCloth2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +15,12 @@ public class BoneData : MonoBehaviour
     [SerializeField]
     List<Transform> standardBones;
 
+    [SerializeField]
+    public List<Transform> MagicaBones;
+
     public Dictionary<string, Transform> StandardBones => standardBones.ToDictionaryOverwrite(x => x.name);
     public List<Transform> BespokeBones { get; private set; } = new();
+    
 
     public BoneData Constructor()
     {
@@ -34,6 +39,19 @@ public class BoneData : MonoBehaviour
             (x => !SkeletonManager.CommonBones.Keys.Contains(x.transform.parent.name));
 
         BespokeBones = filteringList.ToList();
+
+        var magica = transform
+            .parent
+            .GetComponentInChildren<MagicaCloth>(true);
+
+        if (magica)
+        {
+            MagicaBones = magica
+                .SerializeData
+                .rootBones;
+        }
+        MagicaBones ??= new();
+
         return this;
     }
 }

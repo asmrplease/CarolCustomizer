@@ -73,8 +73,10 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
         {
             var newAcc = new StoredAccessory(this, smr);
             AccDict[newAcc] = newAcc;
+            newAcc.Materials
+                .Where(x => x is not null)
+                .ForEach(x=> MaterialDescriptors.Add(x));
 
-            foreach (var newMat in newAcc.Materials) { if (newMat is not null) MaterialDescriptors.Add(newMat); }
         }
         foreach (var effect in compData.EffectBehaviours)
         {
