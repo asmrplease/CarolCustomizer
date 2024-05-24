@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.Events;
 using Button = UnityEngine.UI.Button;
@@ -139,10 +138,11 @@ public static class MiscExtensions
         return results;
     }
 
-    public static void ForEach<T>(this IEnumerable<T> sequence, Action<T> action)
+    public static IEnumerable<T> ForEach<T>(this IEnumerable<T> sequence, Action<T> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
         foreach (T item in sequence) action(item);
+        return sequence;
     }
 
     public static ConfigEntry<T> AsConfigEntry<T>(this EventArgs e)
