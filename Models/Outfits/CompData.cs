@@ -38,10 +38,7 @@ public class CompData : MonoBehaviour
     public List<SkinnedMeshRenderer> allSMRs;
 
     [SerializeField]
-    public MagicaClothCompanion ClothCompanion;
-
-    [SerializeField]
-    public MagicaCloth magicaCloth;
+    public List<MagicaCloth> magicaCloths;
 
     public List<GameObject> EffectGameObjects { get; private set; }
     public List<Behaviour> EffectBehaviours { get; private set; }
@@ -65,15 +62,21 @@ public class CompData : MonoBehaviour
             .GetComponentsInChildren<SkinnedMeshRenderer>(true)
             .ToList();
 
-        
-
         animator ??= GetComponentsInParent<Animator>(true)?
             .FirstOrDefault(x => x.runtimeAnimatorController);
 
-        ClothCompanion = GetComponentInParent<MagicaClothCompanion>(true);
-        magicaCloth = transform
+        magicaCloths = transform
             .parent
-            .GetComponentInChildren<MagicaCloth>(true);
+            .GetComponentsInChildren<MagicaCloth>(true)
+            .ToList();
+
+        foreach (var magica in magicaCloths)
+        {
+            magica
+                .SerializeData
+                .cullingSettings
+                .cameraCullingMode = CullingSettings.CameraCullingMode.Off;
+        }
 
         controller ??= animator?.runtimeAnimatorController;
         coopToggles = transform.parent.GetComponentsInChildren<CoopModelToggle>(true);
@@ -159,8 +162,14 @@ public class CompData : MonoBehaviour
 
     public void RefreshParentComponents()
     {
-        parentComponents = GetComponentsInParent<Component>(true)
+        var components = GetComponentsInParent<Component>(true);
+        if (components is null || !components.Any()) { parentComponents = new(); return; }
+        Log.Debug("RefreshParentComponents() components exist.");
+
+        parentComponents = components
+            .Where(x => x is not null)
             .ToDictionaryOverwrite(x => x.GetType());
+
     }
 
     void OnDestory()

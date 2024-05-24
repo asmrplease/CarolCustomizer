@@ -11,6 +11,7 @@ using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer;
@@ -128,7 +129,7 @@ public class CCPlugin : BaseUnityPlugin
         Config.Save();
         HarmonyInstance?.UnpatchSelf();
         Settings.Dispose();
-        foreach(var player in playerManagers) { if (player is not null) player.Dispose(); }
+        playerManagers.Where(x=> x is not null).ForEach(x => x.Dispose());
         uiAssetLoader.Dispose();
         outfitAssetManager.Dispose();
         npcInstances.Dispose();

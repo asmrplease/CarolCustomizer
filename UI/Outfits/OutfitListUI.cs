@@ -61,6 +61,7 @@ public class OutfitListUI : MonoBehaviour
 
         deselectAll = transform.Find(uncheckAllAddress).GetComponent<Button>();
         deselectAll.onClick.AddListener(outfitManager.DisableAllAccessories);
+        deselectAll.onClick.AddListener(outfitManager.DisableAllEffects);
         favoriteFilter = transform.Find(filtersAddress + "/Favorites").GetComponent<Toggle>();
         favoriteFilter.onValueChanged.AddListener(ProcessFilters);
         activeFilter = transform.Find(filtersAddress + "/Active").GetComponent<Toggle>();

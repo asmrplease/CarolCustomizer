@@ -2,7 +2,10 @@
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
+using MagicaCloth2;
+using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +40,6 @@ public class SkeletonManager : IDisposable
 
     #region Instance Variables
     PelvisWatchdog targetPelvis;
-    DynamicBone headDynamicBone;
     Dictionary<string, Transform> liveStandardBones = new();
     Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = new();
     #endregion
@@ -73,8 +75,8 @@ public class SkeletonManager : IDisposable
         {
             if (!referenceBones[i]) continue;
             string boneName = referenceBones[i].name;
-            if (bespokeDict.ContainsKey(boneName))       { liveBones[i] = bespokeDict[boneName]; continue; }
-            if (liveStandardBones.ContainsKey(boneName)) { liveBones[i] = liveStandardBones[boneName]; continue; }
+            if (liveStandardBones.TryGetValue(boneName, out liveBones[i])) continue;
+            if (bespokeDict      .TryGetValue(boneName, out liveBones[i])) continue;
         }
 
         Transform rootBone = null;
@@ -100,8 +102,6 @@ public class SkeletonManager : IDisposable
 
         targetPelvis = newPelvis;
         liveStandardBones = targetPelvis.BoneData.StandardBones;
-        //TODO: tell magica about new bones?
-
 
         Log.Debug("SkeletonManager.SetNewPelvis() AddBespokeBones");
         playerManager
@@ -127,35 +127,45 @@ public class SkeletonManager : IDisposable
             foreach (var bone in newBone.SkeletonToList()) { boneDict[bone.name] = bone; }
         }
 
-        var newHairRoots = outfit
-            .boneData
-            .MagicaBones
-            .Where(x => 
-                boneDict.ContainsKey(x.name))
-            .Select(x =>
-                boneDict[x.name]);
-
-        Log.Debug("New Hair roots:");
-        newHairRoots.ForEach(x => Log.Debug(x.name));
-
-        targetPelvis
-            .CompData
-            .magicaCloth
-            .SerializeData
-            .rootBones
-            .AddRange(newHairRoots);
-
-        targetPelvis
-            .CompData
-            .magicaCloth
-            .SetParameterChange();
-
         outfitBoneDicts[outfit] = boneDict;
-
+        NewHairSetup(outfit);
         return boneDict;
     }
 
-    
+    void NewHairSetup(Outfit outfit)
+    {
+        outfitBoneDicts.TryGetValue(outfit, out var boneDict);
+
+        var magicas = outfit
+            .compData
+            .magicaCloths;
+        if (magicas is null || !magicas.Any()) { Log.Warning($"{outfit.DisplayName} had no magica component"); return; }
+
+        foreach (var magica in magicas)
+        {
+            var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
+            var liveBones = new Dictionary<string, Transform>(liveStandardBones);
+            liveBones.AddRange(boneDict);
+
+            var transforms = new HashSet<Transform>();
+            liveMagica.SerializeData.GetUsedTransform(transforms);
+
+            var cullSettings = magica.SerializeData.cullingSettings;
+            cullSettings.cameraCullingMode = CullingSettings.CameraCullingMode.Off;
+
+            var missing = transforms
+                 .Where(x =>
+                     !boneDict.ContainsKey(x.name))
+                 .ForEach(x => Log.Warning($"Missing magica-expected transform {x.name}"));
+            //if (missing.Any()) return;
+
+            Log.Info($"magica.ReplaceTransform({outfit.DisplayName}");
+            liveMagica.ReplaceTransform(liveBones);
+            liveMagica.OnBuildComplete += (x) => Log.Info($"build success: {x}");
+            liveMagica.SetParameterChange();
+            Log.Info("Replaced!");
+        }
+    }
 
     void RemoveBespokeBones(Outfit outfit)
     {
