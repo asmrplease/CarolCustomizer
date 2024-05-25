@@ -76,6 +76,7 @@ public class CompData : MonoBehaviour
                 .SerializeData
                 .cullingSettings
                 .cameraCullingMode = CullingSettings.CameraCullingMode.Off;
+            //magica.gameObject.SetActive(false);
         }
 
         controller ??= animator?.runtimeAnimatorController;

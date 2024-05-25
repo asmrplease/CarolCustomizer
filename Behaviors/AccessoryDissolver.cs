@@ -92,7 +92,7 @@ internal static class AccessoryDissolver
         {
             elapsedTime += Time.deltaTime;
             float dissolvePercent = (elapsedTime / time);
-            Log.Debug(dissolvePercent.ToString());
+            //Log.Debug(dissolvePercent.ToString());
             dissolveMaterial.SetFloat(DissolveAmount, dissolvePercent);
             foreach (var acc in accs) { }
             yield return null;

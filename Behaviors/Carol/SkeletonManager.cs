@@ -2,7 +2,6 @@
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
 using MonoMod.Utils;
@@ -79,12 +78,17 @@ public class SkeletonManager : IDisposable
             if (bespokeDict      .TryGetValue(boneName, out liveBones[i])) continue;
         }
 
-        Transform rootBone = null;
-        if (liveStandardBones.ContainsKey(acc.RootBoneName)) rootBone = liveStandardBones[acc.RootBoneName];
-        if (bespokeDict.ContainsKey(acc.RootBoneName)) rootBone = bespokeDict[acc.RootBoneName];
+        liveStandardBones.TryGetValue(acc.RootBoneName, out var rootBone);
+        if (!rootBone) bespokeDict.TryGetValue(acc.RootBoneName, out rootBone);
         rootBone ??= liveStandardBones["CarolPelvis"];
-
         acc.SetLiveBones(liveBones, rootBone);
+
+        if (!MeshClothAccs.TryGetValue(acc.storedAcc, out var magica)) return;
+        targetPelvis.CompData.Animator.enabled = false;
+        MeshClothAccs.Remove(acc.storedAcc);
+        var boneDict = new Dictionary<string, Transform>(liveStandardBones);
+        boneDict.AddRange(bespokeDict);
+        acc.CloneMagica(magica, targetPelvis, boneDict);
     }
     #endregion
 
@@ -99,6 +103,7 @@ public class SkeletonManager : IDisposable
             .ToList()
             .ForEach(RemoveBespokeBones);
         outfitBoneDicts.Clear();
+        MeshClothAccs.Clear();
 
         targetPelvis = newPelvis;
         liveStandardBones = targetPelvis.BoneData.StandardBones;
@@ -132,38 +137,46 @@ public class SkeletonManager : IDisposable
         return boneDict;
     }
 
+    Dictionary<AccessoryDescriptor, MagicaCloth> MeshClothAccs = new();
+
     void NewHairSetup(Outfit outfit)
     {
         outfitBoneDicts.TryGetValue(outfit, out var boneDict);
-
         var magicas = outfit
             .compData
             .magicaCloths;
         if (magicas is null || !magicas.Any()) { Log.Warning($"{outfit.DisplayName} had no magica component"); return; }
-
+       
         foreach (var magica in magicas)
         {
-            var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
-            var liveBones = new Dictionary<string, Transform>(liveStandardBones);
-            liveBones.AddRange(boneDict);
-
-            var transforms = new HashSet<Transform>();
-            liveMagica.SerializeData.GetUsedTransform(transforms);
-
-            var cullSettings = magica.SerializeData.cullingSettings;
-            cullSettings.cameraCullingMode = CullingSettings.CameraCullingMode.Off;
-
-            var missing = transforms
-                 .Where(x =>
-                     !boneDict.ContainsKey(x.name))
-                 .ForEach(x => Log.Warning($"Missing magica-expected transform {x.name}"));
-            //if (missing.Any()) return;
-
-            Log.Info($"magica.ReplaceTransform({outfit.DisplayName}");
-            liveMagica.ReplaceTransform(liveBones);
-            liveMagica.OnBuildComplete += (x) => Log.Info($"build success: {x}");
-            liveMagica.SetParameterChange();
-            Log.Info("Replaced!");
+            switch (magica.SerializeData.clothType) 
+            {
+                case ClothProcess.ClothType.BoneCloth:
+                    var liveBones = new Dictionary<string, Transform>(liveStandardBones);
+                    liveBones.AddRange(boneDict);
+                    var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
+                    liveMagica.ReplaceTransform(liveBones);
+                    liveMagica.SetParameterChange();
+                    magica.gameObject.SetActive(true);
+                    break;
+                case ClothProcess.ClothType.MeshCloth:
+                    var smrs = magica
+                        .SerializeData
+                        .sourceRenderers
+                        .Where(x => x.GetType() == typeof(SkinnedMeshRenderer))
+                        .Select(x => 
+                            new AccessoryDescriptor(
+                                x as SkinnedMeshRenderer, 
+                                outfit.AssetName))
+                        .ToDictionary(
+                            x => x, 
+                            x => magica);
+                    MeshClothAccs.AddRange(smrs);
+                    break;
+                case ClothProcess.ClothType.BoneSpring:
+                    Log.Warning($"{outfit.DisplayName} has an unhandled bonespring component");
+                    break;
+            }
         }
     }
 
