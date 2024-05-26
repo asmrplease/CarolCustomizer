@@ -12,13 +12,14 @@ namespace CarolCustomizer.Models.Accessories;
 public class LiveAccessory : AccessoryDescriptor
 {
     #region Dependencies
-    //protected readonly SkeletonManager skeleton;
+    
     protected readonly Transform folder;
     public readonly StoredAccessory storedAcc;
     #endregion
 
     #region Common Components
     protected SkinnedMeshRenderer liveSMR;
+    protected MagicaCloth liveMagica;
     #endregion
 
     #region Public Interface
@@ -85,7 +86,9 @@ public class LiveAccessory : AccessoryDescriptor
     public void CloneMagica(MagicaCloth referenceMagica, PelvisWatchdog pelvis, Dictionary<string, Transform> boneDict)
     {
         referenceMagica.gameObject.SetActive(false);
-        var liveMagica = GameObject.Instantiate(referenceMagica, liveSMR.transform);
+        if (liveMagica) GameObject.Destroy(liveMagica);
+
+        liveMagica = GameObject.Instantiate(referenceMagica, pelvis.transform.parent);
         liveMagica.SerializeData.cullingSettings.cameraCullingMode = CullingSettings.CameraCullingMode.Off;
 
         liveMagica.SerializeData.sourceRenderers.Clear();
@@ -109,13 +112,7 @@ public class LiveAccessory : AccessoryDescriptor
     {
         Log.Info($"{liveSMR.name}.BuildMagica({success})");
         if (pelvis) pelvis.CompData.Animator.enabled = true;
-        if (!success) { return; } //GameObject.Destroy(completed.gameObject);
 
-        liveSMR
-            .GetComponentsInChildren<MagicaCloth>()
-            .Where(x => x != completed)
-            .ToList()
-            .ForEach(x => GameObject.Destroy(x.gameObject));
         Log.Info("Old magicas destroyed");
     }
 
