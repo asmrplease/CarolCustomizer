@@ -3,7 +3,6 @@ using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
-using MagicaCloth2;
 using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
@@ -14,24 +13,6 @@ namespace CarolCustomizer.Behaviors.Carol;
 
 public class SkeletonManager : IDisposable
 {
-    #region Static Fields
-    public static Dictionary<string, Transform> CommonBones { get; private set; }
-    static List<string> HairBones = new() { "Carol_TAIL_TOP", "Carol_TAIL_HIGH_MID", "Carol_TAIL_LOW_MID", "Carol_TAIL_END", "Carol_ENDBone001", "Carol_ENDBone001Bone001", "Carol_ENDBone001Bone001Bone001", "Carol_ENDBone001Bone001Bone001Bone001", "Carol_ENDBone001Bone001Bone001Bone001Bone001" };
-    public static void SetCommonBones()
-    {
-        if (CommonBones is not null) { Log.Error("tried to replace standard bone names"); return; }
-
-        CommonBones = GameManager.manager
-            .GetOutfit(Constants.Pyjamas)
-            .transform
-            .RecursiveFindTransform(x => x.name == "CarolPelvis")
-            .SkeletonToList()
-            .ToDictionary(keySelector: x => x.name, elementSelector: x => x);
-        foreach (var bone in HairBones) { CommonBones.Remove(bone); }
-        Log.Info($"Found {CommonBones.Count} of expected 60 standard bones.");
-    }
-    #endregion
-
     #region Dependencies
     CarolInstance playerManager;
     public readonly FaceCopier faceCopier;
@@ -41,12 +22,23 @@ public class SkeletonManager : IDisposable
     PelvisWatchdog targetPelvis;
     Dictionary<string, Transform> liveStandardBones = new();
     Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = new();
+    MagicaManager MagicaManager;
     #endregion
+
+    public Dictionary<string, Transform> GetBoneSet(Outfit outfit)
+    {
+        if (!outfitBoneDicts.TryGetValue(outfit, out var boneSet)) return null;
+        Dictionary<string, Transform> results = new(liveStandardBones);
+        results.AddRange(boneSet);
+        return results;
+    }
 
     #region Lifecycle
     public SkeletonManager(CarolInstance player, GameObject parent)
     {
+        MagicaManager = new MagicaManager(this);
         playerManager = player;
+        playerManager.SpawnEvent += MagicaManager.HandleNewPelvis;
         playerManager.SpawnEvent += SetNewPelvis;
 
         faceCopier = parent.AddComponent<FaceCopier>();
@@ -82,13 +74,7 @@ public class SkeletonManager : IDisposable
         if (!rootBone) bespokeDict.TryGetValue(acc.RootBoneName, out rootBone);
         rootBone ??= liveStandardBones["CarolPelvis"];
         acc.SetLiveBones(liveBones, rootBone);
-
-        if (!MeshClothAccs.TryGetValue(acc.storedAcc, out var magica)) return;
-        targetPelvis.CompData.Animator.enabled = false;
-        MeshClothAccs.Remove(acc.storedAcc);
-        var boneDict = new Dictionary<string, Transform>(liveStandardBones);
-        boneDict.AddRange(bespokeDict);
-        acc.CloneMagica(magica, targetPelvis, boneDict);
+        MagicaManager.HandleNewLiveAcc(acc);
     }
     #endregion
 
@@ -103,7 +89,6 @@ public class SkeletonManager : IDisposable
             .ToList()
             .ForEach(RemoveBespokeBones);
         outfitBoneDicts.Clear();
-        MeshClothAccs.Clear();
 
         targetPelvis = newPelvis;
         liveStandardBones = targetPelvis.BoneData.StandardBones;
@@ -133,51 +118,8 @@ public class SkeletonManager : IDisposable
         }
 
         outfitBoneDicts[outfit] = boneDict;
-        NewHairSetup(outfit);
+        MagicaManager.HandleNewOutfit(outfit);
         return boneDict;
-    }
-
-    Dictionary<AccessoryDescriptor, MagicaCloth> MeshClothAccs = new();
-
-    void NewHairSetup(Outfit outfit)
-    {
-        outfitBoneDicts.TryGetValue(outfit, out var boneDict);
-        var magicas = outfit
-            .compData
-            .magicaCloths;
-        if (magicas is null || !magicas.Any()) { Log.Warning($"{outfit.DisplayName} had no magica component"); return; }
-       
-        foreach (var magica in magicas)
-        {
-            switch (magica.SerializeData.clothType) 
-            {
-                case ClothProcess.ClothType.BoneCloth:
-                    var liveBones = new Dictionary<string, Transform>(liveStandardBones);
-                    liveBones.AddRange(boneDict);
-                    var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
-                    liveMagica.ReplaceTransform(liveBones);
-                    liveMagica.SetParameterChange();
-                    magica.gameObject.SetActive(true);
-                    break;
-                case ClothProcess.ClothType.MeshCloth:
-                    var smrs = magica
-                        .SerializeData
-                        .sourceRenderers
-                        .Where(x => x.GetType() == typeof(SkinnedMeshRenderer))
-                        .Select(x => 
-                            new AccessoryDescriptor(
-                                x as SkinnedMeshRenderer, 
-                                outfit.AssetName))
-                        .ToDictionary(
-                            x => x, 
-                            x => magica);
-                    MeshClothAccs.AddRange(smrs);
-                    break;
-                case ClothProcess.ClothType.BoneSpring:
-                    Log.Warning($"{outfit.DisplayName} has an unhandled bonespring component");
-                    break;
-            }
-        }
     }
 
     void RemoveBespokeBones(Outfit outfit)

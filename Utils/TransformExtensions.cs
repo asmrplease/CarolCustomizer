@@ -8,6 +8,13 @@ namespace CarolCustomizer.Utils;
 
 public static class TransformExtensions
 {
+    public static List<Transform> AllChildTransforms(this Transform transform)
+    {
+        return transform
+            .GetComponentsInChildren<Transform>(true)
+            .ToList();
+    }
+
     /// <summary>
     /// Recursively generates a list of all children of the input transform.
     /// </summary>

@@ -22,6 +22,6 @@ public class StoredAccessory : AccessoryDescriptor
     {
         return outfit.FaceDefinition.Invoke(this.referenceSMR) ?
             new LiveFace(this, skeleton, folder) :
-            new LiveAccessory(this, skeleton, folder);
+            new LiveAccessory(this, folder);
     }
 }

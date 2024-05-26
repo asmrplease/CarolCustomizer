@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
 using System;
@@ -27,16 +28,16 @@ public class BoneData : MonoBehaviour
         allTransforms = transform.SkeletonToList();
 
         List<Transform> filteringList = new(allTransforms);
-        if (SkeletonManager.CommonBones is null) { SkeletonManager.SetCommonBones(); }
+        if (!CommonBones.Ready) { CommonBones.SetCommonBones(); }
 
-        standardBones = filteringList.Where(x => SkeletonManager.CommonBones.Keys.Contains(x.name)).ToList();
+        standardBones = filteringList.Where(x => CommonBones.IsCommon(x.name)).ToList();
 
         filteringList = filteringList
             .Except(standardBones)
             .ToList();
 
         filteringList.RemoveAll
-            (x => !SkeletonManager.CommonBones.Keys.Contains(x.transform.parent.name));
+            (x => !CommonBones.IsCommon(x.transform.parent.name));
 
         BespokeBones = filteringList.ToList();
 

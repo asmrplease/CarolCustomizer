@@ -85,7 +85,7 @@ public class CCPlugin : BaseUnityPlugin
         yield return new WaitUntil(() => GameManager.manager && LocalizationIndex.index is not null);
         Log.Info("Start()");
 
-        if (SkeletonManager.CommonBones is null) SkeletonManager.SetCommonBones();
+        if (!CommonBones.Ready) CommonBones.SetCommonBones();
 
         Settings.Game.ApplySettings();
 

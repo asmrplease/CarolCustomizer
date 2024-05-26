@@ -142,7 +142,7 @@ public class OutfitListUI : MonoBehaviour
 
     void OnOutfitUnloaded(Outfit outfit)
     {
-        Log.Debug($"OutfitList.OnOutfitUnloaded({outfit.AssetName})");
+        //Log.Debug($"OutfitList.OnOutfitUnloaded({outfit.AssetName})");
         if (!outfitUIs.ContainsKey(outfit)) { Log.Warning("UI instance was asked to remove a UI element that was not in it's dict"); return; }
         var outfitUI = outfitUIs[outfit];
         outfitUIs.Remove(outfit);
@@ -159,15 +159,15 @@ public class OutfitListUI : MonoBehaviour
             materialUIs.TryGetValue(new AccMatSlot(accessory, i++), out var matUI);
             if (!matUI) continue;
             GameObject.Destroy(matUI.gameObject);
-            Log.Debug($"Removed {mat.Name}'s UI element");
+            //Log.Debug($"Removed {mat.Name}'s UI element");
         }
-        Log.Debug($"Removed {accessory.DisplayName}'s UI element");
+        //Log.Debug($"Removed {accessory.DisplayName}'s UI element");
     }
 
     AccessoryUI BuildAccUI(AccessoryDescriptor accessoryDescriptor)
     {
         Outfit outfit = OutfitAssetManager.GetOutfitByAssetName(accessoryDescriptor.Source);
-        Log.Debug($"BuildAccUI: source: {accessoryDescriptor.Source} outfit.assetname: {outfit.AssetName}");
+        //Log.Debug($"BuildAccUI: source: {accessoryDescriptor.Source} outfit.assetname: {outfit.AssetName}");
         StoredAccessory accessory = outfit.GetAccessory(accessoryDescriptor);
         var outfitUI = outfitUIs[outfit];
 
@@ -178,7 +178,7 @@ public class OutfitListUI : MonoBehaviour
         if (!accUI) { Log.Error("Failed to add AccUI component"); return null; }
         accUI.Constructor(outfitUI, accessory, this, contextMenu, outfitManager);
         accessoryUIs[accessoryDescriptor] = accUI;
-        Log.Debug("Done"); 
+        //Log.Debug("Done"); 
         return accUI;
     }
 

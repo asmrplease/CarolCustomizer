@@ -5,6 +5,7 @@ using System.Linq;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Assets;
 using MagicaCloth2;
+using System.ComponentModel;
 
 namespace CarolCustomizer.Hooks;
 
@@ -91,6 +92,8 @@ public static class OnirismPatches
         { 
             Log.Info("ClothProcess.StartRuntimeBuild");
             Log.Debug($"Process Type: {__instance.cloth.SerializeData.clothType}");
+            string smrName = __instance.cloth.SerializeData.sourceRenderers.FirstOrDefault()?.name ?? "null";
+            Log.Debug($"TargetSMR: {smrName}");
         }
     }
 }
