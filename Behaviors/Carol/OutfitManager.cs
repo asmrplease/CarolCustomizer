@@ -120,7 +120,7 @@ public class OutfitManager
     void OnSpawn(PelvisWatchdog pelvis)
     {
         pelvis.SetBaseVisibility(false);
-        if (this.pelvis == pelvis) { Log.Debug("Outfitmanager was given it's existing pelvis"); return; }
+        //if (this.pelvis == pelvis) { Log.Debug("Outfitmanager was given it's existing pelvis"); return; }
 
         this.pelvis = pelvis;
         RefreshSMRs(pelvis);

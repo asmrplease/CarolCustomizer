@@ -3,6 +3,7 @@ using CarolCustomizer.Utils;
 using MagicaCloth2;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Models.Accessories;
@@ -24,6 +25,8 @@ public class LiveAccessory : AccessoryDescriptor
     public Outfit outfit => storedAcc?.outfit;
 
     public Action OnAccessoryStateChanged;
+
+    public SkinnedMeshRenderer DEBUG_GET_SMR() => liveSMR;
 
     virtual public void Enable() => liveSMR.gameObject.SetActive(true);
 
@@ -54,16 +57,28 @@ public class LiveAccessory : AccessoryDescriptor
 
     public void SetLiveBones(Transform[] liveBones, Transform rootBone)
     {
+        if (!liveSMR) Log.Warning($"{this.Name} had a null SMR during SetLiveBones()");
         liveSMR.bones = liveBones;
         liveSMR.rootBone = rootBone;
     }
 
     public void AddToMagica(MagicaCloth magica)
     {
+        GameObject.Destroy(liveSMR.gameObject);
+        liveSMR = GameObject.Instantiate(storedAcc.referenceSMR, folder).GetComponent<SkinnedMeshRenderer>();
+        ReapplyMaterials();
         magica.SerializeData.sourceRenderers.Clear();
         magica.SerializeData.sourceRenderers.Add(liveSMR);
         magica.SerializeData.rootBones.Clear();
         magica.SerializeData.rootBones.Add(liveSMR.transform);
+        if (liveSMR.bones.Count() != storedAcc.referenceSMR.bones.Count() + 2)
+        {
+            Log.Warning("smr bone count was short");
+            var update = liveSMR.bones.ToList();
+            update.Add(liveSMR.rootBone);
+            update.Add(liveSMR.transform);
+            liveSMR.bones = update.ToArray();
+        }
     }
 
     internal void ApplyMaterial(MaterialDescriptor material, int index)
@@ -72,6 +87,12 @@ public class LiveAccessory : AccessoryDescriptor
         Materials[index] = material;
         liveSMR.ReplaceMaterialAtIndex(material.referenceMaterial, index);
         Log.Debug($"The material is now {liveSMR.materials[index]}.");
+    }
+
+    void ReapplyMaterials()
+    {
+        var i = 0;
+        Materials.ForEach((x) => liveSMR.ReplaceMaterialAtIndex(x.referenceMaterial, i));
     }
 
     internal void ApplySharedMaterials(List<Material> materials)

@@ -122,6 +122,6 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     {
         Log.Info($"Traditionally Instantiating {outfit.DisplayName}");
         CCPlugin.cutscenePlayer.outfitManager.pelvis.SetBaseOutfit(outfit);
-        CCPlugin.cutscenePlayer.outfitManager.pelvis.SetBaseVisibility(true);
+        CCPlugin.cutscenePlayer.outfitManager.pelvis.SetBaseVisibility(Input.GetKey(KeyCode.LeftShift));
     }
 }

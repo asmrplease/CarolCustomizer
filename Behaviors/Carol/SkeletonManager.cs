@@ -82,7 +82,7 @@ public class SkeletonManager : IDisposable
     void SetNewPelvis(PelvisWatchdog newPelvis)
     {
         Log.Info("SkeletonManager.SetNewPelvis()");
-        if (newPelvis == targetPelvis) { Log.Debug("SkeletonManager was given its existing pelvis"); return; }
+        //if (newPelvis == targetPelvis) { Log.Debug("SkeletonManager was given its existing pelvis"); return; }
 
         outfitBoneDicts
             .Keys

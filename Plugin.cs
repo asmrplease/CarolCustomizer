@@ -46,6 +46,8 @@ public class CCPlugin : BaseUnityPlugin
     {
         new Log(Logger);
         Log.Message("Logger Ready!");
+        this.gameObject.AddComponent<DebugOnKeypress>().Constructor(KeyCode.Tab, "----------------------------------------------------------------------------------------------", Log.Info);
+
         CoroutineRunner = this;
         Settings.Constructor(Config);
         saveAdjuster = new();
