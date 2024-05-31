@@ -28,11 +28,7 @@ public class LiveAccessory : AccessoryDescriptor
 
     public SkinnedMeshRenderer DEBUG_GET_SMR() => liveSMR;
 
-    virtual public void Enable() => liveSMR.gameObject.SetActive(true);
-
-    virtual public void Disable() => liveSMR.gameObject.SetActive(false);
-
-    public bool isActive => liveSMR?.gameObject.activeSelf ?? false;
+    public bool isActive { get; private set; } = false;
 
     public LiveAccessory(StoredAccessory acc, Transform folder)
         : base(acc.Name, acc.Source)
@@ -60,6 +56,18 @@ public class LiveAccessory : AccessoryDescriptor
         if (!liveSMR) Log.Warning($"{this.Name} had a null SMR during SetLiveBones()");
         liveSMR.bones = liveBones;
         liveSMR.rootBone = rootBone;
+    }
+
+    virtual public void Enable()
+    {
+        isActive = true;
+        liveSMR.gameObject.SetActive(true);
+    }
+
+    virtual public void Disable() 
+    {
+        isActive = false;
+        liveSMR.gameObject.SetActive(false); 
     }
 
     public void AddToMagica(MagicaCloth magica)

@@ -95,6 +95,7 @@ internal class MagicaManager
             GameObject.DestroyImmediate(existingMagica.gameObject);
         }
 
+        if (!acc.isActive) return;
 
         targetPelvis.DisableAnimator();
         MeshClothAccs.Remove(acc.storedAcc);
