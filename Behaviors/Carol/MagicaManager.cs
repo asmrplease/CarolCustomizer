@@ -60,8 +60,14 @@ internal class MagicaManager
                     
                     var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
                     liveMagica.name = outfit.DisplayName + " BoneCloth";
+                    targetPelvis.DisableAnimator();
                     liveMagica.ReplaceTransform(skeleton.GetBoneSet(outfit));
                     liveMagica.SetParameterChange();
+                    processing.Add(liveMagica);
+                    var buildGuid = Guid.NewGuid();
+                    Log.Debug(buildGuid.ToString());
+                    liveMagica.OnBuildComplete += (x) => HandleBuildComplete(x, liveMagica, buildGuid);
+                    liveMagica.BuildAndRun();
                     BoneCloths[outfit] = liveMagica;
                     magica.gameObject.SetActive(true);
                     break;
@@ -106,7 +112,7 @@ internal class MagicaManager
 
         targetPelvis.DisableAnimator();
         MeshClothAccs.Remove(acc.storedAcc);
-        acc.DEBUG_GET_SMR().GetAddComponent<SMRWatcher>();
+        //acc.DEBUG_GET_SMR().GetAddComponent<SMRWatcher>();
         var boneDict = skeleton.GetBoneSet(acc.outfit);
         //boneDict[acc.Name] = acc.DEBUG_GET_SMR().transform;
 
@@ -127,7 +133,7 @@ internal class MagicaManager
         liveMagica.SetParameterChange();
         var buildGuid = Guid.NewGuid();
         Log.Debug(buildGuid.ToString());
-        liveMagica.OnBuildComplete += (x) => HandleBuildComplete(x, acc, liveMagica, buildGuid);
+        liveMagica.OnBuildComplete += (x) => HandleBuildComplete(x, liveMagica, buildGuid);
         liveMagica.gameObject.SetActive(true);
         referenceMagica.gameObject.SetActive(true);
         LiveCloths[acc] = liveMagica;
@@ -135,16 +141,12 @@ internal class MagicaManager
         acc.DEBUG_GET_SMR().bones.Where(x => x).ForEach(x=>Log.Debug(x.name));
     }
 
-    void HandleBuildComplete(bool success, LiveAccessory acc, MagicaCloth component, Guid buildGuid)
+    void HandleBuildComplete(bool success, MagicaCloth component, Guid buildGuid)
     {
         processing.Remove(component);
-        string smrName = component.SerializeData.sourceRenderers.FirstOrDefault()?.name ?? "null";
-        Log.Info($"HandleBuildComplete({smrName}, {buildGuid}): {success}.");
+        processing.RemoveAll(x => !x);
+        Log.Info($"HandleBuildComplete({buildGuid}): {success}.");
         if (!targetPelvis) { Log.Warning("build completed after pelvis was destroyed"); return; }
-
-        //skeleton.AssignLiveBones(acc);
-        //component.ReplaceTransform(skeleton.GetBoneSet(acc.outfit));
-        //component.SetParameterChange();
 
         if (processing.Any()) return;
         Log.Info("enabling animator");
