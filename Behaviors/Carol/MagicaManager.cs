@@ -6,7 +6,6 @@ using MagicaCloth2;
 using MonoMod.Utils;
 using Slate;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -21,6 +20,7 @@ internal class MagicaManager
     List<MagicaCloth> processing = new();
     PelvisWatchdog targetPelvis;
     Dictionary<AccessoryDescriptor, MagicaCloth> MeshClothAccs = new();
+    Dictionary<Outfit, MagicaCloth> BoneCloths = new();
     
 
     public MagicaManager(SkeletonManager skeleton)
@@ -40,7 +40,7 @@ internal class MagicaManager
 
     public void HandleNewOutfit(Outfit outfit)
     {
-        Log.Debug($"MagicaManager.HandleNewOutfit({outfit.DisplayName}");
+        Log.Info($"MagicaManager.HandleNewOutfit({outfit.DisplayName}");
         if (!targetPelvis) { Log.Warning("MagicaManager had no pelvis during HandleNewOutfit"); return; }
         var magicas = outfit
             .compData
@@ -52,10 +52,17 @@ internal class MagicaManager
             switch (magica.SerializeData.clothType)
             {
                 case ClothProcess.ClothType.BoneCloth:
+                    Log.Debug("BoneCloth");
+                    if (BoneCloths.TryGetValue(outfit, out var existingMagica) && existingMagica)
+                    {
+                        GameObject.DestroyImmediate(existingMagica.gameObject);
+                    }  
+                    
                     var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
                     liveMagica.name = outfit.DisplayName + " BoneCloth";
                     liveMagica.ReplaceTransform(skeleton.GetBoneSet(outfit));
                     liveMagica.SetParameterChange();
+                    BoneCloths[outfit] = liveMagica;
                     magica.gameObject.SetActive(true);
                     break;
                 case ClothProcess.ClothType.MeshCloth:
