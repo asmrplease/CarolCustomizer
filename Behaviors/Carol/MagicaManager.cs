@@ -126,8 +126,8 @@ internal class MagicaManager
         liveMagica.gameObject.SetActive(true);
         referenceMagica.gameObject.SetActive(true);
         LiveCloths[acc] = liveMagica;
-        Log.Debug("Bone list:");
-        acc.DEBUG_GET_SMR().bones.Where(x => x).ForEach(x=>Log.Debug(x.name));
+        //Log.Debug("Bone list:");
+        //acc.DEBUG_GET_SMR().bones.Where(x => x).ForEach(x=>Log.Debug(x.name));
     }
 
     void HandleBuildComplete(bool success, MagicaCloth component, Guid buildGuid)

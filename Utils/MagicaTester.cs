@@ -13,7 +13,7 @@ internal static class MagicaTester
         Log.Info("Magica Cloth Test");
         //basic null checks
         if (acc is null) { Log.Error("LiveAccessory is null"); return; }
-        var liveSMR = acc.DEBUG_GET_SMR();
+        SkinnedMeshRenderer liveSMR = null;//acc.DEBUG_GET_SMR();
         var storedSMR = acc.storedAcc.referenceSMR;
         if (!cloth) { Log.Error("Cloth null"); return; }
         if (!liveSMR) { Log.Error("SMR null"); return; }

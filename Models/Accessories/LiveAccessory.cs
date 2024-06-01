@@ -26,7 +26,7 @@ public class LiveAccessory : AccessoryDescriptor
 
     public Action OnAccessoryStateChanged;
 
-    public SkinnedMeshRenderer DEBUG_GET_SMR() => liveSMR;
+    //public SkinnedMeshRenderer DEBUG_GET_SMR() => liveSMR;
 
     public bool isActive { get; private set; } = false;
 

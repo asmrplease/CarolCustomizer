@@ -24,7 +24,7 @@ public class PelvisWatchdog : MonoBehaviour
     protected string grandparentName => transform.parent?.parent?.name ?? "none";
     protected string rootName => transform.root?.name ?? "none";
 
-    bool disableAnimator;
+    protected bool disableAnimator;
 
     List<(Func<Predicate<PelvisWatchdog>, bool>,
             Predicate<PelvisWatchdog>)> checks;

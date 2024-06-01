@@ -107,6 +107,8 @@ public class PlayerWatchdog : PelvisWatchdog
         if (!animator) { Log.Warning("failed to get animator from outfit"); return; }
 
         this.compData.Animator.runtimeAnimatorController = animator;
+        if (disableAnimator) DisableAnimator();
+
         Log.Debug("Done");
     }
 
