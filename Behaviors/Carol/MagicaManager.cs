@@ -20,8 +20,7 @@ internal class MagicaManager
     List<MagicaCloth> processing = new();
     PelvisWatchdog targetPelvis;
     Dictionary<AccessoryDescriptor, MagicaCloth> MeshClothAccs = new();
-    Dictionary<Outfit, MagicaCloth> BoneCloths = new();
-    
+    List<MagicaCloth> BoneCloths = new();
 
     public MagicaManager(SkeletonManager skeleton)
     {
@@ -35,6 +34,8 @@ internal class MagicaManager
 
         targetPelvis = newPelvis;
         MeshClothAccs.Clear();
+        BoneCloths.Where(x => x).ForEach(GameObject.DestroyImmediate);
+        BoneCloths.Clear();
         Log.Debug("HandlePelvis done.");
     }
 
@@ -53,10 +54,6 @@ internal class MagicaManager
             {
                 case ClothProcess.ClothType.BoneCloth:
                     Log.Debug("BoneCloth");
-                    if (BoneCloths.TryGetValue(outfit, out var existingMagica) && existingMagica)
-                    {
-                        GameObject.DestroyImmediate(existingMagica.gameObject);
-                    }  
                     
                     var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
                     liveMagica.name = outfit.DisplayName + " BoneCloth";
@@ -68,7 +65,7 @@ internal class MagicaManager
                     Log.Debug(buildGuid.ToString());
                     liveMagica.OnBuildComplete += (x) => HandleBuildComplete(x, liveMagica, buildGuid);
                     liveMagica.BuildAndRun();
-                    BoneCloths[outfit] = liveMagica;
+                    BoneCloths.Add(liveMagica);
                     magica.gameObject.SetActive(true);
                     break;
                 case ClothProcess.ClothType.MeshCloth:
@@ -99,12 +96,6 @@ internal class MagicaManager
 
         if (LiveCloths.TryGetValue(acc, out var existingMagica) && existingMagica)
         {
-            if (existingMagica.isActiveAndEnabled)
-            {
-                //Log.Error("Tried to replace active magica cloth!");
-                //GameObject.DestroyImmediate()
-                //return;
-            }
             GameObject.DestroyImmediate(existingMagica.gameObject);
         }
 
@@ -112,9 +103,7 @@ internal class MagicaManager
 
         targetPelvis.DisableAnimator();
         MeshClothAccs.Remove(acc.storedAcc);
-        //acc.DEBUG_GET_SMR().GetAddComponent<SMRWatcher>();
         var boneDict = skeleton.GetBoneSet(acc.outfit);
-        //boneDict[acc.Name] = acc.DEBUG_GET_SMR().transform;
 
         referenceMagica.gameObject.SetActive(false);
 
