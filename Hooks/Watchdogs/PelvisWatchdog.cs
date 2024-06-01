@@ -97,7 +97,7 @@ public class PelvisWatchdog : MonoBehaviour
         disableAnimator = true;
         compData.Animator.enabled = false;
         compData.Animator.Rebind();
-        //return;
+
         var restingBones = OutfitAssetManager.GetPyjamas().boneData.StandardBones;
         foreach (var resting in restingBones)
         {

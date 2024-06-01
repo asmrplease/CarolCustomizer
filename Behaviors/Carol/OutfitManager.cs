@@ -4,7 +4,9 @@ using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
+using MagicaCloth2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +28,7 @@ public class OutfitManager
     HashSet<Outfit> outfitEffects = new();
     Outfit animatorSource;
     HaDSOutfit configurationSource;
+    Outfit colliderSource;
     #endregion
 
     #region Public Interface
@@ -33,6 +36,7 @@ public class OutfitManager
     public event Action<AccessoryChangedEvent> AccessoryChanged;
     public string AnimatorSource => animatorSource?.AssetName ?? Constants.Pyjamas;
     public string ConfigurationSource => configurationSource?.AssetName ?? Constants.Pyjamas;
+    public string ColliderSource => colliderSource?.AssetName ?? Constants.Pyjamas;
 
     public IEnumerable<StoredAccessory> ActiveAccessories =>
             liveAccessories
@@ -58,7 +62,10 @@ public class OutfitManager
     {
         this.skeletonManager = skeletonManager;
         playerManager = player;
-        animatorSource = configurationSource = OutfitAssetManager.GetPyjamas();
+        animatorSource
+            = colliderSource
+            = configurationSource
+            = OutfitAssetManager.GetPyjamas();
 
         playerManager.SpawnEvent += OnSpawn;
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
@@ -121,13 +128,14 @@ public class OutfitManager
     void OnSpawn(PelvisWatchdog pelvis)
     {
         pelvis.SetBaseVisibility(false);
-        //if (this.pelvis == pelvis) { Log.Debug("Outfitmanager was given it's existing pelvis"); return; }
+        if (this.pelvis == pelvis) { Log.Debug("Outfitmanager was given it's existing pelvis"); return; }
 
         this.pelvis = pelvis;
         RefreshSMRs(pelvis);
         if (outfitEffects.Any()) RefreshEffects();
         if (animatorSource is not null) SetAnimator(animatorSource);
         if (configurationSource is not null) ApplyConfig();
+        if (colliderSource is not null) ApplyCollider();
     }
 
     public void SetAnimator(Outfit outfit)
@@ -181,6 +189,37 @@ public class OutfitManager
 
         if ( enabled) outfitEffects.Add(outfit);
         if (!enabled) outfitEffects.Remove(outfit);
+    }
+
+    public void SetColliderSource(Outfit outfit)
+    {
+        if (outfit is null) { Log.Warning("outfit was null when setting collider source"); return; }
+
+        colliderSource = outfit;
+        ApplyCollider();
+    }
+
+    void ApplyCollider()
+    {
+        if (!pelvis) return;
+
+        var sourceColliders = colliderSource
+            .prefabWatchdog
+            .GetComponentsInChildren<MagicaCapsuleCollider>()
+            .ToDictionary(x => x.name);
+        var liveColliders = pelvis
+            .BoneData
+            .StandardBones
+            .Select(x => x.Value.GetComponent<MagicaCapsuleCollider>())
+            .Where(x => x);
+        foreach (var liveCollider in liveColliders)
+        {
+            if (!sourceColliders.TryGetValue(liveCollider.name, out var referenceCollider)) continue;
+
+            liveCollider.SetSize(referenceCollider.GetSize());
+            liveCollider.center = referenceCollider.center;
+            liveCollider.UpdateParameters();
+        }
     }
 
     void RefreshEffects()

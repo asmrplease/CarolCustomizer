@@ -30,7 +30,7 @@ internal class MagicaManager
     public void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
         Log.Debug("magicamanager.handleNewPelvis()");
-        //if (targetPelvis == newPelvis) return;
+        if (targetPelvis == newPelvis) return;
 
         targetPelvis = newPelvis;
         MeshClothAccs.Clear();

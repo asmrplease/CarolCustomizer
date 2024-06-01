@@ -84,7 +84,7 @@ public class SkeletonManager : IDisposable
     void SetNewPelvis(PelvisWatchdog newPelvis)
     {
         Log.Info("SkeletonManager.SetNewPelvis()");
-        //if (newPelvis == targetPelvis) { Log.Debug("SkeletonManager was given its existing pelvis"); return; }
+        if (newPelvis == targetPelvis) { Log.Debug("SkeletonManager was given its existing pelvis"); return; }
 
         outfitBoneDicts
             .Keys
@@ -96,10 +96,6 @@ public class SkeletonManager : IDisposable
         liveStandardBones = targetPelvis.BoneData.StandardBones;
 
         Log.Debug("SkeletonManager.SetNewPelvis() AddBespokeBones");
-        //playerManager
-        //    .outfitManager
-        //    .ActiveOutfits
-        //    .ForEach(x => AddBespokeBones(x));
     }
 
     public Dictionary<string, Transform> AddBespokeBones(Outfit outfit)

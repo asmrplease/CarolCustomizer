@@ -96,9 +96,9 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         {
              ("Use Animator",     () => ui.playerManager.outfitManager.SetAnimator(outfit))
             ,("Use Measurements", () => ui.playerManager.outfitManager.SetConfiguration(hads))
+            ,("Use Colliders",    () => ui.playerManager.outfitManager.SetColliderSource(outfit))
             ,("Activate Effects", () => ui.playerManager.outfitManager.SetEffect(outfit, true))
             ,("Disable Effects",  () => ui.playerManager.outfitManager.SetEffect(outfit, false))
-            ,("Instantiate",  IDK)
         };
 
         foreach (var entry in hads.Variants)
@@ -117,12 +117,5 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             ui.OnAccessoryUnloaded(accUI.accessory);
             GameObject.Destroy(accUI.gameObject);
         }
-    }
-
-    void IDK()
-    {
-        Log.Info($"Traditionally Instantiating {outfit.DisplayName}");
-        CCPlugin.cutscenePlayer.outfitManager.pelvis.SetBaseOutfit(outfit);
-        CCPlugin.cutscenePlayer.outfitManager.pelvis.SetBaseVisibility(Input.GetKey(KeyCode.LeftShift));
     }
 }
