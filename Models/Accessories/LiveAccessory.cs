@@ -54,7 +54,13 @@ public class LiveAccessory : AccessoryDescriptor
     public void SetLiveBones(Transform[] liveBones, Transform rootBone)
     {
         if (!liveSMR) Log.Warning($"{this.Name} had a null SMR during SetLiveBones()");
-        liveSMR.bones = liveBones;
+        if (liveSMR.bones.Length > liveBones.Length)
+        {
+            var temp = new Transform[liveSMR.bones.Length];
+            Array.Copy(liveSMR.bones, temp, liveSMR.bones.Length);
+            foreach (int i in Enumerable.Range(0, liveBones.Length)) temp[i] = liveBones[i];
+        }
+        else liveSMR.bones = liveBones;
         liveSMR.rootBone = rootBone;
     }
 
@@ -79,14 +85,6 @@ public class LiveAccessory : AccessoryDescriptor
         magica.SerializeData.sourceRenderers.Add(liveSMR);
         magica.SerializeData.rootBones.Clear();
         magica.SerializeData.rootBones.Add(liveSMR.transform);
-        if (liveSMR.bones.Count() != storedAcc.referenceSMR.bones.Count() + 2)
-        {
-            Log.Warning("smr bone count was short");
-            var update = liveSMR.bones.ToList();
-            update.Add(liveSMR.rootBone);
-            update.Add(liveSMR.transform);
-            liveSMR.bones = update.ToArray();
-        }
     }
 
     internal void ApplyMaterial(MaterialDescriptor material, int index)

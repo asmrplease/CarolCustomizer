@@ -35,6 +35,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     #region State Variables
     List<AccessoryUI> Accessories = new();
     public bool expanded = false;
+    public Color color = Constants.DefaultColor;
     #endregion
 
     #region Setup
@@ -47,7 +48,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         name = "OutfitUI: " + outfit.DisplayName;
 
         background = transform.GetChild(0).gameObject.GetComponent<Image>();
-        background.color = Constants.DefaultColor;
+        background.color = color;
 
         displayImage = transform.Find(displayImageAddress)?.GetComponent<Image>();
         displayImage.sprite = outfit.Sprite;
@@ -85,7 +86,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     public void OnAccessoryToggled()
     {
         if (Accessories.Any(x => x.activationToggle.isOn)) { background.color = Constants.Highlight; return; }
-        background.color = Constants.DefaultColor;
+        background.color = color;
     }
 
     public List<(string, UnityAction)> GetContextMenuItems()

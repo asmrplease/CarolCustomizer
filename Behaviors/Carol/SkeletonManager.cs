@@ -55,6 +55,7 @@ public class SkeletonManager : IDisposable
     #region Public Interface
     public void AssignLiveBones(LiveAccessory acc)
     {
+        Log.Debug($"AssignLiveBones({acc.Name})");
         if (acc is null) { Log.Error("Requested bones for null accessory"); return; }
         outfitBoneDicts.TryGetValue(acc.outfit, out var bespokeDict);
         bespokeDict ??= AddBespokeBones(acc.outfit);
@@ -73,6 +74,7 @@ public class SkeletonManager : IDisposable
         liveStandardBones.TryGetValue(acc.RootBoneName, out var rootBone);
         if (!rootBone) bespokeDict.TryGetValue(acc.RootBoneName, out rootBone);
         rootBone ??= liveStandardBones["CarolPelvis"];
+
         acc.SetLiveBones(liveBones, rootBone);
         MagicaManager.HandleNewLiveAcc(acc);
     }
@@ -94,10 +96,10 @@ public class SkeletonManager : IDisposable
         liveStandardBones = targetPelvis.BoneData.StandardBones;
 
         Log.Debug("SkeletonManager.SetNewPelvis() AddBespokeBones");
-        playerManager
-            .outfitManager
-            .ActiveOutfits
-            .ForEach(x => AddBespokeBones(x));
+        //playerManager
+        //    .outfitManager
+        //    .ActiveOutfits
+        //    .ForEach(x => AddBespokeBones(x));
     }
 
     public Dictionary<string, Transform> AddBespokeBones(Outfit outfit)

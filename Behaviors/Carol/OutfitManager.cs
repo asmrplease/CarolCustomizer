@@ -69,18 +69,19 @@ public class OutfitManager
         Log.Debug("RefreshSMRS()");
         liveAccessories
             .Values
+            .Where(x => x.isActive)
             .ForEach(
                 skeletonManager.AssignLiveBones);
     }
 
     public void EnableAccessory(StoredAccessory accessory)
     {
+        Log.Debug($"EnableAccessory({accessory.Name})");
         if (!liveAccessories.TryGetValue(accessory, out var live))
         {
             live = accessory.MakeLive(skeletonManager, OutfitAssetManager.liveFolder);
             liveAccessories.Add(accessory, live);
         }
-        Log.Debug($"EnableAccessory({accessory.Name}) AssignLiveBones");
         live.Enable();
         skeletonManager.AssignLiveBones(live);
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, live, true));
