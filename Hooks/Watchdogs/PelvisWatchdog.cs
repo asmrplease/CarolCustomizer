@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PelvisWatchdog : MonoBehaviour
-{   
+{
     readonly Guid Guid = Guid.NewGuid();
     protected Guid SourceGuid;
 
@@ -23,6 +23,8 @@ public class PelvisWatchdog : MonoBehaviour
     protected string parentName => transform.parent?.name ?? "none";
     protected string grandparentName => transform.parent?.parent?.name ?? "none";
     protected string rootName => transform.root?.name ?? "none";
+
+    bool disableAnimator;
 
     List<(Func<Predicate<PelvisWatchdog>, bool>,
             Predicate<PelvisWatchdog>)> checks;
@@ -45,7 +47,7 @@ public class PelvisWatchdog : MonoBehaviour
         DetectType();
     }
 
-    virtual protected void OnTransformParentChanged() => DetectType(); 
+    virtual protected void OnTransformParentChanged() => DetectType();
 
     void SetupCheckList()
     {
@@ -53,7 +55,7 @@ public class PelvisWatchdog : MonoBehaviour
         {
             (Check<VirtualCarol,    MPBotWatchdog>,  (x)=> true),
             (Check<Entity,          PlayerWatchdog>, (x)=> x.rootName == "CAROL(Clone)"),
-            (Check<Entity,          BotWatchdog>,    (x)=> true), 
+            (Check<Entity,          BotWatchdog>,    (x)=> true),
             (Check<CutsceneActor,   ActressWatchdog>,(x)=> true),
             (Check<Character,       PirateWatchdog>, (x)=> x.parentName == "Carol_Pirate"),
             (Check<Character,       ActressWatchdog>,(x)=> true),
@@ -76,17 +78,48 @@ public class PelvisWatchdog : MonoBehaviour
         where ResultType : PelvisWatchdog
     {
         try { if (!predicate.Invoke(this)) return false; }
-        catch (NullReferenceException e) 
+        catch (NullReferenceException e)
         { Log.Warning($"{nameof(ResultType)} predicate caused an exception: {e.Message}"); return false; }
 
         var component = compData.GetParentComponent(typeof(SearchType));
         if (!component) return false;
         if (GetType() == typeof(ResultType)) return true;
-        
+
         Log.Info($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
         gameObject.AddComponent<ResultType>().BuildFromExisting(this, component);
         Destroy(this);
         return true;
+    }
+
+    public void DisableAnimator()
+    {
+        if (!compData.Animator) return;
+        disableAnimator = true;
+        compData.Animator.enabled = false;
+        compData.Animator.Rebind();
+        //return;
+        var restingBones = OutfitAssetManager.GetPyjamas().boneData.StandardBones;
+        foreach (var resting in restingBones)
+        {
+            var livebone = boneData.StandardBones[resting.Key];
+            livebone.localPosition = resting.Value.localPosition;
+            livebone.localRotation = resting.Value.localRotation;
+        }
+
+    }
+
+    void LateUpdate()
+    {
+        if (!disableAnimator) return;
+        if (!compData.Animator) return;
+        compData.Animator.enabled = false;
+    }
+
+    public void EnableAnimator()
+    {
+        if (!compData.Animator) return;
+        disableAnimator = false;
+        compData.Animator.enabled = true;
     }
 
     public virtual void SetBaseOutfit(Outfit outfit) { }

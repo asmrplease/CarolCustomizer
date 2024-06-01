@@ -4,6 +4,8 @@ using CarolCustomizer.Utils;
 using System.Linq;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Assets;
+using MagicaCloth2;
+using System.ComponentModel;
 
 namespace CarolCustomizer.Hooks;
 
@@ -73,5 +75,25 @@ public static class OnirismPatches
     {
         [HarmonyPostfix]
         public static void Postfix() => SaveDataAdjuster.SetPyjamas();
+    }
+
+    [HarmonyPatch(typeof(MagicaCloth), nameof(MagicaCloth.BuildAndRun))] 
+    public static class DebugInit
+    {
+        [HarmonyPostfix]
+        public static void Postfix() => Log.Info("MagicaCloth.BuildAndRun Postfix");
+    }
+
+    [HarmonyPatch(typeof(ClothProcess), "StartRuntimeBuild")]
+    public static class DebugInit2
+    {
+        [HarmonyPrefix]
+        public static void Postfix(ClothProcess __instance) 
+        { 
+            Log.Info("ClothProcess.StartRuntimeBuild");
+            Log.Debug($"Process Type: {__instance.cloth.SerializeData.clothType}");
+            string smrName = __instance.cloth.SerializeData.sourceRenderers.FirstOrDefault()?.name ?? "null";
+            Log.Debug($"TargetSMR: {smrName}");
+        }
     }
 }

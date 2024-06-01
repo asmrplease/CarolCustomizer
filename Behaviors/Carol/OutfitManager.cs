@@ -14,7 +14,7 @@ namespace CarolCustomizer.Behaviors.Carol;
 /// <summary>
 /// Responsible for the clothing of one Carol Instance. 
 /// </summary>
-public class OutfitManager 
+public class OutfitManager
 {
     #region Dependencies
     SkeletonManager skeletonManager;
@@ -44,7 +44,7 @@ public class OutfitManager
         .Values
         .Where(x => x.isActive)
         .Select(x => new AccessoryDescriptor(x));
-        
+
     public IEnumerable<Outfit> ActiveOutfits =>
         ActiveAccessories
         .Select(x => x.outfit)
@@ -54,34 +54,36 @@ public class OutfitManager
         outfitEffects
         .Select(x => x.AssetName);
 
-    public OutfitManager(CarolInstance player, SkeletonManager skeletonManager, OutfitAssetManager dynamicAssetManager)
+    public OutfitManager(CarolInstance player, SkeletonManager skeletonManager)
     {
         this.skeletonManager = skeletonManager;
         playerManager = player;
         animatorSource = configurationSource = OutfitAssetManager.GetPyjamas();
 
-        playerManager.SpawnEvent += RefreshSMRs;
         playerManager.SpawnEvent += OnSpawn;
-        AccessoryChanged += DebugAccChanged;
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
     }
 
-    void DebugAccChanged(AccessoryChangedEvent e) => Log.Debug(e.ToString());
-
-    void RefreshSMRs(PelvisWatchdog pelvis)
+    void RefreshSMRs(PelvisWatchdog pelvis) 
     {
-        foreach (var accessory in ActiveAccessories) { liveAccessories[accessory].Refresh(); }
+        Log.Debug("RefreshSMRS()");
+        liveAccessories
+            .Values
+            .Where(x => x.isActive)
+            .ForEach(
+                skeletonManager.AssignLiveBones);
     }
 
     public void EnableAccessory(StoredAccessory accessory)
     {
-        liveAccessories.TryGetValue(accessory, out var live);
-        if (live is null) { live = Instantiate(accessory); }
-        else
+        Log.Debug($"EnableAccessory({accessory.Name})");
+        if (!liveAccessories.TryGetValue(accessory, out var live))
         {
-            live.Enable();
-            live.Refresh();
+            live = accessory.MakeLive(skeletonManager, OutfitAssetManager.liveFolder);
+            liveAccessories.Add(accessory, live);
         }
+        live.Enable();
+        skeletonManager.AssignLiveBones(live);
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, live, true));
     }
 
@@ -116,19 +118,13 @@ public class OutfitManager
     }
     #endregion
 
-    LiveAccessory Instantiate(StoredAccessory accessory)
-    {
-        var liveAcc = accessory.MakeLive(skeletonManager, OutfitAssetManager.liveFolder);
-        liveAccessories.Add(accessory, liveAcc);
-        liveAcc.Enable();
-        liveAcc.Refresh();
-        return liveAcc;
-    }
-
     void OnSpawn(PelvisWatchdog pelvis)
     {
-        this.pelvis = pelvis;
         pelvis.SetBaseVisibility(false);
+        //if (this.pelvis == pelvis) { Log.Debug("Outfitmanager was given it's existing pelvis"); return; }
+
+        this.pelvis = pelvis;
+        RefreshSMRs(pelvis);
         if (outfitEffects.Any()) RefreshEffects();
         if (animatorSource is not null) SetAnimator(animatorSource);
         if (configurationSource is not null) ApplyConfig();
@@ -145,7 +141,6 @@ public class OutfitManager
 
     public void SetConfiguration(HaDSOutfit outfit) 
     {
-        Log.Debug("SetConfiguration()");
         if (outfit is null) { Log.Warning("outfit is null"); return; }
         this.configurationSource = outfit;
         ApplyConfig();
@@ -160,11 +155,9 @@ public class OutfitManager
 
     public void SetEffect(Outfit outfit, bool enabled)
     {
-        Log.Debug($"SetEffect({outfit.DisplayName}, {enabled});");
         if (!pelvis || outfit is null) return;
         if (!outfit.Effects.Any()) return;
 
-        Log.Debug("Setting effect...");
         skeletonManager.AddBespokeBones(outfit);
         foreach (var effect in outfit.Effects)
         {

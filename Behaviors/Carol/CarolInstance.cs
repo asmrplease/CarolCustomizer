@@ -30,7 +30,7 @@ public class CarolInstance : IDisposable
     public CarolInstance(GameObject parent)
     {
         skeletonManager = new(this, parent);
-        outfitManager = new(this, skeletonManager, null);
+        outfitManager = new(this, skeletonManager);
     }
 
     public virtual void Dispose()

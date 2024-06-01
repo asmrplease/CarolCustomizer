@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Utils;
 using FuseBox.External.MagicaCloth2;
@@ -76,6 +77,7 @@ public class CompData : MonoBehaviour
                 .SerializeData
                 .cullingSettings
                 .cameraCullingMode = CullingSettings.CameraCullingMode.Off;
+            //magica.gameObject.SetActive(false);
         }
 
         controller ??= animator?.runtimeAnimatorController;
@@ -114,10 +116,8 @@ public class CompData : MonoBehaviour
             effectComponents
             .Except(EffectBehaviours)
             .Select(x => x.transform)
-            .Where(x => 
-                !SkeletonManager
-                .CommonBones
-                .ContainsKey(x.name));
+            .Where(x => !CommonBones.IsCommon(x.name));
+
 
         EffectGameObjects = 
             nonBehaviors
@@ -164,7 +164,7 @@ public class CompData : MonoBehaviour
     {
         var components = GetComponentsInParent<Component>(true);
         if (components is null || !components.Any()) { parentComponents = new(); return; }
-        Log.Debug("RefreshParentComponents() components exist.");
+        //Log.Debug("RefreshParentComponents() components exist.");
 
         parentComponents = components
             .Where(x => x is not null)

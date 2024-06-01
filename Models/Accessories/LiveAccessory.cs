@@ -1,6 +1,6 @@
-﻿using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.Models.Outfits;
+﻿using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
+using MagicaCloth2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +10,8 @@ namespace CarolCustomizer.Models.Accessories;
 public class LiveAccessory : AccessoryDescriptor
 {
     #region Dependencies
-    protected readonly SkeletonManager skeleton;
     protected readonly Transform folder;
-    protected readonly StoredAccessory storedAcc;
+    public readonly StoredAccessory storedAcc;
     #endregion
 
     #region Common Components
@@ -27,20 +26,13 @@ public class LiveAccessory : AccessoryDescriptor
 
     public Action OnAccessoryStateChanged;
 
-    virtual public void Enable() => liveSMR.gameObject.SetActive(true);
+    public SkinnedMeshRenderer DEBUG_GET_SMR() => liveSMR;
 
-    virtual public void Disable() => liveSMR.gameObject.SetActive(false);
+    public bool isActive { get; private set; } = false;
 
-    public bool isActive { get 
-        { 
-            if (liveSMR) return liveSMR.gameObject.activeSelf;
-            return false;
-        } }
-
-    public LiveAccessory(StoredAccessory acc, SkeletonManager skeleton, Transform folder)
+    public LiveAccessory(StoredAccessory acc, Transform folder)
         : base(acc.Name, acc.Source)
     {
-        this.skeleton = skeleton;
         this.folder = folder;
         storedAcc = acc;
 
@@ -59,12 +51,40 @@ public class LiveAccessory : AccessoryDescriptor
         if (!liveSMR) { Log.Error($"{storedAcc.referenceSMR.name} was instantiated without an SMR."); return; }
     }
 
-    public void Refresh() => skeleton.AssignLiveBones(this);
-
     public void SetLiveBones(Transform[] liveBones, Transform rootBone)
     {
-        liveSMR.bones = liveBones;
+        if (!liveSMR) Log.Warning($"{this.Name} had a null SMR during SetLiveBones()");
+        if (liveSMR.bones.Length > liveBones.Length)
+        {
+            var temp = new Transform[liveSMR.bones.Length];
+            Array.Copy(liveSMR.bones, temp, liveSMR.bones.Length);
+            foreach (int i in Enumerable.Range(0, liveBones.Length)) temp[i] = liveBones[i];
+        }
+        else liveSMR.bones = liveBones;
         liveSMR.rootBone = rootBone;
+    }
+
+    virtual public void Enable()
+    {
+        isActive = true;
+        liveSMR.gameObject.SetActive(true);
+    }
+
+    virtual public void Disable() 
+    {
+        isActive = false;
+        liveSMR.gameObject.SetActive(false); 
+    }
+
+    public void AddToMagica(MagicaCloth magica)
+    {
+        GameObject.Destroy(liveSMR.gameObject);
+        liveSMR = GameObject.Instantiate(storedAcc.referenceSMR, folder).GetComponent<SkinnedMeshRenderer>();
+        ReapplyMaterials();
+        magica.SerializeData.sourceRenderers.Clear();
+        magica.SerializeData.sourceRenderers.Add(liveSMR);
+        magica.SerializeData.rootBones.Clear();
+        magica.SerializeData.rootBones.Add(liveSMR.transform);
     }
 
     internal void ApplyMaterial(MaterialDescriptor material, int index)
@@ -73,6 +93,12 @@ public class LiveAccessory : AccessoryDescriptor
         Materials[index] = material;
         liveSMR.ReplaceMaterialAtIndex(material.referenceMaterial, index);
         Log.Debug($"The material is now {liveSMR.materials[index]}.");
+    }
+
+    void ReapplyMaterials()
+    {
+        var i = 0;
+        Materials.ForEach((x) => liveSMR.ReplaceMaterialAtIndex(x.referenceMaterial, i));
     }
 
     internal void ApplySharedMaterials(List<Material> materials)

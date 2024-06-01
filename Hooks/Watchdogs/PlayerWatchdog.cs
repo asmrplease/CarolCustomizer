@@ -3,6 +3,7 @@ using CarolCustomizer.Utils;
 using System.Collections;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Assets;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PlayerWatchdog : PelvisWatchdog
@@ -129,5 +130,10 @@ public class PlayerWatchdog : PelvisWatchdog
         if (controllerDisabled) return false;
         if (inDialogue)         return false;
         return true;
+    }
+
+    void OnDisable()
+    {
+        Log.Debug($"{this}.OnDisable()");
     }
 }

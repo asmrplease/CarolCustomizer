@@ -2,9 +2,7 @@
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
-using MagicaCloth2;
 using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
@@ -15,24 +13,6 @@ namespace CarolCustomizer.Behaviors.Carol;
 
 public class SkeletonManager : IDisposable
 {
-    #region Static Fields
-    public static Dictionary<string, Transform> CommonBones { get; private set; }
-    static List<string> HairBones = new() { "Carol_TAIL_TOP", "Carol_TAIL_HIGH_MID", "Carol_TAIL_LOW_MID", "Carol_TAIL_END", "Carol_ENDBone001", "Carol_ENDBone001Bone001", "Carol_ENDBone001Bone001Bone001", "Carol_ENDBone001Bone001Bone001Bone001", "Carol_ENDBone001Bone001Bone001Bone001Bone001" };
-    public static void SetCommonBones()
-    {
-        if (CommonBones is not null) { Log.Error("tried to replace standard bone names"); return; }
-
-        CommonBones = GameManager.manager
-            .GetOutfit(Constants.Pyjamas)
-            .transform
-            .RecursiveFindTransform(x => x.name == "CarolPelvis")
-            .SkeletonToList()
-            .ToDictionary(keySelector: x => x.name, elementSelector: x => x);
-        foreach (var bone in HairBones) { CommonBones.Remove(bone); }
-        Log.Info($"Found {CommonBones.Count} of expected 60 standard bones.");
-    }
-    #endregion
-
     #region Dependencies
     CarolInstance playerManager;
     public readonly FaceCopier faceCopier;
@@ -42,12 +22,23 @@ public class SkeletonManager : IDisposable
     PelvisWatchdog targetPelvis;
     Dictionary<string, Transform> liveStandardBones = new();
     Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = new();
+    MagicaManager MagicaManager;
     #endregion
+
+    public Dictionary<string, Transform> GetBoneSet(Outfit outfit)
+    {
+        if (!outfitBoneDicts.TryGetValue(outfit, out var boneSet)) return null;
+        Dictionary<string, Transform> results = new(liveStandardBones);
+        results.AddRange(boneSet);
+        return results;
+    }
 
     #region Lifecycle
     public SkeletonManager(CarolInstance player, GameObject parent)
     {
+        MagicaManager = new MagicaManager(this);
         playerManager = player;
+        playerManager.SpawnEvent += MagicaManager.HandleNewPelvis;
         playerManager.SpawnEvent += SetNewPelvis;
 
         faceCopier = parent.AddComponent<FaceCopier>();
@@ -64,6 +55,7 @@ public class SkeletonManager : IDisposable
     #region Public Interface
     public void AssignLiveBones(LiveAccessory acc)
     {
+        Log.Debug($"AssignLiveBones({acc.Name})");
         if (acc is null) { Log.Error("Requested bones for null accessory"); return; }
         outfitBoneDicts.TryGetValue(acc.outfit, out var bespokeDict);
         bespokeDict ??= AddBespokeBones(acc.outfit);
@@ -79,12 +71,12 @@ public class SkeletonManager : IDisposable
             if (bespokeDict      .TryGetValue(boneName, out liveBones[i])) continue;
         }
 
-        Transform rootBone = null;
-        if (liveStandardBones.ContainsKey(acc.RootBoneName)) rootBone = liveStandardBones[acc.RootBoneName];
-        if (bespokeDict.ContainsKey(acc.RootBoneName)) rootBone = bespokeDict[acc.RootBoneName];
+        liveStandardBones.TryGetValue(acc.RootBoneName, out var rootBone);
+        if (!rootBone) bespokeDict.TryGetValue(acc.RootBoneName, out rootBone);
         rootBone ??= liveStandardBones["CarolPelvis"];
 
         acc.SetLiveBones(liveBones, rootBone);
+        MagicaManager.HandleNewLiveAcc(acc);
     }
     #endregion
 
@@ -92,7 +84,7 @@ public class SkeletonManager : IDisposable
     void SetNewPelvis(PelvisWatchdog newPelvis)
     {
         Log.Info("SkeletonManager.SetNewPelvis()");
-        if (newPelvis == targetPelvis) { Log.Debug("SkeletonManager was given its existing pelvis"); return; }
+        //if (newPelvis == targetPelvis) { Log.Debug("SkeletonManager was given its existing pelvis"); return; }
 
         outfitBoneDicts
             .Keys
@@ -104,10 +96,10 @@ public class SkeletonManager : IDisposable
         liveStandardBones = targetPelvis.BoneData.StandardBones;
 
         Log.Debug("SkeletonManager.SetNewPelvis() AddBespokeBones");
-        playerManager
-            .outfitManager
-            .ActiveOutfits
-            .ForEach(x => AddBespokeBones(x));
+        //playerManager
+        //    .outfitManager
+        //    .ActiveOutfits
+        //    .ForEach(x => AddBespokeBones(x));
     }
 
     public Dictionary<string, Transform> AddBespokeBones(Outfit outfit)
@@ -128,43 +120,8 @@ public class SkeletonManager : IDisposable
         }
 
         outfitBoneDicts[outfit] = boneDict;
-        NewHairSetup(outfit);
+        MagicaManager.HandleNewOutfit(outfit);
         return boneDict;
-    }
-
-    void NewHairSetup(Outfit outfit)
-    {
-        outfitBoneDicts.TryGetValue(outfit, out var boneDict);
-
-        var magicas = outfit
-            .compData
-            .magicaCloths;
-        if (magicas is null || !magicas.Any()) { Log.Warning($"{outfit.DisplayName} had no magica component"); return; }
-
-        foreach (var magica in magicas)
-        {
-            var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
-            var liveBones = new Dictionary<string, Transform>(liveStandardBones);
-            liveBones.AddRange(boneDict);
-
-            var transforms = new HashSet<Transform>();
-            liveMagica.SerializeData.GetUsedTransform(transforms);
-
-            var cullSettings = magica.SerializeData.cullingSettings;
-            cullSettings.cameraCullingMode = CullingSettings.CameraCullingMode.Off;
-
-            var missing = transforms
-                 .Where(x =>
-                     !boneDict.ContainsKey(x.name))
-                 .ForEach(x => Log.Warning($"Missing magica-expected transform {x.name}"));
-            //if (missing.Any()) return;
-
-            Log.Info($"magica.ReplaceTransform({outfit.DisplayName}");
-            liveMagica.ReplaceTransform(liveBones);
-            liveMagica.OnBuildComplete += (x) => Log.Info($"build success: {x}");
-            liveMagica.SetParameterChange();
-            Log.Info("Replaced!");
-        }
     }
 
     void RemoveBespokeBones(Outfit outfit)

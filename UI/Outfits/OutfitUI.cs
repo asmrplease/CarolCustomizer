@@ -35,6 +35,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     #region State Variables
     List<AccessoryUI> Accessories = new();
     public bool expanded = false;
+    public Color color = Constants.DefaultColor;
     #endregion
 
     #region Setup
@@ -47,7 +48,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         name = "OutfitUI: " + outfit.DisplayName;
 
         background = transform.GetChild(0).gameObject.GetComponent<Image>();
-        background.color = Constants.DefaultColor;
+        background.color = color;
 
         displayImage = transform.Find(displayImageAddress)?.GetComponent<Image>();
         displayImage.sprite = outfit.Sprite;
@@ -85,7 +86,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     public void OnAccessoryToggled()
     {
         if (Accessories.Any(x => x.activationToggle.isOn)) { background.color = Constants.Highlight; return; }
-        background.color = Constants.DefaultColor;
+        background.color = color;
     }
 
     public List<(string, UnityAction)> GetContextMenuItems()
@@ -97,6 +98,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             ,("Use Measurements", () => ui.playerManager.outfitManager.SetConfiguration(hads))
             ,("Activate Effects", () => ui.playerManager.outfitManager.SetEffect(outfit, true))
             ,("Disable Effects",  () => ui.playerManager.outfitManager.SetEffect(outfit, false))
+            ,("Instantiate",  IDK)
         };
 
         foreach (var entry in hads.Variants)
@@ -115,5 +117,12 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             ui.OnAccessoryUnloaded(accUI.accessory);
             GameObject.Destroy(accUI.gameObject);
         }
+    }
+
+    void IDK()
+    {
+        Log.Info($"Traditionally Instantiating {outfit.DisplayName}");
+        CCPlugin.cutscenePlayer.outfitManager.pelvis.SetBaseOutfit(outfit);
+        CCPlugin.cutscenePlayer.outfitManager.pelvis.SetBaseVisibility(Input.GetKey(KeyCode.LeftShift));
     }
 }

@@ -46,6 +46,8 @@ public class CCPlugin : BaseUnityPlugin
     {
         new Log(Logger);
         Log.Message("Logger Ready!");
+        this.gameObject.AddComponent<DebugOnKeypress>().Constructor(KeyCode.Tab, "----------------------------------------------------------------------------------------------", Log.Info);
+
         CoroutineRunner = this;
         Settings.Constructor(Config);
         saveAdjuster = new();
@@ -85,7 +87,7 @@ public class CCPlugin : BaseUnityPlugin
         yield return new WaitUntil(() => GameManager.manager && LocalizationIndex.index is not null);
         Log.Info("Start()");
 
-        if (SkeletonManager.CommonBones is null) SkeletonManager.SetCommonBones();
+        if (!CommonBones.Ready) CommonBones.SetCommonBones();
 
         Settings.Game.ApplySettings();
 
