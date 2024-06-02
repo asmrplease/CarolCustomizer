@@ -53,12 +53,15 @@ internal class MagicaManager
             switch (magica.SerializeData.clothType)
             {
                 case ClothProcess.ClothType.BoneCloth:
-                    Log.Debug("BoneCloth");
-                    
                     var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
                     liveMagica.name = outfit.DisplayName + " BoneCloth";
                     targetPelvis.DisableAnimator();
                     liveMagica.ReplaceTransform(skeleton.GetBoneSet(outfit));
+                    liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();
+                    liveMagica.SerializeData.colliderCollisionConstraint.colliderList.AddRange(
+                        targetPelvis
+                        .GetComponentsInChildren<MagicaCapsuleCollider>(true)
+                        .ToList());
                     liveMagica.SetParameterChange();
                     processing.Add(liveMagica);
                     var buildGuid = Guid.NewGuid();
@@ -79,8 +82,9 @@ internal class MagicaManager
                                 outfit.AssetName))
                         .ToDictionary(
                             x => x,
-                            x => magica);
-                    MeshClothAccs.AddRange(smrs);
+                            x => magica)
+                        .ForEach(x=> MeshClothAccs[x.Key] = x.Value);
+                    //MeshClothAccs.AddRange(smrs);
                     break;
                 case ClothProcess.ClothType.BoneSpring:
                     Log.Warning($"{outfit.DisplayName} has an unhandled bonespring component");
@@ -126,8 +130,6 @@ internal class MagicaManager
         liveMagica.gameObject.SetActive(true);
         referenceMagica.gameObject.SetActive(true);
         LiveCloths[acc] = liveMagica;
-        //Log.Debug("Bone list:");
-        //acc.DEBUG_GET_SMR().bones.Where(x => x).ForEach(x=>Log.Debug(x.name));
     }
 
     void HandleBuildComplete(bool success, MagicaCloth component, Guid buildGuid)

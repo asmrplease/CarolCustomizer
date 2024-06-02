@@ -12,7 +12,7 @@ using System.Linq;
 namespace CarolCustomizer.Behaviors.Recipes;
 internal static class RecipeApplier
 {
-    public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor22 recipe)
+    public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor23 recipe)
     {
         outfitManager.DisableAllAccessories();
         outfitManager.DisableAllEffects();
@@ -38,6 +38,10 @@ internal static class RecipeApplier
             OutfitAssetManager
             .GetOutfitByAssetName(
                recipe.BaseOutfitName));
+        outfitManager.SetColliderSource(
+            OutfitAssetManager
+            .GetOutfitByAssetName(
+                recipe.ColliderSource));
     }
 
     public static void ActivateFirstVariant(OutfitManager outfitManager, string outfitName)
@@ -64,6 +68,7 @@ internal static class RecipeApplier
         outfitManager.SetEffect(outfit, true);
         outfitManager.SetAnimator(outfit);
         outfitManager.SetConfiguration(outfit);
+        outfitManager.SetColliderSource(outfit);
     }
 
     static void SetAccessory(OutfitManager outfitManager, AccessoryDescriptor accessoryDescription)
@@ -104,7 +109,7 @@ internal static class RecipeApplier
         outfitManager.PaintAccessory(accessory, liveMaterial, index);
     }
 
-    public static IEnumerable<string> GetSources(RecipeDescriptor22 recipe)
+    public static IEnumerable<string> GetSources(RecipeDescriptor23 recipe)
     {
         var accSources = recipe
             .ActiveAccessories
@@ -119,10 +124,11 @@ internal static class RecipeApplier
             .Concat(recipe.ActiveEffects)
             .AddItem(recipe.AnimatorSource)
             .AddItem(recipe.BaseOutfitName)
+            .AddItem(recipe.ColliderSource)
             .Distinct();
     }
 
-    public static IEnumerable<string> GetMissingSources(RecipeDescriptor22 recipe)
+    public static IEnumerable<string> GetMissingSources(RecipeDescriptor23 recipe)
     {
         return GetSources(recipe)
             .Where(x => 

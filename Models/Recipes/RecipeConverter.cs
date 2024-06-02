@@ -22,4 +22,15 @@ public static class RecipeConverter
             new List<string>() {Constants.Pyjamas},
             "2.2.0");
     }
+
+    public static RecipeDescriptor23 ToVersion230(this RecipeDescriptor22 legacy)
+    {
+        return new RecipeDescriptor23(
+            legacy.AnimatorSource,
+            legacy.BaseOutfitName,
+            legacy.BaseOutfitName,
+            legacy.ActiveAccessories,
+            legacy.ActiveEffects,
+            "2.3.0");
+    }
 }
