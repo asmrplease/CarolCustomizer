@@ -100,6 +100,7 @@ public class LiveAccessory : AccessoryDescriptor
     {
         var i = 0;
         Materials.ForEach((x) => liveSMR.ReplaceMaterialAtIndex(x.referenceMaterial, i));
+        //TODO: this is failing on faces?
     }
 
     internal void ApplySharedMaterials(List<Material> materials)

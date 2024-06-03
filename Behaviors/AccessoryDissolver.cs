@@ -5,6 +5,7 @@ using CarolCustomizer.Utils;
 using HarmonyLib;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static System.Linq.Enumerable;
@@ -78,12 +79,15 @@ internal static class AccessoryDissolver
         float elapsedTime = 0f;
         SceneExitComplete = false;
         var accs = outfitManager.ActiveAccessories;
+        var liveDescriptions = outfitManager.LiveAccessoryDescriptors;
         var dissolveMat = new MaterialDescriptor(dissolveMaterial, "Resources", MaterialDescriptor.SourceType.Resources);
         Dictionary<StoredAccessory, MaterialDescriptor[]> originalMaterials = new();
 
         foreach (var acc in accs)
         {
-            originalMaterials[acc] = acc.Materials;
+            originalMaterials[acc] = liveDescriptions
+                .FirstOrDefault(x => x.Name == acc.Name && x.Source == acc.Source)
+                .Materials;
             outfitManager.PaintAccessoryShared(acc, acc.Materials.Select(x => dissolveMaterial).ToList());
         }
         Log.Debug("Accessories Painted with dissolve, starting loop.");
@@ -92,9 +96,7 @@ internal static class AccessoryDissolver
         {
             elapsedTime += Time.deltaTime;
             float dissolvePercent = (elapsedTime / time);
-            //Log.Debug(dissolvePercent.ToString());
             dissolveMaterial.SetFloat(DissolveAmount, dissolvePercent);
-            foreach (var acc in accs) { }
             yield return null;
         }
         Log.Debug("Done dissolving, waiting for scene exit");

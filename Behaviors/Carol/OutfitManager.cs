@@ -77,8 +77,7 @@ public class OutfitManager
         liveAccessories
             .Values
             .Where(x => x.isActive)
-            .ForEach(
-                skeletonManager.AssignLiveBones);
+            .ForEach(skeletonManager.AssignLiveBones);
     }
 
     public void EnableAccessory(StoredAccessory accessory)
