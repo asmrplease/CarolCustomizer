@@ -85,6 +85,7 @@ public class LiveAccessory : AccessoryDescriptor
         magica.SerializeData.sourceRenderers.Add(liveSMR);
         magica.SerializeData.rootBones.Clear();
         magica.SerializeData.rootBones.Add(liveSMR.transform);
+        liveSMR.gameObject.SetActive(isActive);
     }
 
     internal void ApplyMaterial(MaterialDescriptor material, int index)

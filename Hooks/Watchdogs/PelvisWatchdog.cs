@@ -20,6 +20,10 @@ public class PelvisWatchdog : MonoBehaviour
     protected CompData compData;
     public CompData CompData { get { return compData; } }
 
+    [SerializeField]
+    protected MagiData magiData;
+    public MagiData MagiData { get { return magiData; } }
+
     protected string parentName => transform.parent?.name ?? "none";
     protected string grandparentName => transform.parent?.parent?.name ?? "none";
     protected string rootName => transform.root?.name ?? "none";
@@ -36,6 +40,7 @@ public class PelvisWatchdog : MonoBehaviour
         SourceGuid = watchdog.Guid;
         boneData = watchdog.BoneData;
         compData = watchdog.CompData;
+        magiData = watchdog.MagiData;
         return this;
     }
 
@@ -44,13 +49,13 @@ public class PelvisWatchdog : MonoBehaviour
         Log.Debug($"{this}.Awake()");
         if (!boneData) boneData = this.gameObject.AddComponent<BoneData>().Constructor();
         if (!compData) compData = this.gameObject.AddComponent<CompData>().Constructor();
+        if (!magiData) magiData = this.gameObject.AddComponent<MagiData>().Constructor();
         DetectType();
     }
 
     virtual protected void OnTransformParentChanged() => DetectType();
 
-    void SetupCheckList()
-    {
+    void SetupCheckList() =>
         checks = new()
         {
             (Check<VirtualCarol,    MPBotWatchdog>,  (x)=> true),
@@ -63,7 +68,6 @@ public class PelvisWatchdog : MonoBehaviour
             (Check<Transform,       PirateWatchdog>, (x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && x.parentName == "Carol_Pirate"),
             (Check<Transform,       ActressWatchdog>,(x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && x.parentName != "Carol_Pirate")
         };
-    }
 
     protected bool DetectType()
     {

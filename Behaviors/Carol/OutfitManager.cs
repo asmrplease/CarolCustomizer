@@ -204,21 +204,18 @@ public class OutfitManager
         if (!pelvis) return;
 
         var sourceColliders = colliderSource
-            .prefabWatchdog
-            .GetComponentsInChildren<MagicaCapsuleCollider>()
-            .ToDictionary(x => x.name);
+            .magiData
+            .CapsuleColliders
+            .ToDictionary(x=>x.name);
         var liveColliders = pelvis
-            .BoneData
-            .StandardBones
-            .Select(x => x.Value.GetComponent<MagicaCapsuleCollider>())
-            .Where(x => x);
+            .MagiData
+            .CapsuleColliders;
+            
         foreach (var liveCollider in liveColliders)
         {
             if (!sourceColliders.TryGetValue(liveCollider.name, out var referenceCollider)) continue;
 
-            liveCollider.SetSize(referenceCollider.GetSize());
-            liveCollider.center = referenceCollider.center;
-            liveCollider.UpdateParameters();
+            liveCollider.CopyFrom(referenceCollider);
         }
     }
 

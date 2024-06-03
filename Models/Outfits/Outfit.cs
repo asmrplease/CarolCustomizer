@@ -36,7 +36,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
     public PelvisWatchdog prefabWatchdog { get; private set; }
     public BoneData boneData => prefabWatchdog.BoneData;
     public CompData compData => prefabWatchdog.CompData;
-
+    public MagiData magiData => prefabWatchdog.MagiData;
     virtual public Func<SkinnedMeshRenderer, bool> FaceDefinition => (x) => x.name == "tete";
 
     #endregion

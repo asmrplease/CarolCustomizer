@@ -1,4 +1,5 @@
 ﻿using BepInEx.Configuration;
+using MagicaCloth2;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -159,5 +160,14 @@ public static class MiscExtensions
             .GetComponent<Button>();
         button.onClick.AddListener(callback);
         return button;
+    }
+
+    public static void CopyFrom(this MagicaCapsuleCollider target,  MagicaCapsuleCollider source)
+    {
+        target.direction = source.direction;
+        target.radiusSeparation = source.radiusSeparation;
+        target.alignedOnCenter = source.alignedOnCenter;
+        target.SetSize(source.GetSize());
+        target.UpdateParameters();
     }
 }

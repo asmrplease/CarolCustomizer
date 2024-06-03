@@ -1,5 +1,4 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Utils;
 using FuseBox.External.MagicaCloth2;
@@ -38,9 +37,6 @@ public class CompData : MonoBehaviour
     [SerializeField]
     public List<SkinnedMeshRenderer> allSMRs;
 
-    [SerializeField]
-    public List<MagicaCloth> magicaCloths;
-
     public List<GameObject> EffectGameObjects { get; private set; }
     public List<Behaviour> EffectBehaviours { get; private set; }
 
@@ -65,20 +61,6 @@ public class CompData : MonoBehaviour
 
         animator ??= GetComponentsInParent<Animator>(true)?
             .FirstOrDefault(x => x.runtimeAnimatorController);
-
-        magicaCloths = transform
-            .parent
-            .GetComponentsInChildren<MagicaCloth>(true)
-            .ToList();
-
-        foreach (var magica in magicaCloths)
-        {
-            magica
-                .SerializeData
-                .cullingSettings
-                .cameraCullingMode = CullingSettings.CameraCullingMode.Off;
-            //magica.gameObject.SetActive(false);
-        }
 
         controller ??= animator?.runtimeAnimatorController;
         coopToggles = transform.parent.GetComponentsInChildren<CoopModelToggle>(true);
@@ -164,12 +146,10 @@ public class CompData : MonoBehaviour
     {
         var components = GetComponentsInParent<Component>(true);
         if (components is null || !components.Any()) { parentComponents = new(); return; }
-        //Log.Debug("RefreshParentComponents() components exist.");
 
         parentComponents = components
             .Where(x => x is not null)
             .ToDictionaryOverwrite(x => x.GetType());
-
     }
 
     void OnDestory()
