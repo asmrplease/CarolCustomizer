@@ -3,7 +3,6 @@ using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
-using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,89 +12,59 @@ namespace CarolCustomizer.Behaviors.Carol;
 
 public class SkeletonManager : IDisposable
 {
-    #region Dependencies
-    CarolInstance playerManager;
     public readonly FaceCopier faceCopier;
-    #endregion
-
-    #region Instance Variables
-    PelvisWatchdog targetPelvis;
-    Dictionary<string, Transform> liveStandardBones = new();
-    Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = new();
     MagicaManager MagicaManager;
-    #endregion
+    PelvisWatchdog targetPelvis;
 
-    public Dictionary<string, Transform> GetBoneSet(Outfit outfit)
-    {
-        if (!outfitBoneDicts.TryGetValue(outfit, out var boneSet)) return null;
-        Dictionary<string, Transform> results = new(liveStandardBones);
-        results.AddRange(boneSet);
-        return results;
-    }
+    Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = new();
 
-    #region Lifecycle
     public SkeletonManager(CarolInstance player, GameObject parent)
     {
         MagicaManager = new MagicaManager(this);
-        playerManager = player;
-        playerManager.SpawnEvent += MagicaManager.HandleNewPelvis;
-        playerManager.SpawnEvent += SetNewPelvis;
+        player.SpawnEvent += MagicaManager.HandleNewPelvis;
+        player.SpawnEvent += HandleNewPelvis;
 
         faceCopier = parent.AddComponent<FaceCopier>();
-        faceCopier.Constructor(playerManager);
+        faceCopier.Constructor(player);
     }
 
-    public void Dispose()
+    void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
-        playerManager.SpawnEvent -= SetNewPelvis;
-        GameObject.Destroy(faceCopier);
+        Log.Info("SkeletonManager.SetNewPelvis()");
+        foreach (var dict in outfitBoneDicts.Values.ToList())
+        {
+            dict.Values
+            .Where(x => x && !targetPelvis.BoneData.StandardBones.ContainsKey(x.name))
+            .Select(x => x.gameObject)
+            .ToList()
+            .ForEach(GameObject.Destroy);
+        }
+        outfitBoneDicts.Clear();
+        targetPelvis = newPelvis;
     }
-    #endregion
 
-    #region Public Interface
     public void AssignLiveBones(LiveAccessory acc)
     {
         Log.Debug($"AssignLiveBones({acc.Name})");
         if (acc is null) { Log.Error("Requested bones for null accessory"); return; }
-        outfitBoneDicts.TryGetValue(acc.outfit, out var bespokeDict);
-        bespokeDict ??= AddBespokeBones(acc.outfit);
 
-        var referenceBones = acc.bones;
-        Transform[] liveBones = new Transform[referenceBones.Length];
-
-        foreach (var i in Enumerable.Range(0, referenceBones.Length))
+        var bespokeDict = GetBoneSet(acc.outfit);
+        Transform[] liveBones = new Transform[acc.bones.Length];
+        foreach (int i in Enumerable.Range(0, acc.bones.Length))
         {
-            if (!referenceBones[i]) continue;
-            string boneName = referenceBones[i].name;
-            if (liveStandardBones.TryGetValue(boneName, out liveBones[i])) continue;
-            if (bespokeDict      .TryGetValue(boneName, out liveBones[i])) continue;
+            if (!acc.bones[i]) continue;
+            bespokeDict.TryGetValue(acc.bones[i].name, out liveBones[i]);
         }
-
-        liveStandardBones.TryGetValue(acc.RootBoneName, out var rootBone);
-        if (!rootBone) bespokeDict.TryGetValue(acc.RootBoneName, out rootBone);
-        rootBone ??= liveStandardBones["CarolPelvis"];
-
+        bespokeDict.TryGetValue(acc.RootBoneName, out var rootBone);
+        rootBone ??= targetPelvis.BoneData.StandardBones["CarolPelvis"];
         acc.SetLiveBones(liveBones, rootBone);
         MagicaManager.HandleNewLiveAcc(acc);
     }
-    #endregion
 
-    #region Private Implementation
-    void SetNewPelvis(PelvisWatchdog newPelvis)
+    public Dictionary<string, Transform> GetBoneSet(Outfit outfit)
     {
-        Log.Info("SkeletonManager.SetNewPelvis()");
-        if (newPelvis == targetPelvis) { Log.Debug("SkeletonManager was given its existing pelvis"); return; }
-
-        outfitBoneDicts
-            .Keys
-            .ToList()
-            .ForEach(RemoveBespokeBones);
-        outfitBoneDicts.Clear();
-
-        targetPelvis = newPelvis;
-        liveStandardBones = targetPelvis.BoneData.StandardBones;
-
-        Log.Debug("SkeletonManager.SetNewPelvis() AddBespokeBones");
+        outfitBoneDicts.TryGetValue(outfit, out var boneSet);
+        return boneSet ?? AddBespokeBones(outfit);
     }
 
     public Dictionary<string, Transform> AddBespokeBones(Outfit outfit)
@@ -104,15 +73,15 @@ public class SkeletonManager : IDisposable
         if (outfitBoneDicts.TryGetValue(outfit, out var dict)) return dict;
 
         Log.Debug("Adding bones");
-        Dictionary<string, Transform> boneDict = new();
+        Dictionary<string, Transform> boneDict = new(targetPelvis.BoneData.StandardBones);
         foreach (var bespokeBone in outfit.boneData.BespokeBones)
         {
-            if (!bespokeBone.parent) { Log.Warning($"BespokeBone {bespokeBone.name} has no parent"); continue; }
-            string parentName = bespokeBone.parent.name;
-            var newBone = InstantiateAt(bespokeBone, parentName);
-            if (!newBone) continue;
+            if (!targetPelvis.BoneData.StandardBones.TryGetValue(bespokeBone.parent.name, out var parentBone))
+            { Log.Error($"Could not find {bespokeBone.name}'s parent, {bespokeBone.parent.name}."); continue; }
 
-            foreach (var bone in newBone.SkeletonToList()) { boneDict[bone.name] = bone; }
+            var newBone = GameObject.Instantiate(bespokeBone.gameObject, parentBone.transform).transform;
+            newBone.DeCloneName();
+            foreach (var bone in newBone.AllChildTransforms()) { boneDict[bone.name] = bone; }
         }
 
         outfitBoneDicts[outfit] = boneDict;
@@ -120,28 +89,5 @@ public class SkeletonManager : IDisposable
         return boneDict;
     }
 
-    void RemoveBespokeBones(Outfit outfit)
-    {
-        if (!outfitBoneDicts.TryGetValue(outfit, out var dict)) return;
-
-        dict.Values
-            .Where(x => x)
-            .Select(x => x.gameObject)
-            .ToList()
-            .ForEach(GameObject.Destroy);
-    }
-
-    Transform InstantiateAt(Transform objectToInstantiate, string parentName)
-    {
-        if (!liveStandardBones.ContainsKey(parentName))
-        { Log.Error($"Could not find {objectToInstantiate.name}'s parent, {parentName}."); return null; }
-
-        var parentBone = liveStandardBones[parentName];
-        if (!parentBone) { Log.Error($"failed to find parent bone when instantiating {objectToInstantiate.name}"); return null; }
-
-        var newBone = GameObject.Instantiate(objectToInstantiate.gameObject, parentBone.transform).transform;
-        newBone.DeCloneName();
-        return newBone;
-    }
-    #endregion
+    public void Dispose() => GameObject.Destroy(faceCopier);
 }

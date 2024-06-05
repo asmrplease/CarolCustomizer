@@ -43,13 +43,11 @@ public class CarolInstance : IDisposable
     public virtual void NotifySpawned(PelvisWatchdog pelvis)
     {
         if (!pelvis) { Log.Error("Null pelviswatchdog on NotifySpawned()"); return; }
-        if (pelvis == targetPelvis) { Log.Warning("PlayerManager was given its existing pelvis as a target."); }
-        else
-        {
-            if (targetPelvis) { previousTargets.Add(targetPelvis); }
-            previousTargets.RemoveAll(x => !x);
-            targetPelvis = pelvis;
-        }
+        if (pelvis == targetPelvis) { Log.Warning("PlayerManager was given its existing pelvis as a target."); return; }
+
+        if (targetPelvis) { previousTargets.Add(targetPelvis); }
+        previousTargets.RemoveAll(x => !x);
+        targetPelvis = pelvis;
 
         Log.Debug($"SpawnEvent.Invoke({pelvis})");
         SpawnEvent?.Invoke(targetPelvis);

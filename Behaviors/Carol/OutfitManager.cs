@@ -67,7 +67,7 @@ public class OutfitManager
             = configurationSource
             = OutfitAssetManager.GetPyjamas();
 
-        playerManager.SpawnEvent += OnSpawn;
+        playerManager.SpawnEvent += HandleNewPelvis;
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
     }
 
@@ -124,11 +124,8 @@ public class OutfitManager
     }
     #endregion
 
-    void OnSpawn(PelvisWatchdog pelvis)
+    void HandleNewPelvis(PelvisWatchdog pelvis)
     {
-        pelvis.SetBaseVisibility(false);
-        if (this.pelvis == pelvis) { Log.Debug("Outfitmanager was given it's existing pelvis"); return; }
-
         this.pelvis = pelvis;
         RefreshSMRs(pelvis);
         if (outfitEffects.Any()) RefreshEffects();

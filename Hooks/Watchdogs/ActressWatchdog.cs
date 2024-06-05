@@ -6,6 +6,7 @@ public class ActressWatchdog : PelvisWatchdog
     void OnEnable()
     {
         Log.Debug($"{this} OnEnable");
+        SetBaseVisibility(false);
         CCPlugin.cutscenePlayer.NotifySpawned(this);
     }
 

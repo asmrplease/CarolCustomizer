@@ -4,6 +4,7 @@ using CarolCustomizer.Utils;
 using Slate;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
@@ -109,7 +110,6 @@ public class PelvisWatchdog : MonoBehaviour
             livebone.localPosition = resting.Value.localPosition;
             livebone.localRotation = resting.Value.localRotation;
         }
-
     }
 
     void LateUpdate()
@@ -136,7 +136,11 @@ public class PelvisWatchdog : MonoBehaviour
     {
         Log.Debug("PelvisWatchdog.SetBaseVisibility()");
         if (compData?.allSMRs is null) return;
-        foreach (var mesh in CompData.allSMRs) { if (mesh?.gameObject) mesh.gameObject.SetActive(visible); }
+
+        CompData
+            .allSMRs
+            .Where(x => x && !x.transform.IsChildOf(this.transform))
+            .ForEach(x => x.gameObject.SetActive(visible));
         Log.Debug("done");
     }
 

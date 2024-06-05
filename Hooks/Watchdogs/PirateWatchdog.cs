@@ -21,7 +21,13 @@ internal class PirateWatchdog : PelvisWatchdog
 
     public override void SetAnimator(Outfit outfit) { }
 
-    void OnEnable() { if (pirateEnabled) NPCManager.OnShezaraAwake(this); }
+    void OnEnable() 
+    {
+        if (!pirateEnabled) return;
+
+        SetBaseVisibility(false);
+        NPCManager.OnShezaraAwake(this); 
+    }
 
     void OnDestroy() { if (pirateEnabled) NPCManager.shezaraInstance?.RestorePrevious(this); }
 }

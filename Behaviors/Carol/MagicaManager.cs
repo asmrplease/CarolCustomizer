@@ -25,13 +25,10 @@ internal class MagicaManager
     public void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
         Log.Debug("magicamanager.handleNewPelvis()");
-        if (targetPelvis == newPelvis) return;
-
         targetPelvis = newPelvis;
         MeshClothAccs.Clear();
         BoneCloths.Where(x => x).ForEach(GameObject.DestroyImmediate);
         BoneCloths.Clear();
-        Log.Debug("HandlePelvis done.");
     }
 
     public void HandleNewOutfit(Outfit outfit)

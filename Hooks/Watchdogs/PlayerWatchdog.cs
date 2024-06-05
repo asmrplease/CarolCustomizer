@@ -31,6 +31,7 @@ public class PlayerWatchdog : PelvisWatchdog
 
     void OnEnable()
     {
+        SetBaseVisibility(false);
         CCPlugin.cutscenePlayer.NotifySpawned(this);
         if (Locked) LockPlayer(0.01f);
     }
@@ -85,6 +86,7 @@ public class PlayerWatchdog : PelvisWatchdog
         carolEntity.StartCoroutine(carolEntity.anim.SetTriggerForOneFrame("PhoneBack"));
         carolEntity.anim.speed = speed;
         yield return new WaitForSeconds(Constants.PhoneHideTime / speed);
+
         var inventory = carolEntity.GetComponent<Inventory>();
         inventory.phone.SetActive(false);
         carolEntity.anim.speed = 1;

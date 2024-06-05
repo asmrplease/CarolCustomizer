@@ -2,48 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace CarolCustomizer.Utils;
 
 public static class TransformExtensions
 {
-    public static List<Transform> AllChildTransforms(this Transform transform)
+    public static IEnumerable<Transform> AllChildTransforms(this Transform transform)
     {
-        return transform
-            .GetComponentsInChildren<Transform>(true)
-            .ToList();
-    }
-
-    /// <summary>
-    /// Recursively generates a list of all children of the input transform.
-    /// </summary>
-    /// <param AssetName="rootBone">The uppermost bone in the list.</param>
-    /// <returns>A new List containing rootBone and all of it's descendants. </returns>
-    public static List<Transform> SkeletonToList(this Transform rootBone)
-    {
-        //TODO: refactor this to create a dictionary instead, GetComponentsInChildren<Transform> seems fast enough
-        List<Transform> outputList = new();
-        if (rootBone is null) return outputList;
-        outputList.Add(rootBone);
-        SkeletonToList(rootBone, outputList);
-        return outputList;
-    }
-
-    /// <summary>
-    /// Recursively generates a list of all children of the input transform.
-    /// </summary>
-    /// <param AssetName="rootBone">The uppermost bone in the list.</param>
-    /// <param AssetName="inputList">List of transforms to append</param>
-    /// <returns>T</returns>
-    private static List<Transform> SkeletonToList(this Transform rootBone, List<Transform> inputList)
-    {
-        foreach (Transform bone in rootBone)
-        {
-            inputList.Add(bone);
-            SkeletonToList(bone, inputList);
-        }
-        return inputList;
+        return transform.GetComponentsInChildren<Transform>(true);
     }
 
     /// <summary>

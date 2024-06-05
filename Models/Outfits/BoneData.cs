@@ -1,8 +1,5 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Utils;
-using MagicaCloth2;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -16,42 +13,26 @@ public class BoneData : MonoBehaviour
     [SerializeField]
     List<Transform> standardBones;
 
-    [SerializeField]
-    public List<Transform> MagicaBones;
-
     public Dictionary<string, Transform> StandardBones => standardBones.ToDictionaryOverwrite(x => x.name);
     public List<Transform> BespokeBones { get; private set; } = new();
-    
 
     public BoneData Constructor()
     {
-        allTransforms = transform.SkeletonToList();
+        allTransforms = transform.AllChildTransforms().ToList();
 
         List<Transform> filteringList = new(allTransforms);
         if (!CommonBones.Ready) { CommonBones.SetCommonBones(); }
 
-        standardBones = filteringList.Where(x => CommonBones.IsCommon(x.name)).ToList();
-
-        filteringList = filteringList
-            .Except(standardBones)
+        standardBones = filteringList
+            .Where(x => CommonBones.IsCommon(x.name))
             .ToList();
 
-        filteringList.RemoveAll
-            (x => !CommonBones.IsCommon(x.transform.parent.name));
-
-        BespokeBones = filteringList.ToList();
-
-        var magica = transform
-            .parent
-            .GetComponentInChildren<MagicaCloth>(true);
-
-        if (magica)
-        {
-            MagicaBones = magica
-                .SerializeData
-                .rootBones;
-        }
-        MagicaBones ??= new();
+        BespokeBones = filteringList
+            .Except(standardBones)
+            .Where(x=> 
+                x.transform.parent
+                && CommonBones.IsCommon(x.transform.parent.name))
+            .ToList();
 
         return this;
     }

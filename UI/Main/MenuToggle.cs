@@ -18,8 +18,6 @@ public class MenuToggle : MonoBehaviour
     GameObject mainMenuPages;
     #endregion
 
-    //TODO: fix input still going to UI when hidden... how? is there an interactable flag we can set?
-
     public void Constructor(UIInstance uiInstance)
     {
         this.uiInstance = uiInstance;
@@ -48,9 +46,9 @@ public class MenuToggle : MonoBehaviour
 
     void Update()
     {
-        if (!uiInstance) return;
-        if (PauseDiary.manager) { GameplayUpdate(); return; }
+        if (!uiInstance) return; 
         if (currentScene.name == Constants.MenuSceneName) { MainMenuUpdate(); return; }
+        if (PauseDiary.manager) { GameplayUpdate(); return; }
     }
 
     bool CheckInput()
@@ -128,17 +126,11 @@ public class MenuToggle : MonoBehaviour
         Log.Debug($"GameplaySetMenuState({visible})");
         if (!uiInstance) { Log.Warning("Tried to set ui state on missing uiInstance."); return; }
 
-        //set game pause diary state
-        if (PauseDiary.manager) PauseDiary.manager.isPaused = visible;
-
-        //set ui visibility?
-        if (visible) uiInstance.Show(); else uiInstance.Hide();
-
-        //Set player state
+        PauseDiary.manager.isPaused = visible;
+        if (visible) uiInstance.Show(); 
+        else uiInstance.Hide();
         if (visible) uiInstance.playerManager.LockPlayer();
         else uiInstance.playerManager.UnlockPlayer();
-
-        //store the visibility state
         isVisible = visible;
     }
 }

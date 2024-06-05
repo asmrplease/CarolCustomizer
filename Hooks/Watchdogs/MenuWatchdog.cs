@@ -20,7 +20,11 @@ public class MenuWatchdog : PelvisWatchdog
 
     void Start() => StartCoroutine(MainMenuFix());
 
-    void OnEnable() => CCPlugin.cutscenePlayer.NotifySpawned(this);
+    void OnEnable()
+    {
+        SetBaseVisibility(false);
+        CCPlugin.cutscenePlayer.NotifySpawned(this);
+    }
 
     private IEnumerator MainMenuFix()
     {
