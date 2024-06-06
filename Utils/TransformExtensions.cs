@@ -51,9 +51,10 @@ public static class TransformExtensions
     /// Removes the string "(Clone)" from the name of a transform.
     /// </summary>
     /// <param name="transform">The transform to be renamed.</param>
-    public static void DeCloneName(this Transform transform)
+    public static Transform DeCloneName(this Transform transform)
     {
         transform.name = transform.name.Replace("(Clone)", "");
+        return transform;
     }
 
     /// <summary>
@@ -137,7 +138,6 @@ public static class TransformExtensions
         target.transform.localRotation = Quaternion.identity;
         target.transform.localPosition = Vector3.zero;
     }
-
 
     //start at the child and recurse up the tree until we reach the parent
     public static string GetAddressRelativeTo(this Transform target, Transform ancestor, string start = "")

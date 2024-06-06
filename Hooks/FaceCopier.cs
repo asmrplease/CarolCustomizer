@@ -19,11 +19,12 @@ public class FaceCopier : MonoBehaviour
     SkinnedMeshRenderer baseFace;
 
     #region Lifecycle
-    public void Constructor(CarolInstance playerManager)
+    public FaceCopier Constructor(CarolInstance playerManager)
     {
         this.playerManager = playerManager;
         this.playerManager.SpawnEvent += UpdateBaseFace;
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
+        return this;
     }
 
     void OnOutfitUnloaded(Outfit outfit)

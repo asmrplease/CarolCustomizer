@@ -162,7 +162,7 @@ public class OutfitManager
         if (!pelvis || outfit is null) return;
         if (!outfit.Effects.Any()) return;
 
-        skeletonManager.AddBespokeBones(outfit);
+        skeletonManager.GetAddBoneSet(outfit);
         foreach (var effect in outfit.Effects)
         {
             var transform = pelvis.transform.Find(effect.RelativePath);
