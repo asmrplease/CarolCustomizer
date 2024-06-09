@@ -37,7 +37,6 @@ public class PelvisWatchdog : MonoBehaviour
     virtual public PelvisWatchdog BuildFromExisting(PelvisWatchdog watchdog, Component typeComponent)
     {
         Log.Debug("Watchdog.CopyFromExisting");
-        if (!watchdog.BoneData || !watchdog.CompData) Log.Warning($"{watchdog} was missing data when constructing {this}.");
         SourceGuid = watchdog.Guid;
         boneData = watchdog.BoneData;
         compData = watchdog.CompData;

@@ -24,7 +24,6 @@ public class HaDSOutfit : Outfit
 
     protected virtual void BuildVariants()
     {
-        Log.Debug("HaDS Variants");
         foreach (int i in Range(0, modelData.accessories.Count))
         {
             if (compData.coopToggles.Count() == 0)

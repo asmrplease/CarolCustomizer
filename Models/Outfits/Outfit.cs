@@ -45,7 +45,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
     public Outfit(Transform storedAsset)
     {
         if (!storedAsset) { Log.Error("Outfit constructor was passed a null transform."); return; }
-        Log.Debug($"Constructing {storedAsset.name}");
+
         this.storedAsset = storedAsset;
         AssetName = storedAsset.name;
         DisplayName = LocalizationIndex.index.GetLine(this.storedAsset.gameObject.name).Replace("CAROL_", "");
@@ -53,31 +53,20 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
         var pelvis = storedAsset.RecursiveFindTransform(x => x.name == "CarolPelvis");
         if (!pelvis) { Log.Error("failed to find pelvis during Outfit construction."); return; }
 
-        var earlyWatchdog = pelvis.gameObject.GetComponent<PelvisWatchdog>();
-        if (earlyWatchdog)
-        {
-            UnityEngine.Object.DestroyImmediate(earlyWatchdog);
-            Log.Debug("Early watchdog found and removed");
-        }
-
         prefabWatchdog = pelvis.gameObject.AddComponent<PelvisWatchdog>();
-        if (!prefabWatchdog) { Log.Error($"failed to instantiate {DisplayName}'s pelvis watchdog"); return; }
         prefabWatchdog.Awake();
 
-        Log.Debug($"Setting up accessories: {storedAsset.name}.");
         if (!prefabWatchdog.CompData) Log.Warning("Failed to instantiate meshdata in time.");
         var smrs = prefabWatchdog?.CompData?.allSMRs;
         if (smrs is null) { Log.Error("no smrs found in watchdog mesh data."); return; }
 
-        foreach (var smr in smrs)
-        {
-            var newAcc = new StoredAccessory(this, smr);
-            AccDict[newAcc] = newAcc;
-            newAcc.Materials
-                .Where(x => x is not null)
-                .ForEach(x=> MaterialDescriptors.Add(x));
+        smrs
+            .Select(smr => new StoredAccessory(this, smr))
+            .ForEach(acc => AccDict[acc] = acc)
+            .SelectMany(acc => acc.Materials)
+            .Where(mat => mat is not null)
+            .ForEach(mat => MaterialDescriptors.Add(mat));
 
-        }
         foreach (var effect in compData.EffectBehaviours)
         {
             Effects.Add(
@@ -97,7 +86,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
                 );
         }
 
-        Log.Debug($"{DisplayName} Outfit constructed.");
+        Log.Debug($"{DisplayName} constructed.");
     }
 
     public StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
@@ -112,9 +101,10 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
     public void Dispose()
     {
         if (!prefabWatchdog) return;
-        if (prefabWatchdog.BoneData) UnityEngine.Object.DestroyImmediate(prefabWatchdog.BoneData);
-        if (prefabWatchdog.CompData) UnityEngine.Object.DestroyImmediate(prefabWatchdog.CompData);
-        UnityEngine.Object.DestroyImmediate(prefabWatchdog);
+        if (prefabWatchdog.BoneData) GameObject.DestroyImmediate(prefabWatchdog.BoneData);
+        if (prefabWatchdog.CompData) GameObject.DestroyImmediate(prefabWatchdog.CompData);
+        if (prefabWatchdog.MagiData) GameObject.DestroyImmediate(prefabWatchdog.MagiData);
+        GameObject.DestroyImmediate(prefabWatchdog);
     }
     #endregion
 
