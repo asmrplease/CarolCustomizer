@@ -58,8 +58,10 @@ public static class Constants
     public const string Pyjamas = "CAROL_PyjamaBasic";
     public const string RobotHead = "Robocarolhead";
     public const string Shezara = "Shezara";
+    public const string HeadBone = "Bn_CarolHead";
     public const float CarolDefaultMass = 0.01f;
     public const KeyCode DefaultReload = KeyCode.F8;
+    public const int SMRLayer = 8;
 
     public static readonly Version v230 = new("2.3.0");
     public static readonly Version v220 = new("2.2.0");

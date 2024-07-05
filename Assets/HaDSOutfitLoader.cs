@@ -24,7 +24,7 @@ internal class HaDSOutfitLoader : IDisposable
         var list = Resources.FindObjectsOfTypeAll<ModelData>();
 
         var vanillaOutfits = list.Where(x =>
-            x.gameObject.name.ToLower().StartsWith("carol_")
+            x.gameObject.name.StartsWith("carol_", StringComparison.InvariantCultureIgnoreCase)
             && !x.gameObject.name.Contains("(Clone)"));//this line is designed to filter for any outfits that might be active when plugin is loaded
 
         foreach (var outfit in vanillaOutfits)

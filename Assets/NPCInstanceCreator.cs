@@ -82,7 +82,6 @@ public class NPCInstanceCreator : IDisposable
         Log.Debug($"found {componentless.Count()} componentless pelvises");
         var parents = componentless.Select(x => x.parent.parent);
         return parents;
-
     }
 
     public static void FindBotEntities(Scene arg0, LoadSceneMode arg1)
@@ -99,6 +98,7 @@ public class NPCInstanceCreator : IDisposable
     static void OnCarolBotDetected(GameObject botPrefab)
     {
         //remove voice componenets which are spamming console
+        //do we still need to do this?
         var voices = botPrefab.GetComponents<Voice>();
         foreach (var voice in voices) { voice.enabled = false; }
 

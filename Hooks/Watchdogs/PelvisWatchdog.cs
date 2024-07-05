@@ -123,6 +123,7 @@ public class PelvisWatchdog : MonoBehaviour
         if (!compData.Animator) return;
         disableAnimator = false;
         compData.Animator.enabled = true;
+        compData.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
     }
 
     public virtual void SetBaseOutfit(Outfit outfit) { }

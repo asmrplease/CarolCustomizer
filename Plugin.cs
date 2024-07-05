@@ -25,7 +25,7 @@ public class CCPlugin : BaseUnityPlugin
     public static List<PlayerCarolInstance> playerManagers = new();
     public static List<UIInstance> uiInstances = new();
     public static CarolInstance cutscenePlayer;
-    public static Action<CCPlugin> OnSetupComplete;
+    public static event Action<CCPlugin> OnSetupComplete;
     public static RecipesManager recipesManager { get; private set; }
     #endregion
 
@@ -39,6 +39,7 @@ public class CCPlugin : BaseUnityPlugin
     HaDSOutfitLoader outfitLoader;
     SaveDataAdjuster saveAdjuster;
     UIAssetLoader uiAssetLoader;
+
     #endregion
 
     #region Setup

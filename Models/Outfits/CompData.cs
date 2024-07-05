@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static GameManager;
 using static System.Linq.Enumerable;
 
 namespace CarolCustomizer.Models.Outfits;
@@ -63,6 +64,8 @@ public class CompData : MonoBehaviour
             .FirstOrDefault(x => x.runtimeAnimatorController);
 
         controller ??= animator?.runtimeAnimatorController;
+        if (animator is not null) animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+
         coopToggles = transform.parent.GetComponentsInChildren<CoopModelToggle>(true);
 
         SetCoopVariants();
@@ -108,16 +111,9 @@ public class CompData : MonoBehaviour
                 .Contains(x.parent))
             .Select(x => x.gameObject)
             .ToList();
-        
-        foreach (var behaviour in EffectBehaviours)
-        {
-            behaviour.enabled = false;
-        }
 
-        foreach (var go in EffectGameObjects)
-        {
-            go.SetActive(false);
-        }
+        EffectBehaviours.ForEach(x => x.enabled = false);
+        EffectGameObjects.ForEach(x => x.SetActive(false));
     }
 
     void SetCoopVariants()

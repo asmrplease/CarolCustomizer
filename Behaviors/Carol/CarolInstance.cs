@@ -23,7 +23,7 @@ public class CarolInstance : IDisposable
     #endregion
 
     #region Events
-    public Action<PelvisWatchdog> SpawnEvent { get; set; }
+    public event Action<PelvisWatchdog> SpawnEvent;
     #endregion
 
     #region Lifecycle

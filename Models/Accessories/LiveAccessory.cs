@@ -26,8 +26,6 @@ public class LiveAccessory : AccessoryDescriptor
 
     public Action OnAccessoryStateChanged;
 
-    //public SkinnedMeshRenderer DEBUG_GET_SMR() => liveSMR;
-
     public bool isActive { get; private set; } = false;
 
     public LiveAccessory(StoredAccessory acc, Transform folder)
@@ -49,6 +47,8 @@ public class LiveAccessory : AccessoryDescriptor
 
         liveSMR = liveObj.GetComponent<SkinnedMeshRenderer>();
         if (!liveSMR) { Log.Error($"{storedAcc.referenceSMR.name} was instantiated without an SMR."); return; }
+
+        liveObj.layer = Constants.SMRLayer;
     }
 
     public void SetLiveBones(Transform[] liveBones, Transform rootBone)
@@ -85,6 +85,7 @@ public class LiveAccessory : AccessoryDescriptor
         magica.SerializeData.sourceRenderers.Add(liveSMR);
         magica.SerializeData.rootBones.Clear();
         magica.SerializeData.rootBones.Add(liveSMR.transform);
+        liveSMR.gameObject.layer = Constants.SMRLayer;
         liveSMR.gameObject.SetActive(isActive);
     }
 
