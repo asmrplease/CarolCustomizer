@@ -45,6 +45,8 @@ public class LiveAccessory : AccessoryDescriptor
         liveSMR = liveObj.GetComponent<SkinnedMeshRenderer>();
         if (!liveSMR) { Log.Error($"{storedAcc.referenceSMR.name} was instantiated without an SMR."); return; }
 
+        liveSMR.allowOcclusionWhenDynamic = false;
+        liveSMR.updateWhenOffscreen = true;
         liveObj.layer = Constants.SMRLayer;
     }
 
@@ -79,6 +81,8 @@ public class LiveAccessory : AccessoryDescriptor
     {
         GameObject.Destroy(liveSMR.gameObject);
         liveSMR = GameObject.Instantiate(storedAcc.referenceSMR, folder).GetComponent<SkinnedMeshRenderer>();
+        liveSMR.allowOcclusionWhenDynamic = false;
+        liveSMR.updateWhenOffscreen = true;
         ReapplyMaterials();
         magica.SerializeData.sourceRenderers.Clear();
         magica.SerializeData.sourceRenderers.Add(liveSMR);
