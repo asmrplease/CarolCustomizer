@@ -85,6 +85,8 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
                     AssetName)
                 );
         }
+        var idk = Effects as object;
+        var wtf = idk as Transform;
 
         Log.Debug($"{DisplayName} constructed.");
     }

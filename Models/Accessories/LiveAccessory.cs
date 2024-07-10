@@ -24,7 +24,7 @@ public class LiveAccessory : AccessoryDescriptor
 
     public Outfit outfit => storedAcc?.outfit;
 
-    public Action OnAccessoryStateChanged;
+    public event Action OnAccessoryStateChanged;
 
     public bool isActive { get; private set; } = false;
 
@@ -35,12 +35,9 @@ public class LiveAccessory : AccessoryDescriptor
         storedAcc = acc;
 
         Materials = new MaterialDescriptor[acc.Materials.Length];
-        int index = 0;
-        foreach (var material in acc.Materials)
-        {
-            Materials[index] = acc.Materials[index];
-            index++;
-        }
+        acc.Materials
+            .Select((mat, i) => (mat, i))
+            .ForEach(tup => Materials[tup.i] = tup.mat);
 
         var liveObj = UnityEngine.Object.Instantiate(storedAcc.referenceSMR.gameObject, folder);
         if (!liveObj) { Log.Error($"Failed to instantiate {storedAcc.referenceSMR.name}."); return; }
@@ -51,16 +48,18 @@ public class LiveAccessory : AccessoryDescriptor
         liveObj.layer = Constants.SMRLayer;
     }
 
+    public bool IsOnArmature(Transform pelvis)
+    {
+        if (!pelvis) return false;
+        if (!liveSMR.rootBone) return false;
+        return liveSMR.rootBone.IsChildOf(pelvis);
+    }
+
     public void SetLiveBones(Transform[] liveBones, Transform rootBone)
     {
         if (!liveSMR) Log.Warning($"{this.Name} had a null SMR during SetLiveBones()");
-        if (liveSMR.bones.Length > liveBones.Length)
-        {
-            var temp = new Transform[liveSMR.bones.Length];
-            Array.Copy(liveSMR.bones, temp, liveSMR.bones.Length);
-            foreach (int i in Enumerable.Range(0, liveBones.Length)) temp[i] = liveBones[i];
-        }
-        else liveSMR.bones = liveBones;
+
+        liveSMR.bones = liveBones;
         liveSMR.rootBone = rootBone;
     }
 

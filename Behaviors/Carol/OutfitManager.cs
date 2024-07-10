@@ -89,7 +89,7 @@ public class OutfitManager
             liveAccessories.Add(accessory, live);
         }
         live.Enable();
-        skeletonManager.AssignLiveBones(live);
+        if (!live.IsOnArmature(pelvis.transform)) skeletonManager.AssignLiveBones(live);
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, live, true));
     }
 
@@ -106,6 +106,7 @@ public class OutfitManager
     public void PaintAccessory(StoredAccessory accessory, MaterialDescriptor material, int index)
     {
         EnableAccessory(accessory);
+        //if (!liveAccessories.ContainsKey(accessory)) { Log.Warning("asked to paint disabled accessory"); return; }
         liveAccessories[accessory].ApplyMaterial(material, index);
         var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, true));
@@ -114,6 +115,7 @@ public class OutfitManager
     public void PaintAccessoryShared(StoredAccessory accessory, List<Material> materials)
     {
         EnableAccessory(accessory);
+        if (!liveAccessories.ContainsKey(accessory)) { Log.Warning("asked to paint disabled accessory"); return; }
         liveAccessories[accessory].ApplySharedMaterials(materials);
     }
 

@@ -162,9 +162,10 @@ public static class MiscExtensions
         return button;
     }
 
-    public static void CopyFrom(this MagicaCapsuleCollider target,  MagicaCapsuleCollider source)
+    public static void CopyFrom(this MagicaCapsuleCollider target, MagicaCapsuleCollider source)
     {
         target.direction = source.direction;
+        target.center = source.center;
         target.radiusSeparation = source.radiusSeparation;
         target.alignedOnCenter = source.alignedOnCenter;
         target.SetSize(source.GetSize());
