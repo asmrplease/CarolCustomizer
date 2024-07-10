@@ -98,8 +98,11 @@ public class LiveAccessory : AccessoryDescriptor
 
     void ReapplyMaterials()
     {
-        var i = 0;
-        Materials.ForEach((x) => liveSMR.ReplaceMaterialAtIndex(x.referenceMaterial, i));
+        Materials
+            .Select((mat,index) => (mat,index))
+            .ForEach((tup) => 
+                liveSMR
+                .ReplaceMaterialAtIndex(tup.mat.referenceMaterial, tup.index));
         //TODO: this is failing on faces?
     }
 
