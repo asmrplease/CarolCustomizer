@@ -204,11 +204,11 @@ public class OutfitManager
         var sourceColliders = colliderSource
             .magiData
             .CapsuleColliders
-            .ToDictionary(x=>x.name);
+            .Where(x => x)
+            .ToDictionary(x=> x.name);
         var liveColliders = pelvis
             .MagiData
-            .CapsuleColliders;
-            
+            .CapsuleColliders;     
         foreach (var liveCollider in liveColliders)
         {
             if (!sourceColliders.TryGetValue(liveCollider.name, out var referenceCollider)) continue;
