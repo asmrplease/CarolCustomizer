@@ -7,6 +7,7 @@ using CarolCustomizer.Hooks;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
+using FaceCam.Behaviors;
 using HarmonyLib;
 using System;
 using System.Collections;
@@ -27,6 +28,7 @@ public class CCPlugin : BaseUnityPlugin
     public static CarolInstance cutscenePlayer;
     public static event Action<CCPlugin> OnSetupComplete;
     public static RecipesManager recipesManager { get; private set; }
+    public static ThumbnailCamera thumbnailCamera;
     #endregion
 
     //the dream is that we can increase this, but that's not really working out rn
@@ -39,6 +41,7 @@ public class CCPlugin : BaseUnityPlugin
     HaDSOutfitLoader outfitLoader;
     SaveDataAdjuster saveAdjuster;
     UIAssetLoader uiAssetLoader;
+    
 
     #endregion
 
@@ -47,10 +50,11 @@ public class CCPlugin : BaseUnityPlugin
     {
         new Log(Logger);
         Log.Message("Logger Ready!");
-        this.gameObject.AddComponent<DebugOnKeypress>().Constructor(KeyCode.Tab, "----------------------------------------------------------------------------------------------", Log.Info);
-
+        //this.gameObject.AddComponent<DebugOnKeypress>().Constructor(KeyCode.Tab, "----------------------------------------------------------------------------------------------", Log.Info);
         CoroutineRunner = this;
+
         Settings.Constructor(Config);
+
         saveAdjuster = new();
         uiAssetLoader = new();
         outfitAssetManager = new(transform);
@@ -58,6 +62,7 @@ public class CCPlugin : BaseUnityPlugin
         recipesManager = new(Constants.RecipeFolderPath);
         NPCManager.Constructor(gameObject, recipesManager);
         npcInstances = new(transform);
+
 
         for (int i = 1; i <= numPlayers; i++)
         {
@@ -95,7 +100,11 @@ public class CCPlugin : BaseUnityPlugin
         Log.Debug("starting hads coroutine");
         OutfitAssetManager.OnOutfitSetLoaded += LoadInitialWatchdogs;
         StartCoroutine(outfitLoader.LoadAllHaDSOutfits());
+        if (!Camera.main) yield return new WaitUntil(() => Camera.main);
 
+        thumbnailCamera = GameObject
+            .Instantiate(Camera.main.gameObject, this.transform)
+            .AddComponent<ThumbnailCamera>();
         Log.Debug("Invoking CCPlugin.Start() callbacks");
         OnSetupComplete?.Invoke(this);
         Log.Info("Start() complete.");
@@ -132,7 +141,9 @@ public class CCPlugin : BaseUnityPlugin
         Config.Save();
         HarmonyInstance?.UnpatchSelf();
         Settings.Dispose();
-        playerManagers.Where(x=> x is not null).ForEach(x => x.Dispose());
+        playerManagers
+            .Where(x=> x is not null)
+            .ForEach(x => x.Dispose());
         uiAssetLoader.Dispose();
         outfitAssetManager.Dispose();
         npcInstances.Dispose();

@@ -90,7 +90,7 @@ public class OutfitListUI : MonoBehaviour
         ProcessFilters();
     }
 
-    void ProcessFilters(bool unused = true)
+    void ProcessFilters(bool unusedParam = true)
     {
         bool favorites = favoriteFilter.isOn;
         bool active = activeFilter.isOn;
@@ -100,10 +100,13 @@ public class OutfitListUI : MonoBehaviour
         foreach (var acc in accessoryUIs.Keys) { SetAccUIVisible(acc, false); }
         foreach (var outfit in outfitUIs.Values) { outfit.gameObject.SetActive(!accFilterActive); }
 
+        //accessoryUIs.Keys.ForEach(acc => SetAccUIVisible(acc, false));
+        //outfitUIs.Values.ForEach(outfit => outfit.gameObject.SetActive(!accFilterActive));
+
         if (active) { foreach (var acc in outfitManager.ActiveAccessories) { SetAccUIVisible(acc, true); } }
         if (favorites) { foreach (var acc in Settings.Favorites.favorites) { SetAccUIVisible(acc, true); } }
-
         if (!textFilter) return;
+
         var lowerString = searchString.ToLower();
         foreach (var outfit in outfitUIs.Keys
             .Where(x => x.DisplayName
@@ -152,6 +155,7 @@ public class OutfitListUI : MonoBehaviour
     public void OnAccessoryUnloaded(StoredAccessory accessory)
     {
         if (!accessoryUIs.TryGetValue(accessory, out var accUI)) return;
+
         accessoryUIs.Remove(accessory);
         int i = 0;
         foreach (var mat in accessory.Materials)

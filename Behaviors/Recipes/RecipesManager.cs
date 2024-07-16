@@ -10,26 +10,26 @@ namespace CarolCustomizer.Behaviors.Recipes;
 public class RecipesManager : IDisposable
 {
     FileSystemWatcher watcher;
-
-    public Action<Recipe> OnRecipeCreated;
-    public Action<Recipe> OnRecipeDeleted;
-
     Dictionary<string, Recipe> recipes = new();
+
+    public event Action<Recipe> OnRecipeCreated;
+    public event Action<Recipe> OnRecipeDeleted;
 
     public IEnumerable<Recipe> Recipes => recipes.Values;
 
     public Recipe GetRecipeByFilename(string name)
     {
-        string address = RecipeSaver.RecipeFilenameToPath(name + Constants.RecipeExtension);
+        string address = RecipeSaver.RecipeFilenameToPath(name);
         Log.Debug($"address: {address}");
-        recipes.TryGetValue(address, out Recipe recipe); return recipe;
+        recipes.TryGetValue(address, out Recipe recipe); 
+        return recipe;
     }
 
     public RecipesManager(string path)
     {
         Directory.CreateDirectory(path);
         watcher = new FileSystemWatcher(path);
-        watcher.Filter = $"*{Constants.RecipeExtension}";
+        //watcher.Filter = $"*{Constants.RecipeExtension}";
         watcher.IncludeSubdirectories = true;
         watcher.Created += HandleRecipeFileCreated;
         watcher.Deleted += HandleRecipeFileRemoved;
@@ -49,13 +49,12 @@ public class RecipesManager : IDisposable
 
     public void RefreshAll()
     {
-        foreach (var recipe in recipes.Values) { OnRecipeDeleted(recipe); }
+        recipes.Values.ForEach(x => OnRecipeDeleted?.Invoke(x));
         recipes.Clear();
 
-        foreach (string existingPath in RecipeLoader.GetRecipeFilePaths())
-        {
-            OnRecipeFileCreated(new Recipe(existingPath));
-        }
+        RecipeLoader
+            .GetRecipeFilePaths()
+            .ForEach(x => OnRecipeFileCreated(new Recipe(x)));
     }
 
     void OnRecipeFileCreated(Recipe newRecipe)
@@ -75,6 +74,8 @@ public class RecipesManager : IDisposable
 
     void HandleRecipeFileCreated(object sender, FileSystemEventArgs e)
     {
+        var ext = Path.GetExtension(e.FullPath).ToLower();
+        if (ext != Constants.RecipeExtension && ext != Constants.RecipeImageExtension) return;
         Log.Debug("HandleRecipeFileCreated");
         var newRecipe = new Recipe(e.FullPath);
         //Log.Debug($"recipe created: {newRecipe.Name}");
@@ -83,6 +84,8 @@ public class RecipesManager : IDisposable
 
     void HandleRecipeFileChanged(object sender, FileSystemEventArgs e)
     {
+        var ext = Path.GetExtension(e.FullPath).ToLower();
+        if (ext != Constants.RecipeExtension && ext != Constants.RecipeImageExtension) return;
         Log.Debug("HandleRecipeFileChanged");
         OnRecipeFileRemoved(recipes[e.FullPath]);
         OnRecipeFileCreated(new Recipe(e.FullPath));
@@ -90,6 +93,8 @@ public class RecipesManager : IDisposable
 
     void HandleRecipeFileRenamed(object sender, RenamedEventArgs e)
     {
+        var ext = Path.GetExtension(e.FullPath).ToLower();
+        if (ext != Constants.RecipeExtension && ext != Constants.RecipeImageExtension) return;
         Log.Debug("HandleRecipeFileRenamed");
         OnRecipeFileRemoved(recipes[e.OldName]);
         OnRecipeFileCreated(new Recipe(e.FullPath));
@@ -97,6 +102,8 @@ public class RecipesManager : IDisposable
 
     void HandleRecipeFileRemoved(object sender, FileSystemEventArgs e)
     {
+        var ext = Path.GetExtension(e.FullPath).ToLower();
+        if (ext != Constants.RecipeExtension && ext != Constants.RecipeImageExtension) return;
         Log.Debug("HandleRecipeFileRemoved");
         if (!recipes.ContainsKey(e.FullPath)) return;
         var removed = recipes[e.FullPath];

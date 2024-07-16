@@ -70,6 +70,7 @@ public static class Constants
     public static readonly Version v100 = new("1.0.0");
     
     public const string RecipeExtension = ".json";
+    public const string RecipeImageExtension = ".png";
     public const string RecipeFolderName = "Recipes";
     public const string BepInExFolder = "BepInEx";
     public const string PluginsFolder = "plugins";
@@ -78,6 +79,7 @@ public static class Constants
     public const string AssetFolderName = "CarolCustomizer";
     public const string Preferences = "Preferences";
     public const string AutoSave = "AutoSave";
+    public const string PNGChunkKeyword = "RecipeData";
 
     public static readonly string ApplicationPath = Directory.GetParent(Application.dataPath).FullName;
     public static readonly string RecipeFolderPath = Path.Combine(ApplicationPath, RecipeFolderName);

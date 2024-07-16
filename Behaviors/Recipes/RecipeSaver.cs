@@ -25,4 +25,19 @@ internal static class RecipeSaver
         newSave.Write(json);
         newSave.Close();
     }
+
+    public static void SavePNG(RecipeDescriptor23 recipe, string filePath)
+    {
+        string json = JsonConvert.SerializeObject(recipe, Formatting.None);
+        if (!filePath.Contains(Constants.RecipeImageExtension))
+        {
+            filePath = RecipeFilenameToPath($"{filePath}{Constants.RecipeImageExtension}");
+            filePath = filePath.Replace(Constants.RecipeExtension, "");
+        }
+        CCPlugin
+            .CoroutineRunner
+            .StartCoroutine(CCPlugin
+                .thumbnailCamera
+                .Save(filePath));
+    }
 }

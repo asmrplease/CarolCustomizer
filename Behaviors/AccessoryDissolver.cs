@@ -44,13 +44,18 @@ internal static class AccessoryDissolver
             Entity playerEntity = other.GetComponent<Entity>();
             if (!playerEntity) return;
 
-            var player = CCPlugin.playerManagers.FirstOrDefault(x => x.ManagesPlayer(playerEntity));
+            var player = CCPlugin
+                .playerManagers
+                .FirstOrDefault(x => x.ManagesPlayer(playerEntity));
             if (player is null) return;
 
             ActiveDissolve = CCPlugin
                 .CoroutineRunner
                 .StartCoroutine(
-                    Dissolve(player.outfitManager, __instance.dissolveMaterial, __instance.dissolveTime));
+                    Dissolve(
+                        player.outfitManager, 
+                        __instance.dissolveMaterial, 
+                        __instance.dissolveTime));
         }
     }
 
@@ -69,7 +74,10 @@ internal static class AccessoryDissolver
             ActiveDissolve = CCPlugin
                 .CoroutineRunner
                 .StartCoroutine(
-                    Dissolve(player.outfitManager, FireDissolve, 0.25f));
+                    Dissolve(
+                        player.outfitManager, 
+                        FireDissolve, 
+                        0.25f));
         }
     }
 

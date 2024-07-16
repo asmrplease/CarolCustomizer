@@ -3,7 +3,6 @@ using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using System.Collections;
-using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Recipes;
@@ -19,20 +18,24 @@ internal class AutoSaver
 
     public void Save()
     {
-        var descriptor = new RecipeDescriptor23(outfitManager);
-        var path = RecipeSaver.RecipeFilenameToPath(Constants.AutoSave);
-        RecipeSaver.Save(descriptor, path);
+        RecipeSaver.Save(
+            new RecipeDescriptor23(outfitManager),
+            RecipeSaver.RecipeFilenameToPath(Constants.AutoSave + Constants.RecipeExtension));
+        Log.Info("Autosave Complete.");
     }
 
     public void Load()
     {
-        var recipe = CCPlugin.recipesManager.GetRecipeByFilename(Constants.AutoSave);
-        CCPlugin.uiInstances.First().StartCoroutine(LoadRecipeRoutine(recipe));//TODO: put this on a proper gameobject
+        var recipe = CCPlugin
+            .recipesManager
+            .GetRecipeByFilename(Constants.AutoSave+Constants.RecipeExtension);
+        CCPlugin.CoroutineRunner.StartCoroutine(LoadRecipeRoutine(recipe));
     }
 
     IEnumerator LoadRecipeRoutine(Recipe recipe)
     {
         if (!outfitManager.pelvis) yield return new WaitUntil(() => outfitManager.pelvis);
+
         if (recipe is null 
             || recipe.Error == Recipe.Status.FileError
             || recipe.Error == Recipe.Status.InvalidJson)

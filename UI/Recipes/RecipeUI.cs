@@ -7,6 +7,7 @@ using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -50,8 +51,12 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
         displayImage = transform.Find(displayImageAddress)?.GetComponent<Image>();
         displayImage.sprite = loader.PirateIcon;
-        displayImage.enabled = Settings.Plugin.shezaraRecipe.Value == recipe.Name;
-        Settings.Plugin.shezaraRecipe.SettingChanged += OnShezaraChanged;
+        displayImage.enabled = false;
+        //displayImage.enabled = Settings.Plugin.shezaraRecipe.Value == recipe.Name;
+
+        if (recipe.Extension == Constants.RecipeImageExtension) 
+            CCPlugin.CoroutineRunner.StartCoroutine(LoadThumbnail());
+        //Settings.Plugin.shezaraRecipe.SettingChanged += OnShezaraChanged;
 
         displayName = transform.Find(outfitNameAddress)?.GetComponentInChildren<Text>();
         displayName.text = this.recipe.Name;
@@ -66,12 +71,33 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     void OnDestroy()
     {
         Log.Info($"RecipeUI: {this.recipe.Name}.OnDestroy()");
-        Settings.Plugin.shezaraRecipe.SettingChanged -= OnShezaraChanged;
+        //Settings.Plugin.shezaraRecipe.SettingChanged -= OnShezaraChanged;
         //TODO: why do these callbacks sometimes appear to continue to get called after recipes are removed?
         //is the event getting registered repeatedly?
         //is the wrong event being removed?
         //is the event not being removed?
         //do i misunderstand the nature of the problem?
+    }
+
+    IEnumerator LoadThumbnail()
+    {
+        yield return new WaitForEndOfFrame();
+
+        Log.Info("LoadThumbnail()");
+        var bytes = File.ReadAllBytes(recipe.Path);
+        var sprite = displayImage.sprite;
+        Texture2D thumbnail = new Texture2D(512, 512, TextureFormat.ARGB32, false);
+        if (!ImageConversion.LoadImage(thumbnail, bytes)) { Log.Warning($"failed to load png for {recipe.Name}"); yield break; }
+
+        displayImage.sprite = Sprite
+            .Create(
+                thumbnail,
+                new Rect (0,0,thumbnail.width,thumbnail.height),
+                new Vector2(0.5f, 0.5f));
+        displayImage.sprite.name = recipe.Name ;
+        displayImage.enabled = true;
+        Log.Debug("thumbnail loaded");
+        yield break;
     }
 
     void OnShezaraChanged(object sender, EventArgs e)
@@ -84,9 +110,9 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     {
         switch (recipe.Error)
         {
-            case Recipe.Status.MissingSource: return $"Missing {RecipeApplier.GetMissingSources(recipe.Descriptor).Count()} sources";
-            case Recipe.Status.InvalidJson: return "Recipe file invalid";
-            case Recipe.Status.FileError: return "Error loading file";
+            case Recipe.Status.MissingSource:   return $"Missing {RecipeApplier.GetMissingSources(recipe.Descriptor).Count()} sources";
+            case Recipe.Status.InvalidJson:     return "Recipe data invalid";
+            case Recipe.Status.FileError:       return "Error loading file";
             default: return "";
         }
     }
@@ -108,15 +134,9 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         messageDialogue.Show(message, confirmText: "Yes!", confirmAction: Overwrite);
     }
 
-    void Overwrite()
-    {
-        RecipeSaver.Save(new RecipeDescriptor23(outfitManager), recipe.Path);
-    }
+    void Overwrite() => RecipeSaver.SavePNG(new RecipeDescriptor23(outfitManager), recipe.Path);
 
-    void OnContextMenuLoad()
-    {
-        RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
-    }
+    void OnContextMenuLoad() => RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
 
     void OnContextMenuWarningLoad()
     {
@@ -165,6 +185,14 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         File.Move(recipe.Path, newPath);
     }
 
+    void ConvertToPNG()
+    {
+        //load recipe
+        //store recipe name
+        //delete .json file
+        //save recipe as png with name
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == Settings.HotKeys.ContextMenu) contextMenu.Show(this);
@@ -188,6 +216,10 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         {
             output.Add(("Load*", OnContextMenuWarningLoad));
             output.Add(("Show Missing", OnContextMenuListMissing));
+        }
+        if (recipe.Extension == Constants.RecipeExtension)
+        {
+            output.Add(("Update to .png", ConvertToPNG));
         }
         return output;
     }

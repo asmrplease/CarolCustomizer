@@ -11,16 +11,40 @@ internal static class RecipeLoader
 {
     public static string[] GetRecipeFilePaths()
     {
-        return Directory.GetFiles(Constants.RecipeFolderPath, $"*{Constants.RecipeExtension}", SearchOption.AllDirectories);
+        return 
+            Directory.GetFiles(
+                Constants.RecipeFolderPath, $"*",
+                SearchOption.AllDirectories)
+            .Select(x=> (ext: Path.GetExtension(x), path: x))
+            .Where(tup => 
+                tup.ext == Constants.RecipeExtension ||
+                tup.ext == Constants.RecipeImageExtension)
+            .Select(tup => tup.path)
+            .ToArray();
     }
 
     public static string GetRecipeJson(string path)
     {
-        var file = File.OpenText(path);
-        if (file is null) { Log.Warning("failed to open file"); return ""; }
+        string results = "";
+        
+        switch (Path.GetExtension(path)) 
+        {
+            case ".json":
+                var file = File.OpenText(path);
+                if (file is null) { Log.Warning("failed to open file"); return ""; }
 
-        string results = file.ReadToEnd();
-        file.Close();
+                results = file.ReadToEnd();
+                file.Close();
+                break;
+            case ".png":
+                results = PngMetadataUtil.GetMetadata(path, Constants.PNGChunkKeyword);
+                if (results == "") Log.Warning("empty json!");
+                break;
+            default: 
+                Log.Warning("tried to load a recipe with an unsupported extension");
+                break;
+        }
+        
         return results;
     }
 
@@ -31,18 +55,30 @@ internal static class RecipeLoader
         string json;
         var results = new ValidationResults { Status = Recipe.Status.NoError, Recipe = null };
 
-        try { json = GetRecipeJson(filePath); }
-        catch { results.Status = Recipe.Status.FileError; return results; }
-        
+        try { json = GetRecipeJson(filePath); Log.Info("json valid..."); }
+        catch (Exception e) 
+        {
+            Log.Error(e.StackTrace);
+            results.Status = Recipe.Status.FileError; return results; 
+        }
+        return ValidateJson(json);
+    }
+
+    public static ValidationResults ValidateJson(string json)
+    {
+        var results = new ValidationResults { Status = Recipe.Status.NoError, Recipe = null };
         Version version;
+
         try
         {
             version = JsonConvert.DeserializeObject<VersionedObject>(json)?.version;
+            if (version is null) { Log.Warning($"Version deserialization failed: {json}"); }
             version ??= Constants.v100;
         }
         catch { version = Constants.v100; }
         try
         {
+            //TODO: this is gonna get out of hand sooner or later
             switch (version)
             {
                 case var x when x >= Constants.v230:
@@ -65,7 +101,7 @@ internal static class RecipeLoader
                     results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor20>(json)
                         .ToVersion210()
                         .ToVersion220()
-                        .ToVersion230();
+                        .ToVersion230(); 
                     break;
             }
         }
