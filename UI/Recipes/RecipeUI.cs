@@ -72,7 +72,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     void OnDestroy()
     {
-        Log.Info($"RecipeUI: {this.recipe.Name}.OnDestroy()");
+        //Log.Info($"RecipeUI: {this.recipe.Name}.OnDestroy()");
         //Settings.Plugin.shezaraRecipe.SettingChanged -= OnShezaraChanged;
         //TODO: why do these callbacks sometimes appear to continue to get called after recipes are removed?
         //is the event getting registered repeatedly?
@@ -219,16 +219,16 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         var output = new List<(string, UnityAction)>();
-        if (recipe.Error == Recipe.Status.NoError)
-        {
-            output.Add(("Load", OnContextMenuLoad));
-        }
         if (recipe.Name == Constants.AutoSave)
         {
             if (recipe.Error == Recipe.Status.FileError) return output;
 
             output.Add(("Load", OnContextMenuLoad));
             return output;
+        }
+        if (recipe.Error == Recipe.Status.NoError)
+        {
+            output.Add(("Load", OnContextMenuLoad));
         }
         if (recipe.Error != Recipe.Status.FileError)
         {

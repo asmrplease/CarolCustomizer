@@ -10,8 +10,10 @@ public class PngMetadataUtil
 {
     public static string GetMetadata(string file, string key)
     {
+        if (!File.Exists(file)) { Log.Warning("Couldn't open file for reading"); return ""; }
+
         PngReader reader = FileHelper.CreatePngReader(file);
-        if (reader is null) Log.Warning($"Failed to create PNG reader for {file}");
+        if (reader is null) { Log.Warning($"Failed to create PNG reader for {file}"); return ""; }
 
         string data = reader
             .GetMetadata()

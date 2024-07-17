@@ -92,4 +92,5 @@ public static class Constants
     public static readonly Vector3 OutOfTheWay = new(-10000, -10000, -10000);
     public const float PhoneHideTime = 1.75f;
     public const int MaxCoopPlayers = 4;
+    public const int ThumbnailSize = 512;
 }

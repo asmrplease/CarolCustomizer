@@ -29,7 +29,7 @@ public class SkeletonManager : IDisposable
 
     void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
-        Log.Info("SkeletonManager.SetNewPelvis()");
+        //Log.Info("SkeletonManager.SetNewPelvis()");
         outfitBoneDicts
             .Values
             .SelectMany(dict => dict.Values)

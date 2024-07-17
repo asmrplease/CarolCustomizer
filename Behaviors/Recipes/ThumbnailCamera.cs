@@ -17,7 +17,7 @@ public class ThumbnailCamera : MonoBehaviour
     CameraController cameraController;
     Transform cameraPostionDriver;
     Transform cameraTarget;
-    int TextureSize = 512;
+    
 
     void Awake()
     {
@@ -49,21 +49,8 @@ public class ThumbnailCamera : MonoBehaviour
 
     void HandleCutsceneEnd(Slate.Cutscene obj)
     {
-        Log.Info("InsetCamera.HandleCutsceneEnd()");
         var slate = GetComponent<Slate.GameCamera>();
         if (slate) GameObject.DestroyImmediate(slate);
-        this.StartCoroutine(ReenableCamera());
-    }
-
-    IEnumerator ReenableCamera()
-    {
-        if (!camera) yield break;
-
-        camera.enabled = false;
-        yield return new WaitForSeconds(0.1f);
-
-        camera.enabled = true;
-        yield break;
     }
 
     void HandleNewPelvis(PelvisWatchdog pelvis)
@@ -85,20 +72,19 @@ public class ThumbnailCamera : MonoBehaviour
         var white = Capture(Color.white);
         var alpha = CalculateTransparency(black, white);
         byte[] bytes = alpha.EncodeToPNG();
-        Log.Debug("Encode complete");
-
         File.WriteAllBytes(filePath, bytes);
         var descriptor = new RecipeDescriptor23(CCPlugin.cutscenePlayer.outfitManager);
         string json = JsonConvert.SerializeObject(descriptor, Formatting.None);
         PngMetadataUtil.AddMetadata(filePath, Constants.PNGChunkKeyword, json);
         Log.Info("Save complete.");
-        
     }
 
     Texture2D Capture(Color color)
     {
         camera.enabled = true;
-        RenderTexture.active = camera.targetTexture ??= new(TextureSize, TextureSize, 32);
+        RenderTexture.active = 
+            camera.targetTexture 
+            ??= new(Constants.ThumbnailSize, Constants.ThumbnailSize, 32);
         camera.backgroundColor = color;
         camera.Render();
         Log.Debug("Render Complete");

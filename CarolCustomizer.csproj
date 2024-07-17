@@ -29,10 +29,10 @@
 		<Reference Include="Newtonsoft.Json">
 			<HintPath>lib\Newtonsoft.Json.dll</HintPath>
 		</Reference>
-		<Reference Include ="MagicaClothV2">
+		<Reference Include="MagicaClothV2">
 			<HintPath>lib\MagicaClothV2.dll</HintPath>
 		</Reference>
-		<Reference Include ="Pngcs">
+		<Reference Include="Pngcs">
 			<HintPath>lib\Pngcs.dll</HintPath>
 		</Reference>
 	</ItemGroup>
@@ -42,6 +42,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="_Release\BepInEx\plugins\CarolCustomizer\NewFolder\" />
 	  <Folder Include="_Release\Recipes\Examples\" />
 	</ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

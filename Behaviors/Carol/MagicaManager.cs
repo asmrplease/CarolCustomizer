@@ -33,7 +33,7 @@ internal class MagicaManager
 
     public void HandleNewOutfit(Outfit outfit)
     {
-        Log.Info($"MagicaManager.HandleNewOutfit({outfit.DisplayName}");
+        //Log.Info($"MagicaManager.HandleNewOutfit({outfit.DisplayName}");
         if (!targetPelvis) { Log.Warning("MagicaManager had no pelvis during HandleNewOutfit"); return; }
 
         var magiData = outfit.magiData;
@@ -125,11 +125,11 @@ internal class MagicaManager
     {
         processing.Remove(component);
         processing.RemoveAll(x => !x);
-        Log.Info($"HandleBuildComplete({buildGuid}): {success}.");
+        //Log.Info($"HandleBuildComplete({buildGuid}): {success}.");
         if (!targetPelvis) { Log.Warning("build completed after pelvis was destroyed"); return; }
 
         if (processing.Any()) return;
-        Log.Info("enabling animator");
+        //Log.Info("enabling animator");
         targetPelvis.EnableAnimator();
     }
 }

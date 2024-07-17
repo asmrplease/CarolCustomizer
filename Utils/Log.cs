@@ -13,7 +13,7 @@ internal class Log
     #endregion
 
     #region Static Logger Methods
-    public static void Debug(string message) => i.LogDebug(message);
+    public static void Debug(string message) { }//i.LogDebug(message);
     public static void Info(string message) => i.LogInfo(message);
     public static void Message(string message) => i.LogMessage(message);
     public static void Warning(string message) => i.LogWarning(message);

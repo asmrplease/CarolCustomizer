@@ -5,6 +5,7 @@ using CarolCustomizer.Utils;
 using CarolCustomizer.Assets;
 using CarolCustomizer.Models.Recipes;
 using UnityEngine;
+using BepInEx;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 public class RecipeFileWatcher : IDisposable
@@ -63,14 +64,20 @@ public class RecipeFileWatcher : IDisposable
         Log.Debug($"OnRecipeFileCreated({newRecipe.Name})");
         recipes[newRecipe.Path] = newRecipe;
         Log.Debug($"OnRecipeCreated?.Invoke({newRecipe.Name})");
-        OnRecipeCreated?.Invoke(newRecipe);
+        ThreadingHelper
+            .Instance
+            .StartSyncInvoke(() =>
+                OnRecipeCreated?.Invoke(newRecipe));
     }
 
     void OnRecipeFileRemoved(Recipe removedRecipe)
     {
         Log.Debug($"OnRecipeFileRemoved({removedRecipe.Name})");
         recipes.Remove(removedRecipe.Path);
-        OnRecipeDeleted?.Invoke(removedRecipe);
+        ThreadingHelper
+            .Instance
+            .StartSyncInvoke(() => 
+                OnRecipeDeleted?.Invoke(removedRecipe));
     }
 
     void HandleRecipeFileCreated(object source, FileSystemEventArgs e)

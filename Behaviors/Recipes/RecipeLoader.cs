@@ -55,7 +55,7 @@ internal static class RecipeLoader
         string json;
         var results = new ValidationResults { Status = Recipe.Status.NoError, Recipe = null };
 
-        try { json = GetRecipeJson(filePath); Log.Info("json valid..."); }
+        try { json = GetRecipeJson(filePath); }
         catch (Exception e) 
         {
             Log.Error(e.StackTrace);
