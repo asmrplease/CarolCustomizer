@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Collections;
 using UnityEngine;
+using System.Linq;
 
 namespace FaceCam.Behaviors;
 public class ThumbnailCamera : MonoBehaviour
@@ -25,8 +26,11 @@ public class ThumbnailCamera : MonoBehaviour
         if (!camera) { Log.Error("InsetCamera instantiated on an object without a camera component!"); return; }
 
         this.name = "Inset Camera";
+        var collider = GetComponent<SphereCollider>();
+        if (collider) GameObject.Destroy(collider);
+
         camera.cullingMask = 1 << Constants.SMRLayer;
-        camera.clearFlags = CameraClearFlags.SolidColor; //CameraClearFlags.Color;//
+        camera.clearFlags = CameraClearFlags.Color; //CameraClearFlags.Color;//
         camera.backgroundColor = Constants.DefaultColor;
         camera.depth = Camera.main.depth + 1;
         camera.fieldOfView = 20;
@@ -48,7 +52,6 @@ public class ThumbnailCamera : MonoBehaviour
         Log.Info("InsetCamera.HandleCutsceneEnd()");
         var slate = GetComponent<Slate.GameCamera>();
         if (slate) GameObject.DestroyImmediate(slate);
-
         this.StartCoroutine(ReenableCamera());
     }
 
@@ -85,40 +88,61 @@ public class ThumbnailCamera : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
 
-        Camera camOV = camera;
-        camera.enabled = true;
-        RenderTexture currentRT = RenderTexture.active;
-        RenderTexture.active = camOV.targetTexture ??= new(TextureSize, TextureSize, 24);
-
-        camOV.Render();
-        Log.Debug("Render Complete");
-        Texture2D imageOverview = new Texture2D(
-            camOV.targetTexture.width,
-            camOV.targetTexture.height,
-            TextureFormat.ARGB32, false);
-        if (imageOverview) Log.Info("created texture2d");
-
-        imageOverview.ReadPixels(
-            new Rect(
-                0, 0,
-                camOV.targetTexture.width,
-                camOV.targetTexture.height),
-            0, 0);
-
-        imageOverview.Apply();
-        RenderTexture.active = currentRT;
-        Log.Debug("ReadPixels complete");
-
-        byte[] bytes = imageOverview.EncodeToPNG();
-        camera.enabled = false;
+        var black = Capture(Color.black);
+        var white = Capture(Color.white);
+        var alpha = CalculateTransparency(black, white);
+        byte[] bytes = alpha.EncodeToPNG();
         Log.Debug("Encode complete");
 
         File.WriteAllBytes(filePath, bytes);
-
         var descriptor = new RecipeDescriptor23(CCPlugin.cutscenePlayer.outfitManager);
         string json = JsonConvert.SerializeObject(descriptor, Formatting.None);
         PngMetadataUtil.AddMetadata(filePath, Constants.PNGChunkKeyword, json);
         Log.Info("Save complete.");
+    }
+
+    Texture2D Capture(Color color)
+    {
+        camera.enabled = true;
+        RenderTexture.active = camera.targetTexture ??= new(TextureSize, TextureSize, 32);
+        camera.backgroundColor = color;
+        camera.Render();
+        Log.Debug("Render Complete");
+        Texture2D result = new Texture2D(
+            camera.targetTexture.width,
+            camera.targetTexture.height,
+            TextureFormat.RGBA32, false);
+        if (result) Log.Info("created texture2d");
+
+        result.ReadPixels(
+            new Rect(
+                0, 0,   
+                camera.targetTexture.width,
+                camera.targetTexture.height),
+            0, 0);
+
+        result.Apply();
+        Log.Debug("ReadPixels complete");
+        camera.enabled = false;
+        return result;
+    }
+
+    Texture2D CalculateTransparency(Texture2D blackTexture, Texture2D whiteTexture)
+    {
+        const int mipmap = 0;
+        Texture2D alphaTex = new Texture2D(
+            camera.targetTexture.width,
+            camera.targetTexture.height,
+            TextureFormat.RGBA32, false);
+        var black = blackTexture.GetPixelData<Color32>(mipmap);
+        var white = whiteTexture.GetPixelData<Color32>(mipmap);
+        var alpha = black
+            .Zip(white, 
+                (black, white) => 
+                white.DifferenceToAlpha(black))
+            .ToArray();
+        alphaTex.SetPixelData(alpha, mipmap);
+        return alphaTex;
     }
 
     void OnDestroy() => Slate.Cutscene.OnCutsceneStopped -= HandleCutsceneEnd;

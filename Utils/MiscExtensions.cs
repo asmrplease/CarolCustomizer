@@ -171,4 +171,15 @@ public static class MiscExtensions
         target.SetSize(source.GetSize());
         target.UpdateParameters();
     }
+
+    public static Color32 DifferenceToAlpha(this Color32 white, Color32 black)
+    {
+        Color32 result = new Color32(black.r, black.g, black.b, 0);
+        var total = 
+            (white.r - black.r) + 
+            (white.g - black.g) + 
+            (white.b - black.b);
+        result.a = (byte)(255-(total / 3));
+        return result;
+    }
 }

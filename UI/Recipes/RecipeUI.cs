@@ -85,7 +85,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
         var bytes = File.ReadAllBytes(recipe.Path);
         var sprite = displayImage.sprite;
-        Texture2D thumbnail = new Texture2D(512, 512, TextureFormat.ARGB32, false);
+        Texture2D thumbnail = new Texture2D(512, 512, TextureFormat.RGBA32, false);
         if (!ImageConversion.LoadImage(thumbnail, bytes)) { Log.Warning($"failed to load png for {recipe.Name}"); yield break; }
 
         displayImage.sprite = Sprite
