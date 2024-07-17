@@ -25,15 +25,15 @@ public class ThumbnailCamera : MonoBehaviour
         camera = this.GetComponent<Camera>();
         if (!camera) { Log.Error("InsetCamera instantiated on an object without a camera component!"); return; }
 
-        this.name = "Inset Camera";
+        this.name = "Thumbnail Camera";
         var collider = GetComponent<SphereCollider>();
         if (collider) GameObject.Destroy(collider);
 
         camera.cullingMask = 1 << Constants.SMRLayer;
-        camera.clearFlags = CameraClearFlags.Color; //CameraClearFlags.Color;//
+        camera.clearFlags = CameraClearFlags.Color; //CameraClearFlags.Depth;//
         camera.backgroundColor = Constants.DefaultColor;
         camera.depth = Camera.main.depth + 1;
-        camera.fieldOfView = 20;
+        camera.fieldOfView = 18;
         camera.aspect = 1;
         camera.useOcclusionCulling = false;
         camera.enabled = false;
@@ -75,19 +75,12 @@ public class ThumbnailCamera : MonoBehaviour
         if (!cameraTarget || !cameraPostionDriver) { Log.Error("Failed to restore target bones."); return; }
     }
 
-    void LateUpdate()
-    {
-        if (!camera) return;
-        if (!cameraTarget || !cameraPostionDriver) return;
-
-        this.transform.position = (cameraPostionDriver.position + 3 * cameraPostionDriver.transform.forward);
-        this.transform.LookAt(cameraTarget);
-    }
-
     public IEnumerator Save(string filePath)
     {
         yield return new WaitForEndOfFrame();
 
+        this.transform.position = (cameraPostionDriver.position + 3 * cameraPostionDriver.transform.forward);
+        this.transform.LookAt(cameraTarget);
         var black = Capture(Color.black);
         var white = Capture(Color.white);
         var alpha = CalculateTransparency(black, white);
@@ -99,6 +92,7 @@ public class ThumbnailCamera : MonoBehaviour
         string json = JsonConvert.SerializeObject(descriptor, Formatting.None);
         PngMetadataUtil.AddMetadata(filePath, Constants.PNGChunkKeyword, json);
         Log.Info("Save complete.");
+        
     }
 
     Texture2D Capture(Color color)

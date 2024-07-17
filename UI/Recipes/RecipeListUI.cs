@@ -25,8 +25,7 @@ public class RecipeListUI : MonoBehaviour
     GameObject filenameDialogueGO;
     Button newRecipeButton;
 
-    //Dictionary<string, RecipeUI> recipeUIs = new();
-    SortedList<string, RecipeUI> recipeUIsSorted = new();
+    SortedList<string, RecipeUI> recipeUIs = new();
 
     public RecipeListUI Constructor(
         UIAssetLoader loader,
@@ -78,14 +77,17 @@ public class RecipeListUI : MonoBehaviour
         if (!recipeUI) { Log.Warning("failed to instantiate recipeUI component"); return; }
         recipeUI.Constructor(newRecipe, loader, outfitManager, contextMenu, fileDialogue, messageDialogue);
 
-        recipeUIsSorted.Add(newRecipe.Path, recipeUI);
-        recipeUI.transform.SetSiblingIndex(recipeUIsSorted.IndexOfKey(newRecipe.Path));
+        recipeUIs.Add(newRecipe.Path, recipeUI);
+        Log.Debug($"Sibling index: {recipeUIs.IndexOfKey(newRecipe.Path)}");
+        recipeUI.transform.SetSiblingIndex(recipeUIs.IndexOfKey(newRecipe.Path));
     }
 
     public void OnRecipeDeleted(Recipe removedRecipe)
     {
-        GameObject.Destroy(recipeUIsSorted[removedRecipe.Path].gameObject);
-        recipeUIsSorted.Remove(removedRecipe.Path);
+        if (!recipeUIs.TryGetValue(removedRecipe.Path, out var ui)) { Log.Warning("tried to remove non-existant recipe ui element."); return; }
+
+        GameObject.Destroy(ui.gameObject);
+        recipeUIs.Remove(removedRecipe.Path);
     }
 
     void OnNewSave()

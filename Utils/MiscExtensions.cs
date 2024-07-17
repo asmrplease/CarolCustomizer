@@ -174,12 +174,14 @@ public static class MiscExtensions
 
     public static Color32 DifferenceToAlpha(this Color32 white, Color32 black)
     {
+        const int alphaCutoff = 200;
         Color32 result = new Color32(black.r, black.g, black.b, 0);
-        var total = 
-            (white.r - black.r) + 
-            (white.g - black.g) + 
-            (white.b - black.b);
-        result.a = (byte)(255-(total / 3));
+        var total = (3 * 255)
+            - (white.r - black.r)
+            - (white.g - black.g)
+            - (white.b - black.b);
+        //alpha 255 is opaque, 0 is transparent
+        result.a = (byte)(total > alphaCutoff ? 255 : total >> 2);//(byte)(255-(total / 3));//TODO: add a cutoff so that mostly opaque pixels become totally opaque
         return result;
     }
 }

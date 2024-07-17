@@ -30,9 +30,9 @@ public class RecipeFileWatcher : IDisposable
         Directory.CreateDirectory(path);
         watcher = new FileSystemWatcher(path);
         watcher.IncludeSubdirectories = true;
-        watcher.Created += (s, e) => HandleRecipeFileCreated(e);
-        watcher.Deleted += (s, e) => HandleRecipeFileRemoved(e);
-        watcher.Changed += (s, e) => HandleRecipeFileChanged(e);
+        watcher.Created += HandleRecipeFileCreated;
+        watcher.Deleted += HandleRecipeFileRemoved;
+        watcher.Changed += HandleRecipeFileChanged;
         watcher.EnableRaisingEvents = true;
 
         OutfitAssetManager.OnOutfitSetLoaded += RefreshAll;
@@ -42,6 +42,9 @@ public class RecipeFileWatcher : IDisposable
     public void Dispose()
     {
         watcher.EnableRaisingEvents = false;
+        watcher.Created -= HandleRecipeFileCreated;
+        watcher.Deleted -= HandleRecipeFileRemoved;
+        watcher.Changed -= HandleRecipeFileChanged;
         watcher.Dispose();
     }
 
@@ -70,7 +73,7 @@ public class RecipeFileWatcher : IDisposable
         OnRecipeDeleted?.Invoke(removedRecipe);
     }
 
-    void HandleRecipeFileCreated(FileSystemEventArgs e)
+    void HandleRecipeFileCreated(object source, FileSystemEventArgs e)
     {
         var ext = Path.GetExtension(e.FullPath).ToLower();
         if (ext != Constants.JsonFileExtension && ext != Constants.PngFileExtension) return;
@@ -79,7 +82,7 @@ public class RecipeFileWatcher : IDisposable
         OnRecipeFileCreated(newRecipe);
     }
 
-    void HandleRecipeFileChanged(FileSystemEventArgs e)
+    void HandleRecipeFileChanged(object source, FileSystemEventArgs e)
     {
         var ext = Path.GetExtension(e.FullPath).ToLower();
         if (ext != Constants.JsonFileExtension && ext != Constants.PngFileExtension) return;
@@ -89,7 +92,7 @@ public class RecipeFileWatcher : IDisposable
 
         OnRecipeFileCreated(new Recipe(e.FullPath));
     }
-    void HandleRecipeFileRemoved(FileSystemEventArgs e)
+    void HandleRecipeFileRemoved(object source, FileSystemEventArgs e)
     {
         var ext = Path.GetExtension(e.FullPath).ToLower();
         if (ext != Constants.JsonFileExtension && ext != Constants.PngFileExtension) return;

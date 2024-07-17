@@ -9,6 +9,8 @@ using CarolCustomizer.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -204,9 +206,23 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         if (eventData.button == Settings.HotKeys.ContextMenu) contextMenu.Show(this);
     }
 
+    void ShowInExplorer()
+    {
+        try
+        {
+            string argument = "/select, \"" + recipe.Path + "\"";
+            Process.Start("explorer.exe", argument);
+        }
+        catch (Win32Exception e) { Log.Error(e.Message); }
+    }
+
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         var output = new List<(string, UnityAction)>();
+        if (recipe.Error == Recipe.Status.NoError)
+        {
+            output.Add(("Load", OnContextMenuLoad));
+        }
         if (recipe.Name == Constants.AutoSave)
         {
             if (recipe.Error == Recipe.Status.FileError) return output;
@@ -220,14 +236,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             output.Add(("Delete", OnContextMenuDelete));
             output.Add(("Rename", OnContextMenuRename));
             output.Add(("Set Shezara", SetAsShezara));
-        }
-        if (recipe.Error == Recipe.Status.FileError) 
-        {
-            output.Add(("Ignore", () => Destroy(this.gameObject)));
-        } 
-        if (recipe.Error == Recipe.Status.NoError)
-        {
-            output.Add(("Load", OnContextMenuLoad));
+            
         }
         if (recipe.Error == Recipe.Status.MissingSource)
         {
@@ -238,6 +247,15 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             && recipe.Error == Recipe.Status.NoError)
         {
             output.Add(("Update to .png", ConvertToPNG));
+        }
+        if (recipe.Extension == Constants.PngFileExtension
+            && recipe.Error != Recipe.Status.FileError)
+        {
+            output.Add(("Show in Explorer", ShowInExplorer));
+        }
+        if (recipe.Error == Recipe.Status.FileError)
+        {
+            output.Add(("Ignore", () => Destroy(this.gameObject)));
         }
         return output;
     }
