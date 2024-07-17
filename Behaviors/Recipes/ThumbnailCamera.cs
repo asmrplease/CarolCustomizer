@@ -29,7 +29,7 @@ public class ThumbnailCamera : MonoBehaviour
         camera.clearFlags = CameraClearFlags.SolidColor; //CameraClearFlags.Color;//
         camera.backgroundColor = Constants.DefaultColor;
         camera.depth = Camera.main.depth + 1;
-        camera.fieldOfView = 24;
+        camera.fieldOfView = 20;
         camera.aspect = 1;
         camera.useOcclusionCulling = false;
         camera.enabled = false;

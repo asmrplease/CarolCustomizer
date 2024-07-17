@@ -69,8 +69,8 @@ public static class Constants
     public static readonly Version v200 = new("2.0.0");
     public static readonly Version v100 = new("1.0.0");
     
-    public const string RecipeExtension = ".json";
-    public const string RecipeImageExtension = ".png";
+    public const string JsonFileExtension = ".json";
+    public const string PngFileExtension = ".png";
     public const string RecipeFolderName = "Recipes";
     public const string BepInExFolder = "BepInEx";
     public const string PluginsFolder = "plugins";

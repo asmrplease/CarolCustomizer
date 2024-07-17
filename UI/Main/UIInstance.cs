@@ -42,7 +42,7 @@ public class UIInstance : MonoBehaviour
     #endregion
 
     #region Public Interface
-    public void Constructor(UIAssetLoader loader, PlayerCarolInstance player, RecipesManager recipesManager)
+    public void Constructor(UIAssetLoader loader, PlayerCarolInstance player, RecipeFileWatcher recipesManager)
     {
         playerManager = player;
         materialManager = new();

@@ -13,13 +13,13 @@ internal static class RecipeSaver
         return path;
     }
 
-    public static void Save(RecipeDescriptor23 recipe, string filePath)
+    public static void SaveJson(RecipeDescriptor23 recipe, string filePath)
     {
         string json = JsonConvert.SerializeObject(recipe, Formatting.Indented);
         Log.Debug(json);
-        if (!filePath.Contains(Constants.RecipeExtension))
+        if (!filePath.Contains(Constants.JsonFileExtension))
         {
-            filePath = RecipeFilenameToPath($"{filePath}{Constants.RecipeExtension}");
+            filePath = RecipeFilenameToPath($"{filePath}{Constants.JsonFileExtension}");
         }
         var newSave = File.CreateText(filePath);
         newSave.Write(json);
@@ -29,10 +29,10 @@ internal static class RecipeSaver
     public static void SavePNG(RecipeDescriptor23 recipe, string filePath)
     {
         string json = JsonConvert.SerializeObject(recipe, Formatting.None);
-        if (!filePath.Contains(Constants.RecipeImageExtension))
+        if (!filePath.Contains(Constants.PngFileExtension))
         {
-            filePath = RecipeFilenameToPath($"{filePath}{Constants.RecipeImageExtension}");
-            filePath = filePath.Replace(Constants.RecipeExtension, "");
+            filePath = RecipeFilenameToPath($"{filePath}{Constants.PngFileExtension}");
+            filePath = filePath.Replace(Constants.JsonFileExtension, "");
         }
         CCPlugin
             .CoroutineRunner

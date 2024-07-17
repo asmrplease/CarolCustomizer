@@ -17,8 +17,8 @@ internal static class RecipeLoader
                 SearchOption.AllDirectories)
             .Select(x=> (ext: Path.GetExtension(x), path: x))
             .Where(tup => 
-                tup.ext == Constants.RecipeExtension ||
-                tup.ext == Constants.RecipeImageExtension)
+                tup.ext == Constants.JsonFileExtension ||
+                tup.ext == Constants.PngFileExtension)
             .Select(tup => tup.path)
             .ToArray();
     }

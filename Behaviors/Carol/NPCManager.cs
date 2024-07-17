@@ -9,14 +9,14 @@ using UnityEngine;
 namespace CarolCustomizer.Behaviors.Carol;
 internal class NPCManager
 {
-    static RecipesManager recipesManager;
+    static RecipeFileWatcher recipesManager;
 
     static Dictionary<PelvisWatchdog, CarolInstance> liveBots = new();
     public static CarolInstance shezaraInstance { get; private set; }
 
     static GameObject folder;
 
-    public static void Constructor(GameObject folder, RecipesManager recipesManager)
+    public static void Constructor(GameObject folder, RecipeFileWatcher recipesManager)
     {
         NPCManager.folder = folder;
         NPCManager.recipesManager = recipesManager;
@@ -58,9 +58,10 @@ internal class NPCManager
         var recipes = recipesManager
             .Recipes
             .Where(x => 
-            x.Error == Recipe.Status.NoError
-            && x.Name != Constants.AutoSave);
+                x.Error == Recipe.Status.NoError
+                && x.Name != Constants.AutoSave);
         if (recipes.Count() == 0) return null;
+
         int index = random.Next(recipes.Count());
         return recipes.ElementAt(index);
     }

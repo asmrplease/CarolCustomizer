@@ -54,7 +54,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         displayImage.enabled = false;
         //displayImage.enabled = Settings.Plugin.shezaraRecipe.Value == recipe.Name;
 
-        if (recipe.Extension == Constants.RecipeImageExtension) 
+        if (recipe.Extension == Constants.PngFileExtension) 
             CCPlugin.CoroutineRunner.StartCoroutine(LoadThumbnail());
         //Settings.Plugin.shezaraRecipe.SettingChanged += OnShezaraChanged;
 
@@ -83,7 +83,6 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     {
         yield return new WaitForEndOfFrame();
 
-        Log.Info("LoadThumbnail()");
         var bytes = File.ReadAllBytes(recipe.Path);
         var sprite = displayImage.sprite;
         Texture2D thumbnail = new Texture2D(512, 512, TextureFormat.ARGB32, false);
@@ -96,7 +95,6 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
                 new Vector2(0.5f, 0.5f));
         displayImage.sprite.name = recipe.Name ;
         displayImage.enabled = true;
-        Log.Debug("thumbnail loaded");
         yield break;
     }
 
@@ -179,7 +177,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         if (newName.Trim() == "") return;
         foreach (var character in Path.GetInvalidFileNameChars()) { if (newName.Contains(character)) return; }
 
-        if (!newName.ToLower().EndsWith(Constants.RecipeExtension)) newName += Constants.RecipeExtension;
+        if (!newName.ToLower().EndsWith(recipe.Extension)) newName += recipe.Extension;
         var newPath = RecipeSaver.RecipeFilenameToPath(newName);
 
         File.Move(recipe.Path, newPath);
@@ -187,10 +185,18 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     void ConvertToPNG()
     {
-        //load recipe
-        //store recipe name
-        //delete .json file
-        //save recipe as png with name
+        RecipeApplier
+            .ActivateRecipe(
+                CCPlugin.cutscenePlayer.outfitManager, 
+                recipe.Descriptor);
+        var newPath = Path.Combine(
+            Path.GetDirectoryName(recipe.Path),
+            Path.GetFileNameWithoutExtension(recipe.Path)
+                + Constants.PngFileExtension); 
+        RecipeSaver.SavePNG(
+            new RecipeDescriptor23(CCPlugin.cutscenePlayer.outfitManager),
+            newPath);
+        File.Delete(recipe.Path);
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -201,6 +207,13 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         var output = new List<(string, UnityAction)>();
+        if (recipe.Name == Constants.AutoSave)
+        {
+            if (recipe.Error == Recipe.Status.FileError) return output;
+
+            output.Add(("Load", OnContextMenuLoad));
+            return output;
+        }
         if (recipe.Error != Recipe.Status.FileError)
         {
             output.Add(("Overwrite", OnContextMenuOverwrite));
@@ -208,6 +221,10 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             output.Add(("Rename", OnContextMenuRename));
             output.Add(("Set Shezara", SetAsShezara));
         }
+        if (recipe.Error == Recipe.Status.FileError) 
+        {
+            output.Add(("Ignore", () => Destroy(this.gameObject)));
+        } 
         if (recipe.Error == Recipe.Status.NoError)
         {
             output.Add(("Load", OnContextMenuLoad));
@@ -217,7 +234,8 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             output.Add(("Load*", OnContextMenuWarningLoad));
             output.Add(("Show Missing", OnContextMenuListMissing));
         }
-        if (recipe.Extension == Constants.RecipeExtension)
+        if (recipe.Extension == Constants.JsonFileExtension
+            && recipe.Error == Recipe.Status.NoError)
         {
             output.Add(("Update to .png", ConvertToPNG));
         }

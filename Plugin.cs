@@ -27,7 +27,7 @@ public class CCPlugin : BaseUnityPlugin
     public static List<UIInstance> uiInstances = new();
     public static CarolInstance cutscenePlayer;
     public static event Action<CCPlugin> OnSetupComplete;
-    public static RecipesManager recipesManager { get; private set; }
+    public static RecipeFileWatcher recipesManager { get; private set; }
     public static ThumbnailCamera thumbnailCamera;
     #endregion
 

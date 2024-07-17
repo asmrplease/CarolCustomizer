@@ -18,9 +18,9 @@ internal class AutoSaver
 
     public void Save()
     {
-        RecipeSaver.Save(
+        RecipeSaver.SaveJson(
             new RecipeDescriptor23(outfitManager),
-            RecipeSaver.RecipeFilenameToPath(Constants.AutoSave + Constants.RecipeExtension));
+            RecipeSaver.RecipeFilenameToPath(Constants.AutoSave + Constants.JsonFileExtension));
         Log.Info("Autosave Complete.");
     }
 
@@ -28,7 +28,7 @@ internal class AutoSaver
     {
         var recipe = CCPlugin
             .recipesManager
-            .GetRecipeByFilename(Constants.AutoSave+Constants.RecipeExtension);
+            .GetRecipeByFilename(Constants.AutoSave+Constants.JsonFileExtension);
         CCPlugin.CoroutineRunner.StartCoroutine(LoadRecipeRoutine(recipe));
     }
 

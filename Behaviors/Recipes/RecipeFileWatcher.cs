@@ -7,7 +7,7 @@ using CarolCustomizer.Models.Recipes;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Recipes;
-public class RecipesManager : IDisposable
+public class RecipeFileWatcher : IDisposable
 {
     FileSystemWatcher watcher;
     Dictionary<string, Recipe> recipes = new();
@@ -25,16 +25,14 @@ public class RecipesManager : IDisposable
         return recipe;
     }
 
-    public RecipesManager(string path)
+    public RecipeFileWatcher(string path)
     {
         Directory.CreateDirectory(path);
         watcher = new FileSystemWatcher(path);
-        //watcher.Filter = $"*{Constants.RecipeExtension}";
         watcher.IncludeSubdirectories = true;
-        watcher.Created += HandleRecipeFileCreated;
-        watcher.Deleted += HandleRecipeFileRemoved;
-        watcher.Changed += HandleRecipeFileChanged;
-        watcher.Renamed += HandleRecipeFileRenamed;
+        watcher.Created += (s, e) => HandleRecipeFileCreated(e);
+        watcher.Deleted += (s, e) => HandleRecipeFileRemoved(e);
+        watcher.Changed += (s, e) => HandleRecipeFileChanged(e);
         watcher.EnableRaisingEvents = true;
 
         OutfitAssetManager.OnOutfitSetLoaded += RefreshAll;
@@ -72,38 +70,29 @@ public class RecipesManager : IDisposable
         OnRecipeDeleted?.Invoke(removedRecipe);
     }
 
-    void HandleRecipeFileCreated(object sender, FileSystemEventArgs e)
+    void HandleRecipeFileCreated(FileSystemEventArgs e)
     {
         var ext = Path.GetExtension(e.FullPath).ToLower();
-        if (ext != Constants.RecipeExtension && ext != Constants.RecipeImageExtension) return;
+        if (ext != Constants.JsonFileExtension && ext != Constants.PngFileExtension) return;
         Log.Debug("HandleRecipeFileCreated");
         var newRecipe = new Recipe(e.FullPath);
-        //Log.Debug($"recipe created: {newRecipe.Name}");
         OnRecipeFileCreated(newRecipe);
     }
 
-    void HandleRecipeFileChanged(object sender, FileSystemEventArgs e)
+    void HandleRecipeFileChanged(FileSystemEventArgs e)
     {
         var ext = Path.GetExtension(e.FullPath).ToLower();
-        if (ext != Constants.RecipeExtension && ext != Constants.RecipeImageExtension) return;
+        if (ext != Constants.JsonFileExtension && ext != Constants.PngFileExtension) return;
         Log.Debug("HandleRecipeFileChanged");
         OnRecipeFileRemoved(recipes[e.FullPath]);
+        if (!File.Exists(e.FullPath)) return;
+
         OnRecipeFileCreated(new Recipe(e.FullPath));
     }
-
-    void HandleRecipeFileRenamed(object sender, RenamedEventArgs e)
+    void HandleRecipeFileRemoved(FileSystemEventArgs e)
     {
         var ext = Path.GetExtension(e.FullPath).ToLower();
-        if (ext != Constants.RecipeExtension && ext != Constants.RecipeImageExtension) return;
-        Log.Debug("HandleRecipeFileRenamed");
-        OnRecipeFileRemoved(recipes[e.OldName]);
-        OnRecipeFileCreated(new Recipe(e.FullPath));
-    }
-
-    void HandleRecipeFileRemoved(object sender, FileSystemEventArgs e)
-    {
-        var ext = Path.GetExtension(e.FullPath).ToLower();
-        if (ext != Constants.RecipeExtension && ext != Constants.RecipeImageExtension) return;
+        if (ext != Constants.JsonFileExtension && ext != Constants.PngFileExtension) return;
         Log.Debug("HandleRecipeFileRemoved");
         if (!recipes.ContainsKey(e.FullPath)) return;
         var removed = recipes[e.FullPath];
