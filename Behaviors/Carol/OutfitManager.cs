@@ -83,6 +83,8 @@ public class OutfitManager
     public void EnableAccessory(StoredAccessory accessory)
     {
         Log.Debug($"EnableAccessory({accessory.Name})");
+        if (!pelvis) { Log.Warning("No pelvis during EnableAccessory"); return; }
+
         if (!liveAccessories.TryGetValue(accessory, out var live))
         {
             live = accessory.MakeLive(skeletonManager, OutfitAssetManager.liveFolder);
@@ -105,7 +107,7 @@ public class OutfitManager
 
     public void PaintAccessory(StoredAccessory accessory, MaterialDescriptor material, int index)
     {
-        EnableAccessory(accessory);
+        //EnableAccessory(accessory);
         //if (!liveAccessories.ContainsKey(accessory)) { Log.Warning("asked to paint disabled accessory"); return; }
         liveAccessories[accessory].ApplyMaterial(material, index);
         var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
@@ -128,6 +130,7 @@ public class OutfitManager
 
     void HandleNewPelvis(PelvisWatchdog pelvis)
     {
+        Log.Debug("HandleNewPelvis()");
         this.pelvis = pelvis;
         RefreshSMRs(pelvis);
         if (outfitEffects.Any()) RefreshEffects();
@@ -147,7 +150,9 @@ public class OutfitManager
 
     public void SetConfiguration(HaDSOutfit outfit) 
     {
+        Log.Debug("SetConfiguration()");
         if (outfit is null) { Log.Warning("outfit is null"); return; }
+
         this.configurationSource = outfit;
         ApplyConfig();
     }
@@ -156,6 +161,8 @@ public class OutfitManager
     {
         if (!pelvis) return;
         if (configurationSource is null) return;
+
+        Log.Debug("ApplyConfig()");
         pelvis.SetHeightOffset(configurationSource.modelData.height);
     }
 
@@ -206,15 +213,15 @@ public class OutfitManager
             .CapsuleColliders
             .Where(x => x)
             .ToDictionary(x=> x.name);
-        var liveColliders = pelvis
-            .MagiData
-            .CapsuleColliders;     
-        foreach (var liveCollider in liveColliders)
-        {
-            if (!sourceColliders.TryGetValue(liveCollider.name, out var referenceCollider)) continue;
-
-            liveCollider.CopyFrom(referenceCollider);
-        }
+        pelvis.MagiData
+            .CapsuleColliders
+            .Select(x =>
+                (live: x
+                ,found: sourceColliders.TryGetValue(x.name, out var reference)
+                ,reference))
+            .Where(tup => tup.found)
+            .ForEach(tup => 
+                tup.live.CopyFrom(tup.reference));
     }
 
     void RefreshEffects()

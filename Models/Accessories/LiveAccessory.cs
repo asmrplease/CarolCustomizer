@@ -1,7 +1,6 @@
 ﻿using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -24,7 +23,7 @@ public class LiveAccessory : AccessoryDescriptor
 
     public Outfit outfit => storedAcc?.outfit;
 
-    public event Action OnAccessoryStateChanged;
+    //public event Action OnAccessoryStateChanged;
 
     public bool isActive { get; private set; } = false;
 
@@ -107,7 +106,6 @@ public class LiveAccessory : AccessoryDescriptor
             .ForEach((tup) => 
                 liveSMR
                 .ReplaceMaterialAtIndex(tup.mat.referenceMaterial, tup.index));
-        //TODO: this is failing on faces?
     }
 
     internal void ApplySharedMaterials(List<Material> materials)

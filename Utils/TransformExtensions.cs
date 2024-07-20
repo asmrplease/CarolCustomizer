@@ -155,4 +155,13 @@ public static class TransformExtensions
                 target.name 
                 : $"{target.name}/{start}");
     }
+
+    public static void CopyFrom(this Transform target, Transform source)
+    {
+        if (!target || !source) return;
+
+        target.localPosition = source.localPosition;
+        target.localRotation = source.localRotation;
+        target.localScale = source.localScale;
+    }
 }

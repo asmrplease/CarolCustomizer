@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
@@ -62,7 +63,6 @@ public class CCPlugin : BaseUnityPlugin
         recipesManager = new(Constants.RecipeFolderPath);
         NPCManager.Constructor(gameObject, recipesManager);
         npcInstances = new(transform);
-
 
         for (int i = 1; i <= numPlayers; i++)
         {
@@ -142,12 +142,13 @@ public class CCPlugin : BaseUnityPlugin
         HarmonyInstance?.UnpatchSelf();
         Settings.Dispose();
         playerManagers
-            .Where(x=> x is not null)
+            .Where(x => x is not null)
             .ForEach(x => x.Dispose());
         uiAssetLoader.Dispose();
         outfitAssetManager.Dispose();
         npcInstances.Dispose();
         outfitLoader.Dispose();
+        AccessoryDissolver.Dispose();
         Log.Info("Customizer unloaded.");
     }
 }

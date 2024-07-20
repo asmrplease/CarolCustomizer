@@ -20,7 +20,11 @@ public class MPBotWatchdog : BotWatchdog
     public override void SetBaseVisibility(bool visible)
     {
         if (Settings.Plugin.customMPBots.Value is not true) return;
-        foreach (var mesh in CompData?.allSMRs) { mesh.gameObject.SetActive(visible); }
+        if (!CompData || CompData.allSMRs is null) return;
+
+        CompData.allSMRs
+            .Where(x => x)
+            .ForEach(mesh => mesh.gameObject.SetActive(visible));
     }
 
     public override void CustomizeBot(Recipe recipe, OutfitManager outfit)

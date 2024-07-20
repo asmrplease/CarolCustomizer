@@ -2,8 +2,6 @@
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Models.Recipes;
-using CarolCustomizer.Utils;
-using System.Linq;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class BotWatchdog : PelvisWatchdog
@@ -25,9 +23,8 @@ public class BotWatchdog : PelvisWatchdog
     public override void SetBaseVisibility(bool visible)
     {
         if (Settings.Plugin.customCampaignBots.Value is not true) return;
-
-        foreach (var mesh in CompData?.allSMRs.Where(x=>x.name != Constants.RobotHead)) 
-            { mesh.gameObject.SetActive(visible); }
+        
+        base.SetBaseVisibility(visible);
     }
 
     void OnDestroy() => NPCManager.OnBotDespawn(this);

@@ -26,6 +26,11 @@ internal static class AccessoryDissolver
         FireDissolve = Resources.Load<Material>(FireDissolveAddress);
     }
 
+    public static void Dispose()
+    {
+        SceneManager.activeSceneChanged -= HandleSceneChanged;
+    }
+
     static void HandleSceneChanged(Scene arg0, Scene arg1)
     {
         Log.Debug($"ActiveSceneChanged {arg0.name}, {arg1.name}");
@@ -65,10 +70,12 @@ internal static class AccessoryDissolver
         [HarmonyPostfix]
         static void Postfix(Entity.DeathType deathType, Entity __instance)
         {
-            Log.Debug("Die postfix");
+            Log.Debug("Die postfix!");
             if (!(deathType == Entity.DeathType.Fire || deathType == Entity.DeathType.InstantFire)) return;
 
-            var player = CCPlugin.playerManagers.FirstOrDefault(x=>x.ManagesPlayer(__instance));
+            var player = CCPlugin
+                .playerManagers
+                .FirstOrDefault(x=>x.ManagesPlayer(__instance));
             if (player is null) return;
 
             ActiveDissolve = CCPlugin

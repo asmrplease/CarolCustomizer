@@ -102,7 +102,8 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     void OnShezaraChanged(object sender, EventArgs e)
     {
-        if (!displayImage) { return; }       
+        if (!displayImage) return; 
+        
         displayImage.enabled = (e.AsConfigEntry<string>().Value == recipe.Name);
     }
 

@@ -146,6 +146,12 @@ public static class MiscExtensions
         return sequence;
     }
 
+    public static void ForEach<T>(this T[] sequence, Action<T> action)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+        foreach (T item in sequence) action(item);
+    }
+
     public static ConfigEntry<T> AsConfigEntry<T>(this EventArgs e)
     {
         var idk = e as SettingChangedEventArgs;

@@ -16,7 +16,7 @@ public class NPCInstanceCreator : IDisposable
     public static List<string> actressSearchRoots = new() { "CUTSCENES", "SECTOR_STORMYSEA" };
 
     public static List<PelvisWatchdog> dedicatedActresses = new();
-    private static List<PelvisWatchdog> carolBotPrefabs = new();
+    private static HashSet<PelvisWatchdog> carolBotPrefabs = new();
     
 
     #region Lifecycle
@@ -86,31 +86,27 @@ public class NPCInstanceCreator : IDisposable
 
     public static void FindBotEntities(Scene arg0, LoadSceneMode arg1)
     {
-        var entities = Resources.FindObjectsOfTypeAll<Entity>().
-            Where(entity => 
-                    entity.name.StartsWith("Carol_Robot")
-                && !entity.name.Contains("(Clone)")
-                && !carolBotPrefabs.Any(x=>x.name == entity.name));
-
-        foreach (var entity in entities) { OnCarolBotDetected(entity.gameObject); }
+        Resources
+            .FindObjectsOfTypeAll<Entity>()
+            .Select(entity => entity.gameObject)
+            .Where(go => go.name.StartsWith("Carol_Robot"))
+            .Where(go => go.gameObject.scene.name is null)
+            .Where(go => go.gameObject.hideFlags != HideFlags.HideAndDontSave)
+            .ForEach(OnCarolBotDetected);
     }
 
     static void OnCarolBotDetected(GameObject botPrefab)
     {
-        //remove voice componenets which are spamming console
-        //do we still need to do this?
-        var voices = botPrefab.GetComponents<Voice>();
-        foreach (var voice in voices) { voice.enabled = false; }
-
         botPrefab.hideFlags = HideFlags.HideAndDontSave;
-
-        var watchdog = botPrefab
-            .transform
-            .RecursiveFindTransform
-            (x => x.name == "CarolPelvis")
-            .gameObject
-            .AddComponent<PelvisWatchdog>();
-
-        carolBotPrefabs.Add(watchdog);
+        botPrefab//remove voice componenets which are spamming console
+            .GetComponents<Voice>()
+            .ForEach(x => x.enabled = false);//this is still happening as of july '24
+        carolBotPrefabs
+            .Add(
+                botPrefab
+                    .transform
+                    .RecursiveFindTransform(x => x.name == "CarolPelvis")
+                    .gameObject
+                    .AddComponent<PelvisWatchdog>());
     }
 }

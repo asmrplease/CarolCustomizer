@@ -4,6 +4,7 @@ using CarolCustomizer.Utils;
 using Slate;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using UnityEngine;
 
@@ -31,8 +32,8 @@ public class PelvisWatchdog : MonoBehaviour
 
     protected bool disableAnimator;
 
-    List<(Func<Predicate<PelvisWatchdog>, bool>,
-            Predicate<PelvisWatchdog>)> checks;
+    List<(Func<Predicate<PelvisWatchdog>, bool> func,
+            Predicate<PelvisWatchdog> pred)> checks;
 
     virtual public PelvisWatchdog BuildFromExisting(PelvisWatchdog watchdog, Component typeComponent)
     {
@@ -73,8 +74,11 @@ public class PelvisWatchdog : MonoBehaviour
     {
         compData.RefreshParentComponents();
         SetupCheckList();
-        foreach (var (func, pred) in checks) if (func.Invoke(pred) is true) return true;
-        return false;
+        if (checks
+            .Select(tup => tup.func.Invoke(tup.pred))
+            .Where(x => x is true)
+            .Any()) return true;
+        else return false;
     }
 
     bool Check<SearchType, ResultType>(Predicate<PelvisWatchdog> predicate)
@@ -98,29 +102,35 @@ public class PelvisWatchdog : MonoBehaviour
     public void DisableAnimator()
     {
         if (!compData.Animator) return;
+
         disableAnimator = true;
         compData.Animator.enabled = false;
         compData.Animator.Rebind();
-
-        var restingBones = OutfitAssetManager.GetPyjamas().boneData.StandardBones;
-        foreach (var resting in restingBones)
-        {
-            var livebone = boneData.StandardBones[resting.Key];
-            livebone.localPosition = resting.Value.localPosition;
-            livebone.localRotation = resting.Value.localRotation;
-        }
+        OutfitAssetManager
+            .GetPyjamas().boneData
+            .StandardBones
+            .Select(kvp => 
+                (found: this.boneData
+                    .StandardBones
+                    .TryGetValue(kvp.Key, out var result)
+                ,resting: kvp.Value
+                ,live: result))
+            .Where(tup => tup.found)
+            .ForEach(tup => tup.live.CopyFrom(tup.resting));
     }
 
     void LateUpdate()
     {
         if (!disableAnimator) return;
         if (!compData.Animator) return;
+
         compData.Animator.enabled = false;
     }
 
     public void EnableAnimator()
     {
         if (!compData.Animator) return;
+
         disableAnimator = false;
         compData.Animator.enabled = true;
         compData.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
