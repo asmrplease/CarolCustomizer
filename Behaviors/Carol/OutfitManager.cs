@@ -3,10 +3,9 @@ using CarolCustomizer.Events;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
-using MagicaCloth2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -100,6 +99,7 @@ public class OutfitManager
     public void DisableAccessory(StoredAccessory accessory)
     {
         if (!liveAccessories.ContainsKey(accessory)) { Log.Warning("Tried to disable an accessory that was never instantiated."); return; }
+
         liveAccessories[accessory].Disable();
         var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, false));
@@ -107,8 +107,6 @@ public class OutfitManager
 
     public void PaintAccessory(StoredAccessory accessory, MaterialDescriptor material, int index)
     {
-        //EnableAccessory(accessory);
-        //if (!liveAccessories.ContainsKey(accessory)) { Log.Warning("asked to paint disabled accessory"); return; }
         liveAccessories[accessory].ApplyMaterial(material, index);
         var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, true));

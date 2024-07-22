@@ -1,7 +1,7 @@
 ﻿using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
-using CarolCustomizer.Models;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.UI.Main;
 using System.Collections.Generic;
 using UnityEngine;

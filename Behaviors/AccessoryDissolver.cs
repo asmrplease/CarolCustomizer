@@ -1,6 +1,6 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
 using HarmonyLib;
 using System.Collections;

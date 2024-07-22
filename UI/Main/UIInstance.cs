@@ -92,21 +92,15 @@ public class UIInstance : MonoBehaviour
         gameObject
             .AddComponent<MenuToggle>()
             .Constructor(this);
+        MenuToggle.OnMenuToggle += HandleMenuToggle;
         return this;
     }
 
-    public void Show()
+    void HandleMenuToggle(bool visible)
     {
-        if (!canvas) { Log.Error("Canvas missing on UIInstance.Show()"); return; }
-        canvas.enabled = true;
-    }
-    //TODO: Animate ui opening/closing
-
-    public void Hide()
-    {
-        if (!canvas) { Log.Error("Canvas missing on UIInstance.Hide()"); return; }
-        EventSystem.current.SetSelectedGameObject(null);
-        canvas.enabled = false;
+        Log.Debug("UIInstance.HandleMenuToggle()");
+        canvas.enabled = visible;
+        if (!visible) EventSystem.current.SetSelectedGameObject(null);
     }
     #endregion
 

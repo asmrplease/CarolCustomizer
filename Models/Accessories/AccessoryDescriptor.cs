@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Models.Materials;
+using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Collections;

@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
 using System;

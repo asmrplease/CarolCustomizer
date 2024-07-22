@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 using System;
 using UnityEngine;
 
-namespace CarolCustomizer.Models;
+namespace CarolCustomizer.Models.Materials;
 [Serializable]
-public class MaterialDescriptor : IEquatable<MaterialDescriptor> 
+public class MaterialDescriptor : IEquatable<MaterialDescriptor>
 {
     public string Name;
     public string Source;
@@ -13,22 +13,22 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>
 
     [JsonIgnore]
     public readonly Material referenceMaterial;
-    
+
     [JsonConstructor]
     public MaterialDescriptor(string name, string source, SourceType type)
     {
-        this.Name = name;
-        this.Source = source;
-        this.Type = type;
-        this.referenceMaterial = null;
+        Name = name;
+        Source = source;
+        Type = type;
+        referenceMaterial = null;
     }
 
     public MaterialDescriptor(Material material, string sourceName, SourceType type)
     {
-        this.referenceMaterial = material;
-        this.Source = sourceName;
-        this.Name = material.name;
-        this.Type = type;
+        referenceMaterial = material;
+        Source = sourceName;
+        Name = material.name;
+        Type = type;
     }
 
     public enum SourceType
@@ -43,20 +43,20 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return (this.Type == other.Type && this.Name.DeInstance() == other.Name.DeInstance() && this.Source == other.Source);
+        return Type == other.Type && Name.DeInstance() == other.Name.DeInstance() && Source == other.Source;
     }
 
     public override bool Equals(object other)
     {
-        if (ReferenceEquals(null, other))       return false;
-        if (ReferenceEquals(this, other))       return true;
-        if (other.GetType() != this.GetType())  return false;
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        if (other.GetType() != GetType()) return false;
 
-        return this.Equals((MaterialDescriptor)other);
+        return Equals((MaterialDescriptor)other);
     }
 
     public override int GetHashCode()
     {
-        return this.Type.GetHashCode() ^ this.Name.DeInstance().GetHashCode() ^ this.Source.GetHashCode();
+        return Type.GetHashCode() ^ Name.DeInstance().GetHashCode() ^ Source.GetHashCode();
     }
 }

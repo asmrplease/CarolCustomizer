@@ -1,6 +1,6 @@
-﻿using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.Behaviors.Settings;
+﻿using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
+using CarolCustomizer.Events;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
@@ -26,8 +26,6 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
     OutfitUI outfitUI;
     public StoredAccessory accessory { get; private set; }
     OutfitListUI ui;
-    Main.ContextMenu contextMenu;
-    OutfitManager outfitManager;
     #endregion
 
     #region Local Component References
@@ -51,15 +49,12 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
     public void Constructor(
         OutfitUI outfitUI,
         StoredAccessory accessory,
-        OutfitListUI ui,
-        Main.ContextMenu contextMenu,
-        OutfitManager outfitManager)
+        OutfitListUI ui
+        )
     {
         this.outfitUI = outfitUI;
         this.accessory = accessory;
-        this.contextMenu = contextMenu;
         this.ui = ui;
-        this.outfitManager = outfitManager;
 
         name = "AccUI: " + accessory.DisplayName;
 
@@ -106,17 +101,24 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
 
     void SetMaterialVisibity(bool state)
     {
-        ui.SetAccessoryExpanded(accessory, state);
+        //outfitUI.SetAccessoryExpanded(accessory, state);
     }
 
-    void OnContextClick() => contextMenu.Show(this);
+    public void HandleAccessoryChanged(AccessoryChangedEvent eventData)
+    {
+        Log.Debug("AccUI.HandleAccessoryChanged");
+        this.activationToggle.SetIsOnWithoutNotify(eventData.Visible);
+        //Set material
+    }
+
+    void OnContextClick() => ui.ContextMenu.Show(this);
 
     public void OnToggle(bool state)
     {
         outfitUI.OnAccessoryToggled();
 
-        if (state) outfitManager.EnableAccessory(accessory);
-        else outfitManager.DisableAccessory(accessory);
+        if (state) ui.TargetOutfit.EnableAccessory(accessory);
+        else ui.TargetOutfit.DisableAccessory(accessory);
     }
 
     public void SetFavorite(bool favorited)

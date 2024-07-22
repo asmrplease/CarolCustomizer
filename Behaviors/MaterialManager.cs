@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using CarolCustomizer.Models;
 using CarolCustomizer.Utils;
 using UnityEngine.SceneManagement;
+using CarolCustomizer.Models.Materials;
 
 namespace CarolCustomizer.Behaviors;
 public class MaterialManager

@@ -1,8 +1,7 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
-using CarolCustomizer.Models;
-using CarolCustomizer.UI.Main;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,8 +24,6 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
     OutfitListUI ui;
     AccessoryUI accessoryUI;
     MaterialDescriptor defaultMaterial;
-    Main.ContextMenu contextMenu;
-    OutfitManager outfitManager;
 
     public int index { get; private set; }
     #endregion
@@ -38,78 +35,64 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
     RectTransform rect;
     #endregion
 
-    public void Constructor(AccessoryUI accessory, MaterialDescriptor material, int index, OutfitListUI ui, Main.ContextMenu contextMenu, OutfitManager outfitManager)
+    public void Constructor(
+        AccessoryUI accessory, 
+        MaterialDescriptor material, 
+        int index, 
+        OutfitListUI ui)
     {
         accessoryUI = accessory;
         defaultMaterial = material;
-        this.outfitManager = outfitManager;
         this.ui = ui;
         this.index = index;
-        this.contextMenu = contextMenu;
+        var toggle = transform.Find(toggleAddress).gameObject;
+        GameObject.Destroy(toggle.GetComponent<Toggle>());//TODO: do we need this line???
+        GameObject.Destroy(toggle);
         rect = GetComponent<RectTransform>();
-
         rect.Translate(new Vector3(16, 0, 0));
         rect.sizeDelta = new Vector2(208, 32);
-
         defaultMaterialName = transform.Find(defaultMaterialTextAddress).GetComponent<Text>();
         defaultMaterialName.text = defaultMaterial.Name;
-
         currentMaterialName = transform.Find(currentMaterialTextAddress).GetComponent<Text>();
-        currentMaterialName.text = CurrentLiveMaterial().Name;
-
+        currentMaterialName.text = CurrentMaterial.Name;
         name = "MatUI: " + defaultMaterial.Name;
-
-        var toggle = transform.Find(toggleAddress).gameObject;
-        GameObject.Destroy(toggle.GetComponent<Toggle>());
-        GameObject.Destroy(toggle);
-
         favoriteIcon = transform.Find(favoriteAddress)?.GetComponent<Image>();
         favoriteIcon.enabled = false;
-
         gameObject.SetActive(false);
     }
 
-    public void UpdateActiveMaterial(MaterialDescriptor material)
+    public void UpdateActiveMaterial(MaterialDescriptor material = null)
     {
-        if (material is null) material = CurrentLiveMaterial();
+        material ??= CurrentMaterial;
         currentMaterialName.text = material.Name;
     }
 
-    private void CopyDefaultMaterial()
-    {
-        ui.materialManager.clipboard = defaultMaterial;
-    }
+    void CopyDefaultMaterial() => ui.MaterialManager.clipboard = defaultMaterial;
 
-    private void CopyCurrentMaterial()
-    {
-        ui.materialManager.clipboard = CurrentLiveMaterial();
-    }
+    void CopyCurrentMaterial() => ui.MaterialManager.clipboard = CurrentMaterial;
 
-    private void PasteMaterial() => SetMaterial(ui.materialManager.clipboard);
+    void PasteMaterial() => SetMaterial(ui.MaterialManager.clipboard);
 
-    private void SetMaterial(MaterialDescriptor material)
+    void SetMaterial(MaterialDescriptor material)
     {
         Log.Debug("MatUI SetMaterial!");
-        outfitManager.EnableAccessory(accessoryUI.accessory);
-        outfitManager.PaintAccessory(accessoryUI.accessory, material, index);
+        ui.TargetOutfit.EnableAccessory(accessoryUI.accessory);
+        ui.TargetOutfit.PaintAccessory(accessoryUI.accessory, material, index);
     }
 
-    private MaterialDescriptor CurrentLiveMaterial()
-    {
-        var storedAcc = accessoryUI.accessory;
-        var mats = outfitManager.GetLiveMaterials(storedAcc);
-        if (mats is null) return defaultMaterial;
-        return mats[index];
-    }
+    MaterialDescriptor CurrentMaterial =>
+        ui.TargetOutfit
+        .GetLiveMaterials(accessoryUI.accessory)
+        ?[index] ?? defaultMaterial;
 
-    private void ResetMaterial() => SetMaterial(defaultMaterial);
+    void ResetMaterial() => SetMaterial(defaultMaterial);
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == Settings.HotKeys.ContextMenu) { OnContextClick(); return; }
     }
 
-    private void OnContextClick() => contextMenu.Show(this);
+    void OnContextClick() => ui.ContextMenu.Show(this);
 
     public List<(string, UnityAction)> GetContextMenuItems()
     {

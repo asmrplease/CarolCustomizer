@@ -1,6 +1,7 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Utils;
+using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
@@ -19,6 +20,8 @@ public class MenuToggle : MonoBehaviour
     GameObject mainMenuPages;
     #endregion
 
+    public static event Action<bool> OnMenuToggle;
+
     public void Constructor(UIInstance uiInstance)
     {
         this.uiInstance = uiInstance;
@@ -32,7 +35,7 @@ public class MenuToggle : MonoBehaviour
     }
     void Start()
     {
-        uiInstance.Hide();
+        OnMenuToggle?.Invoke(false);//uiInstance.Hide();
         currentScene = SceneManager.GetActiveScene();
         if (currentScene.name != Constants.MenuSceneName) return;
         StartCoroutine(OnMainMenuLoaded());
@@ -84,7 +87,7 @@ public class MenuToggle : MonoBehaviour
         //if we are currently visible and asked to go back to regular menu
         if (isVisible && !newVisibility)
         {
-            uiInstance.Hide();
+            OnMenuToggle?.Invoke(false);// uiInstance.Hide();
             mainMenuPages.transform.GetChild(0).gameObject.SetActive(true);
             isVisible = newVisibility;
             return;
@@ -95,7 +98,7 @@ public class MenuToggle : MonoBehaviour
         if (!activePage) { Log.Warning("tried to hide menu screen but no active page was found."); return; }
         if (activePage.GetSiblingIndex() != 0) { Log.Debug("tried to open accUI but we weren't on the main page"); return; }
 
-        uiInstance.Show();
+        OnMenuToggle?.Invoke(true);
         activePage.gameObject.SetActive(false);
         Log.Debug("hid menu");
 
@@ -128,8 +131,7 @@ public class MenuToggle : MonoBehaviour
         if (!uiInstance) { Log.Warning("Tried to set ui state on missing uiInstance."); return; }
 
         PauseDiary.manager.isPaused = visible;
-        if (visible) uiInstance.Show(); 
-        else uiInstance.Hide();
+        OnMenuToggle?.Invoke(visible);
         if (visible) PlayerInstances.DefaultPlayer.LockPlayer();
         else PlayerInstances.DefaultPlayer.UnlockPlayer();
         isVisible = visible;

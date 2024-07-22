@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Models.Outfits;
+﻿using CarolCustomizer.Models.Materials;
+using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
 using System.Collections.Generic;

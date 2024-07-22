@@ -1,7 +1,8 @@
-﻿using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.Behaviors.Recipes;
+﻿using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
+using CarolCustomizer.Events;
+using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
@@ -23,7 +24,6 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     #region Dependencies
     public Outfit outfit { get; private set; }
     OutfitListUI ui;
-    Main.ContextMenu contextMenu;
     #endregion
 
     #region Component Refrerences
@@ -34,39 +34,29 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     #endregion
 
     #region State Variables
-    List<AccessoryUI> Accessories = new();
+    Dictionary<AccessoryDescriptor, AccessoryUI> AccUIs = new();
     public bool expanded = false;
     public Color color = Constants.DefaultColor;
     #endregion
 
     #region Setup
-    public void Constructor(Outfit outfit, OutfitListUI ui, Main.ContextMenu contextMenu)
+    public OutfitUI Constructor(Outfit outfit, OutfitListUI ui)
     {
         this.outfit = outfit;
         this.ui = ui;
-        this.contextMenu = contextMenu;
 
         name = "OutfitUI: " + outfit.DisplayName;
-
         background = transform.GetChild(0).gameObject.GetComponent<Image>();
         background.color = color;
-
         displayImage = transform.Find(displayImageAddress)?.GetComponent<Image>();
         displayImage.sprite = outfit.Sprite;
-
         displayName = transform.Find(outfitNameAddress)?.GetComponentInChildren<Text>();
         displayName.text = outfit.DisplayName;
-
         pickupLocation = transform.Find(pickupLocationAddress)?.GetComponent<Text>();
         pickupLocation.text = "";
+        outfit.Accessories.ForEach(acc => AccUIs.Add(acc, null));
+        return this;
     }
-
-    public void AddAccessory(AccessoryUI accessory)
-    {
-        if (!accessory) { return; }
-        Accessories.Add(accessory);
-    }
-
     #endregion
 
     #region Input Event Handling
@@ -76,17 +66,72 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         if (eventData.button == PointerEventData.InputButton.Left) { OnLeftClick(); }
     }
 
-    void OnLeftClick()
+    AccessoryUI GetAccUI(AccessoryDescriptor descriptor)
     {
-        expanded.Flip();
-        ui.SetOutfitExpanded(outfit, expanded);
+        if (descriptor == null) return null;
+
+        if (!AccUIs.TryGetValue(descriptor, out var UI))
+        {
+            Log.Warning($"Key {descriptor} wasn't in {outfit.DisplayName}.");
+            return null;
+        }
+
+        if (!UI) UI = AccUIs[descriptor] = ui.Factory.BuildAccUI(this, descriptor);
+        return UI;
     }
 
-    void OnContextClick() => contextMenu.Show(this);
+    void OnContextClick() => ui.ContextMenu.Show(this);
+    void OnLeftClick() => SetAccessoriesVisible(expanded.Flip());
+
+    public void HandleFilterEvent(UIFilterChangedEvent eventData)
+    {
+
+    }
+
+    public void HandleAccessoryChanged(AccessoryChangedEvent eventData)
+    {
+        Log.Debug("OutfitUI.HandleAccessoryChanged()");
+        var accUI = GetAccUI(eventData.Target);
+        if (!accUI) { Log.Error($"didn't find accessory {eventData.Target.DisplayName} for ACE in {outfit.DisplayName}"); return; }
+
+        accUI.HandleAccessoryChanged(eventData);
+    }
+
+    void SetAccessoriesVisible(bool visible)
+    {
+        Log.Debug("SetAccessoriesVisible");
+        if (!visible)
+        {
+            Log.Debug("not visible");
+            AccUIs.Values
+                .Where(ui => ui)
+                .Select(ui => ui.gameObject)
+                .ToList()
+                .ForEach(go => go.SetActive(false));
+        }
+        else
+        {
+            Log.Debug("Visible");
+            AccUIs.Keys
+                .ToList()
+                .Select(GetAccUI)
+                .Select (ui => ui.gameObject)
+                .ForEach(go => go.SetActive(true));
+        }
+        OnAccessoryToggled();
+        Log.Debug("SetAccVisisble complete;");
+    }
 
     public void OnAccessoryToggled()
     {
-        if (Accessories.Any(x => x.activationToggle.isOn)) { background.color = Constants.Highlight; return; }
+        Log.Debug("OnAccessoryToggled()");
+        if (AccUIs.Values
+            .Where(x => x)
+            .Any(x => x.activationToggle.isOn)) 
+        { 
+            background.color = Constants.Highlight; 
+            return; 
+        }
         background.color = color;
     }
 
@@ -95,28 +140,25 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         var hads = outfit as HaDSOutfit; //TODO: idk, but not this
         var results = new List<(string, UnityAction)>()
         {
-             ("Use Animator",     () => PlayerInstances.DefaultPlayer.outfitManager.SetAnimator(outfit))
-            ,("Use Measurements", () => PlayerInstances.DefaultPlayer.outfitManager.SetConfiguration(hads))
-            ,("Use Colliders",    () => PlayerInstances.DefaultPlayer.outfitManager.SetColliderSource(outfit))
-            ,("Activate Effects", () => PlayerInstances.DefaultPlayer.outfitManager.SetEffect(outfit, true))
-            ,("Disable Effects",  () => PlayerInstances.DefaultPlayer.outfitManager.SetEffect(outfit, false))
+             ("Use Animator",     () => ui.TargetOutfit.SetAnimator(outfit))
+            ,("Use Measurements", () => ui.TargetOutfit.SetConfiguration(hads))
+            ,("Use Colliders",    () => ui.TargetOutfit.SetColliderSource(outfit))
+            ,("Activate Effects", () => ui.TargetOutfit.SetEffect(outfit, true))
+            ,("Disable Effects",  () => ui.TargetOutfit.SetEffect(outfit, false))
         };
 
         foreach (var entry in hads.Variants)
         {
             results.Add(
-                ($"Load: {entry.Key}", () => RecipeApplier.ActivateVariant(PlayerInstances.DefaultPlayer.outfitManager, hads, entry.Key)));
+                ($"Load: {entry.Key}", () => RecipeApplier.ActivateVariant(ui.TargetOutfit, hads, entry.Key)));
+
         }
         return results;
     }
     #endregion
 
-    void OnDestroy()
-    {
-        foreach(var accUI in Accessories)
-        {
-            ui.OnAccessoryUnloaded(accUI.accessory);
-            GameObject.Destroy(accUI.gameObject);
-        }
-    }
+    void OnDestroy() => AccUIs.Values
+        .Where(x => x)
+        .Select(x => x.gameObject)
+        .ForEach(GameObject.Destroy);
 }

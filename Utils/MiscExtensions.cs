@@ -76,9 +76,10 @@ public static class MiscExtensions
         smr.sharedMaterials = liveArray;
     }
     /// <summary>
-    /// Inverts the value of a given boolean.
+    /// Inverts the value of a boolean.
     /// </summary>
-    /// <param name="value">The boolean to flip.</param>
+    /// <param name="value">The variable to invert.</param>
+    /// <returns>The value of the boolean after inversion.</returns>
     public static bool Flip(ref this bool value)
     {
         value = !value;

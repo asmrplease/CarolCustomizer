@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Hooks;
+using System.Linq;
 
 namespace CarolCustomizer.Assets;
 public class OutfitAssetManager : IDisposable
@@ -31,6 +31,12 @@ public class OutfitAssetManager : IDisposable
         if (outfitSets is null) { Log.Error("outfitSets was null when searching for asset"); return null; }
         if (assetName is null) { Log.Warning("GetOutfitByAssetName was given a null value"); return null; }
 
+        return outfitSets.Values
+            .Select(dict =>
+                (found: dict.TryGetValue(assetName, out var result)
+                ,result: result))
+            .FirstOrDefault(tup => tup.found)
+            .result;
         foreach (var dict in outfitSets.Values) 
         {
             if (dict.TryGetValue(assetName, out var result)) { return result; }

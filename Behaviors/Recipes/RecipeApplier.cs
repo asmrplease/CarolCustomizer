@@ -1,7 +1,7 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
