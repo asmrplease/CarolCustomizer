@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Utils;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class ActressWatchdog : PelvisWatchdog
@@ -7,12 +8,12 @@ public class ActressWatchdog : PelvisWatchdog
     {
         Log.Debug($"{this} OnEnable");
         SetBaseVisibility(false);
-        CCPlugin.cutscenePlayer.NotifySpawned(this);
+        PlayerInstances.DefaultPlayer.NotifySpawned(this);
     }
 
     void OnDisable()
     {
         Log.Debug("Restoring previous pelvis due to ActressWatchdog.OnDisable");
-        CCPlugin.cutscenePlayer?.RestorePrevious(this);
+        PlayerInstances.DefaultPlayer?.RestorePrevious(this);
     }
 }

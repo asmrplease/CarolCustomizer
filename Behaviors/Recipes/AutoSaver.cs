@@ -2,25 +2,38 @@
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
+using System;
 using System.Collections;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Recipes;
-internal class AutoSaver
+internal class AutoSaver : IDisposable
 {
     OutfitManager outfitManager;
+    readonly int playerIndex;
+    readonly string path;
 
-    public AutoSaver(PlayerCarolInstance player)
+    public AutoSaver(PlayerCarolInstance player, int playerIndex = 0)
     {
         outfitManager = player.outfitManager;
         OutfitAssetManager.OnOutfitSetLoaded += Load;
+        this.playerIndex = playerIndex;
+        this.path = RecipeSaver.RecipeFilenameToPath(
+            Constants.AutoSave 
+            + playerIndex 
+            + Constants.JsonFileExtension);
+    }
+
+    public void Dispose()
+    {
+        OutfitAssetManager.OnOutfitSetLoaded -= Load;
     }
 
     public void Save()
     {
         RecipeSaver.SaveJson(
             new RecipeDescriptor23(outfitManager),
-            RecipeSaver.RecipeFilenameToPath(Constants.AutoSave + Constants.JsonFileExtension));
+            this.path);
         Log.Info("Autosave Complete.");
     }
 
@@ -28,7 +41,7 @@ internal class AutoSaver
     {
         var recipe = CCPlugin
             .recipesManager
-            .GetRecipeByFilename(Constants.AutoSave+Constants.JsonFileExtension);
+            .GetRecipeByFilename(this.path);
         CCPlugin.CoroutineRunner.StartCoroutine(LoadRecipeRoutine(recipe));
     }
 

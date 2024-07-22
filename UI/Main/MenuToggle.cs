@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Settings;
+﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Utils;
 using System.Collections;
 using System.Linq;
@@ -108,7 +109,7 @@ public class MenuToggle : MonoBehaviour
         if (isVisible && GameManager.manager.isInCutscene) { GameplaySetMenuState(false); return; }
 
         //don't change the menu state if we're already in a state change
-        if (!uiInstance.playerManager.CanOpenMenu()) return;
+        if (!PlayerInstances.DefaultPlayer.CanOpenMenu()) return;
 
         //hide the menu if it's visible and we pause
         if (isVisible && (Input.GetKeyDown(KeyCode.Escape) || CheckInput()))
@@ -129,8 +130,8 @@ public class MenuToggle : MonoBehaviour
         PauseDiary.manager.isPaused = visible;
         if (visible) uiInstance.Show(); 
         else uiInstance.Hide();
-        if (visible) uiInstance.playerManager.LockPlayer();
-        else uiInstance.playerManager.UnlockPlayer();
+        if (visible) PlayerInstances.DefaultPlayer.LockPlayer();
+        else PlayerInstances.DefaultPlayer.UnlockPlayer();
         isVisible = visible;
     }
 }

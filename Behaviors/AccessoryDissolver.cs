@@ -49,9 +49,7 @@ internal static class AccessoryDissolver
             Entity playerEntity = other.GetComponent<Entity>();
             if (!playerEntity) return;
 
-            var player = CCPlugin
-                .playerManagers
-                .FirstOrDefault(x => x.ManagesPlayer(playerEntity));
+            var player = PlayerInstances.Find(playerEntity);
             if (player is null) return;
 
             ActiveDissolve = CCPlugin
@@ -73,9 +71,7 @@ internal static class AccessoryDissolver
             Log.Debug("Die postfix!");
             if (!(deathType == Entity.DeathType.Fire || deathType == Entity.DeathType.InstantFire)) return;
 
-            var player = CCPlugin
-                .playerManagers
-                .FirstOrDefault(x=>x.ManagesPlayer(__instance));
+            var player = PlayerInstances.Find(__instance);
             if (player is null) return;
 
             ActiveDissolve = CCPlugin

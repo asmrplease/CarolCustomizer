@@ -15,7 +15,6 @@ public class RecipeListUI : MonoBehaviour
     static readonly string newRecipeAddress = "New Recipe";
 
     UIAssetLoader loader;
-    OutfitManager outfitManager;
     Main.ContextMenu contextMenu;
     FilenameDialogue fileDialogue;
     MessageDialogue messageDialogue;
@@ -30,12 +29,10 @@ public class RecipeListUI : MonoBehaviour
     public RecipeListUI Constructor(
         UIAssetLoader loader,
         RecipeFileWatcher recipesManager,
-        OutfitManager outfitManager,
         Main.ContextMenu contextMenu,
         MessageDialogue messageDialogue)
     {
         this.loader = loader;
-        this.outfitManager = outfitManager;
         this.recipesManager = recipesManager;
         this.contextMenu = contextMenu;
         this.messageDialogue = messageDialogue;
@@ -75,7 +72,7 @@ public class RecipeListUI : MonoBehaviour
 
         var recipeUI = uiInstance.AddComponent<RecipeUI>();
         if (!recipeUI) { Log.Warning("failed to instantiate recipeUI component"); return; }
-        recipeUI.Constructor(newRecipe, loader, outfitManager, contextMenu, fileDialogue, messageDialogue);
+        recipeUI.Constructor(newRecipe, loader, contextMenu, fileDialogue, messageDialogue);
 
         recipeUIs.Add(newRecipe.Path, recipeUI);
         Log.Debug($"Sibling index: {recipeUIs.IndexOfKey(newRecipe.Path)}");
@@ -92,6 +89,6 @@ public class RecipeListUI : MonoBehaviour
 
     void OnNewSave()
     {
-        fileDialogue.Show(new RecipeDescriptor23(outfitManager), RecipeSaver.SavePNG);
+        fileDialogue.Show(new RecipeDescriptor23(PlayerInstances.DefaultPlayer.outfitManager), RecipeSaver.SavePNG);
     }
 }

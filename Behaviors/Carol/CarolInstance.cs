@@ -27,7 +27,7 @@ public class CarolInstance : IDisposable
     #endregion
 
     #region Lifecycle
-    public CarolInstance(GameObject parent)
+    public CarolInstance(Transform parent)
     {
         skeletonManager = new(this, parent);
         outfitManager = new(this, skeletonManager);
@@ -36,6 +36,7 @@ public class CarolInstance : IDisposable
     public virtual void Dispose()
     {
         skeletonManager.Dispose();
+        if (targetPelvis) GameObject.Destroy(targetPelvis);
     }
     #endregion
 

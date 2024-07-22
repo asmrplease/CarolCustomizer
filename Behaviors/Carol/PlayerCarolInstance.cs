@@ -9,22 +9,28 @@ public class PlayerCarolInstance : CarolInstance
 {
     PlayerWatchdog player;
     static Type playerWatchdogType = typeof(PlayerWatchdog);
-    AutoSaver autoSaver;
+    readonly AutoSaver autoSaver;
+    public readonly int playerIndex;
 
     public bool Busy => player?.Busy ?? false;
 
-    public PlayerCarolInstance(GameObject parent) : base(parent)
+    public PlayerCarolInstance(Transform folder, int playerIndex) : base(folder) 
     {
-        autoSaver = new(this);
+        this.playerIndex = playerIndex;
+        autoSaver = new(this, playerIndex);
     }
 
     public override void NotifySpawned(PelvisWatchdog pelvis)
     {
         base.NotifySpawned(pelvis);
         //TODO: ew reflection
-        if (!pelvis.GetType().IsAssignableFrom(playerWatchdogType)) return;
+        if (!pelvis.GetType()
+            .IsAssignableFrom(playerWatchdogType)) 
+            return;
         player = pelvis as PlayerWatchdog;
     }
+
+    public bool Exists() => player && player.enabled;
 
     public bool CanOpenMenu() => player?.CanOpenMenu() ?? true;
 
@@ -35,9 +41,8 @@ public class PlayerCarolInstance : CarolInstance
 
     public override void Dispose()
     {
-        Log.Debug("autosaving...");
-        autoSaver.Save();
         Log.Debug("disposing PCI");
+        autoSaver.Save();
         base.Dispose();
     }
 }

@@ -6,6 +6,11 @@ using CarolCustomizer.Models.Recipes;
 namespace CarolCustomizer.Behaviors.Recipes;
 internal static class RecipeSaver
 {
+    /// <summary>
+    /// Combines the application path, recipe folder path, and given filename.
+    /// </summary>
+    /// <param name="fileName">File name with extension.</param>
+    /// <returns>Path to the root recipe folder with filename included.</returns>
     public static string RecipeFilenameToPath(string fileName)
     {
         string relativePath = Path.Combine(Constants.RecipeFolderName, fileName);
@@ -16,7 +21,7 @@ internal static class RecipeSaver
     public static void SaveJson(RecipeDescriptor23 recipe, string filePath)
     {
         string json = JsonConvert.SerializeObject(recipe, Formatting.Indented);
-        Log.Debug(json);
+        //Log.Debug(json);
         if (!filePath.Contains(Constants.JsonFileExtension))
         {
             filePath = RecipeFilenameToPath($"{filePath}{Constants.JsonFileExtension}");

@@ -19,17 +19,19 @@ public class SkeletonManager : IDisposable
 
     Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = new();
 
-    public SkeletonManager(CarolInstance player, GameObject parent)
+    public SkeletonManager(CarolInstance player, Transform parent)
     {
         MagicaManager = new MagicaManager(this);
-        faceCopier = parent.AddComponent<FaceCopier>().Constructor(player);
+        faceCopier = parent
+            .gameObject
+            .AddComponent<FaceCopier>()
+            .Constructor(player);
         player.SpawnEvent += MagicaManager.HandleNewPelvis;
         player.SpawnEvent += HandleNewPelvis;
     }
 
     void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
-        //Log.Info("SkeletonManager.SetNewPelvis()");
         outfitBoneDicts
             .Values
             .SelectMany(dict => dict.Values)

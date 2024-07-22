@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Behaviors.Carol;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class MenuWatchdog : PelvisWatchdog
@@ -23,7 +24,7 @@ public class MenuWatchdog : PelvisWatchdog
     void OnEnable()
     {
         SetBaseVisibility(false);
-        CCPlugin.cutscenePlayer.NotifySpawned(this);
+        PlayerInstances.DefaultPlayer.NotifySpawned(this);
     }
 
     private IEnumerator MainMenuFix()

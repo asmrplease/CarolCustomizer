@@ -8,6 +8,7 @@ using System.IO;
 using System.Collections;
 using UnityEngine;
 using System.Linq;
+using CarolCustomizer.Behaviors.Carol;
 
 namespace FaceCam.Behaviors;
 public class ThumbnailCamera : MonoBehaviour
@@ -38,13 +39,13 @@ public class ThumbnailCamera : MonoBehaviour
         camera.useOcclusionCulling = false;
         camera.enabled = false;
 
-        CCPlugin.cutscenePlayer.SpawnEvent += HandleNewPelvis;
+        PlayerInstances.DefaultPlayer.SpawnEvent += HandleNewPelvis;
         Slate.Cutscene.OnCutsceneStopped += HandleCutsceneEnd;
 
         cameraController = this.GetComponent<CameraController>();
         if (!cameraController) { Log.Warning("didn't find cameracontroller component"); return; }
         GameObject.Destroy(cameraController);
-        HandleNewPelvis(CCPlugin.cutscenePlayer.outfitManager.pelvis);
+        HandleNewPelvis(PlayerInstances.DefaultPlayer.outfitManager.pelvis);
     }
 
     void HandleCutsceneEnd(Slate.Cutscene obj)
@@ -73,7 +74,7 @@ public class ThumbnailCamera : MonoBehaviour
         var alpha = CalculateTransparency(black, white);
         byte[] bytes = alpha.EncodeToPNG();
         File.WriteAllBytes(filePath, bytes);
-        var descriptor = new RecipeDescriptor23(CCPlugin.cutscenePlayer.outfitManager);
+        var descriptor = new RecipeDescriptor23(PlayerInstances.DefaultPlayer.outfitManager);
         string json = JsonConvert.SerializeObject(descriptor, Formatting.None);
         PngMetadataUtil.AddMetadata(filePath, Constants.PNGChunkKeyword, json);
         Log.Info("Save complete.");

@@ -26,7 +26,6 @@ public class UIInstance : MonoBehaviour
     #endregion
 
     #region Dependencies
-    public PlayerCarolInstance playerManager { get; private set; }
     public MaterialManager materialManager { get; private set; }
     #endregion
 
@@ -42,9 +41,8 @@ public class UIInstance : MonoBehaviour
     #endregion
 
     #region Public Interface
-    public void Constructor(UIAssetLoader loader, PlayerCarolInstance player, RecipeFileWatcher recipesManager)
+    public UIInstance Constructor(UIAssetLoader loader, RecipeFileWatcher recipeFileWatcher)
     {
-        playerManager = player;
         materialManager = new();
 
         var mainTransform = Instantiate(loader.UIContainer, transform).transform;
@@ -67,10 +65,10 @@ public class UIInstance : MonoBehaviour
 
         var outfitView = Instantiate(loader.OutfitView, viewRoot)
             .AddComponent<OutfitListUI>()
-            .Constructor(loader, player, materialManager, contextMenu);
+            .Constructor(loader, materialManager, contextMenu);
         var recipesView = Instantiate(loader.RecipesView, viewRoot)
             .AddComponent<RecipeListUI>()
-            .Constructor(loader, recipesManager, player.outfitManager, contextMenu, messageDialogue);
+            .Constructor(loader, recipeFileWatcher, contextMenu, messageDialogue);
         var materialsView = Instantiate(loader.MaterialsView, viewRoot)
             .AddComponent<MaterialsListUI>()
             .Constructor(loader, materialManager, contextMenu);
@@ -91,6 +89,10 @@ public class UIInstance : MonoBehaviour
         Buttons = new List<Button> { outfitsButton, recipesButton, materialsButton, configButton };
         
         ChangeTab(outfitsButton, outfitView.gameObject);
+        gameObject
+            .AddComponent<MenuToggle>()
+            .Constructor(this);
+        return this;
     }
 
     public void Show()

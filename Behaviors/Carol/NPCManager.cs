@@ -14,9 +14,9 @@ internal class NPCManager
     static Dictionary<PelvisWatchdog, CarolInstance> liveBots = new();
     public static CarolInstance shezaraInstance { get; private set; }
 
-    static GameObject folder;
+    static Transform folder;
 
-    public static void Constructor(GameObject folder, RecipeFileWatcher recipesManager)
+    public static void Constructor(Transform folder, RecipeFileWatcher recipesManager)
     {
         NPCManager.folder = folder;
         NPCManager.recipesManager = recipesManager;

@@ -12,36 +12,26 @@ using System.Linq;
 namespace CarolCustomizer.Behaviors.Recipes;
 internal static class RecipeApplier
 {
-    public static void ActivateRecipe(OutfitManager outfitManager, RecipeDescriptor23 recipe)
+    public static void ActivateRecipe(OutfitManager target, RecipeDescriptor23 recipe)
     {
-        outfitManager.DisableAllAccessories();
-        outfitManager.DisableAllEffects();
-
+        target.DisableAllAccessories();
+        target.DisableAllEffects();
         recipe
             .ActiveAccessories
-            .ForEach(x => 
-                SetAccessory(outfitManager, x));
+            .ForEach(x => SetAccessory(target, x));
         recipe
             .ActiveEffects
-            .Select(
-                OutfitAssetManager
-                .GetOutfitByAssetName)
+            .Select(OutfitAssetManager.GetOutfitByAssetName)
             .Where(x => x is not null)
             .ForEach(x => 
-                outfitManager
+                target
                 .SetEffect(x, true));
-        outfitManager.SetAnimator(
-            OutfitAssetManager
-            .GetOutfitByAssetName(
-            recipe.AnimatorSource));
-        outfitManager.SetConfiguration(
-            OutfitAssetManager
-            .GetOutfitByAssetName(
-               recipe.BaseOutfitName));
-        outfitManager.SetColliderSource(
-            OutfitAssetManager
-            .GetOutfitByAssetName(
-                recipe.ColliderSource));
+        target.SetAnimator(
+            OutfitAssetManager.GetOutfitByAssetName(recipe.AnimatorSource));
+        target.SetConfiguration(
+            OutfitAssetManager.GetOutfitByAssetName(recipe.BaseOutfitName));
+        target.SetColliderSource(
+            OutfitAssetManager.GetOutfitByAssetName(recipe.ColliderSource));
     }
 
     public static void ActivateFirstVariant(OutfitManager outfitManager, string outfitName)
@@ -71,7 +61,7 @@ internal static class RecipeApplier
         outfitManager.SetColliderSource(outfit);
     }
 
-    static void SetAccessory(OutfitManager outfitManager, AccessoryDescriptor accessoryDescription)
+    static void SetAccessory(OutfitManager target, AccessoryDescriptor accessoryDescription)
     {
         Log.Debug($"Setting accessory {accessoryDescription.Source}:{accessoryDescription.Name}...");
         var outfit = OutfitAssetManager.GetOutfitByAssetName(accessoryDescription.Source);
@@ -80,19 +70,15 @@ internal static class RecipeApplier
 
         var accessory = outfit.GetAccessory(accessoryDescription);
         if (accessory is null) { Log.Warning($"failed to find {accessoryDescription.Name}"); return; }
-        Log.Debug("found accessory");
 
-        outfitManager.EnableAccessory(accessory);
-        Log.Debug("enabled accessory");
-
-        int index = 0;
-        foreach (var material in accessoryDescription.Materials)
-        {
-            SetMaterial(outfitManager, accessory, material, index++);
-        }
+        target.EnableAccessory(accessory);
+        accessoryDescription
+            .Materials
+            .Select((mat, index) => (mat, index))
+            .ForEach(tup => SetMaterial(target, accessory, tup.mat, tup.index));
     }
 
-    static void SetMaterial(OutfitManager outfitManager, StoredAccessory accessory, MaterialDescriptor materialDescription, int index)
+    static void SetMaterial(OutfitManager target, StoredAccessory accessory, MaterialDescriptor materialDescription, int index)
     {
         Log.Debug("setting material...");
         if (materialDescription.Type == MaterialDescriptor.SourceType.World)
@@ -106,7 +92,7 @@ internal static class RecipeApplier
         outfit.MaterialDescriptors.TryGetValue(materialDescription, out var liveMaterial);
         if (liveMaterial is null) { Log.Warning($"failed to find {materialDescription.Name} in source"); return; }
 
-        outfitManager.PaintAccessory(accessory, liveMaterial, index);
+        target.PaintAccessory(accessory, liveMaterial, index);
     }
 
     public static IEnumerable<string> GetSources(RecipeDescriptor23 recipe)
@@ -118,7 +104,6 @@ internal static class RecipeApplier
             .ActiveAccessories
             .SelectMany(x => x.Materials)
             .Select(x => x.Source);
-
         return accSources
             .Concat(matSources)
             .Concat(recipe.ActiveEffects)
@@ -132,8 +117,7 @@ internal static class RecipeApplier
     {
         return GetSources(recipe)
             .Where(x => 
-                OutfitAssetManager
-                .GetOutfitByAssetName(x) 
+                OutfitAssetManager.GetOutfitByAssetName(x)
                 is null);
     }
 }

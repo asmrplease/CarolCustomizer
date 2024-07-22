@@ -26,7 +26,6 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     static readonly string pickupLocationAddress = "Outfit Header/Text/Pickup Location";
 
     Recipe recipe;
-    OutfitManager outfitManager;
     Main.ContextMenu contextMenu;
     FilenameDialogue filenameDialogue;
     MessageDialogue messageDialogue;
@@ -39,13 +38,11 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     public void Constructor(
         Recipe recipe,
         UIAssetLoader loader,
-        OutfitManager outfitManager,
         Main.ContextMenu contextMenu,
         FilenameDialogue filenameDialogue,
         MessageDialogue messageDialogue)
     {
         this.recipe = recipe;
-        this.outfitManager = outfitManager;
         this.contextMenu = contextMenu;
         this.filenameDialogue = filenameDialogue;
         this.messageDialogue = messageDialogue;
@@ -54,11 +51,9 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         displayImage = transform.Find(displayImageAddress)?.GetComponent<Image>();
         displayImage.sprite = loader.PirateIcon;
         displayImage.enabled = false;
-        //displayImage.enabled = Settings.Plugin.shezaraRecipe.Value == recipe.Name;
 
         if (recipe.Extension == Constants.PngFileExtension) 
             CCPlugin.CoroutineRunner.StartCoroutine(LoadThumbnail());
-        //Settings.Plugin.shezaraRecipe.SettingChanged += OnShezaraChanged;
 
         displayName = transform.Find(outfitNameAddress)?.GetComponentInChildren<Text>();
         displayName.text = this.recipe.Name;
@@ -135,16 +130,17 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         messageDialogue.Show(message, confirmText: "Yes!", confirmAction: Overwrite);
     }
 
-    void Overwrite() => RecipeSaver.SavePNG(new RecipeDescriptor23(outfitManager), recipe.Path);
+    void Overwrite() => RecipeSaver.SavePNG(new RecipeDescriptor23(PlayerInstances.DefaultPlayer.outfitManager), recipe.Path);
 
-    void OnContextMenuLoad() => RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
+    void OnContextMenuLoad(PlayerCarolInstance player) => 
+        RecipeApplier.ActivateRecipe(player.outfitManager, recipe.Descriptor);
 
     void OnContextMenuWarningLoad()
     {
         string message = "Some of the resources for this recipe aren't available: " + Environment.NewLine; ;
         var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
         foreach (var source in missingSources) { message += source + Environment.NewLine; }
-        messageDialogue.Show(message, cancelText: "Nevermind", confirmText: "Load Anyway", confirmAction: OnContextMenuLoad);
+        messageDialogue.Show(message, cancelText: "Nevermind", confirmText: "Load Anyway", confirmAction: () =>OnContextMenuLoad(PlayerInstances.DefaultPlayer));
     }
 
     void OnContextMenuRename()
@@ -190,14 +186,14 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     {
         RecipeApplier
             .ActivateRecipe(
-                CCPlugin.cutscenePlayer.outfitManager, 
+                PlayerInstances.DefaultPlayer.outfitManager, 
                 recipe.Descriptor);
         var newPath = Path.Combine(
             Path.GetDirectoryName(recipe.Path),
             Path.GetFileNameWithoutExtension(recipe.Path)
                 + Constants.PngFileExtension); 
         RecipeSaver.SavePNG(
-            new RecipeDescriptor23(CCPlugin.cutscenePlayer.outfitManager),
+            new RecipeDescriptor23(PlayerInstances.DefaultPlayer.outfitManager),
             newPath);
         File.Delete(recipe.Path);
     }
@@ -220,16 +216,15 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         var output = new List<(string, UnityAction)>();
-        if (recipe.Name == Constants.AutoSave)
-        {
-            if (recipe.Error == Recipe.Status.FileError) return output;
-
-            output.Add(("Load", OnContextMenuLoad));
-            return output;
-        }
         if (recipe.Error == Recipe.Status.NoError)
         {
-            output.Add(("Load", OnContextMenuLoad));
+            PlayerInstances.ValidPlayers
+                .ForEach(player =>
+                    output.Add(
+                        ($"Load on P{player.playerIndex+1}"
+                        ,()=> OnContextMenuLoad(player))));
+            if (recipe.Name.Contains(Constants.AutoSave, StringComparison.CurrentCultureIgnoreCase))
+                return output;
         }
         if (recipe.Error != Recipe.Status.FileError)
         {

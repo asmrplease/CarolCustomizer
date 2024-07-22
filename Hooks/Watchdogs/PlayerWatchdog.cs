@@ -4,6 +4,7 @@ using System.Collections;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PlayerWatchdog : PelvisWatchdog
@@ -11,8 +12,8 @@ public class PlayerWatchdog : PelvisWatchdog
     private const float LockSpeed = 1.00f;
     private const float UnlockSpeed = 1.75f;
 
-    Entity carolEntity;
     CarolController carolController;
+    public Entity carolEntity { get; private set; }
 
     public bool Busy { get; private set; } = false;
     public bool Locked { get; private set; } = false;
@@ -32,7 +33,14 @@ public class PlayerWatchdog : PelvisWatchdog
     void OnEnable()
     {
         SetBaseVisibility(false);
-        CCPlugin.cutscenePlayer.NotifySpawned(this);
+        if (!carolEntity) carolEntity = GetComponentInParent<Entity>();
+        if (!carolEntity)
+        {
+            Log.Error("Failed to find Entity during PlayerWatchdog.OnEnable()!");
+            PlayerInstances.DefaultPlayer.NotifySpawned(this);
+            return;
+        }
+        PlayerInstances.OnPlayerSpawn(this);
         if (Locked) LockPlayer(0.01f);
     }
 

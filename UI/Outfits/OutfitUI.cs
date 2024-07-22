@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Recipes;
+﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
@@ -94,17 +95,17 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         var hads = outfit as HaDSOutfit; //TODO: idk, but not this
         var results = new List<(string, UnityAction)>()
         {
-             ("Use Animator",     () => ui.playerManager.outfitManager.SetAnimator(outfit))
-            ,("Use Measurements", () => ui.playerManager.outfitManager.SetConfiguration(hads))
-            ,("Use Colliders",    () => ui.playerManager.outfitManager.SetColliderSource(outfit))
-            ,("Activate Effects", () => ui.playerManager.outfitManager.SetEffect(outfit, true))
-            ,("Disable Effects",  () => ui.playerManager.outfitManager.SetEffect(outfit, false))
+             ("Use Animator",     () => PlayerInstances.DefaultPlayer.outfitManager.SetAnimator(outfit))
+            ,("Use Measurements", () => PlayerInstances.DefaultPlayer.outfitManager.SetConfiguration(hads))
+            ,("Use Colliders",    () => PlayerInstances.DefaultPlayer.outfitManager.SetColliderSource(outfit))
+            ,("Activate Effects", () => PlayerInstances.DefaultPlayer.outfitManager.SetEffect(outfit, true))
+            ,("Disable Effects",  () => PlayerInstances.DefaultPlayer.outfitManager.SetEffect(outfit, false))
         };
 
         foreach (var entry in hads.Variants)
         {
             results.Add(
-                ($"Load: {entry.Key}", () => RecipeApplier.ActivateVariant(ui.playerManager.outfitManager, hads, entry.Key)));
+                ($"Load: {entry.Key}", () => RecipeApplier.ActivateVariant(PlayerInstances.DefaultPlayer.outfitManager, hads, entry.Key)));
         }
         return results;
     }

@@ -24,9 +24,9 @@ public class OutfitListUI : MonoBehaviour
     #endregion
 
     UIAssetLoader loader;
-    OutfitManager outfitManager;
     Main.ContextMenu contextMenu;
-    public CarolInstance playerManager { get; private set; }
+    OutfitManager outfitManager;
+    //public CarolInstance playerManager { get; private set; }
     public MaterialManager materialManager { get; private set; }
 
     public string searchString { get; private set; } = "";
@@ -44,14 +44,12 @@ public class OutfitListUI : MonoBehaviour
 
     public OutfitListUI Constructor(
         UIAssetLoader loader,
-        CarolInstance playerManager,
         MaterialManager materialManager,
         Main.ContextMenu contextMenu)
     {
         this.loader = loader;
         this.materialManager = materialManager;
-        this.playerManager = playerManager;
-        outfitManager = playerManager.outfitManager;
+        outfitManager = PlayerInstances.DefaultPlayer.outfitManager;
         this.contextMenu = contextMenu;
 
         OutfitAssetManager.OnOutfitLoaded += OnOutfitLoaded;
@@ -276,13 +274,13 @@ public class OutfitListUI : MonoBehaviour
 
     void UnfavoriteAllAccessories()
     {
-        foreach (var accessory in Settings.Favorites.favorites.ToList())
-        {
-            accessoryUIs.TryGetValue(accessory, out var ui);
-            if (!ui) { Log.Debug($"{accessory} was not in ui accessory list.");  continue; }
-            Log.Debug($"Unfavoriting {accessory}");
-            ui.SetFavorite(false);
-        }
+        Settings.Favorites.favorites
+            .ToList()
+            .Select(acc =>
+                (found: accessoryUIs.TryGetValue(acc, out var ui)
+                ,ui: ui))
+            .Where(tup => tup.found)
+            .ForEach(tup => tup.ui.SetFavorite(false);
     }
 
     //TODO: there may be an issue here with some StoredAccessories not actually being unique enough on their own

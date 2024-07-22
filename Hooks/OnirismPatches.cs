@@ -4,7 +4,7 @@ using CarolCustomizer.Utils;
 using System.Linq;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Assets;
-using MagicaCloth2;
+using CarolCustomizer.Behaviors.Carol;
 
 namespace CarolCustomizer.Hooks;
 
@@ -18,11 +18,7 @@ public static class OnirismPatches
         {
             if (!Entity.players.Contains(__instance.origin)) return;
 
-            var uis = CCPlugin.uiInstances.Where(x => x.playerManager.ManagesPlayer(__instance.origin));
-            if (uis.Count() != 1) { Log.Debug($"when firing a projectile, found {uis.Count()} players that matched."); return; }
-
-            var ui = uis.First();
-            ui.materialManager.OnNewTarget(collider.gameObject);
+            CCPlugin.uiInstance.materialManager.OnNewTarget(collider.gameObject);
         }
     }
 
@@ -36,11 +32,11 @@ public static class OnirismPatches
                 __instance.selection.transform.parent.gameObject,
                 out var modelData);
             if (!modelData) return false;
-            Log.Debug($"CostumeSwapUI: {modelData.name}");
 
+            Log.Debug($"CostumeSwapUI: {modelData.name}");
             RecipeApplier.ActivateFirstVariant(
-                CCPlugin
-                    .cutscenePlayer
+                PlayerInstances
+                    .DefaultPlayer
                     .outfitManager,
                 OutfitAssetManager
                     .GetOutfitByAssetName(modelData.name).AssetName);
@@ -52,10 +48,7 @@ public static class OnirismPatches
     public class AccessoryTogglePatch
     {
         [HarmonyPrefix]
-        public static bool Prefix()
-        {
-            return false;
-        } 
+        public static bool Prefix() => false;
     }
 
     [HarmonyPatch(typeof(SwapCostumeTrigger), "OnTriggerEnter")]
@@ -65,7 +58,7 @@ public static class OnirismPatches
         public static bool Prefix(Collider intrus)
         {
             var entity = intrus.GetComponent<Entity>();
-            return !CCPlugin.playerManagers.Any(x => x.ManagesPlayer(entity));
+            return !PlayerInstances.IsPlayer(entity);
         }
     }
 
@@ -74,18 +67,5 @@ public static class OnirismPatches
     {
         [HarmonyPostfix]
         public static void Postfix() => SaveDataAdjuster.SetPyjamas();
-    }
-
-    [HarmonyPatch(typeof(ClothProcess), "StartRuntimeBuild")]
-    public static class DebugInit2
-    {
-        [HarmonyPrefix]
-        public static void Postfix(ClothProcess __instance) 
-        { 
-            //Log.Info("ClothProcess.StartRuntimeBuild");
-            Log.Debug($"Process Type: {__instance.cloth.SerializeData.clothType}");
-            string smrName = __instance.cloth.SerializeData.sourceRenderers.FirstOrDefault()?.name ?? "null";
-            Log.Debug($"TargetSMR: {smrName}");
-        }
     }
 }
