@@ -1,5 +1,4 @@
 ﻿using CarolCustomizer.Models.Recipes;
-using CarolCustomizer.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -18,9 +17,8 @@ public class FilenameDialogue : MonoBehaviour
     RecipeDescriptor23 recipe;
     UnityAction<RecipeDescriptor23, string> onConfirm;
 
-    public void Constructor()
+    public FilenameDialogue Constructor()
     {
-        Log.Debug("FileDialogue.Constructor()");
         textBox = GetComponentInChildren<InputField>(true);
         rect = GetComponent<RectTransform>();
 
@@ -31,12 +29,11 @@ public class FilenameDialogue : MonoBehaviour
         cancel.onClick.AddListener(OnCancel);
 
         gameObject.SetActive(false);
-        Log.Debug("end constructor");
+        return this;
     }
 
     public void Show(RecipeDescriptor23 recipe, UnityAction<RecipeDescriptor23, string> onConfirm)
     {
-        Log.Debug("FilenameDialogue.Show()");
         this.recipe = recipe;
         this.onConfirm = onConfirm;
 

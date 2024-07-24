@@ -5,6 +5,7 @@ using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,7 @@ namespace CarolCustomizer.UI.Recipes;
 public class RecipeListUI : MonoBehaviour
 {
     static readonly string listRootAddress = "Scroll View/Viewport/Content";
+    static readonly string searchBoxAddress = "Search Box";
     static readonly string newRecipeAddress = "New Recipe";
 
     UIAssetLoader loader;
@@ -23,6 +25,8 @@ public class RecipeListUI : MonoBehaviour
     Transform listRoot;
     GameObject filenameDialogueGO;
     Button newRecipeButton;
+    InputField searchBox;
+    Text searchBoxHint;
 
     SortedList<string, RecipeUI> recipeUIs = new();
 
@@ -51,6 +55,14 @@ public class RecipeListUI : MonoBehaviour
         this.recipesManager.OnRecipeCreated += OnRecipeCreated;
         this.recipesManager.OnRecipeDeleted += OnRecipeDeleted;
 
+        searchBox = transform
+            .Find(searchBoxAddress)
+            .GetComponent<InputField>();
+        searchBoxHint = searchBox.transform
+            .GetChild(1)
+            .GetComponent<Text>();
+        searchBox.onEndEdit.AddListener(OnSearchBoxChanged);
+        searchBoxHint.text = "Search Recipes";
         gameObject.SetActive(false);
 
         return this;
@@ -61,6 +73,17 @@ public class RecipeListUI : MonoBehaviour
         Log.Debug("ReceiptListUI.OnDestroy()");
         recipesManager.OnRecipeCreated -= OnRecipeCreated;
         recipesManager.OnRecipeDeleted -= OnRecipeDeleted;
+    }
+
+    void OnSearchBoxChanged(string text)
+    {
+        string search = text.Trim();
+        bool empty = search == string.Empty;
+        recipeUIs.ToList()
+            .ForEach(kvp => 
+                kvp.Value.gameObject.SetActive(
+                    empty || 
+                    kvp.Key.Contains(search, System.StringComparison.OrdinalIgnoreCase)));
     }
 
     public void OnRecipeCreated(Recipe newRecipe)

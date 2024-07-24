@@ -10,6 +10,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="_Release\BepInEx\plugins\CarolCustomizer\NewFolder\**" />
+	  <EmbeddedResource Remove="_Release\BepInEx\plugins\CarolCustomizer\NewFolder\**" />
+	  <None Remove="_Release\BepInEx\plugins\CarolCustomizer\NewFolder\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
 		<PackageReference Include="BepInEx.Core" Version="5.*" />
 		<PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
@@ -42,7 +48,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="_Release\BepInEx\plugins\CarolCustomizer\NewFolder\" />
 	  <Folder Include="_Release\Recipes\Examples\" />
 	</ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
