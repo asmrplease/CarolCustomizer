@@ -1,5 +1,9 @@
 ﻿using CarolCustomizer.Events;
+using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Materials;
+using CarolCustomizer.Models.Outfits;
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,13 +25,21 @@ internal class FilterUI : MonoBehaviour
 
     public FilterUI Constructor()
     {
-        favoriteFilter = transform.Find(filtersAddress + "/Favorites").GetComponent<Toggle>();
+        favoriteFilter = transform
+            .Find(filtersAddress + "/Favorites")
+            .GetComponent<Toggle>();
+        activeFilter = transform
+            .Find(filtersAddress + "/Active")
+            .GetComponent<Toggle>();
+        searchBox = transform
+            .Find(searchBoxAddress)
+            .GetComponent<InputField>();
+        searchBoxHint = searchBox.transform
+            .GetChild(1)
+            .GetComponent<Text>();
         favoriteFilter.onValueChanged.AddListener(ProcessFilters);
-        activeFilter = transform.Find(filtersAddress + "/Active").GetComponent<Toggle>();
-        activeFilter.onValueChanged.AddListener(ProcessFilters);
-        searchBox = transform.Find(searchBoxAddress).GetComponent<InputField>();
+        activeFilter.onValueChanged.AddListener(ProcessFilters);    
         searchBox.onEndEdit.AddListener(OnSearchBoxChanged);
-        searchBoxHint = searchBox.transform.GetChild(1).GetComponent<Text>();
         searchBoxHint.text = SearchModeHint;
         return this;
     }
@@ -37,13 +49,38 @@ internal class FilterUI : MonoBehaviour
         ProcessFilters();
     }
 
-    void ProcessFilters(bool unusedParam = true)
+    public void ProcessFilters(bool unusedParam = true)
     {
         bool favorites = favoriteFilter.isOn;
         bool active = activeFilter.isOn;
         string textFilter = searchString.Trim();
 
         FilterChanged?.Invoke(new(textFilter, favorites, active));
+    }
+
+    public static bool CheckOutfit(Outfit outfit, UIFilterChangedEvent e)
+    {
+        if (!e.HasText) return false; 
+
+        if (outfit.DisplayName.Contains(e.Text, StringComparison.OrdinalIgnoreCase)) return true;
+        if (outfit.Author.Contains(e.Text, StringComparison.OrdinalIgnoreCase)) return true;
+        return false;
+    }
+
+    public static bool CheckAccessory(AccessoryDescriptor acc, UIFilterChangedEvent e)
+    {
+        if (!e.HasText) return false;
+
+        if (acc.Name.Contains(e.Text, StringComparison.OrdinalIgnoreCase)) return true;
+        return acc.Materials.Select(mat => CheckMaterial(mat, e)).Any(b => b is true);
+    }
+
+    public static bool CheckMaterial(MaterialDescriptor material, UIFilterChangedEvent e)
+    {
+        if (!e.HasText) return false;
+
+        if (material.Name.Contains(e.Text, StringComparison.OrdinalIgnoreCase)) return true;
+        return false;
     }
 
 }

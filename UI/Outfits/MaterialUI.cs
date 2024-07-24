@@ -1,5 +1,4 @@
-﻿using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.Behaviors.Settings;
+﻿using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
@@ -76,12 +75,12 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
     void SetMaterial(MaterialDescriptor material)
     {
         Log.Debug("MatUI SetMaterial!");
-        ui.TargetOutfit.EnableAccessory(accessoryUI.accessory);
-        ui.TargetOutfit.PaintAccessory(accessoryUI.accessory, material, index);
+        OutfitListUI.TargetOutfit.EnableAccessory(accessoryUI.accessory);
+        OutfitListUI.TargetOutfit.PaintAccessory(accessoryUI.accessory, material, index);
     }
 
     MaterialDescriptor CurrentMaterial =>
-        ui.TargetOutfit
+        OutfitListUI.TargetOutfit
         .GetLiveMaterials(accessoryUI.accessory)
         ?[index] ?? defaultMaterial;
 

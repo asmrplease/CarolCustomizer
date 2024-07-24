@@ -9,7 +9,6 @@ using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace CarolCustomizer.UI.Outfits;
@@ -17,24 +16,20 @@ public class OutfitListUI : MonoBehaviour
 {
     #region Static Constants
     const string listRootAddress = "Scroll View/Viewport/Content";
-    const string scrollViewAddress = "Scroll View";
     const string uncheckAllAddress = "Uncheck All";
-    const string targetSelectAddress = "Target Select";
-    const int TargetSelectHeight = 32;
     #endregion
 
     UIAssetLoader loader;
     FilterUI filter;
-    CarolInstance targetCarol;
+    TargetSelectUI targetSelect;
+    static CarolInstance targetCarol;
     Button deselectAll;
-    Dropdown TargetSelect;
-    RectTransform scrollView;
 
     SortedList<Outfit, OutfitUI> outfitUIs = new();
 
     public Main.ContextMenu ContextMenu { get; private set; }
     public MaterialManager MaterialManager { get; private set; }
-    public OutfitManager TargetOutfit => targetCarol?.outfitManager;
+    public static OutfitManager TargetOutfit => targetCarol?.outfitManager;
     public UIElementFactory Factory { get; private set; }
     public Transform ListRoot { get; private set; }
 
@@ -50,25 +45,22 @@ public class OutfitListUI : MonoBehaviour
         filter = this.gameObject
             .AddComponent<FilterUI>()
             .Constructor();
-        TargetSelect = transform
-            .Find(targetSelectAddress)
-            .GetComponent<Dropdown>();
+        targetSelect = this.gameObject
+            .AddComponent<TargetSelectUI>();
         deselectAll = transform
             .Find(uncheckAllAddress)
             .GetComponent<Button>();
         ListRoot = transform.Find(listRootAddress);
         Factory = new(loader, this);
-        scrollView = transform.Find(scrollViewAddress) as RectTransform;
 
         OutfitAssetManager.OnOutfitLoaded += OnOutfitLoaded;
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
         Settings.Favorites.OnFavoritesCleared += UnfavoriteAllAccessories;
-        MenuToggle.OnMenuToggle += HandleMenuToggle;
         deselectAll.onClick.AddListener(HandleDisableAllAccessories);
         deselectAll.onClick.AddListener(HandleDisableAllEffects);
         filter.FilterChanged += HandleFilterEvent;
+        TargetSelectUI.OnCarolSelectionChanged += HandleTargetChanged;
         HandleTargetChanged(PlayerInstances.DefaultPlayer);
-        
         return this;
     }
 
@@ -77,40 +69,6 @@ public class OutfitListUI : MonoBehaviour
         OutfitAssetManager.OnOutfitLoaded -= OnOutfitLoaded;
         OutfitAssetManager.OnOutfitUnloaded -= OnOutfitUnloaded;
         filter.FilterChanged -= HandleFilterEvent;
-        MenuToggle.OnMenuToggle -= HandleMenuToggle;
-    }
-
-    void HandleMenuToggle(bool state)
-    {
-        Log.Debug("OutfitListUI.HandleMenuToggle()");
-        Log.Debug(PlayerInstances.ValidPlayers.Count().ToString());
-        if (PlayerInstances.ValidPlayers.Count() > 1)
-        {
-            ShowTargetSelect();
-            return;
-        }
-        HideTargetSelect(); 
-    }
-
-    void ShowTargetSelect()
-    {
-        if (TargetSelect.gameObject.activeSelf) return;
-
-        //when the number of players changes, we need to change the list options
-        TargetSelect.gameObject.SetActive(true);
-        var size = scrollView.sizeDelta;
-        size.y -= TargetSelectHeight;
-        scrollView.sizeDelta = size;
-    }
-
-    void HideTargetSelect()
-    {
-        if (!TargetSelect.gameObject.activeSelf) return;
-
-        TargetSelect.gameObject.SetActive(false);
-        var size = scrollView.sizeDelta;
-        size.y += TargetSelectHeight;
-        scrollView.sizeDelta = size;
     }
 
     void OnOutfitLoaded(Outfit outfit)
@@ -133,17 +91,33 @@ public class OutfitListUI : MonoBehaviour
         Destroy(outfitUI.gameObject);
     }
 
-    void HandleDisableAllAccessories() => this.TargetOutfit.DisableAllAccessories();
-    void HandleDisableAllEffects() => this.TargetOutfit.DisableAllEffects();
+    void HandleDisableAllAccessories() => TargetOutfit.DisableAllAccessories();
+    void HandleDisableAllEffects() => TargetOutfit.DisableAllEffects();
 
     void HandleFilterEvent(UIFilterChangedEvent eventData)
     {
         outfitUIs.Values.ForEach(x => x.HandleFilterEvent(eventData));
+        if (eventData.ShowActive)
+        {
+            TargetOutfit.ActiveAccessories
+                .ForEach(acc => outfitUIs[acc.outfit].SetAccessoryVisible(acc));
+        }
+        if (eventData.ShowFavorites)
+        {
+            Settings.Favorites
+                .favorites
+                .Select(acc =>  
+                    (outfit: OutfitAssetManager.GetOutfitByAssetName(acc.Source)
+                    ,acc))
+                .Where(tup => tup.outfit is not null)
+                .ForEach(tup => outfitUIs[tup.outfit].SetAccessoryVisible(tup.acc));
+        }
+        Log.Info(eventData.ToString());
     }
 
-    void HandleTargetChanged(CarolInstance target)
+    void HandleTargetChanged(CarolInstance newTarget)
     {
-        if (target is null) return;
+        if (newTarget is null) return;
 
         if (targetCarol is not null)
         {
@@ -152,16 +126,17 @@ public class OutfitListUI : MonoBehaviour
                 .Select(x => new AccessoryChangedEvent(x, x, false))//fire events to 'clear' the ui?
                 .ForEach(HandleAccessoryChanged);
         }
-        targetCarol = target;
+        targetCarol = newTarget;
         targetCarol.outfitManager.ActiveAccessories
                 .Select(x => new AccessoryChangedEvent(x, x, true))//notify the ui what the new outfit looks like
                 .ForEach(HandleAccessoryChanged);
         targetCarol.outfitManager.AccessoryChanged += HandleAccessoryChanged;
+        filter.ProcessFilters();
     }
 
     void HandleAccessoryChanged(AccessoryChangedEvent e)
     {
-        Log.Debug("OutfitListUI.HandleAccessoryChanged()");
+        //TODO: make a bulk version of this so we can update the filter after the recipe changes/this event
         if (!outfitUIs.TryGetValue(e.Target.outfit, out var outfitUI)) { Log.Warning($"{e.Target.outfit.DisplayName} is not in outfit list?"); return; }
         
         outfitUI.HandleAccessoryChanged(e);
@@ -169,12 +144,13 @@ public class OutfitListUI : MonoBehaviour
 
     void UnfavoriteAllAccessories()
     {
-        //Settings.Favorites.favorites
-        //    .ToList()
-        //    .Select(acc =>
-        //        (found: accessoryUIs.TryGetValue(acc, out var ui)
-        //        ,ui: ui))
-        //    .Where(tup => tup.found)
-        //    .ForEach(tup => tup.ui.SetFavorite(false));
+        Settings.Favorites.favorites
+            .ToList()
+            .Select(acc => OutfitAssetManager.GetOutfitByAssetName(acc.Source))
+            .Where(outfit => outfit is not null)
+            .Distinct()
+            .Select(outfit => (found: outfitUIs.TryGetValue(outfit, out var UI), UI))
+            .Where(tup => tup.found)
+            .ForEach(tup => tup.UI.ClearFavorites());
     }
 }

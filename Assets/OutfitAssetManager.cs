@@ -19,7 +19,7 @@ public class OutfitAssetManager : IDisposable
     public OutfitAssetManager(Transform parent)
     {
         liveFolder = new GameObject().transform;
-        liveFolder.name = "AccMod Dynamic Assets";
+        liveFolder.name = "Customizer Dynamic Assets";
         liveFolder.transform.parent = parent;
         liveFolder.position = Constants.OutOfTheWay;
     }
@@ -37,12 +37,6 @@ public class OutfitAssetManager : IDisposable
                 ,result: result))
             .FirstOrDefault(tup => tup.found)
             .result;
-        foreach (var dict in outfitSets.Values) 
-        {
-            if (dict.TryGetValue(assetName, out var result)) { return result; }
-        }
-        Log.Warning($"{assetName} was not found in any outfit set");
-        return null;
     }
 
     public void Dispose() => GameObject.Destroy(liveFolder);

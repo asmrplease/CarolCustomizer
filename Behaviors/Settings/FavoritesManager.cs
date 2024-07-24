@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using CarolCustomizer.Models.Accessories;
+using static ModelData;
 
 namespace CarolCustomizer.Behaviors.Settings;
 public class FavoritesManager : IDisposable
@@ -47,7 +48,7 @@ public class FavoritesManager : IDisposable
 
     public void AddToFavorites(AccessoryDescriptor descriptor, bool autoSave = true)
     {
-        favorites.Add(descriptor);
+        favorites.Add(new AccessoryDescriptor(descriptor));
         if (autoSave) SaveFavorites();
     }
 

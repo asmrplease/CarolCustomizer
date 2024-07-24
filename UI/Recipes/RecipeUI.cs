@@ -65,16 +65,6 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         pickupLocation.text = GetStatusMessage();
     }
 
-    void OnDestroy()
-    {
-        //Log.Info($"RecipeUI: {this.recipe.Name}.OnDestroy()");
-        //Settings.Plugin.shezaraRecipe.SettingChanged -= OnShezaraChanged;
-        //TODO: why do these callbacks sometimes appear to continue to get called after recipes are removed?
-        //is the event getting registered repeatedly?
-        //is the wrong event being removed?
-        //is the event not being removed?
-        //do i misunderstand the nature of the problem?
-    }
 
     IEnumerator LoadThumbnail()
     {
@@ -140,7 +130,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         string message = "Some of the resources for this recipe aren't available: " + Environment.NewLine; ;
         var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
         foreach (var source in missingSources) { message += source + Environment.NewLine; }
-        messageDialogue.Show(message, cancelText: "Nevermind", confirmText: "Load Anyway", confirmAction: () =>OnContextMenuLoad(PlayerInstances.DefaultPlayer));
+        messageDialogue.Show(message, cancelText: "Nevermind", confirmText: "Load Anyway", confirmAction: () => OnContextMenuLoad(PlayerInstances.DefaultPlayer));
     }
 
     void OnContextMenuRename()
@@ -223,6 +213,10 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
                     output.Add(
                         ($"Load on P{player.playerIndex+1}"
                         ,()=> OnContextMenuLoad(player))));
+            if (PlayerInstances.ValidPlayers.Count() == 0)
+            {
+                output.Add(("Load", () => OnContextMenuLoad(PlayerInstances.DefaultPlayer)));
+            }
             if (recipe.Name.Contains(Constants.AutoSave, StringComparison.CurrentCultureIgnoreCase))
                 return output;
         }
@@ -231,7 +225,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             output.Add(("Overwrite", OnContextMenuOverwrite));
             output.Add(("Delete", OnContextMenuDelete));
             output.Add(("Rename", OnContextMenuRename));
-            output.Add(("Set Shezara", SetAsShezara));
+            output.Add(("Set Shezara", SetAsShezara));  
             
         }
         if (recipe.Error == Recipe.Status.MissingSource)

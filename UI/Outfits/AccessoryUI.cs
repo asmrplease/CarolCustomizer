@@ -2,6 +2,7 @@
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Events;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
     #endregion
 
     #region Lists
-    List<MaterialUI> materials = new();
+    List<MaterialUI> matUIs;
     #endregion
 
     public string DisplayName => accessory.DisplayName;
@@ -49,39 +50,38 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
     public void Constructor(
         OutfitUI outfitUI,
         StoredAccessory accessory,
-        OutfitListUI ui
-        )
+        OutfitListUI ui)
     {
         this.outfitUI = outfitUI;
         this.accessory = accessory;
         this.ui = ui;
-
         name = "AccUI: " + accessory.DisplayName;
-
-        displayName = transform.Find(displayNameAddress).GetComponent<Text>();
+        displayName = transform
+            .Find(displayNameAddress)
+            .GetComponent<Text>();
+        materialName = transform
+            .Find(materialNameAddress)
+            .GetComponent<Text>();
+        favoriteIcon = transform
+            .Find(favoriteAddress)
+            .GetComponent<Image>();
+        activationToggle = transform
+            .GetComponentInChildren<Toggle>(true);
         displayName.text = accessory.DisplayName;
-
-        materialName = transform.Find(materialNameAddress).GetComponent<Text>();
-        materialName.text = "";
-
-        activationToggle = transform.GetComponentInChildren<Toggle>(true);
-        activationToggle.onValueChanged.AddListener(OnToggle);
-
-        favoriteIcon = transform.Find(favoriteAddress)?.GetComponent<Image>();
+        materialName.text = $"Material Count: {accessory.Materials.Count()}";
         favoriteIcon.enabled = Settings.Favorites.IsInFavorites(accessory);
-
+        activationToggle.onValueChanged
+            .AddListener(OnToggle);
+        matUIs = accessory.Materials
+            .Select((mat, i)=> 
+                ui.Factory.BuildMatUI(this, i, mat))
+            .ToList();
         gameObject.SetActive(false);
-    }
-
-    public void AddMaterial(MaterialUI material)
-    {
-        materials.Add(material);
-        materialName.text = $"Material Count: {materials.Count()}";
     }
     #endregion
 
     #region Event Handling
-    public void OnDisable()
+    void OnDisable()
     {
         expanded = false;
         SetMaterialVisibity(expanded);
@@ -101,14 +101,16 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
 
     void SetMaterialVisibity(bool state)
     {
-        //outfitUI.SetAccessoryExpanded(accessory, state);
+        matUIs.ForEach(x => x.gameObject.SetActive(state));
     }
 
     public void HandleAccessoryChanged(AccessoryChangedEvent eventData)
     {
         Log.Debug("AccUI.HandleAccessoryChanged");
         this.activationToggle.SetIsOnWithoutNotify(eventData.Visible);
-        //Set material
+        eventData.State.Materials
+            .Zip(matUIs, (x, y) => (des: x, ui: y))
+            .ForEach(tup => tup.ui.UpdateActiveMaterial(tup.des));    
     }
 
     void OnContextClick() => ui.ContextMenu.Show(this);
@@ -117,15 +119,14 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
     {
         outfitUI.OnAccessoryToggled();
 
-        if (state) ui.TargetOutfit.EnableAccessory(accessory);
-        else ui.TargetOutfit.DisableAccessory(accessory);
+        if (state) OutfitListUI.TargetOutfit.EnableAccessory(accessory);
+        else OutfitListUI.TargetOutfit.DisableAccessory(accessory);
     }
 
     public void SetFavorite(bool favorited)
     {
-        var description = new AccessoryDescriptor(accessory);//TODO: idr why we can't just pass the existing AD
-        if (favorited) Settings.Favorites.AddToFavorites(description); 
-        else Settings.Favorites.RemoveFromFavorites(description);
+        if (favorited) Settings.Favorites.AddToFavorites(accessory); 
+        else Settings.Favorites.RemoveFromFavorites(accessory);
         favoriteIcon.enabled = favorited;
     }
 
