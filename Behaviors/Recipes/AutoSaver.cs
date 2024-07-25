@@ -4,6 +4,7 @@ using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Recipes;
@@ -31,8 +32,11 @@ internal class AutoSaver : IDisposable
 
     public void Save()
     {
+        var recipe = new RecipeDescriptor23(outfitManager);
+        if (!recipe.ActiveAccessories.Any()) { Log.Warning($"Skipping Player {playerIndex + 1} autosave becuase no accessories are active. "); return; }
+
         RecipeSaver.SaveJson(
-            new RecipeDescriptor23(outfitManager),
+            recipe,
             this.path);
         Log.Info("Autosave Complete.");
     }
@@ -51,10 +55,16 @@ internal class AutoSaver : IDisposable
 
         if (recipe is null 
             || recipe.Error == Recipe.Status.FileError
-            || recipe.Error == Recipe.Status.InvalidJson)
+            || recipe.Error == Recipe.Status.InvalidJson
+            || !recipe.Descriptor.ActiveAccessories.Any())
         {
             Log.Warning("Loading pyjamas instead of autosave");
-            RecipeApplier.ActivateFirstVariant(outfitManager, Constants.Pyjamas);
+            var outfit = OutfitAssetManager.GetPyjamas();
+            var variant = outfit
+                .Variants
+                .Keys
+                .ElementAt(playerIndex);
+            RecipeApplier.ActivateVariant(outfitManager, outfit, variant);
             yield break;
         }
         Log.Info("Loading autosave recipe");

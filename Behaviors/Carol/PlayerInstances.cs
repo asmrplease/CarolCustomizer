@@ -1,5 +1,4 @@
-﻿using CarolCustomizer.Behaviors.Recipes;
-using CarolCustomizer.Hooks.Watchdogs;
+﻿using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;

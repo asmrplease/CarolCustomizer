@@ -33,13 +33,13 @@ public static class OnirismPatches
                 out var modelData);
             if (!modelData) return false;
 
+            var player = PlayerInstances.Find(__instance.player);
+            if (player is null) return false;
+
             Log.Debug($"CostumeSwapUI: {modelData.name}");
             RecipeApplier.ActivateFirstVariant(
-                PlayerInstances
-                    .DefaultPlayer
-                    .outfitManager,
-                OutfitAssetManager
-                    .GetOutfitByAssetName(modelData.name).AssetName);
+                player.outfitManager,
+                OutfitAssetManager.GetOutfitByAssetName(modelData.name).AssetName);
             return false;
         }
     }
