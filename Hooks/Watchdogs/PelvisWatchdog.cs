@@ -4,7 +4,6 @@ using CarolCustomizer.Utils;
 using Slate;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using UnityEngine;
 
@@ -77,7 +76,8 @@ public class PelvisWatchdog : MonoBehaviour
         if (checks
             .Select(tup => tup.func.Invoke(tup.pred))
             .Where(x => x is true)
-            .Any()) return true;
+            .Any()) 
+            return true;
         else return false;
     }
 
@@ -91,6 +91,7 @@ public class PelvisWatchdog : MonoBehaviour
 
         var component = compData.GetParentComponent(typeof(SearchType));
         if (!component) return false;
+
         if (GetType() == typeof(ResultType)) return true;
 
         Log.Info($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");

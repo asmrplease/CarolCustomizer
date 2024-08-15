@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Carol;
-internal class PlayerInstances : IDisposable
+public class PlayerInstances : IDisposable
 {
     static List<PlayerCarolInstance> Players;
     public static IEnumerable<PlayerCarolInstance> ValidPlayers => Players.Where(x => x.Exists());
