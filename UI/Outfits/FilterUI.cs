@@ -2,6 +2,7 @@
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Utils;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -35,12 +36,13 @@ internal class FilterUI : MonoBehaviour
             .Find(searchBoxAddress)
             .GetComponent<InputField>();
         searchBoxHint = searchBox.transform
-            .GetChild(1)
+            .Find("Placeholder")
             .GetComponent<Text>();
         favoriteFilter.onValueChanged.AddListener(ProcessFilters);
         activeFilter.onValueChanged.AddListener(ProcessFilters);    
         searchBox.onEndEdit.AddListener(OnSearchBoxChanged);
         searchBoxHint.text = SearchModeHint;
+        Log.Debug($"search boxt set: {SearchModeHint}");
         return this;
     }
     void OnSearchBoxChanged(string searchString)
