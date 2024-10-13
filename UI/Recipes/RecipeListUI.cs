@@ -59,9 +59,11 @@ public class RecipeListUI : MonoBehaviour
             .Find(searchBoxAddress)
             .GetComponent<InputField>();
         searchBoxHint = searchBox.transform
-            .GetChild(1)
+            .Find("Placeholder")
             .GetComponent<Text>();
-        searchBox.onEndEdit.AddListener(OnSearchBoxChanged);
+        searchBox
+            .onEndEdit
+            .AddListener(OnSearchBoxChanged);
         searchBoxHint.text = "Search Recipes";
         gameObject.SetActive(false);
 
