@@ -6,12 +6,15 @@ using CarolCustomizer.Assets;
 using CarolCustomizer.Models.Recipes;
 using UnityEngine;
 using BepInEx;
+using System.Linq;
+using CarolCustomizer.UI.Main;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 public class RecipeFileWatcher : IDisposable
 {
-    FileSystemWatcher watcher;
-    Dictionary<string, Recipe> recipes = new();
+    readonly FileSystemWatcher watcher;
+    readonly Dictionary<string, Recipe> recipes = new();
+    public List<Recipe> AllRecipes => recipes.Values.ToList();
 
     public event Action<Recipe> OnRecipeCreated;
     public event Action<Recipe> OnRecipeDeleted;
@@ -29,12 +32,16 @@ public class RecipeFileWatcher : IDisposable
     public RecipeFileWatcher(string path)
     {
         Directory.CreateDirectory(path);
-        watcher = new FileSystemWatcher(path);
-        watcher.IncludeSubdirectories = true;
+        watcher = new(path)
+        {
+            IncludeSubdirectories = true
+        };
         watcher.Created += HandleRecipeFileCreated;
         watcher.Deleted += HandleRecipeFileRemoved;
         watcher.Changed += HandleRecipeFileChanged;
         watcher.EnableRaisingEvents = true;
+
+        MenuToggle.OnMenuToggle += MenuToggleHandle;
 
         OutfitAssetManager.OnOutfitSetLoaded += RefreshAll;
         Application.quitting += Dispose;
@@ -47,6 +54,13 @@ public class RecipeFileWatcher : IDisposable
         watcher.Deleted -= HandleRecipeFileRemoved;
         watcher.Changed -= HandleRecipeFileChanged;
         watcher.Dispose();
+
+        MenuToggle.OnMenuToggle -= MenuToggleHandle;
+    }
+
+    void MenuToggleHandle(bool visible)
+    {
+        watcher.EnableRaisingEvents = visible;
     }
 
     public void RefreshAll()

@@ -2,12 +2,13 @@
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Models.Accessories;
-public class LiveAccessory : AccessoryDescriptor
+public class LiveAccessory : AccessoryDescriptor, IDisposable
 {
     #region Dependencies
     protected readonly Transform folder;
@@ -114,7 +115,7 @@ public class LiveAccessory : AccessoryDescriptor
         liveSMR.SetSharedMaterials(materials);
     }
 
-    public void DestroyGameObject()
+    public void Dispose()
     {
         if (liveSMR) GameObject.Destroy(liveSMR.gameObject);
     }

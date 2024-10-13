@@ -3,7 +3,6 @@ using CarolCustomizer.Utils;
 using System.Collections;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Settings;
-using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
 
 namespace CarolCustomizer.Hooks.Watchdogs;

@@ -13,11 +13,11 @@ public class BotWatchdog : PelvisWatchdog
         NPCManager.OnBotSpawn(this);
     }
 
-    public virtual void CustomizeBot(Recipe recipe, OutfitManager outfit) 
+    public virtual void CustomizeBot(Recipe recipe, OutfitManager outfitManager) 
     {
         if (Settings.Plugin.customCampaignBots.Value is not true) return;
 
-        RecipeApplier.ActivateRecipe(outfit, recipe.Descriptor);
+        RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
     }
 
     public override void SetBaseVisibility(bool visible)

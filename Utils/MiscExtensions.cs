@@ -31,7 +31,7 @@ public static class MiscExtensions
     /// <returns>Array representing the current state of all weights.</returns>
     public static float[] GetAllBlendshapes(this SkinnedMeshRenderer smr)
     {
-        if (!smr || !smr.sharedMesh) { Log.Error("Tried to get blendshapes from a null smr"); return null; }
+        //if (!smr || !smr.sharedMesh) { Log.Error("Tried to get blendshapes from a null smr"); return null; }
 
         int count = smr.sharedMesh.blendShapeCount;
         float[] output = new float[count];
@@ -51,7 +51,7 @@ public static class MiscExtensions
     /// <param name="shapes">Values to apply.</param>
     public static void SetAllBlendshapes(this SkinnedMeshRenderer smr, float[] shapes)
     {
-        if (!smr) { Log.Error("Tried to set blendshapes from a null smr"); return; }
+        //if (!smr) { Log.Error("Tried to set blendshapes from a null smr"); return; }
 
         int ourCount = smr.sharedMesh.blendShapeCount;
         int theirCount = shapes.Length;

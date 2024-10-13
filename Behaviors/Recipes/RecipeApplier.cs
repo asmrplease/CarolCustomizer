@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace CarolCustomizer.Behaviors.Recipes;
-internal static class RecipeApplier
+public static class RecipeApplier
 {
     public static void ActivateRecipe(OutfitManager target, RecipeDescriptor23 recipe)
     {

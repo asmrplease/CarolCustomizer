@@ -9,18 +9,16 @@ using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Carol;
-internal class MagicaManager
+internal class MagicaManager(SkeletonManager skeleton)
 {
     Dictionary<LiveAccessory, MagicaCloth> LiveCloths = new();
 
-    SkeletonManager skeleton;
+    SkeletonManager skeleton = skeleton;
     PelvisWatchdog targetPelvis;
 
     List<MagicaCloth> processing = new();
     Dictionary<AccessoryDescriptor, MagicaCloth> MeshClothAccs = new();
     List<MagicaCloth> BoneCloths = new();
-
-    public MagicaManager(SkeletonManager skeleton) => this.skeleton = skeleton;
 
     public void HandleNewPelvis(PelvisWatchdog newPelvis)
     {

@@ -13,7 +13,7 @@ internal static class RecipeSaver
     /// <returns>Path to the root recipe folder with filename included.</returns>
     public static string RecipeFilenameToPath(string fileName)
     {
-        string relativePath = Path.Combine(Constants.RecipeFolderName, fileName);
+        string relativePath = Path.Combine(Constants.RecipeFolderName, fileName);//TODO: this doesn't support recipes in subfolders :<
         string path = Path.Combine(Constants.ApplicationPath, relativePath);
         return path;
     }

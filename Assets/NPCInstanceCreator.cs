@@ -39,27 +39,20 @@ public class NPCInstanceCreator : IDisposable
     //TODO: are gamemanager.playeractor and playeractorreplace useful here?
     public static void FindDedicatedActresses(Scene scene, LoadSceneMode arg1)
     {
-        Log.Debug("FindDedicatedActressess");
         var count = dedicatedActresses.RemoveAll(x => !x);
-        Log.Debug($"Removed {count} dead actressess");
         if (scene.name == Constants.MenuSceneName) return;
 
-        Log.Debug("Searching for dedicated actresses...");
         var list = Resources.FindObjectsOfTypeAll<Slate.Character>();
-        Log.Debug($"{list.Length} Slate.Character components in Resources");
         var actresses = list.Where(x => x.name.Contains("CAROL")).Select(x=>x.transform).ToList();
-        Log.Debug($"{actresses.Count()} slate actresseses found.");
 
         foreach (string rootAddress in actressSearchRoots)
         {
             actresses.AddRange(FindPelvisesInRootObject(scene, rootAddress));
         }
-        Log.Debug($"{actresses.Count()} total actresseses found.");
 
 
         foreach (var actress in actresses) 
         {
-            Log.Debug($"building dedicated actress for: {actress.name}");
             Transform target = actress;
             if (target.name != "CarolPelvis") target = target.RecursiveFindTransform(x => x.name == "CarolPelvis");
             if (!target) { Log.Warning($"failed to find pelvis for {actress.name}"); return; }
@@ -101,12 +94,10 @@ public class NPCInstanceCreator : IDisposable
         botPrefab//remove voice componenets which are spamming console
             .GetComponents<Voice>()
             .ForEach(x => x.enabled = false);//this is still happening as of july '24
-        carolBotPrefabs
-            .Add(
-                botPrefab
-                    .transform
-                    .RecursiveFindTransform(x => x.name == "CarolPelvis")
-                    .gameObject
-                    .AddComponent<PelvisWatchdog>());
+        carolBotPrefabs.Add(botPrefab
+            .transform
+            .RecursiveFindTransform(x => x.name == "CarolPelvis")
+            .gameObject
+            .AddComponent<PelvisWatchdog>());
     }
 }

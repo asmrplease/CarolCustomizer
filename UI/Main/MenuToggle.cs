@@ -51,6 +51,7 @@ public class MenuToggle : MonoBehaviour
     void Update()
     {
         if (!uiInstance) return; 
+
         if (currentScene.name == Constants.MenuSceneName) { MainMenuUpdate(); return; }
         if (PauseDiary.manager) { GameplayUpdate(); return; }
     }

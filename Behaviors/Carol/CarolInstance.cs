@@ -36,6 +36,7 @@ public class CarolInstance : IDisposable
     public virtual void Dispose()
     {
         skeletonManager.Dispose();
+        outfitManager.Dispose();
         if (targetPelvis) GameObject.Destroy(targetPelvis);
     }
     #endregion

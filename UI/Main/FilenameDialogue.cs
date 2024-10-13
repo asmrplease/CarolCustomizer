@@ -6,8 +6,8 @@ using UnityEngine.UI;
 namespace CarolCustomizer.UI.Main;
 public class FilenameDialogue : MonoBehaviour
 {
-    private static readonly string confirmAddress = "Buttons/Confirm";
-    private static readonly string cancelAddress = "Buttons/Cancel";
+    static readonly string confirmAddress = "Buttons/Confirm";
+    static readonly string cancelAddress = "Buttons/Cancel";
 
     InputField textBox;
     Button confirm;
@@ -40,23 +40,23 @@ public class FilenameDialogue : MonoBehaviour
         gameObject.SetActive(true);
     }
 
-    private void Update()
+    void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape)) gameObject.SetActive(false);
     }
 
-    private void OnConfirm()
+    void OnConfirm()
     {
         if (textBox.text != "") onConfirm?.Invoke(recipe, textBox.text);
         gameObject.SetActive(false);
     }
 
-    private void OnCancel()
+    void OnCancel()
     {
         gameObject.SetActive(false);
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         textBox.text = "";
     }

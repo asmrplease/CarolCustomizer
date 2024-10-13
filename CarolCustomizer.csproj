@@ -4,7 +4,7 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<AssemblyName>CarolCustomizer</AssemblyName>
 		<Description>Build your own Carol!</Description>
-		<Version>2.3.6</Version>
+		<Version>2.3.7</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>

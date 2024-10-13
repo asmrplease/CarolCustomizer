@@ -60,10 +60,17 @@ public class FaceCopier : MonoBehaviour
         if (!baseFace) return;
         float[] values = baseFace.GetAllBlendshapes();
         
-        foreach (var target in targets.Where(x=> x is not null && x.isActive))
+        foreach (var target in targets)
         {
+            if (target is null) continue;
             target.SetAllBlendshapes(values);
         }
+
+        //TODO: would not using linq here be more performant?
+        //foreach (var target in targets.Where(x=> x is not null && x.isActive))
+        //{
+        //    target.SetAllBlendshapes(values);
+        //}
     }
     #endregion
 }

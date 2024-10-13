@@ -15,11 +15,11 @@ namespace CarolCustomizer.Behaviors.Carol;
 /// <summary>
 /// Responsible for the clothing of one Carol Instance. 
 /// </summary>
-public class OutfitManager
+public class OutfitManager : IDisposable
 {
     #region Dependencies
-    SkeletonManager skeletonManager;
-    CarolInstance playerManager;
+    readonly SkeletonManager skeletonManager;
+    readonly CarolInstance playerManager;
     #endregion
 
     #region State Management
@@ -68,6 +68,14 @@ public class OutfitManager
 
         playerManager.SpawnEvent += HandleNewPelvis;
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
+    }
+
+    public void Dispose()
+    {
+        liveAccessories.Values
+            .ToList()
+            .ForEach(x => x.Dispose());
+            
     }
 
     void RefreshSMRs(PelvisWatchdog pelvis) 
@@ -242,7 +250,7 @@ public class OutfitManager
         {
             liveAccessories.TryGetValue(storedAcc, out var liveAcc);
             if (liveAcc is null) continue;
-            liveAcc.DestroyGameObject();
+            liveAcc.Dispose();
             liveAccessories.Remove(storedAcc);
         }
     }
