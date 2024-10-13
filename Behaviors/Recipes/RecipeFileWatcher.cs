@@ -61,6 +61,19 @@ public class RecipeFileWatcher : IDisposable
     void MenuToggleHandle(bool visible)
     {
         watcher.EnableRaisingEvents = visible;
+        if (visible) QuickRefresh();
+    }
+    
+    void QuickRefresh()
+    {
+        var paths = RecipeLoader.GetRecipeFilePaths();
+        var missing = paths.Where(x => !recipes.ContainsKey(x));
+        foreach (var path in missing)
+        {
+            var ext = Path.GetExtension(path).ToLower();
+            if (ext != Constants.JsonFileExtension && ext != Constants.PngFileExtension) continue;
+            OnRecipeFileCreated(new Recipe(path));
+        }
     }
 
     public void RefreshAll()
