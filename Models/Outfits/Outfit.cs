@@ -54,6 +54,15 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
         var pelvis = storedAsset.RecursiveFindTransform(x => x.name == "CarolPelvis");
         if (!pelvis) { Log.Error("failed to find pelvis during Outfit construction."); return; }
 
+        var duplicates = pelvis
+            .GetComponentsInChildren<Transform>(true)
+            .GroupBy(x => x.name)
+            .Where(x => x.Count() > 1);
+        foreach (var grouping in duplicates) 
+        { 
+            int i = 0; 
+            grouping.ForEach(x => x.name += i++); 
+        }
         prefabWatchdog = pelvis.gameObject.AddComponent<PelvisWatchdog>();
         prefabWatchdog.Awake();
 
@@ -86,8 +95,6 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
                     AssetName)
                 );
         }
-        var idk = Effects as object;
-        var wtf = idk as Transform;
 
         Log.Debug($"{DisplayName} constructed.");
     }
