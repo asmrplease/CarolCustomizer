@@ -41,6 +41,7 @@ public class PelvisWatchdog : MonoBehaviour
         boneData = watchdog.BoneData;
         compData = watchdog.CompData;
         magiData = watchdog.MagiData;
+        Destroy(watchdog);
         return this;
     }
 
@@ -96,7 +97,7 @@ public class PelvisWatchdog : MonoBehaviour
 
         Log.Info($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
         gameObject.AddComponent<ResultType>().BuildFromExisting(this, component);
-        Destroy(this);
+        //Destroy(this);
         return true;
     }
 

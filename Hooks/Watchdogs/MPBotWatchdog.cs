@@ -34,7 +34,7 @@ public class MPBotWatchdog : BotWatchdog
         SetMPName(recipe.Name);
     }
 
-    private void SetMPName(string name)
+    void SetMPName(string name)
     {
         if (name is null) { Log.Debug("SetBotName passed null name"); return; }
 

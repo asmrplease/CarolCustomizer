@@ -5,6 +5,7 @@ using System.Linq;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Behaviors.Settings;
 
 namespace CarolCustomizer.Hooks;
 
@@ -67,5 +68,21 @@ public static class OnirismPatches
     {
         [HarmonyPostfix]
         public static void Postfix() => SaveDataAdjuster.SetPyjamas();
+    }
+
+    [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.LoadSave))]
+    public static class SetPyjamasInVersus
+    {
+        [HarmonyPostfix]
+        public static void Postfix(MainMenuManager __instance)
+        {
+            if (__instance.mapSelectType != "Versus") return;
+            if (!Settings.Plugin.customMPBots.Value) return;
+
+            MultiplayerSelection
+                .selected
+                .ForEach(x => 
+                    x.skinPlaceholder = GameManager.manager.carolModel);
+        }
     }
 }

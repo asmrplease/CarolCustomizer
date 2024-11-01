@@ -50,7 +50,6 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
         this.storedAsset = storedAsset;
         AssetName = storedAsset.name;
         DisplayName = LocalizationIndex.index.GetLine(this.storedAsset.gameObject.name).Replace("CAROL_", "");
-
         var pelvis = storedAsset.RecursiveFindTransform(x => x.name == "CarolPelvis");
         if (!pelvis) { Log.Error("failed to find pelvis during Outfit construction."); return; }
 

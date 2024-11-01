@@ -50,7 +50,6 @@ public class NPCInstanceCreator : IDisposable
             actresses.AddRange(FindPelvisesInRootObject(scene, rootAddress));
         }
 
-
         foreach (var actress in actresses) 
         {
             Transform target = actress;

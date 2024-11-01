@@ -1,7 +1,6 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Models.Outfits;
-using System.Linq;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 internal class PirateWatchdog : PelvisWatchdog
