@@ -55,7 +55,7 @@ internal class MagicaManager(SkeletonManager skeleton)
         processing.Add(liveMagica);
         var buildGuid = Guid.NewGuid();
         Log.Debug(buildGuid.ToString());
-        liveMagica.OnBuildComplete += (x) => HandleBuildComplete(x, liveMagica, buildGuid);
+        liveMagica.OnBuildComplete += (_, x) => HandleBuildComplete(x, liveMagica, buildGuid);
         liveMagica.BuildAndRun();
         BoneCloths.Add(liveMagica);
         magica.gameObject.SetActive(true);
@@ -113,7 +113,8 @@ internal class MagicaManager(SkeletonManager skeleton)
         liveMagica.SetParameterChange();
         var buildGuid = Guid.NewGuid();
         Log.Debug(buildGuid.ToString());
-        liveMagica.OnBuildComplete += (x) => HandleBuildComplete(x, liveMagica, buildGuid);
+        liveMagica.OnBuildComplete += (_, x) => HandleBuildComplete(x, liveMagica, buildGuid);
+        liveMagica.BuildAndRun();
         liveMagica.gameObject.SetActive(true);
         referenceMagica.gameObject.SetActive(true);
         LiveCloths[acc] = liveMagica;

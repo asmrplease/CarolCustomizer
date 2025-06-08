@@ -2,17 +2,27 @@
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Carol;
+
+internal enum NPC
+{
+    Shezara,
+    Cherryl,
+    Prunelle,
+    Error,
+}
+
 internal class NPCManager
 {
     static RecipeFileWatcher recipesManager;
 
     static Dictionary<PelvisWatchdog, CarolInstance> liveBots = new();
-    public static CarolInstance shezaraInstance { get; private set; }
+    public static Dictionary<NPC, CarolInstance> NPCs { get; private set; }
 
     static Transform folder;
 
@@ -20,7 +30,19 @@ internal class NPCManager
     {
         NPCManager.folder = folder;
         NPCManager.recipesManager = recipesManager;
-        shezaraInstance = new(folder);
+        NPCs = [];
+        Enum.GetValues(typeof(NPC))
+            .Cast<NPC>()
+            .Where(x => x != NPC.Error)
+            .ForEach(x => NPCs[x] = new(folder));
+    }
+
+    public static NPC GetNPCType(string name)
+    {
+        if (name == "Carol_Pirate")       return NPC.Shezara;
+        if (name.Contains("Cherryl"))     return NPC.Cherryl;
+        if (name.Contains("Prunelle"))    return NPC.Prunelle;
+        return NPC.Error;
     }
 
     public static void OnBotSpawn(BotWatchdog pelvis)
@@ -32,16 +54,22 @@ internal class NPCManager
         pelvis.CustomizeBot(GetRandomOutfit(), botInstance.outfitManager);
     }
 
-    public static void OnShezaraAwake(PelvisWatchdog pelvis)
+    public static void OnNPCAwake(NPCWatchdog pelvis)
     {
+        if (pelvis.npcType == NPC.Error) { Log.Error("OnNPCAwake() called on an NPC watchdog of type Error"); return; }
+        
+        var npcInstance = NPCs[pelvis.npcType];
+        if (npcInstance is null) { Log.Error($"Failed to find NPC CarolInstance in NPC dict of type {pelvis.npcType}"); }
+
         string recipeName = Settings.Settings.Plugin.shezaraRecipe.Value;
         var shezaraRecipe = recipesManager.Recipes
             .First
             (x => x.Name == recipeName);
         if (shezaraRecipe is null) { Log.Warning($"didn't find shezara recipe {recipeName}"); return; }
-        shezaraInstance.NotifySpawned(pelvis);
+        npcInstance.NotifySpawned(pelvis);
         Log.Info($"applying {shezaraRecipe.Name} to shezara");
-        RecipeApplier.ActivateRecipe(shezaraInstance.outfitManager, shezaraRecipe.Descriptor);
+        RecipeApplier.ActivateRecipe(npcInstance.outfitManager, shezaraRecipe.Descriptor);
+        //RecipeApplier.ActivateRecipe(npcInstance.outfitManager, GetRandomOutfit().Descriptor);
     }
 
     public static void OnBotDespawn(PelvisWatchdog pelvis)

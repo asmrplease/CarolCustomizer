@@ -48,6 +48,11 @@ public class MenuToggle : MonoBehaviour
         StartCoroutine(OnMainMenuLoaded()); 
     }
 
+    public void ToggleMenu(bool visible) {
+        if (currentScene.name == Constants.MenuSceneName) { MainMenuSetMenuState(visible); return; }
+        if (PauseDiary.manager) { GameplaySetMenuState(visible); return; }
+    }
+
     void Update()
     {
         if (!uiInstance) return; 
@@ -95,7 +100,7 @@ public class MenuToggle : MonoBehaviour
         }
 
         //if we are not currently visible and asked to become visible
-        var activePage = mainMenuPages.transform.Cast<Transform>().First(x => x.gameObject.activeSelf);
+        var activePage = mainMenuPages.transform.Cast<Transform>().FirstOrDefault(x => x.gameObject.activeSelf);
         if (!activePage) { Log.Warning("tried to hide menu screen but no active page was found."); return; }
         if (activePage.GetSiblingIndex() != 0) { Log.Debug("tried to open accUI but we weren't on the main page"); return; }
 
@@ -126,7 +131,7 @@ public class MenuToggle : MonoBehaviour
         GameplaySetMenuState(true);
     }
 
-    public void GameplaySetMenuState(bool visible)
+    void GameplaySetMenuState(bool visible)
     {
         Log.Debug($"GameplaySetMenuState({visible})");
         if (!uiInstance) { Log.Warning("Tried to set ui state on missing uiInstance."); return; }

@@ -1,13 +1,10 @@
 ﻿using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
-using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Models.Outfits;
@@ -57,10 +54,10 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
             .GetComponentsInChildren<Transform>(true)
             .GroupBy(x => x.name)
             .Where(x => x.Count() > 1);
-        foreach (var grouping in duplicates) 
-        { 
-            int i = 0; 
-            grouping.ForEach(x => x.name += i++); 
+        foreach (var grouping in duplicates)
+        {
+            int i = 0;
+            grouping.ForEach(x => x.name += i++);
         }
         prefabWatchdog = pelvis.gameObject.AddComponent<PelvisWatchdog>();
         prefabWatchdog.Awake();

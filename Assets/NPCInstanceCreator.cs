@@ -13,7 +13,11 @@ namespace CarolCustomizer.Assets;
 /// </summary>
 public class NPCInstanceCreator : IDisposable
 {
-    public static List<string> actressSearchRoots = new() { "CUTSCENES", "SECTOR_STORMYSEA" };
+    public static List<string> actressSearchRoots = new() 
+    { 
+        "CUTSCENES", 
+        "SECTOR_STORMYSEA",
+    };
 
     public static List<PelvisWatchdog> dedicatedActresses = new();
     private static HashSet<PelvisWatchdog> carolBotPrefabs = new();
@@ -42,13 +46,13 @@ public class NPCInstanceCreator : IDisposable
         var count = dedicatedActresses.RemoveAll(x => !x);
         if (scene.name == Constants.MenuSceneName) return;
 
-        var list = Resources.FindObjectsOfTypeAll<Slate.Character>();
-        var actresses = list.Where(x => x.name.Contains("CAROL")).Select(x=>x.transform).ToList();
-
-        foreach (string rootAddress in actressSearchRoots)
-        {
-            actresses.AddRange(FindPelvisesInRootObject(scene, rootAddress));
-        }
+        var actresses = Resources
+            .FindObjectsOfTypeAll<Slate.Character>()
+            .Where(x => x.name.Contains("CAROL"))
+            .Select(x => x.transform)
+            .ToList();
+        actressSearchRoots
+            .ForEach(addr => actresses.AddRange(FindPelvisesInRootObject(scene, addr)));
 
         foreach (var actress in actresses) 
         {
@@ -67,13 +71,12 @@ public class NPCInstanceCreator : IDisposable
 
         if (!roots.Any(x => x.name == rootObjectName)) { return componentless; }
 
-        Log.Debug($"looking for carols in {rootObjectName}");
-        var cutsceneGO = scene.GetRootGameObjects().First(x => x.name == rootObjectName);
-            
-        cutsceneGO.transform.RecursiveFindTransforms(x => x.name == "CarolPelvis", ref componentless);
-        Log.Debug($"found {componentless.Count()} componentless pelvises");
-        var parents = componentless.Select(x => x.parent.parent);
-        return parents;
+        Log.Info($"looking for carols in {rootObjectName}");
+        return roots.First(x => x.name == rootObjectName)
+            .transform
+            .GetComponents<Transform>()
+            .Where(x => x.name == "CarolPelvis")
+            .Select(x => x.parent.parent);
     }
 
     public static void FindBotEntities(Scene arg0, LoadSceneMode arg1)

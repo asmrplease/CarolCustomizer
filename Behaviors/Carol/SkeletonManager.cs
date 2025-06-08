@@ -17,7 +17,7 @@ public class SkeletonManager : IDisposable
     MagicaManager MagicaManager;
     PelvisWatchdog targetPelvis;
 
-    Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = new();
+    Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = [];
 
     public SkeletonManager(CarolInstance player, Transform parent)
     {

@@ -3,18 +3,19 @@ using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Models.Outfits;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-internal class PirateWatchdog : PelvisWatchdog
+internal class NPCWatchdog : PelvisWatchdog
 {
-    bool pirateEnabled;
+    bool customNPCsEnabled;
+    public NPC npcType { get; private set; }
     public override void Awake()
     {
         base.Awake();
-        pirateEnabled = Settings.Plugin.customShezara.Value;
+        customNPCsEnabled = Settings.Plugin.customShezara.Value;
     }
 
     public override void SetBaseVisibility(bool visible)
     {
-        if (pirateEnabled is not true) return;
+        if (customNPCsEnabled is not true) return;
         base.SetBaseVisibility(visible);
     }
 
@@ -22,11 +23,14 @@ internal class PirateWatchdog : PelvisWatchdog
 
     void OnEnable() 
     {
-        if (!pirateEnabled) return;
+        if (!customNPCsEnabled) return;
 
         SetBaseVisibility(false);
-        NPCManager.OnShezaraAwake(this); 
+        NPCManager.OnNPCAwake(this); 
     }
 
-    void OnDestroy() { if (pirateEnabled) NPCManager.shezaraInstance?.RestorePrevious(this); }
+    void OnDestroy() 
+    { 
+        if (customNPCsEnabled) NPCManager.NPCs[npcType].RestorePrevious(this); 
+    }
 }

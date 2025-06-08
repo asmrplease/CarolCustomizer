@@ -34,7 +34,7 @@ public static class TransformExtensions
 
     public static List<Transform> RecursiveFindTransforms(this Transform transform, Predicate<Transform> query, ref List<Transform> existingList)
     {
-        existingList ??= new();
+        existingList ??= [];
         if (!transform) return null;
         if (query(transform)) { existingList.Add(transform); }
 

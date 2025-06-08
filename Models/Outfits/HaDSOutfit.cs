@@ -22,6 +22,19 @@ public class HaDSOutfit : Outfit
         BuildVariants();
     }
 
+    void GetHair()
+    {
+        var hair = this.modelData.defaultHairstyle;
+        if (!hair) return;
+
+        var hairstyle = hair.GetComponent<Hairstyle>();
+        var renderer = hairstyle.model;
+        if (renderer is not SkinnedMeshRenderer smr) { Log.Warning("Hair is not an SMR"); return; }
+
+        var acc = new StoredAccessory(this, smr);
+        this.AccDict[acc] = acc;
+    }
+
     protected virtual void BuildVariants()
     {
         foreach (int i in Range(0, modelData.accessories.Count))

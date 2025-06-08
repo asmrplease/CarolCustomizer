@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using Slate;
@@ -63,11 +64,11 @@ public class PelvisWatchdog : MonoBehaviour
             (Check<Entity,          PlayerWatchdog>, (x)=> x.rootName == "CAROL(Clone)"),
             (Check<Entity,          BotWatchdog>,    (x)=> true),
             (Check<CutsceneActor,   ActressWatchdog>,(x)=> true),
-            (Check<Character,       PirateWatchdog>, (x)=> x.parentName == "Carol_Pirate"),
+            (Check<Character,       NPCWatchdog>,    (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
             (Check<Character,       ActressWatchdog>,(x)=> true),
             (Check<MenuSwitchOutfit,MenuWatchdog>,   (x)=> true),
-            (Check<Transform,       PirateWatchdog>, (x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && x.parentName == "Carol_Pirate"),
-            (Check<Transform,       ActressWatchdog>,(x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && x.parentName != "Carol_Pirate")
+            (Check<Transform,       NPCWatchdog>,    (x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && NPCManager.GetNPCType(x.parentName) != NPC.Error),
+            (Check<Transform,       ActressWatchdog>,(x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && NPCManager.GetNPCType(x.parentName) == NPC.Error)
         };
 
     protected bool DetectType()
