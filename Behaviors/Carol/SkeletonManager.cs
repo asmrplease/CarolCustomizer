@@ -70,7 +70,9 @@ public class SkeletonManager : IDisposable
         Dictionary<string, Transform> boneDict = new(targetPelvis.BoneData.StandardBones);
         foreach (var bespokeBone in outfit.boneData.BespokeBones)
         {
-            if (!targetPelvis.BoneData.StandardBones.TryGetValue(bespokeBone.parent.name, out var parentBone))
+            Transform parentBone;
+            if (!bespokeBone.parent){ parentBone = boneDict["Bn_CarolHead"]; }
+            else if (!targetPelvis.BoneData.StandardBones.TryGetValue(bespokeBone.parent.name, out parentBone))
             { Log.Error($"Could not find {bespokeBone.name}'s parent, {bespokeBone.parent.name}."); continue; }
 
             GameObject.Instantiate(bespokeBone.gameObject, parentBone.transform)

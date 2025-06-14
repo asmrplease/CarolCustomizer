@@ -12,6 +12,7 @@ public class HaDSOutfit : Outfit
     public override Sprite Sprite => modelData.portraitShop;
     public override RuntimeAnimatorController RuntimeAnimator => modelData?.controller;
     public ModelData modelData { get; protected set; }
+    public HairData hairData { get; protected set; }
 
     public Dictionary<string, List<StoredAccessory>> Variants { get; private set; } = new();
 
@@ -20,6 +21,7 @@ public class HaDSOutfit : Outfit
         modelData = this.storedAsset.gameObject.GetComponent<ModelData>();
         if (!modelData) { Log.Error("No ModelData component was found during HaDS constructor."); return; }
         BuildVariants();
+        GetHair();
     }
 
     void GetHair()
@@ -27,12 +29,15 @@ public class HaDSOutfit : Outfit
         var hair = this.modelData.defaultHairstyle;
         if (!hair) return;
 
-        var hairstyle = hair.GetComponent<Hairstyle>();
-        var renderer = hairstyle.model;
-        if (renderer is not SkinnedMeshRenderer smr) { Log.Warning("Hair is not an SMR"); return; }
-
-        var acc = new StoredAccessory(this, smr);
-        this.AccDict[acc] = acc;
+        this.hairData = new HairData(hair.transform);
+        this.hairData.models.ForEach(x => x.gameObject.SetActive(false));//disables built in hair when it's instantiated on carol by game
+        //TODO: We're violating look but don't touch here but idk what else to do 
+        /*
+        this.boneData.BespokeBones.Add(this.hairData.armatureRoot);
+        this.hairData.models
+            .Select(x => new StoredAccessory(this, x))
+            .ForEach(x => this.AccDict[x] = x);
+        */
     }
 
     protected virtual void BuildVariants()
