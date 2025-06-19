@@ -8,6 +8,11 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
+	
+	<ItemGroup>
+		<Using Include="CarolCustomizer.Models.Recipes.RecipeDescriptor24" Alias="LatestDescriptor" />
+	</ItemGroup>
+
 
 	<ItemGroup>
 	  <Compile Remove="_Release\BepInEx\plugins\CarolCustomizer\NewFolder\**" />

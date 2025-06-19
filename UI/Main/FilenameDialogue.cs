@@ -14,8 +14,8 @@ public class FilenameDialogue : MonoBehaviour
     Button cancel;
     RectTransform rect;
 
-    RecipeDescriptor24 recipe;
-    UnityAction<RecipeDescriptor24, string> onConfirm;
+    LatestDescriptor recipe;
+    UnityAction<LatestDescriptor, string> onConfirm;
 
     public FilenameDialogue Constructor()
     {
@@ -32,7 +32,7 @@ public class FilenameDialogue : MonoBehaviour
         return this;
     }
 
-    public void Show(RecipeDescriptor24 recipe, UnityAction<RecipeDescriptor24, string> onConfirm)
+    public void Show(LatestDescriptor recipe, UnityAction<LatestDescriptor, string> onConfirm)
     {
         this.recipe = recipe;
         this.onConfirm = onConfirm;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 namespace CarolCustomizer.Models.Recipes;
+
 public static class RecipeConverter
 {
     public static RecipeDescriptor21 ToVersion210(this RecipeDescriptor20 legacy)

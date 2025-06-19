@@ -12,7 +12,7 @@ using System.Linq;
 namespace CarolCustomizer.Behaviors.Recipes;
 public static class RecipeApplier
 {
-    public static void ActivateRecipe(OutfitManager target, RecipeDescriptor24 recipe)
+    public static void ActivateRecipe(OutfitManager target, LatestDescriptor recipe)
     {
         target.DisableAllAccessories();
         target.DisableAllEffects();
@@ -97,7 +97,7 @@ public static class RecipeApplier
         target.PaintAccessory(accessory, liveMaterial, index);
     }
 
-    public static IEnumerable<string> GetSources(RecipeDescriptor24 recipe)
+    public static IEnumerable<string> GetSources(LatestDescriptor recipe)
     {
         var accSources = recipe
             .ActiveAccessories
@@ -115,7 +115,7 @@ public static class RecipeApplier
             .Distinct();
     }
 
-    public static IEnumerable<string> GetMissingSources(RecipeDescriptor24 recipe)
+    public static IEnumerable<string> GetMissingSources(LatestDescriptor recipe)
     {
         return GetSources(recipe)
             .Where(x => 

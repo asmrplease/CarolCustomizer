@@ -32,7 +32,7 @@ internal class AutoSaver : IDisposable
 
     public void Save()
     {
-        var recipe = new RecipeDescriptor24(outfitManager);
+        var recipe = new LatestDescriptor(outfitManager);
         if (!recipe.ActiveAccessories.Any()) { Log.Warning($"Skipping Player {playerIndex + 1} autosave becuase no accessories are active. "); return; }
 
         RecipeSaver.SaveJson(

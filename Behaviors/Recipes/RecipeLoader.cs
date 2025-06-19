@@ -48,7 +48,7 @@ internal static class RecipeLoader
         return results;
     }
 
-    public struct ValidationResults { public Recipe.Status Status; public RecipeDescriptor24 Recipe; }
+    public struct ValidationResults { public Recipe.Status Status; public LatestDescriptor Recipe; }
 
     public static ValidationResults ValidateRecipeFile(string filePath)
     {

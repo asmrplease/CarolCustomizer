@@ -120,7 +120,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         messageDialogue.Show(message, confirmText: "Yes!", confirmAction: Overwrite);
     }
 
-    void Overwrite() => RecipeSaver.SavePNG(new RecipeDescriptor24(PlayerInstances.DefaultPlayer.outfitManager), recipe.Path);
+    void Overwrite() => RecipeSaver.SavePNG(new LatestDescriptor(PlayerInstances.DefaultPlayer.outfitManager), recipe.Path);
 
     void OnContextMenuLoad(PlayerCarolInstance player) => 
         RecipeApplier.ActivateRecipe(player.outfitManager, recipe.Descriptor);
@@ -161,7 +161,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         messageDialogue.Show(message, cancelText: "Done");
     }
 
-    void OnRename(RecipeDescriptor24 _, string newName)
+    void OnRename(LatestDescriptor _, string newName)
     {
         if (newName.Trim() == "") return;
         foreach (var character in Path.GetInvalidFileNameChars()) { if (newName.Contains(character)) return; }
@@ -183,7 +183,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             Path.GetFileNameWithoutExtension(recipe.Path)
                 + Constants.PngFileExtension); 
         RecipeSaver.SavePNG(
-            new RecipeDescriptor24(PlayerInstances.DefaultPlayer.outfitManager),
+            new LatestDescriptor(PlayerInstances.DefaultPlayer.outfitManager),
             newPath);
         File.Delete(recipe.Path);
     }

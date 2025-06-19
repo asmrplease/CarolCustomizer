@@ -74,7 +74,7 @@ public class ThumbnailCamera : MonoBehaviour
         var alpha = CalculateTransparency(black, white);
         byte[] bytes = alpha.EncodeToPNG();
         File.WriteAllBytes(filePath, bytes);
-        var descriptor = new RecipeDescriptor24(PlayerInstances.DefaultPlayer.outfitManager);
+        var descriptor = new LatestDescriptor(PlayerInstances.DefaultPlayer.outfitManager);
         string json = JsonConvert.SerializeObject(descriptor, Formatting.None);
         PngMetadataUtil.AddMetadata(filePath, Constants.PNGChunkKeyword, json);
         Log.Info("Save complete.");
