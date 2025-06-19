@@ -20,6 +20,7 @@ public class OutfitManager : IDisposable
     #region Dependencies
     readonly SkeletonManager skeletonManager;
     readonly CarolInstance playerManager;
+    readonly HairstyleManager hairstyleManager;
     #endregion
 
     #region State Management
@@ -38,9 +39,9 @@ public class OutfitManager : IDisposable
     public string ColliderSource => colliderSource?.AssetName ?? Constants.Pyjamas;
 
     public IEnumerable<StoredAccessory> ActiveAccessories =>
-            liveAccessories
-            .Where(x => x.Value.isActive)
-            .Select(x => x.Key);
+        liveAccessories
+        .Where(x => x.Value.isActive)
+        .Select(x => x.Key);
 
     public IEnumerable<AccessoryDescriptor> LiveAccessoryDescriptors =>
         liveAccessories
@@ -57,9 +58,16 @@ public class OutfitManager : IDisposable
         outfitEffects
         .Select(x => x.AssetName);
 
+    public string Hairstyle => hairstyleManager.hairstyle ?
+        hairstyleManager.hairstyle.name : "";
+
+    public string HairColor => hairstyleManager.hairMaterial ?
+        hairstyleManager.hairMaterial.name : "";
+
     public OutfitManager(CarolInstance player, SkeletonManager skeletonManager)
     {
         this.skeletonManager = skeletonManager;
+        this.hairstyleManager = new HairstyleManager(player);
         playerManager = player;
         animatorSource
             = colliderSource
@@ -74,8 +82,8 @@ public class OutfitManager : IDisposable
     {
         liveAccessories.Values
             .ToList()
-            .ForEach(x => x.Dispose());
-            
+            .ForEach(x => x.Dispose()); 
+        hairstyleManager.Dispose();
     }
 
     void RefreshSMRs(PelvisWatchdog pelvis) 
@@ -254,4 +262,8 @@ public class OutfitManager : IDisposable
             liveAccessories.Remove(storedAcc);
         }
     }
+
+    public void SetHairstyle(Hairstyle style) => hairstyleManager.AssignHairstyle(style);
+    public void SetHairColor(Material hairMat) => hairstyleManager.AssignMaterial(hairMat);
+    
 }

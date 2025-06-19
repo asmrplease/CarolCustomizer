@@ -33,4 +33,17 @@ public static class RecipeConverter
             legacy.ActiveEffects,
             "2.3.0");
     }
+
+    public static RecipeDescriptor24 ToVersion240(this RecipeDescriptor23 legacy)
+    {
+        return new RecipeDescriptor24(
+            legacy.AnimatorSource,
+            legacy.BaseOutfitName,
+            legacy.ColliderSource,
+            legacy.ActiveAccessories,
+            legacy.ActiveEffects,
+            "Haircut_Default_Ponytail",
+            "CRLH_Default_Brown",
+            "2.4.0");
+    }
 }

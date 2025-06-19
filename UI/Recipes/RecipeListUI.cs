@@ -114,6 +114,6 @@ public class RecipeListUI : MonoBehaviour
 
     void OnNewSave()
     {
-        fileDialogue.Show(new RecipeDescriptor23(PlayerInstances.DefaultPlayer.outfitManager), RecipeSaver.SavePNG);
+        fileDialogue.Show(new RecipeDescriptor24(PlayerInstances.DefaultPlayer.outfitManager), RecipeSaver.SavePNG);
     }
 }

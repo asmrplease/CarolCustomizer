@@ -1,6 +1,5 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors;
-using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.UI.Config;
 using CarolCustomizer.UI.Materials;
@@ -62,7 +61,6 @@ public class UIInstance : MonoBehaviour
         var messageDialogue = Instantiate(loader.MessageDialogue, mainTransform)
             .AddComponent<MessageDialogue>()
             .Constructor();
-
         var outfitView = Instantiate(loader.OutfitView, viewRoot)
             .AddComponent<OutfitListUI>()
             .Constructor(loader, materialManager, contextMenu);

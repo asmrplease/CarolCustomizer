@@ -12,6 +12,8 @@ internal class HaDSOutfitLoader : IDisposable
 {
     static string ListName = "HaDS Outfits";
     static Dictionary<string, HaDSOutfit> HaDSOutfits = new();
+    static List<Hairstyle> Hairstyles = new();
+    static List<Material> HairColors = new();
 
     public HaDSOutfitLoader()
     {
@@ -22,6 +24,12 @@ internal class HaDSOutfitLoader : IDisposable
     {
         Log.Info("loading vanilla outfits");
         var list = Resources.FindObjectsOfTypeAll<ModelData>();
+        Hairstyles = Resources.FindObjectsOfTypeAll<Hairstyle>()
+            .Where(x => !x.gameObject.name.Contains("(Clone)"))
+            .ToList();
+        HairColors = Resources.FindObjectsOfTypeAll<Material>()
+            .Where(x => x.name.StartsWith("CRLH_") && !x.name.Contains("(Instance)"))
+            .ToList();
 
         var vanillaOutfits = list.Where(x =>
             x.gameObject.name.StartsWith("carol_", StringComparison.InvariantCultureIgnoreCase)
@@ -43,6 +51,16 @@ internal class HaDSOutfitLoader : IDisposable
         var hads = new HaDSOutfit(outfit.transform);
         HaDSOutfits.Add(hads.AssetName, hads);
         OutfitAssetManager.OnOutfitLoaded?.Invoke(hads);
+    }
+
+    public static Hairstyle GetHairstyle(string name)
+    {
+        return Hairstyles.First(x=> x.name == name);
+    }
+
+    public static Material GetHairColor(string name)
+    {
+        return HairColors.First(x=> x.name == name);
     }
 
     public void Dispose()

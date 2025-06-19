@@ -7,7 +7,7 @@ public record Recipe
     public readonly string Path;
     public readonly string Extension;
     public readonly Status Error;
-    public readonly RecipeDescriptor23 Descriptor;
+    public readonly RecipeDescriptor24 Descriptor;
 
     public Recipe(string path)
     {

@@ -63,6 +63,7 @@ public static class Constants
     public const KeyCode DefaultReload = KeyCode.F8;
     public const int SMRLayer = 8;
 
+    public static readonly Version v240 = new("2.4.0");
     public static readonly Version v230 = new("2.3.0");
     public static readonly Version v220 = new("2.2.0");
     public static readonly Version v210 = new("2.1.0");

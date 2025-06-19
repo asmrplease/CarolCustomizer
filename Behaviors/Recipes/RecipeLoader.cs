@@ -48,7 +48,7 @@ internal static class RecipeLoader
         return results;
     }
 
-    public struct ValidationResults { public Recipe.Status Status; public RecipeDescriptor23 Recipe; }
+    public struct ValidationResults { public Recipe.Status Status; public RecipeDescriptor24 Recipe; }
 
     public static ValidationResults ValidateRecipeFile(string filePath)
     {
@@ -81,27 +81,35 @@ internal static class RecipeLoader
             //TODO: this is gonna get out of hand sooner or later
             switch (version)
             {
+                case var x when x >= Constants.v240:
+                    Log.Debug("VRF dectected recipe version as >= 2.4.0");
+                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor24>(json);
+                    break;
                 case var x when x >= Constants.v230:
                     Log.Debug("VRF dectected recipe version as >= 2.3.0");
-                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor23>(json);
+                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor23>(json)
+                        .ToVersion240();
                     break;
                 case var x when x >= Constants.v220:
                     Log.Debug("VRF dectected recipe version as >= 2.2.0");
                     results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor22>(json)
-                        .ToVersion230();
+                        .ToVersion230()
+                        .ToVersion240();
                     break;
                 case var x when x > Constants.v200:
                     Log.Debug("VRF dectected recipe version as > 2.0.0");
                     results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor21>(json)
                         .ToVersion220()
-                        .ToVersion230();
+                        .ToVersion230()
+                        .ToVersion240();
                     break;
                 default:
                     Log.Debug("Legacy descriptor");
                     results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor20>(json)
                         .ToVersion210()
                         .ToVersion220()
-                        .ToVersion230(); 
+                        .ToVersion230()
+                        .ToVersion240(); 
                     break;
             }
         }

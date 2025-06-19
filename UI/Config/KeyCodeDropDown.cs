@@ -29,9 +29,9 @@ public class KeyCodeDropDown : MonoBehaviour
 
         foreach (var key in keys)
         {
-            Dropdown.OptionData idk = new();
-            idk.text = key.ToString();
-            dropdown.options.Add(idk);
+            Dropdown.OptionData entry = new();
+            entry.text = key.ToString();
+            dropdown.options.Add(entry);
         }
 
         SetKeyCode(keycodeConfig.Value);
