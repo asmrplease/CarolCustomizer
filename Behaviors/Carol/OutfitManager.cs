@@ -34,6 +34,7 @@ public class OutfitManager : IDisposable
     #region Public Interface
     public PelvisWatchdog pelvis { get; private set; }
     public event Action<AccessoryChangedEvent> AccessoryChanged;
+    public event Action<HairChangeEvent> HairstyleChanged;
     public string AnimatorSource => animatorSource?.AssetName ?? Constants.Pyjamas;
     public string ConfigurationSource => configurationSource?.AssetName ?? Constants.Pyjamas;
     public string ColliderSource => colliderSource?.AssetName ?? Constants.Pyjamas;
@@ -258,12 +259,24 @@ public class OutfitManager : IDisposable
         {
             liveAccessories.TryGetValue(storedAcc, out var liveAcc);
             if (liveAcc is null) continue;
+
             liveAcc.Dispose();
             liveAccessories.Remove(storedAcc);
         }
     }
 
-    public void SetHairstyle(Hairstyle style) => hairstyleManager.AssignHairstyle(style);
-    public void SetHairColor(Material hairMat) => hairstyleManager.AssignMaterial(hairMat);
+    public void SetHairstyle(Hairstyle style) 
+    {
+        hairstyleManager.AssignHairstyle(style);
+        var e = hairstyleManager.GetHairDescriptor();
+        HairstyleChanged?.Invoke(e);
+
+    } 
+    public void SetHairColor(Material hairMat) 
+    {
+        hairstyleManager.AssignMaterial(hairMat);
+        var e = hairstyleManager.GetHairDescriptor();
+        HairstyleChanged?.Invoke(e);
+    } 
     
 }

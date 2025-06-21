@@ -5,19 +5,17 @@ using CarolCustomizer.Utils;
 namespace CarolCustomizer.Assets;
 public class UIAssetLoader : IDisposable
 {
-    const string uiContainerAddress = "Assets/Mods/TabUI/Accessory Canvas 1.prefab";
+    const string uiContainerAddress = "Assets/Mods/TabUI/Accessory Canvas.prefab";
     const string accessoryButtonAddress = "Assets/Mods/TabUI/Blank Accessory.prefab";
     const string outfitButtonAddress = "Assets/Mods/TabUI/Blank Outfit.prefab";
-    const string hairstyleButtonAddress = "Assets/Mods/TabUI/Blank Hairstyle.prefab";
     const string contextMenuAddress = "Assets/Mods/TabUI/Context Menu.prefab";
-    const string outfitViewAddress = "Assets/Mods/TabUI/OutfitView.prefab";
+    const string outfitViewAddress = "Assets/Mods/TabUI/OutfitView 1.prefab";
     const string materialsViewAddress = "Assets/Mods/TabUI/MaterialsView.prefab";
     const string recipesViewAddress = "Assets/Mods/TabUI/RecipesView.prefab";
     const string settingsViewAddress = "Assets/Mods/TabUI/SettingsView.prefab";
     const string filenameDialogueAddress = "Assets/Mods/TabUI/FilenameDialogue.prefab";
     const string messageDialogueAddress = "Assets/Mods/TabUI/MessageDialogue.prefab";
     const string pirateIconAddress = "assets/mods/tabui/pirateicon.png";
-    const string hairstyleViewAddress = "Assets/Mods/TabUI/HairstyleView.prefab";
 
     AssetBundle assetBundle;
 
@@ -68,7 +66,6 @@ public class UIAssetLoader : IDisposable
         MaterialsView = assetBundle.LoadAsset<GameObject>(materialsViewAddress);
         RecipesView = assetBundle.LoadAsset<GameObject>(recipesViewAddress);
         SettingsView = assetBundle.LoadAsset<GameObject>(settingsViewAddress);
-        HairstyleView = assetBundle.LoadAsset<GameObject>(hairstyleViewAddress);
         FilenameDialogue = assetBundle.LoadAsset<GameObject>(filenameDialogueAddress);
         MessageDialogue = assetBundle.LoadAsset<GameObject>(messageDialogueAddress);
         PirateIcon = assetBundle.LoadAsset<Sprite>(pirateIconAddress);

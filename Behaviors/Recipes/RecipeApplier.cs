@@ -32,8 +32,8 @@ public static class RecipeApplier
             OutfitAssetManager.GetOutfitByAssetName(recipe.BaseOutfitName));
         target.SetColliderSource(
             OutfitAssetManager.GetOutfitByAssetName(recipe.ColliderSource));
-        target.SetHairstyle(HaDSOutfitLoader.GetHairstyle(recipe.Hairstyle));
-        target.SetHairColor(HaDSOutfitLoader.GetHairColor(recipe.HairMaterial));
+        target.SetHairstyle(OutfitAssetManager.GetHairstyle(recipe.Hairstyle));
+        target.SetHairColor(OutfitAssetManager.GetHairColor(recipe.HairMaterial));
     }
 
     public static void ActivateFirstVariant(OutfitManager outfitManager, string outfitName)
@@ -61,6 +61,8 @@ public static class RecipeApplier
         outfitManager.SetAnimator(outfit);
         outfitManager.SetConfiguration(outfit);
         outfitManager.SetColliderSource(outfit);
+        outfitManager.SetHairstyle(outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>());
+        outfitManager.SetHairColor(outfit.modelData.defaultHaircolor);
     }
 
     static void SetAccessory(OutfitManager target, AccessoryDescriptor accessoryDescription)
