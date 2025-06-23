@@ -220,4 +220,9 @@ public class OutfitListUI : MonoBehaviour
         var style = OutfitAssetManager.Hairstyles[index];
         OutfitListUI.TargetOutfit.SetHairstyle(style);
     }
+
+    void OnEnable()
+    {
+        filter?.ProcessFilters();
+    }
 }

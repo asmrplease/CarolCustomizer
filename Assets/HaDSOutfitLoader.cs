@@ -20,7 +20,9 @@ internal class HaDSOutfitLoader : IDisposable
 
     public IEnumerator LoadAllHaDSOutfits()
     {
-        Log.Info("loading vanilla outfits");
+        Log.Info("Loading hair");
+        LoadHair();
+        Log.Info("Hair load complete, loading outfits");
         var list = Resources.FindObjectsOfTypeAll<ModelData>();
 
         var vanillaOutfits = list.Where(x =>
@@ -34,7 +36,6 @@ internal class HaDSOutfitLoader : IDisposable
         }
 
         OutfitAssetManager.OnOutfitSetLoaded?.Invoke();
-        LoadHair();
     }
 
     void LoadHair()
@@ -43,7 +44,7 @@ internal class HaDSOutfitLoader : IDisposable
             .Where(x => !x.gameObject.name.Contains("(Clone)"))
             .ToList();
         var colors = Resources.FindObjectsOfTypeAll<Material>()
-            .Where(x => x.name.StartsWith("CRLH_") && !x.name.Contains("(Instance)"))
+            .Where(x => x.name.StartsWith("CRL") && !x.name.Contains("(Instance)"))
             .ToList();
         OutfitAssetManager.NotifyHairReady(hair, colors);
     }

@@ -43,7 +43,7 @@ public static class RecipeConverter
             legacy.ColliderSource,
             legacy.ActiveAccessories,
             legacy.ActiveEffects,
-            "Haircut_Default_Ponytail",
+            "Haircut_Powerhelmet",
             "CRLH_Default_Brown",
             "2.4.0");
     }

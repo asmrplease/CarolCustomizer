@@ -58,7 +58,6 @@ public class OutfitAssetManager : IDisposable
         Hairstyles.AddRange(hair);
         HairColors.AddRange(colors);
         OnHairLoaded?.Invoke((hair, colors));
-
     }
 
     public void Dispose() => GameObject.Destroy(liveFolder);

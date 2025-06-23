@@ -267,6 +267,7 @@ public class OutfitManager : IDisposable
 
     public void SetHairstyle(Hairstyle style) 
     {
+        Log.Debug($"Assigning hairstyle {style.name}");
         hairstyleManager.AssignHairstyle(style);
         var e = hairstyleManager.GetHairDescriptor();
         HairstyleChanged?.Invoke(e);

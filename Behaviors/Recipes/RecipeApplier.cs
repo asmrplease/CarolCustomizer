@@ -3,7 +3,6 @@ using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using HarmonyLib;
 using System.Collections.Generic;
@@ -16,6 +15,9 @@ public static class RecipeApplier
     {
         target.DisableAllAccessories();
         target.DisableAllEffects();
+        //load hair first so if it's replaced later, we don't overwrite it. 
+        target.SetHairstyle(OutfitAssetManager.GetHairstyle(recipe.Hairstyle));
+        target.SetHairColor(OutfitAssetManager.GetHairColor(recipe.HairMaterial));
         recipe
             .ActiveAccessories
             .ForEach(x => SetAccessory(target, x));
@@ -32,8 +34,24 @@ public static class RecipeApplier
             OutfitAssetManager.GetOutfitByAssetName(recipe.BaseOutfitName));
         target.SetColliderSource(
             OutfitAssetManager.GetOutfitByAssetName(recipe.ColliderSource));
-        target.SetHairstyle(OutfitAssetManager.GetHairstyle(recipe.Hairstyle));
-        target.SetHairColor(OutfitAssetManager.GetHairColor(recipe.HairMaterial));
+    }
+
+    public static void ActivateVariant(OutfitManager outfitManager, HaDSOutfit outfit, string variantName)
+    {
+        Log.Debug("ActivateVariant()");
+        outfitManager.DisableAllAccessories();
+        outfitManager.DisableAllEffects();
+
+        outfit.Variants.TryGetValue(variantName, out var variantAccs);
+        if (variantAccs is null) { Log.Warning($"variant {variantName} not found in {outfit.DisplayName}"); return; }
+
+        outfitManager.SetHairstyle(outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>());
+        outfitManager.SetHairColor(outfit.modelData.defaultHaircolor);
+        variantAccs.ForEach(x => SetAccessory(outfitManager, x));
+        outfitManager.SetEffect(outfit, true);
+        outfitManager.SetAnimator(outfit);
+        outfitManager.SetConfiguration(outfit);
+        outfitManager.SetColliderSource(outfit);
     }
 
     public static void ActivateFirstVariant(OutfitManager outfitManager, string outfitName)
@@ -47,33 +65,22 @@ public static class RecipeApplier
         ActivateVariant(outfitManager, outfit, variant);
     }
 
-    public static void ActivateVariant(OutfitManager outfitManager, HaDSOutfit outfit, string variantName)
-    {
-        Log.Debug("ActivateVariant()");
-        outfitManager.DisableAllAccessories();
-        outfitManager.DisableAllEffects();
-
-        outfit.Variants.TryGetValue(variantName, out var variant);
-        if (variant is null) { Log.Warning($"variant {variantName} not found in {outfit.DisplayName}"); return; }
-
-        foreach (var acc in variant) SetAccessory(outfitManager, acc);
-        outfitManager.SetEffect(outfit, true);
-        outfitManager.SetAnimator(outfit);
-        outfitManager.SetConfiguration(outfit);
-        outfitManager.SetColliderSource(outfit);
-        outfitManager.SetHairstyle(outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>());
-        outfitManager.SetHairColor(outfit.modelData.defaultHaircolor);
-    }
-
     static void SetAccessory(OutfitManager target, AccessoryDescriptor accessoryDescription)
     {
         Log.Debug($"Setting accessory {accessoryDescription.Source}:{accessoryDescription.Name}...");
         var outfit = OutfitAssetManager.GetOutfitByAssetName(accessoryDescription.Source);
-        if (outfit is null) { Log.Warning($"failed to find {accessoryDescription.Source}."); return; }
+        if (outfit is null) { Log.Warning($"failed to find outfit {accessoryDescription.Source}."); return; }
+        
         Log.Debug("found source");
-
         var accessory = outfit.GetAccessory(accessoryDescription);
-        if (accessory is null) { Log.Warning($"failed to find {accessoryDescription.Name}"); return; }
+        if (accessory is null && accessoryDescription.Name.ToLower().Contains("hair"))
+        {
+            Log.Info("hair accessory was missing, setting hairstyle to outfit's hair.");
+            target.SetHairstyle(outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>());
+            target.SetHairColor(outfit.modelData.defaultHaircolor);
+            return;
+        }
+        else if (accessory is null) { Log.Warning($"failed to find accessory {accessoryDescription.Name}"); return; }
 
         target.EnableAccessory(accessory);
         accessoryDescription
@@ -120,8 +127,7 @@ public static class RecipeApplier
     public static IEnumerable<string> GetMissingSources(LatestDescriptor recipe)
     {
         return GetSources(recipe)
-            .Where(x => 
-                OutfitAssetManager.GetOutfitByAssetName(x)
-                is null);
+            .Where(x => OutfitAssetManager.GetOutfitByAssetName(x) is null);
     }
+
 }
