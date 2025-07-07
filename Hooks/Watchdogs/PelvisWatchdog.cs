@@ -58,18 +58,19 @@ public class PelvisWatchdog : MonoBehaviour
     virtual protected void OnTransformParentChanged() => DetectType();
 
     void SetupCheckList() =>
-        checks = new()
-        {
+        checks =
+        [
             (Check<VirtualCarol,    MPBotWatchdog>,  (x)=> true),
             (Check<Entity,          PlayerWatchdog>, (x)=> x.rootName == "CAROL(Clone)"),
+            (Check<Entity,          NPCWatchdog>,    (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
             (Check<Entity,          BotWatchdog>,    (x)=> true),
             (Check<CutsceneActor,   ActressWatchdog>,(x)=> true),
             (Check<Character,       NPCWatchdog>,    (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
             (Check<Character,       ActressWatchdog>,(x)=> true),
             (Check<MenuSwitchOutfit,MenuWatchdog>,   (x)=> true),
-            (Check<Transform,       NPCWatchdog>,    (x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && NPCManager.GetNPCType(x.parentName) != NPC.Error),
-            (Check<Transform,       ActressWatchdog>,(x)=> NPCInstanceCreator.actressSearchRoots.Contains(x.rootName) && NPCManager.GetNPCType(x.parentName) == NPC.Error)
-        };
+            (Check<Transform,       NPCWatchdog>,    (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
+            (Check<Transform,       ActressWatchdog>,(x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error)
+        ];
 
     protected bool DetectType()
     {

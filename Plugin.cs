@@ -6,6 +6,7 @@ using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Hooks;
 using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Tests;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using FaceCam.Behaviors;
@@ -124,4 +125,7 @@ public class CCPlugin : BaseUnityPlugin
         AccessoryDissolver.Dispose();
         Log.Info("Customizer unloaded.");
     }
+
+    void TestCutscenes() => CutsceneTest.RunAllCutscenes();
+    void TestSceneLoad() => SceneResourceProvider.VolcanoTest();
 }

@@ -64,7 +64,7 @@ public class PlayerWatchdog : PelvisWatchdog
         if (initialDelay > 0) yield return new WaitForSeconds(initialDelay);
 
         var inventory = carolEntity.GetComponent<Inventory>();
-        carolEntity.rigidbody.velocity = Vector3.zero;
+        carolEntity.rigidbody.linearVelocity = Vector3.zero;
         carolEntity.LockMove(float.PositiveInfinity);
         carolEntity.LockAttack(float.PositiveInfinity);
         carolEntity.AddInvulnerableTime(float.PositiveInfinity);

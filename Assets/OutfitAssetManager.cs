@@ -45,12 +45,16 @@ public class OutfitAssetManager : IDisposable
 
     public static Hairstyle GetHairstyle(string name)
     {
-        return Hairstyles.First(x => x.name == name);
+        var hair = Hairstyles.FirstOrDefault(x => x.name == name);
+        if (!hair) Log.Warning($"When searching for hairstyle '{name}', no results were found. ");
+        return hair;
     }
 
     public static Material GetHairColor(string name)
     {
-        return HairColors.First(x => x.name == name);
+        var style = HairColors.FirstOrDefault(x => x.name == name);
+        if (!style) Log.Warning($"When searching for hairstyle '{name}', no results were found. ");
+        return style;
     }
 
     public static void NotifyHairReady(List<Hairstyle> hair, List<Material> colors)

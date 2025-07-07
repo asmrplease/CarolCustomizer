@@ -14,6 +14,7 @@ internal enum NPC
     Shezara,
     Cherryl,
     Prunelle,
+    Blueberry,
     Error,
 }
 
@@ -42,6 +43,7 @@ internal class NPCManager
         if (name == "Carol_Pirate")       return NPC.Shezara;
         if (name.Contains("Cherryl"))     return NPC.Cherryl;
         if (name.Contains("Prunelle"))    return NPC.Prunelle;
+        if (name.Contains("Blueberry"))   return NPC.Blueberry;
         return NPC.Error;
     }
 

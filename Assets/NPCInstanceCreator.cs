@@ -21,19 +21,36 @@ public class NPCInstanceCreator : IDisposable
 
     public static List<PelvisWatchdog> dedicatedActresses = new();
     private static HashSet<PelvisWatchdog> carolBotPrefabs = new();
-    
+    static List<GameObject> pelvises = new();
 
     #region Lifecycle
     public NPCInstanceCreator(Transform parent)
     {
         SceneManager.sceneLoaded += FindDedicatedActresses;
         SceneManager.sceneLoaded += FindBotEntities;
+        //SceneManager.sceneLoaded += FindAllPelvises;
+    }
+
+    private void FindAllPelvises(Scene _, LoadSceneMode __)
+    {
+        pelvises = Resources
+            .FindObjectsOfTypeAll<GameObject>()
+            .Where(x => x.name == "CarolPelvis")
+            .Where(x => x.GetComponent<PelvisWatchdog>() == null)
+            .ToList();
+        Log.Debug("Found Pelvises:");
+        pelvises
+            .Select(x => x.transform.parent.name)
+            .ForEach(Log.Debug);
+        pelvises
+            .ForEach(x => x.AddComponent<PelvisWatchdog>());
     }
 
     public void Dispose()
     {
         SceneManager.sceneLoaded -= FindDedicatedActresses;
         SceneManager.sceneLoaded -= FindBotEntities;
+        //SceneManager.sceneLoaded -= FindAllPelvises;
 
         foreach (var actress in dedicatedActresses) { if (actress) GameObject.Destroy(actress); }
         foreach (var botPrefab in carolBotPrefabs) { if (botPrefab) GameObject.Destroy(botPrefab); }
@@ -79,7 +96,7 @@ public class NPCInstanceCreator : IDisposable
             .Select(x => x.parent.parent);
     }
 
-    public static void FindBotEntities(Scene arg0, LoadSceneMode arg1)
+    public static void FindBotEntities(Scene _, LoadSceneMode __)
     {
         Resources
             .FindObjectsOfTypeAll<Entity>()

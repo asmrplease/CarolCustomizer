@@ -23,13 +23,12 @@ public class MaterialManager
     public List<MaterialDescriptor> ListMaterials()
     {
         Log.Debug("ListMaterials()");
-        if (!currentTarget) { Log.Warning("current target is null."); return null; }
+        List<Material> materials = [];
+        if (!currentTarget) { Log.Warning("current target is null."); return []; }
 
         var renderers = currentTarget.GetComponentsInChildren<Renderer>(true);
+        if (renderers.Count() == 0) { Log.Warning("no renderers were found in target."); return []; }
 
-        if (renderers.Count() == 0) { Log.Warning("no smrs were found in target."); return null; }
-
-        List<Material> materials = new();
         foreach (var renderer in renderers) { materials.AddRange(renderer.materials); }
 
         string sceneName = SceneManager.GetActiveScene().name;

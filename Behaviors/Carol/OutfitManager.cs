@@ -267,14 +267,18 @@ public class OutfitManager : IDisposable
 
     public void SetHairstyle(Hairstyle style) 
     {
+        if (style is null) { Log.Warning("Tried to apply a null hairstyle"); return; }
+
         Log.Debug($"Assigning hairstyle {style.name}");
         hairstyleManager.AssignHairstyle(style);
         var e = hairstyleManager.GetHairDescriptor();
         HairstyleChanged?.Invoke(e);
-
     } 
+
     public void SetHairColor(Material hairMat) 
     {
+        if (hairMat is null) { Log.Warning("Tried to apply a null hair material"); return; }
+
         hairstyleManager.AssignMaterial(hairMat);
         var e = hairstyleManager.GetHairDescriptor();
         HairstyleChanged?.Invoke(e);
