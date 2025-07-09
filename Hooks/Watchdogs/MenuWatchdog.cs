@@ -33,7 +33,7 @@ public class MenuWatchdog : PelvisWatchdog
         {
             if (CompData.allSMRs.Any(x => x.gameObject.activeSelf))
             {
-                Log.Debug("MainMenuFix RefreshBaseVisibility");
+                //Log.Debug("MainMenuFix RefreshBaseVisibility");
                 base.SetBaseVisibility(false);
             }
             yield return new WaitForSeconds(1);

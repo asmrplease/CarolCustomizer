@@ -127,5 +127,4 @@ public class CCPlugin : BaseUnityPlugin
     }
 
     void TestCutscenes() => CutsceneTest.RunAllCutscenes();
-    void TestSceneLoad() => SceneResourceProvider.VolcanoTest();
 }

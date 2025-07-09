@@ -18,7 +18,7 @@ internal static class RecipeSaver
         return path;
     }
 
-    public static void SaveJson(LatestDescriptor recipe, string filePath)
+    public static void SaveJson(RecipeDescriptor recipe, string filePath)
     {
         string json = JsonConvert.SerializeObject(recipe, Formatting.Indented);
         //Log.Debug(json);
@@ -31,7 +31,7 @@ internal static class RecipeSaver
         newSave.Close();
     }
 
-    public static void SavePNG(LatestDescriptor recipe, string filePath)
+    public static void SavePNG(RecipeDescriptor recipe, string filePath)
     {
         string json = JsonConvert.SerializeObject(recipe, Formatting.None);
         if (!filePath.Contains(Constants.PngFileExtension))

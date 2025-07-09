@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Materials;
@@ -50,6 +51,7 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
     private void CopyMaterial()
     {
         materialManager.clipboard = material;
+        SceneResourceProvider.Cache(material);
     }
 
     public void OnPointerClick(PointerEventData eventData)

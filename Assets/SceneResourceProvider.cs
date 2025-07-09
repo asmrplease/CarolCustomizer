@@ -1,5 +1,7 @@
-﻿using CarolCustomizer.Models.Materials;
+﻿using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,18 +12,74 @@ namespace CarolCustomizer.Assets;
 internal class SceneResourceProvider
 {
     //we want a list of materials to load, grouped by the scene that they're sourced from
-    readonly static List<MaterialDescriptor> pendingLoad = [];
-    readonly static List<MaterialDescriptor> loaded = [];
+    //this list should be populated from the player's marked favorites, and the list of recipes
+    readonly static HashSet<MaterialDescriptor> pendingLoad = [];
+    readonly static HashSet<MaterialDescriptor> loaded = [];
+    readonly static HashSet<string> loadedScenes = [];
+
+    readonly static Dictionary<string, HashSet<MaterialDescriptor>> matsByScene = [];
+    public static bool FakeLoad { get; private set; } = false;
+
+    internal static void AddToPending(MaterialDescriptor material)
+    {
+        if (loaded.Contains(material)) { Log.Info("Material already loaded"); return; }
+
+        pendingLoad.Add(material);
+    }
+
+    internal static void Cache(MaterialDescriptor material)
+    {
+        loaded.Add(material);
+    }
+
+    internal static IEnumerator LazyApplyMaterial(MaterialDescriptor requestedMat, Action<MaterialDescriptor> closure)
+    {
+        var existing = loaded.FirstOrDefault(x => x.Equals(requestedMat));
+        if (existing is null)
+        {
+            AddToPending(requestedMat);
+            yield return LoadMatsFromSceneAsync(requestedMat.Source);
+            existing = loaded.FirstOrDefault(x => x.Equals(requestedMat));
+        }
+        if (existing is null) { Log.Warning($"failed to get {requestedMat.Name} from scene"); yield break; }
+        if (!existing.referenceMaterial) { Log.Warning($"no material found in material descriptor for {requestedMat.Name}"); yield break; }
+
+        Log.Info($"Applying {existing.Name}");
+        closure?.Invoke(existing);
+        yield break;
+    }
+
+    static IEnumerator LoadMatsFromSceneAsync(string scene)
+    {
+        if (loadedScenes.Contains(scene) || SceneManager.GetActiveScene().name == scene) 
+        {
+            yield return new WaitUntil(() => FakeLoad is false);
+            GetResourcesFromScene(scene);
+            yield break; 
+        }
+        
+        Log.Debug("Starting Scene Load");
+        FakeLoad = true;
+        loadedScenes.Add(scene);
+        yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
+        GetResourcesFromScene(scene);
+        yield return SceneManager.UnloadSceneAsync(scene);
+        yield return Resources.UnloadUnusedAssets();
+        loadedScenes.Remove(scene);
+        FakeLoad = false;
+        Log.Info("Scene Unload complete.");
+    }
 
     static void GetResourcesFromScene(string sceneName)
     {
         var inThisScene = pendingLoad
             .Where(x => x.Source == sceneName)
-            .Select(x => x.Name)
+            .Select(x => x.Name.DeInstance())
             .ToList();
-        Log.Debug("Assets pending load:");
-        inThisScene.ForEach(Log.Debug);
-        Resources.FindObjectsOfTypeAll<Material>()
+        Log.Info("Assets pending load:");
+        inThisScene.ForEach(Log.Info);
+        int pendingCount = inThisScene.Count;
+        int loadedCount = Resources.FindObjectsOfTypeAll<Material>()
             .Where(x => inThisScene.Contains(x.name))
             .Select(x => new MaterialDescriptor(x, sceneName, MaterialDescriptor.SourceType.World))
             .ForEach(x =>
@@ -29,58 +87,9 @@ internal class SceneResourceProvider
                 x.referenceMaterial.hideFlags = HideFlags.HideAndDontSave;
                 loaded.Add(x);
                 pendingLoad.Remove(x);
-            });
-    }
-
-    internal static void VolcanoTest()
-    {
-        CCPlugin.CoroutineRunner.StartCoroutine(TestLoad2());
-    }
-
-    static IEnumerator TestLoad2()
-    {
-        string scene = "volcano";
-        string matName = "Lava_3_Vertex Color Only 11";
-        Log.Info("Target materials currently loaded:");
-        Resources.FindObjectsOfTypeAll<Material>()
-            .Where(x => x.name.Contains(matName))
-            .ForEach(x => Log.Info(x.name));
-        pendingLoad.Add(new MaterialDescriptor(matName, scene, MaterialDescriptor.SourceType.World));
-
-        Log.Info("Starting Scene Load");
-        var request = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
-        //request.allowSceneActivation = false;
-        yield return new WaitUntil(() => request.progress > 0.89f);
-
-        GetResourcesFromScene(scene);
-        Log.Info("Target materials currently loaded:");
-        loaded
-            .Where(x => x.Name.Contains(matName))
-            .Select(x => x.Name)
-            .ForEach(Log.Info);
-        yield return SceneManager.UnloadSceneAsync(scene);
-        Log.Info("Scene Unload complete.");
-    }
-
-    static IEnumerator TestLoad()
-    {
-        //load volcano
-        Log.Info("Target materials currently loaded:");
-        Resources.FindObjectsOfTypeAll<Material>()
-            .Where(x => x.name.Contains("Lava_3_Vertex Color Only 11"))
-            .ForEach(x => Log.Info(x.name));
-        Log.Info("Starting Scene Load");
-        var request = SceneManager.LoadSceneAsync("volcano", LoadSceneMode.Additive);
-        request.allowSceneActivation = false;
-        yield return request;
-        Log.Info("Target materials currently loaded:");
-        Resources.FindObjectsOfTypeAll<Material>()
-            .Where(x => x.name.Contains("Lava_3_Vertex Color Only 11"))
-            .ForEach(x => Log.Info(x.name));
-        Log.Info("End target materials. Starting scene unload.");
-        yield return SceneManager.UnloadSceneAsync("volcano");
-        Log.Info("Scene unloaded");
-        
+            })
+            .Count();
+        Log.Info($"Loaded {loadedCount} of {pendingCount} materials");
     }
 
     internal enum SceneAssetStatus
