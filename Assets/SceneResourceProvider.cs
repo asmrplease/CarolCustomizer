@@ -13,32 +13,100 @@ internal class SceneResourceProvider
 {
     //we want a list of materials to load, grouped by the scene that they're sourced from
     //this list should be populated from the player's marked favorites, and the list of recipes
-    readonly static HashSet<MaterialDescriptor> pendingLoad = [];
+    //the recipe applier needs to report the list of objects to be loaded
+    //once all objects have been queued, call the load method to sequentially load the requested assets
+    //but then we either need separate queues for scenes/objects that we want to load now versus low 
+    readonly static HashSet<MaterialDescriptor> lazyLoad = [];
+    readonly static Dictionary<MaterialDescriptor, List<Action<MaterialDescriptor>>> batchLoad = [];
     readonly static HashSet<MaterialDescriptor> loaded = [];
     readonly static HashSet<string> loadedScenes = [];
-
-    readonly static Dictionary<string, HashSet<MaterialDescriptor>> matsByScene = [];
     public static bool FakeLoad { get; private set; } = false;
 
-    internal static void AddToPending(MaterialDescriptor material)
+    internal static IEnumerator BatchQueueAndThen(MaterialDescriptor request, Action<MaterialDescriptor> closure)
+    {
+        if (!batchLoad.TryGetValue(request, out var actions)) actions = [];
+        actions.Add(closure);
+        batchLoad[request] = actions;//i forget if we have to do this or not but it doesn't hurt so we do it.
+        yield break;
+    }
+
+    internal static IEnumerator BatchLoad()
+    {
+        var batchLoadScenes = batchLoad
+            .Select(x => x.Key.Source)
+            .Distinct()
+            .ToList();
+        Log.Info("Loading the folling scenes:");
+        batchLoadScenes.ForEach(Log.Info);
+        foreach (var scene in batchLoadScenes) yield return BatchLoadMatsFromScene(scene);
+        yield break;
+    }
+
+    static IEnumerator BatchLoadMatsFromScene(string scene)
+    {
+        Log.Debug("Starting Scene Load");
+        FakeLoad = true;
+        loadedScenes.Add(scene);
+        yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
+        //GetLazyResourcesFromScene(scene);
+        GetBatchResourcesFromScene(scene);
+        yield return SceneManager.UnloadSceneAsync(scene);
+        yield return Resources.UnloadUnusedAssets();
+        loadedScenes.Remove(scene);
+        FakeLoad = false;
+        Log.Info("Scene Unload complete.");
+    }
+
+    static void GetBatchResourcesFromScene(string sceneName)
+    {
+        Log.Info($"GetBatchResourcesFromScene({sceneName}");
+        var inThisScene = batchLoad
+            .Where(x => x.Key.Source == sceneName)
+            .Select(x => x.Key.Name.DeInstance())
+            .ToList();
+        Log.Info("Assets pending load:");
+        inThisScene.ForEach(Log.Info);
+        int pendingCount = inThisScene.Count;
+        int loadedCount = Resources.FindObjectsOfTypeAll<Material>()
+            .Where(x => inThisScene.Contains(x.name))
+            .Select(x => new MaterialDescriptor(x, sceneName, MaterialDescriptor.SourceType.World))
+            .ForEach(x =>
+            {
+                x.referenceMaterial.hideFlags = HideFlags.HideAndDontSave;
+                loaded.Add(x);
+                var callbacks = batchLoad[x];
+                batchLoad.Remove(x);
+                Log.Info($"Calling back {callbacks.Count()} method(s) for {x.Name}");
+                callbacks.ForEach(callback => callback?.Invoke(x));
+            })
+            .Count();
+        Log.Info($"Loaded {loadedCount} of {pendingCount} materials");
+    }
+
+    internal static void AddToLazyLoad(MaterialDescriptor material)
     {
         if (loaded.Contains(material)) { Log.Info("Material already loaded"); return; }
 
-        pendingLoad.Add(material);
+        lazyLoad.Add(material);
     }
-
+    /// <summary>
+    /// Quickly store a material 
+    /// </summary>
+    /// <param name="material"></param>
     internal static void Cache(MaterialDescriptor material)
     {
+        if (!material.referenceMaterial) { Log.Warning($"Tried to cache MaterialDescriptor {material.Name}, but there was no actual material attached."); return; }
+
         loaded.Add(material);
     }
 
-    internal static IEnumerator LazyApplyMaterial(MaterialDescriptor requestedMat, Action<MaterialDescriptor> closure)
+    internal static IEnumerator LoadMaterialAndThen(MaterialDescriptor requestedMat, Action<MaterialDescriptor> closure)
     {
         var existing = loaded.FirstOrDefault(x => x.Equals(requestedMat));
         if (existing is null)
         {
-            AddToPending(requestedMat);
-            yield return LoadMatsFromSceneAsync(requestedMat.Source);
+            AddToLazyLoad(requestedMat);
+            yield return LazyLoadMatsFromScene(requestedMat.Source);
             existing = loaded.FirstOrDefault(x => x.Equals(requestedMat));
         }
         if (existing is null) { Log.Warning($"failed to get {requestedMat.Name} from scene"); yield break; }
@@ -49,12 +117,12 @@ internal class SceneResourceProvider
         yield break;
     }
 
-    static IEnumerator LoadMatsFromSceneAsync(string scene)
+    static IEnumerator LazyLoadMatsFromScene(string scene)
     {
         if (loadedScenes.Contains(scene) || SceneManager.GetActiveScene().name == scene) 
         {
             yield return new WaitUntil(() => FakeLoad is false);
-            GetResourcesFromScene(scene);
+            GetLazyResourcesFromScene(scene);
             yield break; 
         }
         
@@ -62,7 +130,7 @@ internal class SceneResourceProvider
         FakeLoad = true;
         loadedScenes.Add(scene);
         yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
-        GetResourcesFromScene(scene);
+        GetLazyResourcesFromScene(scene);
         yield return SceneManager.UnloadSceneAsync(scene);
         yield return Resources.UnloadUnusedAssets();
         loadedScenes.Remove(scene);
@@ -70,9 +138,9 @@ internal class SceneResourceProvider
         Log.Info("Scene Unload complete.");
     }
 
-    static void GetResourcesFromScene(string sceneName)
+    static void GetLazyResourcesFromScene(string sceneName)
     {
-        var inThisScene = pendingLoad
+        var inThisScene = lazyLoad
             .Where(x => x.Source == sceneName)
             .Select(x => x.Name.DeInstance())
             .ToList();
@@ -86,7 +154,7 @@ internal class SceneResourceProvider
             {
                 x.referenceMaterial.hideFlags = HideFlags.HideAndDontSave;
                 loaded.Add(x);
-                pendingLoad.Remove(x);
+                lazyLoad.Remove(x);
             })
             .Count();
         Log.Info($"Loaded {loadedCount} of {pendingCount} materials");

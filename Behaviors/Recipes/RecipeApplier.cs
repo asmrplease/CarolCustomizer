@@ -22,6 +22,7 @@ public static class RecipeApplier
         recipe
             .ActiveAccessories
             .ForEach(x => SetAccessory(target, x));
+        CCPlugin.CoroutineRunner.StartCoroutine(SceneResourceProvider.BatchLoad());
         recipe
             .ActiveEffects
             .Select(OutfitAssetManager.GetOutfitByAssetName)
@@ -100,7 +101,7 @@ public static class RecipeApplier
                 .CoroutineRunner
                 .StartCoroutine
                 (
-                    SceneResourceProvider.LazyApplyMaterial(
+                    SceneResourceProvider.BatchQueueAndThen(
                         materialDescription, 
                         (x) => target.PaintAccessory(accessory, x, index))
                 );
