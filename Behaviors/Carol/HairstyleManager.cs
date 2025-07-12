@@ -83,15 +83,23 @@ internal class HairstyleManager : IDisposable
                 x.updateWhenOffscreen = true;
             });
         //Magica activation
+        UpdateColliders();
+    }
+
+    public void UpdateColliders()
+    {
         if (!targetPelvis.MagiData.ClothCompanion) { Log.Warning("No cloth companion found on carol."); return; }
 
         var hairMagica = liveHair.GetComponentInChildren<MagicaCloth>();
+        if (!hairMagica) { Log.Warning($"no magica cloth found for {liveHair.name}."); return; }
+
         var hairCompanion = targetPelvis.MagiData.ClothCompanion;
         hairCompanion.cloth = hairMagica;
         hairCompanion.colliderRoots.Clear();
         hairCompanion.colliderRoots.Add(targetPelvis.transform);
         hairCompanion.RebuildCollidersList();
-   }
+    }
+
 
     public void Dispose() => GameObject.Destroy(liveHair);
 
