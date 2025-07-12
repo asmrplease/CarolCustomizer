@@ -19,7 +19,6 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
     const string toggleAddress = "Toggle";
 
     Main.ContextMenu contextMenu;
-    MaterialManager materialManager;
     MaterialDescriptor material;
 
     Text displayName;

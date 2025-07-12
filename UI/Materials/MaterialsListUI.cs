@@ -55,6 +55,7 @@ internal class MaterialsListUI : MonoBehaviour
             .AddComponent<ReadOnlyMatUI>()
             .Constructor(mat, contextMenu);
         bookmarkedMaterialUIs.Add(mat, ui);
+        //ui.transform.SetSiblingIndex(bookmarkedMaterialUIs.IndexOfKey(mat));
     }
 
     private void OnEyedropperChanged(List<MaterialDescriptor> materials)
@@ -73,6 +74,7 @@ internal class MaterialsListUI : MonoBehaviour
                .AddComponent<ReadOnlyMatUI>()
                .Constructor(x, contextMenu))
             .ForEach(eyedropperMaterialUIs.Add);
+        eyedropperMaterialUIs.ForEach(x=> x.transform.SetAsFirstSibling());
     }
 
     void Update()

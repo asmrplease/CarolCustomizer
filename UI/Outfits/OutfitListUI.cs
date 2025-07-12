@@ -29,7 +29,7 @@ public class OutfitListUI : MonoBehaviour
     Dropdown ColorSelector;
     Dropdown ModelSelector;
 
-    SortedList<Outfit, OutfitUI> outfitUIs = new();
+    SortedList<Outfit, OutfitUI> outfitUIs = [];
 
     public Main.ContextMenu ContextMenu { get; private set; }
     public MaterialManager MaterialManager { get; private set; }
