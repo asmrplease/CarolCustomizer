@@ -1,5 +1,4 @@
-﻿using CarolCustomizer.Behaviors.Recipes;
-using CarolCustomizer.Models.Materials;
+﻿using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections;
@@ -24,6 +23,7 @@ internal class SceneResourceProvider
 
     internal static IEnumerator BatchQueueAndThen(MaterialDescriptor request, Action<MaterialDescriptor> closure)
     {
+        if (loaded.TryGetValue(request, out var existing)) { closure?.Invoke(existing); yield break; }
         if (!batchLoad.TryGetValue(request, out var actions)) actions = [];
         actions.Add(closure);
         batchLoad[request] = actions;//i forget if we have to do this or not but it doesn't hurt so we do it.
@@ -32,13 +32,23 @@ internal class SceneResourceProvider
 
     internal static IEnumerator BatchLoad()
     {
+        Log.Info("BatchLoad()");
+        var currentScene = SceneManager.GetActiveScene().name;
         var batchLoadScenes = batchLoad
             .Select(x => x.Key.Source)
             .Distinct()
-            .ToList();
+            .Where(x => currentScene != x)
+            .ToList();  
+        lazyLoad
+            .Where(x => batchLoadScenes.Contains(x.Source))
+            .ForEach(x => batchLoad.TryAdd(x, []))
+            .ToList()
+            .ForEach(x => lazyLoad.Remove(x));
         Log.Info("Loading the folling scenes:");
         batchLoadScenes.ForEach(Log.Info);
+        GetBatchResourcesFromScene(currentScene);
         foreach (var scene in batchLoadScenes) yield return BatchLoadMatsFromScene(scene);
+
         yield break;
     }
 
@@ -67,19 +77,21 @@ internal class SceneResourceProvider
         Log.Info("Assets pending load:");
         inThisScene.ForEach(Log.Info);
         int pendingCount = inThisScene.Count;
-        int loadedCount = Resources.FindObjectsOfTypeAll<Material>()
+        var foundList = Resources.FindObjectsOfTypeAll<Material>()
             .Where(x => inThisScene.Contains(x.name))
-            .Select(x => new MaterialDescriptor(x, sceneName, MaterialDescriptor.SourceType.World))
-            .ForEach(x =>
-            {
-                x.referenceMaterial.hideFlags = HideFlags.HideAndDontSave;
-                loaded.Add(x);
-                var callbacks = batchLoad[x];
-                batchLoad.Remove(x);
-                Log.Info($"Calling back {callbacks.Count()} method(s) for {x.Name}");
-                callbacks.ForEach(callback => callback?.Invoke(x));
-            })
-            .Count();
+            .Select(x => new MaterialDescriptor(x, sceneName, MaterialDescriptor.SourceType.World));
+        int loadedCount = 0;
+        foreach (var found in foundList) 
+        {
+            if (!batchLoad.TryGetValue(found, out var callbacks)) { continue; }
+
+            found.referenceMaterial.hideFlags = HideFlags.HideAndDontSave;
+            loaded.Add(found);
+            batchLoad.Remove(found);
+            Log.Info($"Calling back {callbacks.Count()} method(s) for {found.Name}");
+            callbacks.ForEach(callback => callback?.Invoke(found));
+            loadedCount++;
+        }
         Log.Info($"Loaded {loadedCount} of {pendingCount} materials");
     }
 
@@ -185,3 +197,4 @@ internal class SceneResourceProvider
         var idk = await Test();
     }
 }
+

@@ -10,6 +10,26 @@ namespace CarolCustomizer.Hooks;
 
 public static class OnirismPatches
 {
+    //[HarmonyPatch(typeof(GameManager), "Awake")]
+    public class DontWakeManager
+    {
+        public static bool Prefix()
+        {
+            Log.Info($"DontWakeManager patch, FakeLoad: {SceneResourceProvider.FakeLoad}");
+            return !SceneResourceProvider.FakeLoad;
+        }
+    }
+
+    //[HarmonyPatch(typeof(GameManager), "Start")]
+    public class DontStartManager
+    {
+        public static bool Prefix()
+        {
+            Log.Info($"DontStartManager patch, FakeLoad: {SceneResourceProvider.FakeLoad}");
+            return !SceneResourceProvider.FakeLoad;
+        }
+    }
+
     [HarmonyPatch(typeof(Projectile), "OnTriggerEnter")]
     public class ProjectileCollision
     {

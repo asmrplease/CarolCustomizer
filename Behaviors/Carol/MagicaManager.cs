@@ -11,14 +11,14 @@ using UnityEngine;
 namespace CarolCustomizer.Behaviors.Carol;
 internal class MagicaManager(SkeletonManager skeleton)
 {
-    Dictionary<LiveAccessory, MagicaCloth> LiveCloths = new();
+    Dictionary<LiveAccessory, MagicaCloth> LiveCloths = [];
 
     SkeletonManager skeleton = skeleton;
     PelvisWatchdog targetPelvis;
 
-    List<MagicaCloth> processing = new();
-    Dictionary<AccessoryDescriptor, MagicaCloth> MeshClothAccs = new();
-    List<MagicaCloth> BoneCloths = new();
+    List<MagicaCloth> processing = [];
+    Dictionary<AccessoryDescriptor, MagicaCloth> MeshClothAccs = [];
+    List<MagicaCloth> BoneCloths = [];
 
     public void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
@@ -120,7 +120,7 @@ internal class MagicaManager(SkeletonManager skeleton)
         LiveCloths[acc] = liveMagica;
     }
 
-    void HandleBuildComplete(bool success, MagicaCloth component, Guid buildGuid)
+    void HandleBuildComplete(bool _, MagicaCloth component, Guid __)
     {
         processing.Remove(component);
         processing.RemoveAll(x => !x);

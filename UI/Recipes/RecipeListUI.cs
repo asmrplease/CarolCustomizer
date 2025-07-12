@@ -91,8 +91,8 @@ public class RecipeListUI : MonoBehaviour
     public void OnRecipeCreated(Recipe newRecipe)
     {
         Log.Debug("RecipeListUI.OnRecipeCreated");
-        //RecipeApplier.GetWorldMats(newRecipe.Descriptor)
-        //    .ForEach(SceneResourceProvider.AddToLazyLoad);
+        RecipeApplier.GetWorldMats(newRecipe.Descriptor)
+            .ForEach(SceneResourceProvider.AddToLazyLoad);
 
 
         var uiInstance = Instantiate(loader.OutfitListElement, listRoot);

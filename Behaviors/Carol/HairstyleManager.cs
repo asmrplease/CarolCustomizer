@@ -1,7 +1,9 @@
 ﻿using CarolCustomizer.Events;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Utils;
+using MagicaCloth2;
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Carol;
@@ -60,10 +62,13 @@ internal class HairstyleManager : IDisposable
     void InstantiateHairstyle()
     {
         if (liveHair) GameObject.Destroy(liveHair);
-        if (hairstyle is null) return;
-
         var head = targetPelvis.BoneData.StandardBones["Bn_CarolHead"];
         if (!head) { Log.Error("No valid headbone when instantiating hairstyle"); return; }
+        head.GetComponentsInChildren<Hairstyle>(true)
+            .Select(x => x.gameObject)
+            .ForEach(GameObject.Destroy);
+
+        if (hairstyle is null) return;
 
         liveHair = GameObject.Instantiate(hairstyle.gameObject, head.transform);
         liveHair.transform.localScale = Vector3.one;
@@ -76,9 +81,17 @@ internal class HairstyleManager : IDisposable
                 x.renderingLayerMask = Constants.SMRLayer;
                 x.allowOcclusionWhenDynamic = false;
                 x.updateWhenOffscreen = true;
-            }); 
-        //Magica activation?
-    }
+            });
+        //Magica activation
+        if (!targetPelvis.MagiData.ClothCompanion) { Log.Warning("No cloth companion found on carol."); return; }
+
+        var hairMagica = liveHair.GetComponentInChildren<MagicaCloth>();
+        var hairCompanion = targetPelvis.MagiData.ClothCompanion;
+        hairCompanion.cloth = hairMagica;
+        hairCompanion.colliderRoots.Clear();
+        hairCompanion.colliderRoots.Add(targetPelvis.transform);
+        hairCompanion.RebuildCollidersList();
+   }
 
     public void Dispose() => GameObject.Destroy(liveHair);
 
