@@ -26,7 +26,7 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
     Text materialName;
     Image favoriteIcon;
 
-    public void Constructor(MaterialDescriptor material, MaterialManager materialManager, Main.ContextMenu contextMenu)
+    public ReadOnlyMatUI Constructor(MaterialDescriptor material, MaterialManager materialManager, Main.ContextMenu contextMenu)
     {
         this.material = material;
         this.materialManager = materialManager;
@@ -46,6 +46,7 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
         favoriteIcon.enabled = false;
 
         name = "ReadonlyMatUI: " + this.material.Name;
+        return this;
     }
 
     private void CopyMaterial()

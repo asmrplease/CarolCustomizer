@@ -1,8 +1,9 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors;
-using CarolCustomizer.UI.Main;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.UI.Materials;
@@ -12,6 +13,7 @@ internal class MaterialsListUI : MonoBehaviour
 
     MaterialManager materialManager;
     UIAssetLoader loader;
+    Eyedropper eyedropper;
     Main.ContextMenu contextMenu;
 
     Transform listRoot;
@@ -23,27 +25,37 @@ internal class MaterialsListUI : MonoBehaviour
         this.materialManager = materialManager;
         this.loader = loader;
         this.contextMenu = contextMenu;
-
+        this.eyedropper = this.gameObject.AddComponent<Eyedropper>();
+        this.eyedropper.OnMaterialsFound += OnMaterialsChanged;
         listRoot = transform.Find(listRootAddress);
         return this;
     }
 
-    private void OnEnable()
+    private void OnMaterialsChanged(List<MaterialDescriptor> materials)
     {
-        if (!listRoot) { Log.Warning("MaterialsListUI was null during OnEnable"); return; }
-        //get the world materials from the material manager
-        foreach (var item in materialUIs) { if (item) Destroy(item.gameObject); }
-        materialUIs.Clear();
-
-        var materials = materialManager.ListMaterials();
         if (materials is null) return;
+        if (!this.eyedropper.enabled) return;
 
-        foreach (var material in materialManager.ListMaterials())
-        {
-            var listElementGO = Instantiate(loader.AccessoryListElement, listRoot);
-            var matUI = listElementGO.AddComponent<ReadOnlyMatUI>();
-            matUI.Constructor(material, materialManager, contextMenu);
-            materialUIs.Add(matUI);
-        }
+        materialUIs
+            .Where(x => x)
+            .Select(x => x.gameObject)
+            .ForEach(Destroy);//foreach (var item in materialUIs) { if (item) Destroy(item.gameObject); }
+        materialUIs.Clear();
+        materials
+            .Select(x =>
+                Instantiate(loader.AccessoryListElement, listRoot)
+               .AddComponent<ReadOnlyMatUI>()
+               .Constructor(x, materialManager, contextMenu))
+            .ForEach(materialUIs.Add);
     }
+
+    void Update()
+    {
+        if (!Input.GetMouseButtonDown(0)) return;
+        if (this.contextMenu.isActiveAndEnabled) return;
+
+        Log.Debug("Toggling Eyedropper");
+        this.eyedropper.enabled = !this.eyedropper.enabled;
+    }
+
 }

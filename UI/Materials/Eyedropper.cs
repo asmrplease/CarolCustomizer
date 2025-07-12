@@ -1,19 +1,41 @@
-﻿using UnityEngine;
+﻿using CarolCustomizer.Models.Materials;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace CarolCustomizer.UI.Materials;
 internal class Eyedropper : MonoBehaviour
 {
+    GameObject lastHit;
+    readonly float scanInterval = 0.10f;
+    float nextScan = 0;
+    internal event Action<List<MaterialDescriptor>> OnMaterialsFound;
+
     void Update()
     {
-        //if mouse position has changed
+        if (Time.time < nextScan) return;
 
-        //if 
-    }
+        nextScan = Time.time + scanInterval;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Physics.Raycast(ray, out RaycastHit cast, 1000f);
+        if (!cast.transform) return;
 
-    void Raycast()
-    {
-        var mousePos = 
-        Ray ray = Camera.main.ScreenPointToRay(mousePos);
-        Physics.Raycast(ray, out RaycastHit hit, 1000f);
+        var hit = cast.transform.gameObject;
+        if (lastHit && hit == lastHit) return;
+        if (hit.name == "CAROL(Clone)") return;
+
+        lastHit = hit;
+        var scene = SceneManager.GetActiveScene().name;
+        var results = hit
+            .GetComponentsInChildren<Renderer>(true)
+            .Concat(hit.GetComponentsInParent<Renderer>(true))
+            .SelectMany(x => x.materials)
+            .Distinct()
+            .Select(x => new MaterialDescriptor(x, scene, MaterialDescriptor.SourceType.World))
+            .ToList();
+        if (results.Any()) OnMaterialsFound?.Invoke(results);
     }
+    
 }

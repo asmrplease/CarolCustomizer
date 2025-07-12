@@ -43,6 +43,8 @@ public class MenuToggle : MonoBehaviour
 
     void OnSceneChange(Scene newScene, LoadSceneMode mode)
     {
+        if (mode == LoadSceneMode.Additive) return;
+
         currentScene = newScene;
         if (currentScene.name == Constants.MenuSceneName) return;
         StartCoroutine(OnMainMenuLoaded()); 
