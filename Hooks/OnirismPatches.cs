@@ -30,18 +30,6 @@ public static class OnirismPatches
         }
     }
 
-    [HarmonyPatch(typeof(Projectile), "OnTriggerEnter")]
-    public class ProjectileCollision
-    {
-        [HarmonyPostfix]
-        public static void PostFix(Collider collider, Projectile __instance)
-        {
-            if (!Entity.players.Contains(__instance.origin)) return;
-
-            CCPlugin.uiInstance.materialManager.OnNewTarget(collider.gameObject);
-        }
-    }
-
     [HarmonyPatch(typeof(CostumeSwapUI), nameof(CostumeSwapUI.ChangeCostume))]
     public static class CostumeSwapPatch
     {

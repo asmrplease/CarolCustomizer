@@ -1,6 +1,7 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors;
 using CarolCustomizer.Models.Materials;
+using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,42 +12,67 @@ internal class MaterialsListUI : MonoBehaviour
 {
     private static readonly string listRootAddress = "Scroll View/Viewport/Content";
 
-    MaterialManager materialManager;
     UIAssetLoader loader;
     Eyedropper eyedropper;
     Main.ContextMenu contextMenu;
 
     Transform listRoot;
 
-    List<ReadOnlyMatUI> materialUIs = new();
+    readonly List<ReadOnlyMatUI> eyedropperMaterialUIs = [];
+    readonly Dictionary<MaterialDescriptor, ReadOnlyMatUI> bookmarkedMaterialUIs = [];
 
-    public MaterialsListUI Constructor(UIAssetLoader loader, MaterialManager materialManager, Main.ContextMenu contextMenu)
+    public MaterialsListUI Constructor(UIAssetLoader loader, Main.ContextMenu contextMenu)
     {
-        this.materialManager = materialManager;
         this.loader = loader;
         this.contextMenu = contextMenu;
-        this.eyedropper = this.gameObject.AddComponent<Eyedropper>();
-        this.eyedropper.OnMaterialsFound += OnMaterialsChanged;
+        this.eyedropper = this.gameObject.AddComponent<Eyedropper>().Constructor(loader);
+        this.eyedropper.OnMaterialsFound += OnEyedropperChanged;
+        SceneResourceProvider.OnMaterialLoaded += OnMaterialBookmarked;
+        MenuToggle.OnMenuToggle += HandleMenuToggle;
         listRoot = transform.Find(listRootAddress);
         return this;
     }
 
-    private void OnMaterialsChanged(List<MaterialDescriptor> materials)
+    void HandleMenuToggle(bool visible)
+    {
+        this.eyedropper.enabled = visible;
+    }
+
+    void OnEnable()
+    {
+        this.eyedropper.enabled = true;
+    }
+
+    private void OnMaterialBookmarked(MaterialDescriptor mat)
+    {
+        Log.Debug($"Creating materialUI for {mat.Name}");
+        if (bookmarkedMaterialUIs.TryGetValue(mat, out var existing))
+        {
+            Destroy(existing.gameObject);
+            bookmarkedMaterialUIs.Remove(mat);
+        }
+        var ui = Instantiate(loader.AccessoryListElement, listRoot)
+            .AddComponent<ReadOnlyMatUI>()
+            .Constructor(mat, contextMenu);
+        bookmarkedMaterialUIs.Add(mat, ui);
+    }
+
+    private void OnEyedropperChanged(List<MaterialDescriptor> materials)
     {
         if (materials is null) return;
         if (!this.eyedropper.enabled) return;
 
-        materialUIs
+        eyedropperMaterialUIs
             .Where(x => x)
             .Select(x => x.gameObject)
             .ForEach(Destroy);//foreach (var item in materialUIs) { if (item) Destroy(item.gameObject); }
-        materialUIs.Clear();
+        eyedropperMaterialUIs.Clear();
         materials
             .Select(x =>
                 Instantiate(loader.AccessoryListElement, listRoot)
                .AddComponent<ReadOnlyMatUI>()
-               .Constructor(x, materialManager, contextMenu))
-            .ForEach(materialUIs.Add);
+               .Constructor(x, contextMenu))
+            .ForEach(eyedropperMaterialUIs.Add);
     }
 
     void Update()

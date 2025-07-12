@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Models.Materials;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Models.Materials;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,26 @@ internal class Eyedropper : MonoBehaviour
 {
     GameObject lastHit;
     readonly float scanInterval = 0.10f;
+    readonly Vector2 hotspot = new(4, 28);
+    Texture2D cursor;
     float nextScan = 0;
     internal event Action<List<MaterialDescriptor>> OnMaterialsFound;
+
+    internal Eyedropper Constructor(UIAssetLoader uiAssets)
+    {
+        this.cursor = uiAssets.CursorTexture;
+        return this;
+    }
+
+    void OnEnable()
+    {
+        Cursor.SetCursor(this.cursor, hotspot, CursorMode.Auto);
+    }
+
+    void OnDisable()
+    {
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+    }
 
     void Update()
     {

@@ -19,6 +19,8 @@ internal class SceneResourceProvider
     readonly static Dictionary<MaterialDescriptor, List<Action<MaterialDescriptor>>> batchLoad = [];
     readonly static HashSet<MaterialDescriptor> loaded = [];
     readonly static HashSet<string> loadedScenes = [];
+
+    internal static event Action<MaterialDescriptor> OnMaterialLoaded;
     public static bool FakeLoad { get; private set; } = false;
 
     internal static IEnumerator BatchQueueAndThen(MaterialDescriptor request, Action<MaterialDescriptor> closure)
@@ -52,7 +54,7 @@ internal class SceneResourceProvider
         yield break;
     }
 
-    static IEnumerator BatchLoadMatsFromScene(string scene)
+    internal static IEnumerator BatchLoadMatsFromScene(string scene)
     {
         Log.Debug("Starting Scene Load");
         FakeLoad = true;
@@ -70,9 +72,17 @@ internal class SceneResourceProvider
     static void GetBatchResourcesFromScene(string sceneName)
     {
         Log.Info($"GetBatchResourcesFromScene({sceneName}");
-        var inThisScene = batchLoad
+        var batchInScene = batchLoad
             .Where(x => x.Key.Source == sceneName)
             .Select(x => x.Key.Name.DeInstance())
+            .ToList();
+        var lazyInScene = lazyLoad
+            .Where(x => x.Source == sceneName)
+            .Select(x => x.Name.DeInstance())
+            .ToList();
+        var inThisScene = batchInScene
+            .Concat(lazyInScene)
+            .Distinct()
             .ToList();
         Log.Info("Assets pending load:");
         inThisScene.ForEach(Log.Info);
@@ -88,8 +98,10 @@ internal class SceneResourceProvider
             found.referenceMaterial.hideFlags = HideFlags.HideAndDontSave;
             loaded.Add(found);
             batchLoad.Remove(found);
+            lazyLoad.Remove(found);
             Log.Info($"Calling back {callbacks.Count()} method(s) for {found.Name}");
             callbacks.ForEach(callback => callback?.Invoke(found));
+            OnMaterialLoaded?.Invoke(found);
             loadedCount++;
         }
         Log.Info($"Loaded {loadedCount} of {pendingCount} materials");
@@ -100,6 +112,7 @@ internal class SceneResourceProvider
         if (loaded.Contains(material)) { Log.Info("Material already loaded"); return; }
 
         lazyLoad.Add(material);
+        OnMaterialLoaded?.Invoke(material);
     }
     /// <summary>
     /// Quickly store a material 

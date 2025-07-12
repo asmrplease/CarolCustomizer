@@ -3,7 +3,7 @@ using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Materials;
-using CarolCustomizer.UI.Main;
+using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -23,24 +23,27 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
     MaterialDescriptor material;
 
     Text displayName;
-    Text materialName;
+    Text sceneName;
     Image favoriteIcon;
+    Image background;
 
-    public ReadOnlyMatUI Constructor(MaterialDescriptor material, MaterialManager materialManager, Main.ContextMenu contextMenu)
+    public ReadOnlyMatUI Constructor(MaterialDescriptor material, Main.ContextMenu contextMenu)
     {
         this.material = material;
-        this.materialManager = materialManager;
         this.contextMenu = contextMenu;
 
         displayName = transform.Find(displayNameAddress).GetComponent<Text>();
         displayName.text = this.material.Name;
 
-        materialName = transform.Find(materialNameAddress).GetComponent<Text>();
-        materialName.text = "";
+        sceneName = transform.Find(materialNameAddress).GetComponent<Text>();
+        sceneName.text = material.Source;
 
         var toggle = transform.Find(toggleAddress).gameObject;
         GameObject.Destroy(toggle.GetComponent<Toggle>());
         GameObject.Destroy(toggle);
+
+        background = GetComponent<Image>();
+        background.color = material.referenceMaterial ? Constants.DefaultColor : Color.gray;
 
         favoriteIcon = transform.Find(favoriteAddress)?.GetComponent<Image>();
         favoriteIcon.enabled = false;
@@ -49,10 +52,20 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
         return this;
     }
 
-    private void CopyMaterial()
+    void CopyMaterial()
     {
-        materialManager.clipboard = material;
+        MaterialManager.clipboard = material;
         SceneResourceProvider.Cache(material);
+    }
+
+    void LoadMaterial()
+    {
+        string scene = this.material.Source;
+        CCPlugin.CoroutineRunner.StartCoroutine(SceneResourceProvider.BatchQueueAndThen(
+            this.material,
+            (_) => { }));
+        CCPlugin.CoroutineRunner.StartCoroutine(
+            SceneResourceProvider.BatchLoad());
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -60,17 +73,16 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
         if (eventData.button == Settings.HotKeys.ContextMenu) { OnContextClick(); return; }
     }
 
-    private void OnContextClick()
+    void OnContextClick()
     {
         contextMenu.Show(this);
     }
 
     public List<(string, UnityAction)> GetContextMenuItems()
     {
-        List<(string, UnityAction)> menuItems = new()
-        {
-            ("Copy Material", CopyMaterial),
-        };
+        List<(string, UnityAction)> menuItems = [];
+        if (this.material.referenceMaterial) menuItems.Add(("Copy Material", CopyMaterial));
+        else menuItems.Add(("Load Material", LoadMaterial));
         return menuItems;
     }
 }

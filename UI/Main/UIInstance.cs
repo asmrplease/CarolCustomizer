@@ -69,7 +69,7 @@ public class UIInstance : MonoBehaviour
             .Constructor(loader, recipeFileWatcher, contextMenu, messageDialogue);
         var materialsView = Instantiate(loader.MaterialsView, viewRoot)
             .AddComponent<MaterialsListUI>()
-            .Constructor(loader, materialManager, contextMenu);
+            .Constructor(loader, contextMenu);
         var configView = Instantiate(loader.SettingsView, viewRoot)
             .AddComponent<ConfigUI>()
             .Constructor(messageDialogue);
