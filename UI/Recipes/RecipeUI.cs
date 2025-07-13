@@ -97,6 +97,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         switch (recipe.Error)
         {
             case Recipe.Status.MissingSource:   return $"Missing {RecipeApplier.GetMissingSources(recipe.Descriptor).Count()} sources";
+            case Recipe.Status.SlowSource:      return $"{SceneResourceProvider.CheckMaterialsReady(RecipeApplier.GetWorldMats(recipe.Descriptor)).Count()} scenes required.";
             case Recipe.Status.InvalidJson:     return "Recipe data invalid";
             case Recipe.Status.FileError:       return "Error loading file";
             default: return "";
@@ -108,6 +109,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         switch (recipe.Error)
         {
             case Recipe.Status.MissingSource: return Constants.DefaultColor;
+            case Recipe.Status.SlowSource: return Constants.DefaultColor.RGBMultiplied(0.5f);
             case Recipe.Status.InvalidJson: return Color.gray;
             case Recipe.Status.FileError: return Color.gray;
             default: return Constants.DefaultColor;
@@ -127,9 +129,20 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     void OnContextMenuWarningLoad()
     {
-        string message = "Some of the resources for this recipe aren't available: " + Environment.NewLine; ;
-        var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
-        foreach (var source in missingSources) { message += source + Environment.NewLine; }
+        string message = string.Empty;
+        if (recipe.Error == Recipe.Status.MissingSource)
+        {
+            message = "Some of the resources for this recipe aren't available: " + Environment.NewLine; ;
+            var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
+            foreach (var source in missingSources) { message += source + Environment.NewLine; }
+        }
+        if (recipe.Error == Recipe.Status.SlowSource)
+        {
+            message = "The following scenes will be loaded in the background to provide materials:" + Environment.NewLine; ;
+            var mats = RecipeApplier.GetWorldMats(recipe.Descriptor);
+            var unloadedScenes = SceneResourceProvider.CheckMaterialsReady(mats);
+            foreach (var scene in unloadedScenes) { message += scene + Environment.NewLine; }
+        }
         messageDialogue.Show(message, cancelText: "Nevermind", confirmText: "Load Anyway", confirmAction: () => OnContextMenuLoad(PlayerInstances.DefaultPlayer));
     }
 
@@ -155,9 +168,18 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     void OnContextMenuListMissing()
     {
-        var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
         string message = string.Empty;
-        foreach (var source in missingSources) { message += source + Environment.NewLine; }
+        if (recipe.Error == Recipe.Status.MissingSource)
+        {
+            var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
+            foreach (var source in missingSources) { message += source + Environment.NewLine; }
+        }
+        if (recipe.Error == Recipe.Status.SlowSource)
+        {
+            var mats = RecipeApplier.GetWorldMats(recipe.Descriptor);
+            var unloadedScenes = SceneResourceProvider.CheckMaterialsReady(mats);
+            foreach (var scene in unloadedScenes) { message += scene + Environment.NewLine; }
+        }
         messageDialogue.Show(message, cancelText: "Done");
     }
 
@@ -228,7 +250,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             output.Add(("Set Shezara", SetAsShezara));  
             
         }
-        if (recipe.Error == Recipe.Status.MissingSource)
+        if (recipe.Error == Recipe.Status.MissingSource || recipe.Error == Recipe.Status.SlowSource)
         {
             output.Add(("Load*", OnContextMenuWarningLoad));
             output.Add(("Show Missing", OnContextMenuListMissing));

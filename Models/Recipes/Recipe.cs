@@ -23,6 +23,7 @@ public record Recipe
     {
         NoError,
         MissingSource,
+        SlowSource,
         InvalidJson,
         FileError
     }

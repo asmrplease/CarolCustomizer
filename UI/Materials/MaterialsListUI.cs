@@ -1,5 +1,4 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
@@ -27,6 +26,7 @@ internal class MaterialsListUI : MonoBehaviour
         this.contextMenu = contextMenu;
         this.eyedropper = this.gameObject.AddComponent<Eyedropper>().Constructor(loader);
         this.eyedropper.OnMaterialsFound += OnEyedropperChanged;
+        SceneResourceProvider.SetCallback();
         SceneResourceProvider.OnMaterialLoaded += OnMaterialBookmarked;
         MenuToggle.OnMenuToggle += HandleMenuToggle;
         listRoot = transform.Find(listRootAddress);

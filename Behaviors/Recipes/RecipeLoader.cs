@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using CarolCustomizer.Assets;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using MonoMod.Utils;
@@ -122,13 +123,15 @@ internal static class RecipeLoader
 
         if (results.Recipe is null) { results.Status = Recipe.Status.InvalidJson; return results; }
 
+        bool slow = SceneResourceProvider.CheckMaterialsReady(RecipeApplier.GetWorldMats(results.Recipe)).Any();
+        if (slow) results.Status = Recipe.Status.SlowSource;
+
         try
         {
             if (RecipeApplier.GetMissingSources(results.Recipe).Any())
             { results.Status = Recipe.Status.MissingSource; }
         }
         catch { results.Status = Recipe.Status.MissingSource; }
-
         return results;
     }
 }

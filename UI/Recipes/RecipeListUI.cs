@@ -94,7 +94,6 @@ public class RecipeListUI : MonoBehaviour
         RecipeApplier.GetWorldMats(newRecipe.Descriptor)
             .ForEach(SceneResourceProvider.AddToLazyLoad);
 
-
         var uiInstance = Instantiate(loader.OutfitListElement, listRoot);
         if (!uiInstance) { Log.Error("Failed to instantiate outfit UI prefab for a recipeUI."); return; }
 

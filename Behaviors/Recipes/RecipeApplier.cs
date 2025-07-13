@@ -153,6 +153,7 @@ public static class RecipeApplier
         var matSources = recipe
             .ActiveAccessories
             .SelectMany(x => x.Materials)
+            .Where(x => x.Type != SourceType.World)
             .Select(x => x.Source);
         return accSources
             .Concat(matSources)
@@ -165,8 +166,7 @@ public static class RecipeApplier
 
     public static IEnumerable<string> GetMissingSources(RecipeDescriptor recipe)
     {
-        return GetSources(recipe)
-            .Where(x => OutfitAssetManager.GetOutfitByAssetName(x) is null);
+        return GetSources(recipe).Where(x => OutfitAssetManager.GetOutfitByAssetName(x) is null);
     }
 
 }

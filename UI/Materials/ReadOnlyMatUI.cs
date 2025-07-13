@@ -42,7 +42,7 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
         GameObject.Destroy(toggle);
 
         background = GetComponent<Image>();
-        background.color = material.referenceMaterial ? Constants.DefaultColor : Color.gray;
+        background.color = material.referenceMaterial ? Constants.DefaultColor : Constants.DefaultColor.RGBMultiplied(0.5f);
 
         favoriteIcon = transform.Find(favoriteAddress)?.GetComponent<Image>();
         favoriteIcon.enabled = false;
