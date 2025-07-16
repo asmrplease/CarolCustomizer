@@ -17,7 +17,7 @@ internal static class AccessoryDissolver
     const string FireDissolveAddress = "Materials/Deathdissolvefire";
     
     static Coroutine ActiveDissolve;
-    static bool SceneExitComplete = false;
+    static bool FadeFinish = false;
     static Material FireDissolve;
 
     static AccessoryDissolver()
@@ -34,7 +34,17 @@ internal static class AccessoryDissolver
     static void HandleSceneChanged(Scene arg0, Scene arg1)
     {
         Log.Debug($"ActiveSceneChanged {arg0.name}, {arg1.name}");
-        SceneExitComplete = true;
+        FadeFinish = true;
+    }
+
+    [HarmonyPatch(typeof(CheckPoints), "OnTriggerEnter")]
+    class CheckPointEnterPatch
+    {
+        [HarmonyPostfix]
+        static void Postfix()
+        {
+            FadeFinish = true;
+        }
     }
 
     [HarmonyPatch(typeof(SceneSwitcher), "OnTriggerStay")]
@@ -88,7 +98,7 @@ internal static class AccessoryDissolver
     {
         Log.Debug("Dissolve()");
         float elapsedTime = 0f;
-        SceneExitComplete = false;
+        FadeFinish = false;
         var accs = outfitManager.ActiveAccessories;
         var liveDescriptions = outfitManager.LiveAccessoryDescriptors;
         var dissolveMat = new MaterialDescriptor(dissolveMaterial, "Resources", MaterialDescriptor.SourceType.Resources);
@@ -110,9 +120,12 @@ internal static class AccessoryDissolver
             dissolveMaterial.SetFloat(DissolveAmount, dissolvePercent);
             yield return null;
         }
-        Log.Debug("Done dissolving, waiting for scene exit");
+        Log.Debug("Done dissolving, waiting for scene exit or player respawn");
 
-        yield return new WaitUntil(() => SceneExitComplete);
+        //how do we recognize when this outfitmanager's player has respawned?
+        //we probably want to pass in the entity instead, or get the 
+
+        yield return new WaitUntil(() => FadeFinish);
 
         foreach (var acc in accs)
         {

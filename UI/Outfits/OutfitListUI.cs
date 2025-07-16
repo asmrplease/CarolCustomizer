@@ -32,19 +32,16 @@ public class OutfitListUI : MonoBehaviour
     SortedList<Outfit, OutfitUI> outfitUIs = [];
 
     public Main.ContextMenu ContextMenu { get; private set; }
-    public MaterialManager MaterialManager { get; private set; }
     public static OutfitManager TargetOutfit => targetCarol?.outfitManager;
     public UIElementFactory Factory { get; private set; }
     public Transform ListRoot { get; private set; }
 
     public OutfitListUI Constructor(
         UIAssetLoader loader,
-        MaterialManager materialManager,
         Main.ContextMenu contextMenu)
     {
         Log.Debug("OutfitListUI.Constructor()");
         this.loader = loader;
-        this.MaterialManager = materialManager;
         this.ContextMenu = contextMenu;
         filter = this.gameObject
             .AddComponent<FilterUI>()

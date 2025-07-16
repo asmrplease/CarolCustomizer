@@ -20,6 +20,7 @@ internal class HaDSOutfitLoader : IDisposable
 
     public IEnumerator LoadAllHaDSOutfits()
     {
+        //var reference = CCPlugin.uiInstance.loadingIndicator.NotifyLoadingStart();
         Log.Info("Loading hair");
         LoadHair();
         Log.Info("Hair load complete, loading outfits");
@@ -36,6 +37,7 @@ internal class HaDSOutfitLoader : IDisposable
         }
 
         OutfitAssetManager.OnOutfitSetLoaded?.Invoke();
+        //CCPlugin.uiInstance.loadingIndicator.NotifyLoadingComplete(reference);
     }
 
     void LoadHair()

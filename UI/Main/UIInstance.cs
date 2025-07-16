@@ -24,10 +24,6 @@ public class UIInstance : MonoBehaviour
     private static readonly string settingsButtonAddress = "Accessory Panel/Tabs/Settings";
     #endregion
 
-    #region Dependencies
-    public MaterialManager materialManager { get; private set; }
-    #endregion
-
     Button outfitsButton;
     Button recipesButton;
     Button materialsButton;
@@ -37,13 +33,12 @@ public class UIInstance : MonoBehaviour
     Canvas canvas;
     List<Component> Views;
     List<Button> Buttons;
+    internal LoadingIndicator loadingIndicator;
     #endregion
 
     #region Public Interface
     public UIInstance Constructor(UIAssetLoader loader, RecipeFileWatcher recipeFileWatcher)
     {
-        materialManager = new();
-
         var mainTransform = Instantiate(loader.UIContainer, transform).transform;
         mainTransform
             .Find(versionAddress)
@@ -63,7 +58,7 @@ public class UIInstance : MonoBehaviour
             .Constructor();
         var outfitView = Instantiate(loader.OutfitView, viewRoot)
             .AddComponent<OutfitListUI>()
-            .Constructor(loader, materialManager, contextMenu);
+            .Constructor(loader, contextMenu);
         var recipesView = Instantiate(loader.RecipesView, viewRoot)
             .AddComponent<RecipeListUI>()
             .Constructor(loader, recipeFileWatcher, contextMenu, messageDialogue);
@@ -74,6 +69,9 @@ public class UIInstance : MonoBehaviour
             .AddComponent<ConfigUI>()
             .Constructor(messageDialogue);
 
+        loadingIndicator = viewRoot.gameObject
+            .AddComponent<LoadingIndicator>()
+            .Constructor(viewRoot);
         outfitsButton =   mainTransform.SetupButton(outfitsButtonAddress, 
             () => ChangeTab(outfitsButton, outfitView.gameObject));
         recipesButton =   mainTransform.SetupButton(recipesButtonAddress, 
@@ -83,8 +81,8 @@ public class UIInstance : MonoBehaviour
         configButton =  mainTransform.SetupButton(settingsButtonAddress,
             () => ChangeTab(configButton, configView.gameObject));
 
-        Views = new List<Component>() { outfitView, recipesView, materialsView, configView };
-        Buttons = new List<Button> { outfitsButton, recipesButton, materialsButton, configButton };
+        Views = [ outfitView, recipesView, materialsView, configView];
+        Buttons = [outfitsButton, recipesButton, materialsButton, configButton ];
         
         ChangeTab(outfitsButton, outfitView.gameObject);
         gameObject

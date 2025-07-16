@@ -50,6 +50,7 @@ internal class SceneResourceProvider
     internal static IEnumerator BatchLoad()
     {
         Log.Info("BatchLoad()");
+        var reference = CCPlugin.uiInstance.loadingIndicator.NotifyLoadingStart();
         var currentScene = SceneManager.GetActiveScene().name;
         var batchLoadScenes = batchLoad
             .Select(x => x.Key.Source)
@@ -65,7 +66,7 @@ internal class SceneResourceProvider
         batchLoadScenes.ForEach(Log.Info);
         GetResourcesFromScene(currentScene);
         foreach (var scene in batchLoadScenes) yield return BatchLoadMatsFromScene(scene);
-
+        CCPlugin.uiInstance.loadingIndicator.NotifyLoadingComplete(reference);
         yield break;
     }
 
