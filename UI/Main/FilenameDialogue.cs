@@ -1,12 +1,8 @@
-﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Hooks.Watchdogs;
+﻿using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -72,7 +68,6 @@ public class FilenameDialogue : MonoBehaviour
     {
         if (OutfitListUI.TargetOutfit.pelvis is PlayerWatchdog player)
         {
-            //player.UnlockPlayer();
             yield return player.UnlockRoutine();
             var carolEntity = player.carolEntity;
             carolEntity.LockMove(float.PositiveInfinity);
@@ -89,11 +84,7 @@ public class FilenameDialogue : MonoBehaviour
 
     void OnDropdownChanged(int index)
     {
-        //get animation name
-        //var selection = dropdown.options[index];
-        //get animator
         var animator = OutfitListUI.TargetOutfit.pelvis.CompData.Animator;
-        //animator.SetBool(selection.text, true);
         StartCoroutine(Dialogue.controller.SetExpressionValue(animator, "Expression", index));
     }
 
@@ -122,7 +113,7 @@ public class FilenameDialogue : MonoBehaviour
     void OnDisable()
     {
         textBox.text = "";
-        var animator = OutfitListUI.TargetOutfit.pelvis.CompData.Animator;
-        StartCoroutine(Dialogue.controller.SetExpressionValue(animator, "Expression", 0));
+        //var animator = OutfitListUI.TargetOutfit.pelvis.CompData.Animator;
+        //StartCoroutine(Dialogue.controller.SetExpressionValue(animator, "Expression", 0));
     }
 }
