@@ -17,6 +17,20 @@ public class FilenameDialogue : MonoBehaviour
     static readonly string confirmAddress = "Buttons/Confirm";
     static readonly string cancelAddress = "Buttons/Cancel";
     static readonly string dropdownAddress = "Pose Select";
+    static readonly List<string> expressions = 
+    [
+        "Idle",
+        "Angry",
+        "Disappointed",
+        "Excited",
+        "Neutral",
+        "Skeptical",
+        "Threatening",
+        "Shy",
+        "Thinking",
+        "Shocked",
+        "Confident",
+    ];
 
     InputField textBox;
     Dropdown dropdown;
@@ -40,36 +54,17 @@ public class FilenameDialogue : MonoBehaviour
 
         dropdown = transform.Find(dropdownAddress).GetComponent<Dropdown>();
         dropdown.onValueChanged.AddListener(OnDropdownChanged);
+        dropdown.ClearOptions();
+        dropdown.AddOptions(expressions);
+
         gameObject.SetActive(false);
         return this;
-    }
-
-    void DropdownSetup()
-    {
-        var list = Enumerable.Range(0, 11)
-            .Select(x => x.ToString())
-            .ToList();
-        dropdown.ClearOptions();
-        dropdown.AddOptions(list);
-        //var animator = OutfitListUI.TargetOutfit.pelvis.CompData.Animator;
-        //StartCoroutine(animator.SetTriggerForOneFrame("PhoneBack"));
-        //Log.Debug("Getting animations from pyjamas:");
-        //var animator = OutfitListUI.TargetOutfit.pelvis.CompData.Animator;
-        ////how do we get a list of animations from the animator
-        //List<string> animationNames = animator.parameters
-        //    .Where(x => x.type == AnimatorControllerParameterType.Bool)
-        //    .Select(x => x.name)
-        //    .ToList();
-        //animationNames.ForEach(Log.Debug);
-        //dropdown.ClearOptions();
-        //dropdown.AddOptions(animationNames);
     }
 
     public void Show(RecipeDescriptor recipe, UnityAction<RecipeDescriptor, string> onConfirm)
     {
         this.recipe = recipe;
         this.onConfirm = onConfirm;
-        DropdownSetup();
         CCPlugin.CoroutineRunner.StartCoroutine(idk());
     }
 
