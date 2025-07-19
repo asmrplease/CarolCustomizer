@@ -1,6 +1,8 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
+using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using HarmonyLib;
 using System.Collections;
@@ -80,6 +82,8 @@ internal static class AccessoryDissolver
         {
             Log.Debug("Die postfix!");
             if (!(deathType == Entity.DeathType.Fire || deathType == Entity.DeathType.InstantFire)) return;
+            if (__instance.healthOptions.downed.isDowned) return;
+            if (GameManager.manager.coop.isCoop) return;
 
             var player = PlayerInstances.Find(__instance);
             if (player is null) return;
@@ -94,6 +98,9 @@ internal static class AccessoryDissolver
         }
     }
 
+    //TODO: we need to handle the 'downed' state better- making the player invisible when they're downed probably isn't how the game was meant to be played
+    //TODO: either get the hair to act like another accessory, or create a SetHairColorShared that can apply the dissolve correctly
+
     public static IEnumerator Dissolve(OutfitManager outfitManager, Material dissolveMaterial, float time)
     {
         Log.Debug("Dissolve()");
@@ -101,8 +108,9 @@ internal static class AccessoryDissolver
         FadeFinish = false;
         var accs = outfitManager.ActiveAccessories;
         var liveDescriptions = outfitManager.LiveAccessoryDescriptors;
+        //var hairColor = outfitManager.HairColor;
         var dissolveMat = new MaterialDescriptor(dissolveMaterial, "Resources", MaterialDescriptor.SourceType.Resources);
-        Dictionary<StoredAccessory, MaterialDescriptor[]> originalMaterials = new();
+        Dictionary<StoredAccessory, MaterialDescriptor[]> originalMaterials = [];
 
         foreach (var acc in accs)
         {
@@ -111,6 +119,7 @@ internal static class AccessoryDissolver
                 .Materials;
             outfitManager.PaintAccessoryShared(acc, acc.Materials.Select(x => dissolveMaterial).ToList());
         }
+        //outfitManager.SetHairColor(dissolveMat.referenceMaterial);
         Log.Debug("Accessories Painted with dissolve, starting loop.");
 
         while (elapsedTime < time)
@@ -134,6 +143,7 @@ internal static class AccessoryDissolver
                 outfitManager.PaintAccessory(acc, originalMaterials[acc][i], i);
             }
         }
+        //outfitManager.SetHairColor(OutfitAssetManager.GetHairColor(hairColor));
         Log.Debug("Restored original materials");
         ActiveDissolve = null;
         yield break;

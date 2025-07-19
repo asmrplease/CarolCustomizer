@@ -45,7 +45,7 @@ public class CarolInstance : IDisposable
     #region Notifications
     public virtual void NotifySpawned(PelvisWatchdog pelvis)
     {
-        if (SceneResourceProvider.FakeLoad) { Log.Info("FakeLoad is true, ignoring pelvis spawns"); return; }
+        if (SceneResourceProvider.Loading) { Log.Info("FakeLoad is true, ignoring pelvis spawns"); return; }
         if (!pelvis) { Log.Error("Null pelviswatchdog on NotifySpawned()"); return; }
         if (pelvis == targetPelvis) { Log.Warning("PlayerManager was given its existing pelvis as a target."); return; }
 
@@ -59,7 +59,7 @@ public class CarolInstance : IDisposable
 
     public bool RestorePrevious(PelvisWatchdog pelvis)
     {
-        if (SceneResourceProvider.FakeLoad) return false;
+        if (SceneResourceProvider.Loading) return false;
         if (targetPelvis != pelvis) return false;
         if (previousTargets is null) return false;
         if (!previousTargets.Any(x => x)) return false;

@@ -49,6 +49,11 @@ public class PlayerWatchdog : PelvisWatchdog
 
     protected override void OnTransformParentChanged() { }
 
+    internal void SetAnimation(string animationName)
+    {
+        StartCoroutine(carolEntity.anim.SetTriggerForOneFrame(animationName));
+    }
+
     public override void SetBaseOutfit(Outfit outfit)
     {
         Log.Debug("Changing outfit via Entity.Swapmodel");
@@ -74,7 +79,7 @@ public class PlayerWatchdog : PelvisWatchdog
         carolEntity.anim.SetFloat("SpeedSides", 0f);
         inventory.phone.SetActive(true);
         carolEntity.anim.speed = speed;
-        carolEntity.StartCoroutine(carolEntity.anim.SetTriggerForOneFrame("PhoneOut"));
+        SetAnimation("PhoneOut");
         carolEntity.enabled = false;
         yield return new WaitForSeconds(Constants.PhoneHideTime / speed);
 
@@ -84,13 +89,13 @@ public class PlayerWatchdog : PelvisWatchdog
         yield break;
     }
 
-    IEnumerator UnlockRoutine()
+    internal IEnumerator UnlockRoutine()
     {
         float speed = UnlockSpeed * Settings.Plugin.MenuSpeed;
         Log.Debug("Unlocking player");
         Busy = true;
         Locked = false;
-        carolEntity.StartCoroutine(carolEntity.anim.SetTriggerForOneFrame("PhoneBack"));
+        SetAnimation("PhoneBack");
         carolEntity.anim.speed = speed;
         yield return new WaitForSeconds(Constants.PhoneHideTime / speed);
 
@@ -126,7 +131,6 @@ public class PlayerWatchdog : PelvisWatchdog
     public override void SetHeightOffset(float height)
     {
         Log.Debug("SetHeightOffset");
-        //var prefabRoot = pelvis.transform.parent.parent.parent;
         var prefabRoot = transform.parent;
         if (!prefabRoot) { Log.Warning("prefabRoot was null in SetHeightOffset"); return; }
 

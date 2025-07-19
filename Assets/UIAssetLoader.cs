@@ -13,7 +13,7 @@ public class UIAssetLoader : IDisposable
     const string materialsViewAddress = "Assets/Mods/TabUI/MaterialsView.prefab";
     const string recipesViewAddress = "Assets/Mods/TabUI/RecipesView.prefab";
     const string settingsViewAddress = "Assets/Mods/TabUI/SettingsView.prefab";
-    const string filenameDialogueAddress = "Assets/Mods/TabUI/FilenameDialogue.prefab";
+    const string filenameDialogueAddress = "Assets/Mods/TabUI/FilenameDialogue 1.prefab";
     const string messageDialogueAddress = "Assets/Mods/TabUI/MessageDialogue.prefab";
     const string pirateIconAddress = "assets/mods/tabui/pirateicon.png";
     const string eyedropperCursorAddress = "Assets/Mods/TabUI/eyedropper32.png";

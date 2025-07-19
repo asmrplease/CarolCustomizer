@@ -16,7 +16,7 @@ internal class SceneResourceProvider
     readonly static HashSet<string> loadedScenes = [];
 
     internal static event Action<MaterialDescriptor> OnMaterialLoaded;
-    public static bool FakeLoad { get; private set; } = false;
+    public static bool Loading { get; private set; } = false;
 
     internal static IEnumerable<string> CheckMaterialsReady(IEnumerable<MaterialDescriptor> materials)
     {
@@ -50,6 +50,8 @@ internal class SceneResourceProvider
     internal static IEnumerator BatchLoad()
     {
         Log.Info("BatchLoad()");
+        if (Loading) { Log.Warning("Tried to BatchLoad() while already loading a scene."); yield break; }
+    
         var reference = CCPlugin.uiInstance.loadingIndicator.NotifyLoadingStart();
         var currentScene = SceneManager.GetActiveScene().name;
         var batchLoadScenes = batchLoad
@@ -67,20 +69,20 @@ internal class SceneResourceProvider
         GetResourcesFromScene(currentScene);
         foreach (var scene in batchLoadScenes) yield return BatchLoadMatsFromScene(scene);
         CCPlugin.uiInstance.loadingIndicator.NotifyLoadingComplete(reference);
+        Loading = false;
         yield break;
     }
 
-    internal static IEnumerator BatchLoadMatsFromScene(string scene)
+    static IEnumerator BatchLoadMatsFromScene(string scene)
     {
         Log.Debug("Starting Scene Load");
-        FakeLoad = true;
+        
         loadedScenes.Add(scene);
         yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
         GetResourcesFromScene(scene);
         yield return SceneManager.UnloadSceneAsync(scene);
         yield return Resources.UnloadUnusedAssets();
         loadedScenes.Remove(scene);
-        FakeLoad = false;
         Log.Info("Scene Unload complete.");
     }
 

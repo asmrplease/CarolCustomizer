@@ -15,8 +15,8 @@ public static class OnirismPatches
     {
         public static bool Prefix()
         {
-            Log.Info($"DontWakeManager patch, FakeLoad: {SceneResourceProvider.FakeLoad}");
-            return !SceneResourceProvider.FakeLoad;
+            Log.Info($"DontWakeManager patch, FakeLoad: {SceneResourceProvider.Loading}");
+            return !SceneResourceProvider.Loading;
         }
     }
 
@@ -25,8 +25,8 @@ public static class OnirismPatches
     {
         public static bool Prefix()
         {
-            Log.Info($"DontStartManager patch, FakeLoad: {SceneResourceProvider.FakeLoad}");
-            return !SceneResourceProvider.FakeLoad;
+            Log.Info($"DontStartManager patch, FakeLoad: {SceneResourceProvider.Loading}");
+            return !SceneResourceProvider.Loading;
         }
     }
 
