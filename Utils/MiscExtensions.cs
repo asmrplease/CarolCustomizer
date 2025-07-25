@@ -182,7 +182,7 @@ public static class MiscExtensions
     public static Color32 DifferenceToAlpha(this Color32 white, Color32 black)
     {
         const int alphaCutoff = 200;
-        Color32 result = new Color32(black.r, black.g, black.b, 0);
+        var result = new Color32(black.r, black.g, black.b, 0);
         var total = (3 * 255)
             - (white.r - black.r)
             - (white.g - black.g)

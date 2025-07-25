@@ -111,16 +111,14 @@ public class ThumbnailCamera : MonoBehaviour
     Texture2D CalculateTransparency(Texture2D blackTexture, Texture2D whiteTexture)
     {
         const int mipmap = 0;
-        Texture2D alphaTex = new Texture2D(
+        var alphaTex = new Texture2D(
             camera.targetTexture.width,
             camera.targetTexture.height,
             TextureFormat.RGBA32, false);
         var black = blackTexture.GetPixelData<Color32>(mipmap);
         var white = whiteTexture.GetPixelData<Color32>(mipmap);
         var alpha = black
-            .Zip(white, 
-                (black, white) => 
-                white.DifferenceToAlpha(black))
+            .Zip(white, (black, white) => white.DifferenceToAlpha(black))
             .ToArray();
         alphaTex.SetPixelData(alpha, mipmap);
         return alphaTex;
