@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,102 +10,138 @@ using UnityEngine.SceneManagement;
 namespace CarolCustomizer.Assets;
 internal class SceneResourceProvider
 {
-    //we want a list of materials to load, grouped by the scene that they're sourced from
-    readonly static List<MaterialDescriptor> pendingLoad = [];
-    readonly static List<MaterialDescriptor> loaded = [];
+    readonly static HashSet<MaterialDescriptor> lazyLoad = [];
+    readonly static Dictionary<MaterialDescriptor, List<Action<MaterialDescriptor>>> batchLoad = [];
+    readonly static HashSet<MaterialDescriptor> loaded = [];
+    readonly static HashSet<string> loadedScenes = [];
 
-    static void GetResourcesFromScene(string sceneName)
+    internal static event Action<MaterialDescriptor> OnMaterialLoaded;
+    public static bool Loading { get; private set; } = false;
+
+    internal static IEnumerable<string> CheckMaterialsReady(IEnumerable<MaterialDescriptor> materials)
     {
-        var inThisScene = pendingLoad
-            .Where(x => x.Source == sceneName)
-            .Select(x => x.Name)
-            .ToList();
-        Log.Debug("Assets pending load:");
-        inThisScene.ForEach(Log.Debug);
-        Resources.FindObjectsOfTypeAll<Material>()
-            .Where(x => inThisScene.Contains(x.name))
-            .Select(x => new MaterialDescriptor(x, sceneName, MaterialDescriptor.SourceType.World))
-            .ForEach(x =>
-            {
-                x.referenceMaterial.hideFlags = HideFlags.HideAndDontSave;
-                loaded.Add(x);
-                pendingLoad.Remove(x);
-            });
+        return materials
+            .Where(x => !loaded.Contains(x))
+            .Select(x => x.Source)
+            .Distinct();
     }
 
-    internal static void VolcanoTest()
+    internal static void SetCallback()
     {
-        CCPlugin.CoroutineRunner.StartCoroutine(TestLoad2());
+        SceneManager.sceneLoaded += HandleNaturalSceneLoad;
     }
 
-    static IEnumerator TestLoad2()
+    static void HandleNaturalSceneLoad(Scene scene, LoadSceneMode mode)
     {
-        string scene = "volcano";
-        string matName = "Lava_3_Vertex Color Only 11";
-        Log.Info("Target materials currently loaded:");
-        Resources.FindObjectsOfTypeAll<Material>()
-            .Where(x => x.name.Contains(matName))
-            .ForEach(x => Log.Info(x.name));
-        pendingLoad.Add(new MaterialDescriptor(matName, scene, MaterialDescriptor.SourceType.World));
+        if (mode == LoadSceneMode.Additive) return;
 
-        Log.Info("Starting Scene Load");
-        var request = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
-        //request.allowSceneActivation = false;
-        yield return new WaitUntil(() => request.progress > 0.89f);
+        GetResourcesFromScene(scene.name);
+    }
 
+    internal static IEnumerator BatchQueueAndThen(MaterialDescriptor request, Action<MaterialDescriptor> closure)
+    {
+        if (loaded.TryGetValue(request, out var existing)) { closure?.Invoke(existing); yield break; }
+        if (!batchLoad.TryGetValue(request, out var actions)) actions = [];
+        actions.Add(closure);
+        batchLoad[request] = actions;//i forget if we have to do this or not but it doesn't hurt so we do it.
+        yield break;
+    }
+
+    internal static IEnumerator BatchLoad()
+    {
+        Log.Info("BatchLoad()");
+        if (Loading) { Log.Warning("Tried to BatchLoad() while already loading a scene."); yield break; }
+    
+        var reference = CCPlugin.uiInstance.loadingIndicator.NotifyLoadingStart();
+        var currentScene = SceneManager.GetActiveScene().name;
+        var batchLoadScenes = batchLoad
+            .Select(x => x.Key.Source)
+            .Distinct()
+            .Where(x => currentScene != x)
+            .ToList();  
+        lazyLoad
+            .Where(x => batchLoadScenes.Contains(x.Source))
+            .ForEach(x => batchLoad.TryAdd(x, []))
+            .ToList()
+            .ForEach(x => lazyLoad.Remove(x));
+        Log.Info("Loading the folling scenes:");
+        batchLoadScenes.ForEach(Log.Info);
+        GetResourcesFromScene(currentScene);
+        foreach (var scene in batchLoadScenes) yield return BatchLoadMatsFromScene(scene);
+        CCPlugin.uiInstance.loadingIndicator.NotifyLoadingComplete(reference);
+        Loading = false;
+        yield break;
+    }
+
+    static IEnumerator BatchLoadMatsFromScene(string scene)
+    {
+        Log.Debug("Starting Scene Load");
+        
+        loadedScenes.Add(scene);
+        yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
         GetResourcesFromScene(scene);
-        Log.Info("Target materials currently loaded:");
-        loaded
-            .Where(x => x.Name.Contains(matName))
-            .Select(x => x.Name)
-            .ForEach(Log.Info);
         yield return SceneManager.UnloadSceneAsync(scene);
+        yield return Resources.UnloadUnusedAssets();
+        loadedScenes.Remove(scene);
         Log.Info("Scene Unload complete.");
     }
 
-    static IEnumerator TestLoad()
+    static void GetResourcesFromScene(string sceneName)
     {
-        //load volcano
-        Log.Info("Target materials currently loaded:");
-        Resources.FindObjectsOfTypeAll<Material>()
-            .Where(x => x.name.Contains("Lava_3_Vertex Color Only 11"))
-            .ForEach(x => Log.Info(x.name));
-        Log.Info("Starting Scene Load");
-        var request = SceneManager.LoadSceneAsync("volcano", LoadSceneMode.Additive);
-        request.allowSceneActivation = false;
-        yield return request;
-        Log.Info("Target materials currently loaded:");
-        Resources.FindObjectsOfTypeAll<Material>()
-            .Where(x => x.name.Contains("Lava_3_Vertex Color Only 11"))
-            .ForEach(x => Log.Info(x.name));
-        Log.Info("End target materials. Starting scene unload.");
-        yield return SceneManager.UnloadSceneAsync("volcano");
-        Log.Info("Scene unloaded");
-        
-    }
-
-    internal enum SceneAssetStatus
-    {
-        Ready,
-        RequiresSceneLoad,
-        RequiresAssetBundle,
-    }
-
-    async Awaitable<int> Test()
-    {
-        var idk = AssetBundle.LoadFromFileAsync("");
-        var bundle = idk.assetBundle;
-        var wtf = SceneManager.LoadSceneAsync("");
-        List<AsyncOperation> ops = [idk, wtf];
-        foreach (var op in ops)
+        Log.Info($"GetBatchResourcesFromScene({sceneName}");
+        var batchInScene = batchLoad
+            .Where(x => x.Key.Source == sceneName)
+            .Select(x => x.Key.Name.DeInstance())
+            .ToList();
+        var lazyInScene = lazyLoad
+            .Where(x => x.Source == sceneName)
+            .Select(x => x.Name.DeInstance())
+            .ToList();
+        var inThisScene = batchInScene
+            .Concat(lazyInScene)
+            .Distinct()
+            .ToList();
+        Log.Info("Assets pending load:");
+        inThisScene.ForEach(Log.Info);
+        int pendingCount = inThisScene.Count;
+        var foundList = Resources.FindObjectsOfTypeAll<Material>()
+            .Where(x => x && inThisScene.Contains(x.name))
+            .Select(x => new MaterialDescriptor(x, sceneName, MaterialDescriptor.SourceType.World));
+        int loadedCount = 0;
+        foreach (var found in foundList) 
         {
-            await op;
+            batchLoad.TryGetValue(found, out var callbacks);
+            found.referenceMaterial.hideFlags = HideFlags.HideAndDontSave;
+            loaded.Add(found);
+            batchLoad.Remove(found);
+            lazyLoad.Remove(found);
+            OnMaterialLoaded?.Invoke(found);
+            loadedCount++;
+            if (callbacks is null) continue;
+
+            Log.Info($"Calling back {callbacks.Count()} method(s) for {found.Name}");
+            callbacks.ForEach(callback => callback?.Invoke(found));
         }
-        return 0;
+        Log.Info($"Loaded {loadedCount} of {pendingCount} materials");
     }
 
-    async Awaitable idk()
+    internal static void AddToLazyLoad(MaterialDescriptor material)
     {
-        var idk = await Test();
+        if (loaded.Contains(material)) { Log.Info("Material already loaded"); return; }
+
+        lazyLoad.Add(material);
+        OnMaterialLoaded?.Invoke(material);
+    }
+    /// <summary>
+    /// Quickly store a material 
+    /// </summary>
+    /// <param name="material"></param>
+    internal static void Cache(MaterialDescriptor material)
+    {
+        if (!material.referenceMaterial) { Log.Warning($"Tried to cache MaterialDescriptor {material.Name}, but there was no actual material attached."); return; }
+
+        loaded.Add(material);
+        OnMaterialLoaded?.Invoke(material);
     }
 }
+

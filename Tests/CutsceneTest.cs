@@ -67,8 +67,10 @@ internal class CutsceneTest
         readyForNextScene = true;
     }
 
-    private static void HandleSceneChanged(Scene scene, LoadSceneMode arg1)
+    private static void HandleSceneChanged(Scene scene, LoadSceneMode mode)
     {
+        if (mode == LoadSceneMode.Additive) return;
+
         SceneManager.sceneLoaded -= HandleSceneChanged;
         Log.Info($"Cutscenes in {scene.name}:");
         var cutscenes = Resources.FindObjectsOfTypeAll<Slate.Cutscene>();

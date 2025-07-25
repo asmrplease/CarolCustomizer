@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Settings;
+﻿using CarolCustomizer.Behaviors;
+using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
@@ -66,11 +67,11 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
         currentMaterialName.text = material.Name;
     }
 
-    void CopyDefaultMaterial() => ui.MaterialManager.clipboard = defaultMaterial;
+    void CopyDefaultMaterial() => MaterialManager.clipboard = defaultMaterial;
 
-    void CopyCurrentMaterial() => ui.MaterialManager.clipboard = CurrentMaterial;
+    void CopyCurrentMaterial() => MaterialManager.clipboard = CurrentMaterial;
 
-    void PasteMaterial() => SetMaterial(ui.MaterialManager.clipboard);
+    void PasteMaterial() => SetMaterial(MaterialManager.clipboard);
 
     void SetMaterial(MaterialDescriptor material)
     {

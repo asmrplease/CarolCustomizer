@@ -8,6 +8,7 @@ using UnityEngine;
 using BepInEx;
 using System.Linq;
 using CarolCustomizer.UI.Main;
+using UnityEngine.SceneManagement;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 public class RecipeFileWatcher : IDisposable
@@ -40,6 +41,7 @@ public class RecipeFileWatcher : IDisposable
         watcher.Deleted += HandleRecipeFileRemoved;
         watcher.Changed += HandleRecipeFileChanged;
         watcher.EnableRaisingEvents = true;
+        SceneManager.sceneUnloaded += (_) => RefreshSlow();
 
         MenuToggle.OnMenuToggle += MenuToggleHandle;
 
@@ -84,6 +86,20 @@ public class RecipeFileWatcher : IDisposable
         RecipeLoader
             .GetRecipeFilePaths()
             .ForEach(x => OnRecipeFileCreated(new Recipe(x)));
+    }
+
+    public void RefreshSlow()
+    {
+        var slow = recipes
+            .Where(x => x.Value.Error == Recipe.Status.SlowSource)
+            .ToList();
+        foreach (var entry in slow)
+        {
+            OnRecipeDeleted?.Invoke(entry.Value);
+            recipes.Remove(entry.Key);
+            OnRecipeFileCreated(new Recipe(entry.Key));
+        }
+
     }
 
     void OnRecipeFileCreated(Recipe newRecipe)

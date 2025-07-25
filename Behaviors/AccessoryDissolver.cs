@@ -1,6 +1,8 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
+using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using HarmonyLib;
 using System.Collections;
@@ -17,7 +19,7 @@ internal static class AccessoryDissolver
     const string FireDissolveAddress = "Materials/Deathdissolvefire";
     
     static Coroutine ActiveDissolve;
-    static bool SceneExitComplete = false;
+    static bool FadeFinish = false;
     static Material FireDissolve;
 
     static AccessoryDissolver()
@@ -34,7 +36,17 @@ internal static class AccessoryDissolver
     static void HandleSceneChanged(Scene arg0, Scene arg1)
     {
         Log.Debug($"ActiveSceneChanged {arg0.name}, {arg1.name}");
-        SceneExitComplete = true;
+        FadeFinish = true;
+    }
+
+    [HarmonyPatch(typeof(CheckPoints), "OnTriggerEnter")]
+    class CheckPointEnterPatch
+    {
+        [HarmonyPostfix]
+        static void Postfix()
+        {
+            FadeFinish = true;
+        }
     }
 
     [HarmonyPatch(typeof(SceneSwitcher), "OnTriggerStay")]
@@ -70,6 +82,8 @@ internal static class AccessoryDissolver
         {
             Log.Debug("Die postfix!");
             if (!(deathType == Entity.DeathType.Fire || deathType == Entity.DeathType.InstantFire)) return;
+            if (__instance.healthOptions.downed.isDowned) return;
+            if (GameManager.manager.coop.isCoop) return;
 
             var player = PlayerInstances.Find(__instance);
             if (player is null) return;
@@ -84,15 +98,19 @@ internal static class AccessoryDissolver
         }
     }
 
+    //TODO: we need to handle the 'downed' state better- making the player invisible when they're downed probably isn't how the game was meant to be played
+    //TODO: either get the hair to act like another accessory, or create a SetHairColorShared that can apply the dissolve correctly
+
     public static IEnumerator Dissolve(OutfitManager outfitManager, Material dissolveMaterial, float time)
     {
         Log.Debug("Dissolve()");
         float elapsedTime = 0f;
-        SceneExitComplete = false;
+        FadeFinish = false;
         var accs = outfitManager.ActiveAccessories;
         var liveDescriptions = outfitManager.LiveAccessoryDescriptors;
+        //var hairColor = outfitManager.HairColor;
         var dissolveMat = new MaterialDescriptor(dissolveMaterial, "Resources", MaterialDescriptor.SourceType.Resources);
-        Dictionary<StoredAccessory, MaterialDescriptor[]> originalMaterials = new();
+        Dictionary<StoredAccessory, MaterialDescriptor[]> originalMaterials = [];
 
         foreach (var acc in accs)
         {
@@ -101,6 +119,7 @@ internal static class AccessoryDissolver
                 .Materials;
             outfitManager.PaintAccessoryShared(acc, acc.Materials.Select(x => dissolveMaterial).ToList());
         }
+        //outfitManager.SetHairColor(dissolveMat.referenceMaterial);
         Log.Debug("Accessories Painted with dissolve, starting loop.");
 
         while (elapsedTime < time)
@@ -110,9 +129,12 @@ internal static class AccessoryDissolver
             dissolveMaterial.SetFloat(DissolveAmount, dissolvePercent);
             yield return null;
         }
-        Log.Debug("Done dissolving, waiting for scene exit");
+        Log.Debug("Done dissolving, waiting for scene exit or player respawn");
 
-        yield return new WaitUntil(() => SceneExitComplete);
+        //how do we recognize when this outfitmanager's player has respawned?
+        //we probably want to pass in the entity instead, or get the 
+
+        yield return new WaitUntil(() => FadeFinish);
 
         foreach (var acc in accs)
         {
@@ -121,6 +143,7 @@ internal static class AccessoryDissolver
                 outfitManager.PaintAccessory(acc, originalMaterials[acc][i], i);
             }
         }
+        //outfitManager.SetHairColor(OutfitAssetManager.GetHairColor(hairColor));
         Log.Debug("Restored original materials");
         ActiveDissolve = null;
         yield break;

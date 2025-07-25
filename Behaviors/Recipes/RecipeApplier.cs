@@ -7,11 +7,12 @@ using CarolCustomizer.Utils;
 using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
+using static CarolCustomizer.Models.Materials.MaterialDescriptor;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 public static class RecipeApplier
 {
-    public static void ActivateRecipe(OutfitManager target, LatestDescriptor recipe)
+    public static void ActivateRecipe(OutfitManager target, RecipeDescriptor recipe)
     {
         target.DisableAllAccessories();
         target.DisableAllEffects();
@@ -21,6 +22,7 @@ public static class RecipeApplier
         recipe
             .ActiveAccessories
             .ForEach(x => SetAccessory(target, x));
+        CCPlugin.CoroutineRunner.StartCoroutine(SceneResourceProvider.BatchLoad());
         recipe
             .ActiveEffects
             .Select(OutfitAssetManager.GetOutfitByAssetName)
@@ -93,20 +95,57 @@ public static class RecipeApplier
     {
         Log.Debug("setting material...");
         if (materialDescription.Type == MaterialDescriptor.SourceType.World)
-        { Log.Warning("idk how to load world materials yet"); return; }
+        {
+            Log.Info("Attempting to load world material");
+            CCPlugin
+                .CoroutineRunner
+                .StartCoroutine
+                (
+                    SceneResourceProvider.BatchQueueAndThen(
+                        materialDescription, 
+                        (x) => target.PaintAccessory(accessory, x, index))
+                );
+        }
+        else if (materialDescription.Type == MaterialDescriptor.SourceType.AssetBundle)
+        {
+            var outfit = OutfitAssetManager.GetOutfitByAssetName(materialDescription.Source);
+            if (outfit is null) { Log.Warning($"failed to find {materialDescription.Source}."); return; }
+            Log.Debug("found outfit again...");
+            if (outfit.MaterialDescriptors is null) { Log.Warning($"failed to get {materialDescription.Source} MaterialDescriptors"); return; }
 
-        var outfit = OutfitAssetManager.GetOutfitByAssetName(materialDescription.Source);
-        if (outfit is null) { Log.Warning($"failed to find {materialDescription.Source}."); return; }
-        Log.Debug("found outfit again...");
-        if (outfit.MaterialDescriptors is null) { Log.Warning($"failed to get {materialDescription.Source} MaterialDescriptors"); return; }
+            outfit.MaterialDescriptors.TryGetValue(materialDescription, out var liveMaterial);
+            if (liveMaterial is null) { Log.Warning($"failed to find {materialDescription.Name} in source {materialDescription.Source}"); return; }
 
-        outfit.MaterialDescriptors.TryGetValue(materialDescription, out var liveMaterial);
-        if (liveMaterial is null) { Log.Warning($"failed to find {materialDescription.Name} in source"); return; }
-
-        target.PaintAccessory(accessory, liveMaterial, index);
+            target.PaintAccessory(accessory, liveMaterial, index);
+        }
+        else if (materialDescription.Type == MaterialDescriptor.SourceType.Resources)
+        {
+            //we shouldn't be saving materials of this type probably idk lol
+        }
+        
+        
     }
 
-    public static IEnumerable<string> GetSources(LatestDescriptor recipe)
+    public static IEnumerable<(string, SourceType)> GetMatSources(RecipeDescriptor recipe)
+    {
+        var matSources = recipe
+            .ActiveAccessories
+            .SelectMany(x => x.Materials)
+            .Select(x => (x.Source, x.Type))
+            .Distinct();
+        return matSources;
+    }
+
+    public static IEnumerable<MaterialDescriptor> GetWorldMats(RecipeDescriptor recipe)
+    {
+        return recipe
+            .ActiveAccessories
+            .SelectMany(x => x.Materials)
+            .Where(x => x.Type == SourceType.World)
+            .Distinct();
+    }
+
+    public static IEnumerable<string> GetSources(RecipeDescriptor recipe)
     {
         var accSources = recipe
             .ActiveAccessories
@@ -114,6 +153,7 @@ public static class RecipeApplier
         var matSources = recipe
             .ActiveAccessories
             .SelectMany(x => x.Materials)
+            .Where(x => x.Type != SourceType.World)
             .Select(x => x.Source);
         return accSources
             .Concat(matSources)
@@ -124,10 +164,9 @@ public static class RecipeApplier
             .Distinct();
     }
 
-    public static IEnumerable<string> GetMissingSources(LatestDescriptor recipe)
+    public static IEnumerable<string> GetMissingSources(RecipeDescriptor recipe)
     {
-        return GetSources(recipe)
-            .Where(x => OutfitAssetManager.GetOutfitByAssetName(x) is null);
+        return GetSources(recipe).Where(x => OutfitAssetManager.GetOutfitByAssetName(x) is null);
     }
 
 }

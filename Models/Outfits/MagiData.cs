@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using static MagicaCloth2.CullingSettings;
 using static MagicaCloth2.ClothProcess;
+using FuseBox.External.MagicaCloth2;
 
 namespace CarolCustomizer.Models.Outfits;
 public class MagiData : MonoBehaviour
@@ -23,6 +24,9 @@ public class MagiData : MonoBehaviour
 
     [SerializeField]
     public List<MagicaCapsuleCollider> CapsuleColliders;
+
+    [SerializeField]
+    public MagicaClothCompanion ClothCompanion;
 
     public MagiData Constructor()
     {
@@ -55,6 +59,10 @@ public class MagiData : MonoBehaviour
         CapsuleColliders = transform
             .GetComponentsInChildren<MagicaCapsuleCollider>(true)
             .ToList();
+
+        ClothCompanion = transform
+            .parent?.parent?.parent?
+            .GetComponent<MagicaClothCompanion>();
 
         return this;
     }

@@ -237,6 +237,7 @@ public class OutfitManager : IDisposable
             .Where(tup => tup.found)
             .ForEach(tup => 
                 tup.live.CopyFrom(tup.reference));
+        hairstyleManager.UpdateColliders();
     }
 
     void RefreshEffects()

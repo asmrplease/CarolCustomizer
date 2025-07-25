@@ -31,8 +31,10 @@ public class NPCInstanceCreator : IDisposable
         //SceneManager.sceneLoaded += FindAllPelvises;
     }
 
-    private void FindAllPelvises(Scene _, LoadSceneMode __)
+    private void FindAllPelvises(Scene _, LoadSceneMode mode)
     {
+        if (mode == LoadSceneMode.Additive) return;
+
         pelvises = Resources
             .FindObjectsOfTypeAll<GameObject>()
             .Where(x => x.name == "CarolPelvis")
@@ -58,8 +60,10 @@ public class NPCInstanceCreator : IDisposable
     #endregion
 
     //TODO: are gamemanager.playeractor and playeractorreplace useful here?
-    public static void FindDedicatedActresses(Scene scene, LoadSceneMode arg1)
+    public static void FindDedicatedActresses(Scene scene, LoadSceneMode mode)
     {
+        if (mode == LoadSceneMode.Additive) return;
+
         var count = dedicatedActresses.RemoveAll(x => !x);
         if (scene.name == Constants.MenuSceneName) return;
 
@@ -96,8 +100,10 @@ public class NPCInstanceCreator : IDisposable
             .Select(x => x.parent.parent);
     }
 
-    public static void FindBotEntities(Scene _, LoadSceneMode __)
+    public static void FindBotEntities(Scene _, LoadSceneMode mode)
     {
+        if (mode == LoadSceneMode.Additive) return;
+
         Resources
             .FindObjectsOfTypeAll<Entity>()
             .Select(entity => entity.gameObject)

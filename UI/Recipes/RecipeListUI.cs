@@ -91,6 +91,8 @@ public class RecipeListUI : MonoBehaviour
     public void OnRecipeCreated(Recipe newRecipe)
     {
         Log.Debug("RecipeListUI.OnRecipeCreated");
+        RecipeApplier.GetWorldMats(newRecipe.Descriptor)
+            .ForEach(SceneResourceProvider.AddToLazyLoad);
 
         var uiInstance = Instantiate(loader.OutfitListElement, listRoot);
         if (!uiInstance) { Log.Error("Failed to instantiate outfit UI prefab for a recipeUI."); return; }
@@ -114,6 +116,6 @@ public class RecipeListUI : MonoBehaviour
 
     void OnNewSave()
     {
-        fileDialogue.Show(new LatestDescriptor(PlayerInstances.DefaultPlayer.outfitManager), RecipeSaver.SavePNG);
+        fileDialogue.Show(new RecipeDescriptor(PlayerInstances.DefaultPlayer.outfitManager), RecipeSaver.SavePNG);
     }
 }

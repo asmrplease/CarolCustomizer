@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CarolCustomizer.Models.Materials;
 [Serializable]
-public class MaterialDescriptor : IEquatable<MaterialDescriptor>
+public class MaterialDescriptor : IEquatable<MaterialDescriptor>, IComparable<MaterialDescriptor>
 {
     public string Name;
     public string Source;
@@ -60,5 +60,13 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>
     public override int GetHashCode()
     {
         return Type.GetHashCode() ^ Name.DeInstance().GetHashCode() ^ Source.GetHashCode();
+    }
+
+    public int CompareTo(MaterialDescriptor other)
+    {
+        //var scene = this.Source.CompareTo(other.Source);
+        //if (scene != 0) return scene;
+        var name = this.Name.CompareTo(other.Name);
+        return name;
     }
 }

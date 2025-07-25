@@ -7,7 +7,7 @@ public record Recipe
     public readonly string Path;
     public readonly string Extension;
     public readonly Status Error;
-    public readonly LatestDescriptor Descriptor;
+    public readonly RecipeDescriptor Descriptor;
 
     public Recipe(string path)
     {
@@ -23,6 +23,7 @@ public record Recipe
     {
         NoError,
         MissingSource,
+        SlowSource,
         InvalidJson,
         FileError
     }

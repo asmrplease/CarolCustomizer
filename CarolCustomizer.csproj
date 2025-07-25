@@ -10,7 +10,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<Using Include="CarolCustomizer.Models.Recipes.RecipeDescriptor24" Alias="LatestDescriptor" />
+		<Using Include="CarolCustomizer.Models.Recipes.RecipeDescriptor24" Alias="RecipeDescriptor" />
 	</ItemGroup>
 
 

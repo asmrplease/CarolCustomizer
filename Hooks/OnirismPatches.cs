@@ -10,15 +10,23 @@ namespace CarolCustomizer.Hooks;
 
 public static class OnirismPatches
 {
-    [HarmonyPatch(typeof(Projectile), "OnTriggerEnter")]
-    public class ProjectileCollision
+    //[HarmonyPatch(typeof(GameManager), "Awake")]
+    public class DontWakeManager
     {
-        [HarmonyPostfix]
-        public static void PostFix(Collider collider, Projectile __instance)
+        public static bool Prefix()
         {
-            if (!Entity.players.Contains(__instance.origin)) return;
+            Log.Info($"DontWakeManager patch, FakeLoad: {SceneResourceProvider.Loading}");
+            return !SceneResourceProvider.Loading;
+        }
+    }
 
-            CCPlugin.uiInstance.materialManager.OnNewTarget(collider.gameObject);
+    //[HarmonyPatch(typeof(GameManager), "Start")]
+    public class DontStartManager
+    {
+        public static bool Prefix()
+        {
+            Log.Info($"DontStartManager patch, FakeLoad: {SceneResourceProvider.Loading}");
+            return !SceneResourceProvider.Loading;
         }
     }
 
