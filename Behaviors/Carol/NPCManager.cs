@@ -47,29 +47,27 @@ internal class NPCManager
         return NPC.Error;
     }
 
-    public static void OnBotSpawn(BotWatchdog pelvis)
+    public static void OnBotSpawn(CampaignBot bot)
     {
         Log.Debug("OnBotSpawn()");
         var botInstance = new CarolInstance(folder);
-        liveBots.Add(pelvis, botInstance);
-        liveBots[pelvis].NotifySpawned(pelvis);
-        pelvis.CustomizeBot(GetRandomOutfit(), botInstance.outfitManager);
+        liveBots.Add(bot.watchdog, botInstance);
+        liveBots[bot.watchdog].NotifySpawned(bot.watchdog);
+        bot.CustomizeBot(GetRandomOutfit(), botInstance.outfitManager);
     }
 
-    public static void OnNPCAwake(NPCWatchdog pelvis)
+    public static void OnNPCAwake(NPCModBehavior npc)
     {
-        if (pelvis.npcType == NPC.Error) { Log.Error("OnNPCAwake() called on an NPC watchdog of type Error"); return; }
+        if (npc.npcType == NPC.Error) { Log.Error("OnNPCAwake() called on an NPC watchdog of type Error"); return; }
         
-        var npcInstance = NPCs[pelvis.npcType];
-        if (npcInstance is null) { Log.Error($"Failed to find NPC CarolInstance in NPC dict of type {pelvis.npcType}"); }
+        var npcInstance = NPCs[npc.npcType];
+        if (npcInstance is null) { Log.Error($"Failed to find NPC CarolInstance in NPC dict of type {npc.npcType}"); }
 
         string recipeName = Settings.Settings.Plugin.shezaraRecipe.Value;
-        var shezaraRecipe = recipesManager.Recipes
-            .First
-            (x => x.Name == recipeName);
+        var shezaraRecipe = recipesManager.Recipes.First(x => x.Name == recipeName);
         if (shezaraRecipe is null) { Log.Warning($"didn't find shezara recipe {recipeName}"); return; }
-        npcInstance.NotifySpawned(pelvis);
-        Log.Info($"applying {shezaraRecipe.Name} to shezara");
+        npcInstance.NotifySpawned(npc.watchdog);
+        Log.Info($"applying {shezaraRecipe.Name} to NPC");
         RecipeApplier.ActivateRecipe(npcInstance.outfitManager, shezaraRecipe.Descriptor);
         //RecipeApplier.ActivateRecipe(npcInstance.outfitManager, GetRandomOutfit().Descriptor);
     }

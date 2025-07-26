@@ -1,35 +1,29 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Contracts;
+using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
-using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class MPBotWatchdog : BotWatchdog
+public class MPBotBehavior : MonoBehaviour, ICustomizable
 {
     VirtualCarol virtualCarol;
+    public PelvisWatchdog watchdog { get; private set; }
 
-    public override PelvisWatchdog BuildFromExisting(PelvisWatchdog watchdog, Component typeComponent)
-    {
-        virtualCarol = typeComponent as VirtualCarol;
-        return base.BuildFromExisting(watchdog, typeComponent);
-    }
-
-    public override void SetBaseVisibility(bool visible)
+    public void SetBaseVisibility(bool visible)
     {
         if (Settings.Plugin.customMPBots.Value is not true) return;
-        if (!CompData || CompData.allSMRs is null) return;
 
-        CompData.allSMRs
-            .Where(x => x)
-            .ForEach(mesh => mesh.gameObject.SetActive(visible));
+        watchdog.CompData.SetBaseVisibility(visible);
     }
 
-    public override void CustomizeBot(Recipe recipe, OutfitManager outfit)
+    public void CustomizeBot(Recipe recipe, OutfitManager outfit)
     {
         if (!Settings.Plugin.customMPBots.Value) return;
+
         RecipeApplier.ActivateRecipe(outfit, recipe.Descriptor);
         SetMPName(recipe.Name);
     }
@@ -45,5 +39,31 @@ public class MPBotWatchdog : BotWatchdog
         if (stats is null) { Log.Error("didn't find stats from virtualCarol"); return; }
 
         stats.name = name;
+    }
+
+    public ICustomizable Constructor(PelvisWatchdog watchdog)
+    {
+        this.watchdog = watchdog;
+        return this;
+    }
+
+    public void SetBaseOutfit(Outfit outfit)
+    {
+        
+    }
+
+    public void SetAnimator(Outfit outfit)
+    {
+        
+    }
+
+    public void SetHeightOffset(float height)
+    {
+        
+    }
+
+    public void Dispose()
+    {
+        Destroy(this);
     }
 }

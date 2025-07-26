@@ -3,6 +3,7 @@ using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace CarolCustomizer.Models.Outfits;
 public class BoneData : MonoBehaviour
@@ -35,5 +36,18 @@ public class BoneData : MonoBehaviour
             .ToList();
 
         return this;
+    }
+
+    public void MoveToRestPosition()
+    {
+        OutfitAssetManager
+            .GetPyjamas().boneData
+            .StandardBones
+            .Select(kvp =>
+                (found: this.StandardBones.TryGetValue(kvp.Key, out var result)
+                , resting: kvp.Value
+                , live: result))
+            .Where(tup => tup.found)
+            .ForEach(tup => tup.live.CopyFrom(tup.resting));
     }
 }

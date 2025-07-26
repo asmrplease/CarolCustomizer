@@ -7,8 +7,8 @@ using UnityEngine;
 namespace CarolCustomizer.Behaviors.Carol;
 public class PlayerCarolInstance : CarolInstance
 {
-    PlayerWatchdog player;
-    static Type playerWatchdogType = typeof(PlayerWatchdog);
+    PlayerModBehavior player;
+    static Type playerWatchdogType = typeof(PlayerModBehavior);
     readonly AutoSaver autoSaver;
     public readonly int playerIndex;
 
@@ -23,11 +23,9 @@ public class PlayerCarolInstance : CarolInstance
     public override void NotifySpawned(PelvisWatchdog pelvis)
     {
         base.NotifySpawned(pelvis);
-        //TODO: ew reflection
-        if (!pelvis.GetType()
-            .IsAssignableFrom(playerWatchdogType)) 
-            return;
-        player = pelvis as PlayerWatchdog;
+        if (!pelvis.Behavior.GetType().IsAssignableFrom(playerWatchdogType)) return;
+
+        player = pelvis.Behavior as PlayerModBehavior;
     }
 
     public bool Exists() => player && player.enabled;

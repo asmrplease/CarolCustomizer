@@ -4,14 +4,16 @@ using System.Collections;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Contracts;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class PlayerWatchdog : PelvisWatchdog
+public class PlayerModBehavior : MonoBehaviour, ICustomizable
 {
     private const float LockSpeed = 1.00f;
     private const float UnlockSpeed = 1.75f;
 
     CarolController carolController;
+    public PelvisWatchdog watchdog { get; private set; }
     public Entity carolEntity { get; private set; }
 
     public bool Busy { get; private set; } = false;
@@ -21,22 +23,24 @@ public class PlayerWatchdog : PelvisWatchdog
     public bool controllerDisabled => !carolController.enabled;
     public bool inDialogue => carolEntity.hud.dialogue.dialogue.activeSelf;
 
-    public override PelvisWatchdog BuildFromExisting(PelvisWatchdog watchdog, Component typeComponent)
+    public ICustomizable Constructor(PelvisWatchdog watchdog)
     {
-        carolEntity = typeComponent as Entity;
-        carolController = gameObject.GetComponentInParent<CarolController>();
-        if (!carolController) { Log.Error($"Failed to find {this}'s CarolController"); }
-        return base.BuildFromExisting(watchdog, typeComponent);
+        this.watchdog ??= watchdog;
+        carolController = this.gameObject.GetComponentInParent<CarolController>();
+        if (!carolController) Log.Error("Failed to find CarolController in PlayerModBehavior.Constructor()");
+        return this;
     }
 
     void OnEnable()
     {
-        SetBaseVisibility(false);
+        this.watchdog = GetComponent<PelvisWatchdog>();
+        carolController = this.gameObject.GetComponentInParent<CarolController>();
+        watchdog.CompData.SetBaseVisibility(false);
         if (!carolEntity) carolEntity = GetComponentInParent<Entity>();
         if (!carolEntity)
         {
             Log.Error("Failed to find Entity during PlayerWatchdog.OnEnable()!");
-            PlayerInstances.DefaultPlayer.NotifySpawned(this);
+            PlayerInstances.DefaultPlayer.NotifySpawned(watchdog);
             return;
         }
         PlayerInstances.OnPlayerSpawn(this);
@@ -47,14 +51,12 @@ public class PlayerWatchdog : PelvisWatchdog
 
     public void UnlockPlayer() => StartCoroutine(UnlockRoutine());
 
-    protected override void OnTransformParentChanged() { }
-
     internal void SetAnimation(string animationName)
     {
         StartCoroutine(carolEntity.anim.SetTriggerForOneFrame(animationName));
     }
 
-    public override void SetBaseOutfit(Outfit outfit)
+    public void SetBaseOutfit(Outfit outfit)
     {
         Log.Debug("Changing outfit via Entity.Swapmodel");
         carolEntity.SwapModel(outfit.storedAsset.gameObject);
@@ -113,22 +115,17 @@ public class PlayerWatchdog : PelvisWatchdog
 
     public bool ManagesPlayer(Entity playerEntity) => carolEntity == playerEntity;
 
-    public override void SetAnimator(Outfit outfit)
+    public void SetAnimator(Outfit outfit)
     {
-        if (this.compData?.Animator is null) { Log.Warning($"null animator when trying to set animator on {this}"); return; }
+        if (watchdog.AnimData?.Animator is null) { Log.Warning($"null animator when trying to set animator on {this}"); return; }
         Log.Debug($"Setting animator from {outfit.DisplayName}");
-        var animator = outfit?.RuntimeAnimator;
-        if (!animator) { Log.Warning("failed to get animator from outfit"); return; }
-
+        var rac = outfit?.RuntimeAnimator;
+        if (!rac) { Log.Warning("failed to get animator from outfit"); return; }
         
-        this.compData.Animator.runtimeAnimatorController = animator;
-        this.compData.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-        if (disableAnimator) DisableAnimator();
-
-        Log.Debug("Done");
+        watchdog.AnimData.SetAnimator(rac);
     }
 
-    public override void SetHeightOffset(float height)
+    public void SetHeightOffset(float height)
     {
         Log.Debug("SetHeightOffset");
         var prefabRoot = transform.parent;
@@ -152,5 +149,12 @@ public class PlayerWatchdog : PelvisWatchdog
     void OnDisable()
     {
         Log.Debug($"{this}.OnDisable()");
+    }
+
+    public void SetBaseVisibility(bool visibility) => watchdog.CompData.SetBaseVisibility(visibility);
+
+    public void Dispose()
+    {
+        Destroy(this);
     }
 }

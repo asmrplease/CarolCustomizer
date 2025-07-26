@@ -7,14 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static GameManager;
 using static System.Linq.Enumerable;
 
 namespace CarolCustomizer.Models.Outfits;
 public class CompData : MonoBehaviour
 {
-    static readonly HashSet<Type> SkipTypes = new() 
-    {
+    static readonly HashSet<Type> SkipTypes =
+    [
          typeof(Transform)
         ,typeof(PelvisWatchdog)
         ,typeof(BoneData)
@@ -24,16 +23,7 @@ public class CompData : MonoBehaviour
         ,typeof(MagicaClothCompanion)
         ,typeof(MagicaCloth)
         ,typeof(SkinnedMeshRenderer)
-    };
-
-
-    [SerializeField]
-    RuntimeAnimatorController controller;
-    public RuntimeAnimatorController Controller => controller;
-
-    [SerializeField]
-    Animator animator;
-    public Animator Animator => animator;
+    ];
 
     [SerializeField]
     public List<SkinnedMeshRenderer> allSMRs;
@@ -43,34 +33,22 @@ public class CompData : MonoBehaviour
 
     public SkinnedMeshRenderer BaseFace => allSMRs.FirstOrDefault(x => x && x.name == "tete");
 
-    Dictionary<Type, Component> parentComponents = new();
     public CoopModelToggle[] coopToggles { get; private set; }
 
     public List<SkinnedMeshRenderer>[] coopMeshes
         { get; private set; }
         = new List<SkinnedMeshRenderer>[Constants.MaxCoopPlayers];
-    public List<SkinnedMeshRenderer> allCoopMeshes
-        { get; private set; }
-        = new();
+    public List<SkinnedMeshRenderer> allCoopMeshes{ get; private set; } = [];
+
 
     public CompData Constructor()
     {
-        allSMRs = transform
-            .parent
+        allSMRs = transform.parent
             .GetComponentsInChildren<SkinnedMeshRenderer>(true)
             .ToList();
-
-        animator ??= GetComponentsInParent<Animator>(true)?
-            .FirstOrDefault(x => x.runtimeAnimatorController);
-
-        controller ??= animator?.runtimeAnimatorController;
-        if (animator is not null) animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-
         coopToggles = transform.parent.GetComponentsInChildren<CoopModelToggle>(true);
-
         SetCoopVariants();
         coopToggles.ForEach(x => x.enabled = false);
-        RefreshParentComponents();
         EffectSetup();
         return this;
     }
@@ -83,11 +61,7 @@ public class CompData : MonoBehaviour
             .ForEach(x =>
                 x.cullingMode = AnimatorCullingMode.AlwaysAnimate);
 
-        var effectComponents = 
-            allComponents
-            .Where(x => 
-                !SkipTypes
-                .Contains(x.GetType()));
+        var effectComponents = allComponents.Where(x => !SkipTypes.Contains(x.GetType()));
 
         EffectBehaviours = 
             effectComponents
@@ -96,22 +70,15 @@ public class CompData : MonoBehaviour
                 .IsAssignableFrom(typeof(Behaviour)))
             .Select(x => x as Behaviour)
             .ToList();
-
         var nonBehaviors = 
             effectComponents
             .Except(EffectBehaviours)
             .Select(x => x.transform)
             .Where(x => !CommonBones.IsCommon(x.name));
-
-
-        EffectGameObjects = 
-            nonBehaviors
-            .Where(x =>
-                !nonBehaviors
-                .Contains(x.parent))
+        EffectGameObjects = nonBehaviors
+            .Where(x => !nonBehaviors.Contains(x.parent))
             .Select(x => x.gameObject)
             .ToList();
-
         EffectBehaviours.ForEach(x => x.enabled = false);
         EffectGameObjects.ForEach(x => x.SetActive(false));
     }
@@ -121,31 +88,23 @@ public class CompData : MonoBehaviour
         foreach (int i in Range(0, Constants.MaxCoopPlayers))
         {
             var playerToggles = coopToggles.Where(x=>x.playerNumberToggle == i);
-            coopMeshes[i] = new();
+            coopMeshes[i] = [];
             if (playerToggles is null) continue;
-            foreach (var toggle in playerToggles)
-            {
-                var smrs = toggle.GetComponentsInChildren<SkinnedMeshRenderer>(true);
-                coopMeshes[i].AddRange(smrs);
-                allCoopMeshes.AddRange(smrs);
-            }
+
+            playerToggles
+                .Select(x => x.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+                .ForEach(coopMeshes[i].AddRange)
+                .ForEach(allCoopMeshes.AddRange);
         }
     }
-
-    public Component GetParentComponent(Type type)
+    public void SetBaseVisibility(bool visible)
     {
-        parentComponents.TryGetValue(type, out Component component);
-        return component;
-    }
+        Log.Debug("CompData.SetBaseVisibility()");
+        if (allSMRs is null) return;
 
-    public void RefreshParentComponents()
-    {
-        var components = GetComponentsInParent<Component>(true);
-        if (components is null || !components.Any()) { parentComponents = new(); return; }
-
-        parentComponents = components
-            .Where(x => x is not null)
-            .ToDictionaryOverwrite(x => x.GetType());
+        allSMRs
+            .Where(x => x && !x.transform.IsChildOf(this.transform))
+            .ForEach(x => x.gameObject.SetActive(visible));
     }
 
     void OnDestory()

@@ -4,43 +4,47 @@ using UnityEngine;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Contracts;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class MenuWatchdog : PelvisWatchdog
+public class MenuModBehavior : MonoBehaviour, ICustomizable
 {
     MenuSwitchOutfit menuSwitchOutfit;
+    public PelvisWatchdog watchdog {  get; private set; }
 
-    public override PelvisWatchdog BuildFromExisting(PelvisWatchdog watchdog, Component typeComponent)
+    public ICustomizable Constructor(PelvisWatchdog watchdog)
     {
-        Log.Debug("MenuWatchdog.Constructor");
-        Log.Debug($"{watchdog.CompData.allSMRs.Count()}");
-        Log.Debug($"ctor BoneData exists: {(bool)BoneData}");
-        menuSwitchOutfit = typeComponent as MenuSwitchOutfit;
-        return base.BuildFromExisting(watchdog, typeComponent);
+        Log.Debug("MenuModBehavior.Constructor()");
+        this.watchdog = watchdog;
+        menuSwitchOutfit = this.gameObject.GetComponentInParent<MenuSwitchOutfit>(true);
+        if (!menuSwitchOutfit) Log.Warning("No MenuSwitchOutfit component found!");
+        return this;
     }
 
     void Start() => StartCoroutine(MainMenuFix());
 
     void OnEnable()
     {
+        this.watchdog = GetComponent<PelvisWatchdog>();
+        this.menuSwitchOutfit = this.gameObject.GetComponentInParent<MenuSwitchOutfit>(true);
         SetBaseVisibility(false);
-        PlayerInstances.DefaultPlayer.NotifySpawned(this);
+        PlayerInstances.DefaultPlayer.NotifySpawned(this.watchdog);
     }
 
     private IEnumerator MainMenuFix()
     {
         while (true)
         {
-            if (CompData.allSMRs.Any(x => x.gameObject.activeSelf))
+            if (watchdog.CompData.allSMRs.Any(x => x.gameObject.activeSelf))
             {
                 //Log.Debug("MainMenuFix RefreshBaseVisibility");
-                base.SetBaseVisibility(false);
+                watchdog.CompData.SetBaseVisibility(false);
             }
             yield return new WaitForSeconds(1);
         }
     }
 
-    public override void SetBaseOutfit(Outfit outfit)
+    public void SetBaseOutfit(Outfit outfit)
     {
         Log.Debug("SetBaseOutfit(MenuSwitchOutfit)");
         if (menuSwitchOutfit.loadedModel) { Destroy(menuSwitchOutfit.loadedModel); }
@@ -50,5 +54,25 @@ public class MenuWatchdog : PelvisWatchdog
         menuSwitchOutfit.loadedModel.transform.ResetLocalPosRot();
         menuSwitchOutfit.modelData = ((HaDSOutfit)outfit).modelData;
         menuSwitchOutfit.PickHair(menuSwitchOutfit.transform);
+    }
+
+    public void SetAnimator(Outfit outfit)
+    {
+        
+    }
+
+    public void SetHeightOffset(float height)
+    {
+        
+    }
+
+    public void SetBaseVisibility(bool visibility)
+    {
+        watchdog?.CompData?.SetBaseVisibility(visibility);
+    }
+
+    public void Dispose()
+    {
+        Destroy(this);
     }
 }

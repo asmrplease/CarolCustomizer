@@ -20,21 +20,18 @@ public class PlayerInstances : IDisposable
             .ToList();
     }
 
-    public static void OnPlayerSpawn(PlayerWatchdog watchdog)
+    public static void OnPlayerSpawn(PlayerModBehavior player)
     {
         Log.Debug("OnPlayerSpawn()");
-        if (!watchdog.carolEntity) { Log.Error("Watchdog spawned with null Entity"); return; }
+        if (!player.carolEntity) { Log.Error("Watchdog spawned with null Entity"); return; }
 
-        int index = PlayerIndex(watchdog.carolEntity);
+        int index = PlayerIndex(player.carolEntity);
         if (index < 0) { Log.Error("No matching player entity found "); return; }
         if (index >= Players.Count) { Log.Warning($"index {index} was outside of player count {Players.Count}"); return; }
 
         Log.Debug($"Players[{index}].NotifySpawned()");
-        Players[index].NotifySpawned(watchdog);
+        Players[index].NotifySpawned(player.watchdog);
     }
-
-    //handle cutscene start?
-    //handle cutscene end?
 
     public static int PlayerIndex(Entity entity) => 
         Entity.players is null ? -1:

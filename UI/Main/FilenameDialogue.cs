@@ -66,7 +66,7 @@ public class FilenameDialogue : MonoBehaviour
 
     IEnumerator idk()
     {
-        if (OutfitListUI.TargetOutfit.pelvis is PlayerWatchdog player)
+        if (OutfitListUI.TargetOutfit.pelvis.Behavior is PlayerModBehavior player)
         {
             yield return player.UnlockRoutine();
             var carolEntity = player.carolEntity;
@@ -84,7 +84,7 @@ public class FilenameDialogue : MonoBehaviour
 
     void OnDropdownChanged(int index)
     {
-        var animator = OutfitListUI.TargetOutfit.pelvis.CompData.Animator;
+        var animator = OutfitListUI.TargetOutfit.pelvis.AnimData.Animator;
         StartCoroutine(Dialogue.controller.SetExpressionValue(animator, "Expression", index));
     }
 
@@ -96,17 +96,17 @@ public class FilenameDialogue : MonoBehaviour
     void OnConfirm()
     {
         if (textBox.text != "") onConfirm?.Invoke(recipe, textBox.text);
-        var animator = OutfitListUI.TargetOutfit.pelvis.CompData.Animator;
+        var animator = OutfitListUI.TargetOutfit.pelvis.AnimData.Animator;
         StartCoroutine(Dialogue.controller.SetExpressionValue(animator, "Expression", 0));
-        if (OutfitListUI.TargetOutfit.pelvis is PlayerWatchdog player) player.LockPlayer();
+        if (OutfitListUI.TargetOutfit.pelvis.Behavior is PlayerModBehavior player) player.LockPlayer();
         gameObject.SetActive(false);
     }
 
     void OnCancel()
     {
-        var animator = OutfitListUI.TargetOutfit.pelvis.CompData.Animator;
+        var animator = OutfitListUI.TargetOutfit.pelvis.AnimData.Animator;
         StartCoroutine(Dialogue.controller.SetExpressionValue(animator, "Expression", 0));
-        if (OutfitListUI.TargetOutfit.pelvis is PlayerWatchdog player) player.LockPlayer();
+        if (OutfitListUI.TargetOutfit.pelvis.Behavior is PlayerModBehavior player) player.LockPlayer();
         gameObject.SetActive(false);
     }
 

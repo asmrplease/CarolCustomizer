@@ -62,7 +62,8 @@ internal class HaDSOutfitLoader : IDisposable
 
     public void Dispose()
     {
-        foreach (var outfit in HaDSOutfits) { outfit.Value.Dispose(); }
+        HaDSOutfits.Values.ForEach(x=>x.Dispose());
+        //foreach (var outfit in HaDSOutfits.Values) { outfit.Dispose(); }
     }
 
 }

@@ -59,9 +59,9 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
             int i = 0;
             grouping.ForEach(x => x.name += i++);
         }
-        prefabWatchdog = pelvis.gameObject.AddComponent<PelvisWatchdog>();
-        prefabWatchdog.Awake();
-
+        prefabWatchdog = pelvis.gameObject
+            .AddComponent<PelvisWatchdog>()
+            .Constructor();
         if (!prefabWatchdog.CompData) Log.Warning("Failed to instantiate meshdata in time.");
         var smrs = prefabWatchdog?.CompData?.allSMRs;
         if (smrs is null) { Log.Error("no smrs found in watchdog mesh data."); return; }
@@ -106,11 +106,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
 
     public void Dispose()
     {
-        if (!prefabWatchdog) return;
-        if (prefabWatchdog.BoneData) GameObject.DestroyImmediate(prefabWatchdog.BoneData);
-        if (prefabWatchdog.CompData) GameObject.DestroyImmediate(prefabWatchdog.CompData);
-        if (prefabWatchdog.MagiData) GameObject.DestroyImmediate(prefabWatchdog.MagiData);
-        GameObject.DestroyImmediate(prefabWatchdog);
+        if (prefabWatchdog) prefabWatchdog.Dispose();
     }
     #endregion
 

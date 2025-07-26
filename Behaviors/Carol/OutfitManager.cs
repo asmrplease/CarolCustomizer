@@ -156,10 +156,11 @@ public class OutfitManager : IDisposable
 
     public void SetAnimator(Outfit outfit)
     {
-        if (!pelvis) { Log.Warning("Tried to swap animators with no pelviswatchdog instantiated."); return; }
+        if (!pelvis || pelvis.Behavior is null) { Log.Warning("Tried to swap animators with no pelviswatchdog instantiated."); return; }
         if (outfit is null) { Log.Warning("Tried to load animator from null outfit"); return; }
+        
         Log.Debug($"changing animator to {outfit.DisplayName}");
-        pelvis.SetAnimator(outfit);
+        pelvis.Behavior.SetAnimator(outfit);
         this.animatorSource = outfit;
     }
 
@@ -174,16 +175,16 @@ public class OutfitManager : IDisposable
 
     void ApplyConfig()
     {
-        if (!pelvis) return;
+        if (!pelvis || pelvis.Behavior is null) return;
         if (configurationSource is null) return;
 
         Log.Debug("ApplyConfig()");
-        pelvis.SetHeightOffset(configurationSource.modelData.height);
+        pelvis.Behavior.SetHeightOffset(configurationSource.modelData.height);
     }
 
     public void SetEffect(Outfit outfit, bool enabled)
     {
-        if (!pelvis || outfit is null) return;
+        if (!pelvis || pelvis.Behavior is null || outfit is null) return;
         if (!outfit.Effects.Any()) return;
 
         skeletonManager.GetAddBoneSet(outfit);
@@ -221,7 +222,7 @@ public class OutfitManager : IDisposable
 
     void ApplyCollider()
     {
-        if (!pelvis) return;
+        if (!pelvis || pelvis.Behavior is null) return;
 
         var sourceColliders = colliderSource
             .magiData

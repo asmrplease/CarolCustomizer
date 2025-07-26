@@ -1,5 +1,5 @@
-﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using Slate;
@@ -9,154 +9,95 @@ using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class PelvisWatchdog : MonoBehaviour
+public class PelvisWatchdog : MonoBehaviour, IDisposable
 {
-    readonly Guid Guid = Guid.NewGuid();
-    protected Guid SourceGuid;
+    [SerializeField]
+    AnimData animData;
+    public AnimData AnimData { get {  return animData; } }
 
     [SerializeField]
-    protected BoneData boneData;
+    BoneData boneData;
     public BoneData BoneData { get { return boneData; } }
 
     [SerializeField]
-    protected CompData compData;
+    CompData compData;
     public CompData CompData { get { return compData; } }
 
     [SerializeField]
-    protected MagiData magiData;
+    MagiData magiData;
     public MagiData MagiData { get { return magiData; } }
-
-    protected string parentName => transform.parent?.name ?? "none";
-    protected string grandparentName => transform.parent?.parent?.name ?? "none";
-    protected string rootName => transform.root?.name ?? "none";
-
-    protected bool disableAnimator;
-
     List<(Func<Predicate<PelvisWatchdog>, bool> func,
-            Predicate<PelvisWatchdog> pred)> checks;
+        Predicate<PelvisWatchdog> pred)> checks;
+    public ICustomizable Behavior { get; private set; }
+    string parentName => transform.parent?.name ?? "none";
+    string grandparentName => transform.parent?.parent?.name ?? "none";
+    string rootName => transform.root?.name ?? "none";
+    bool Constructed = false;
 
-    virtual public PelvisWatchdog BuildFromExisting(PelvisWatchdog watchdog, Component typeComponent)
+    public PelvisWatchdog Constructor()
     {
-        Log.Debug("Watchdog.CopyFromExisting");
-        SourceGuid = watchdog.Guid;
-        boneData = watchdog.BoneData;
-        compData = watchdog.CompData;
-        magiData = watchdog.MagiData;
-        Destroy(watchdog);
+        if (Constructed) return this;
+
+        Log.Debug($"{this}.Awake()");
+        boneData = this.gameObject.AddComponent<BoneData>().Constructor();
+        compData = this.gameObject.AddComponent<CompData>().Constructor();
+        magiData = this.gameObject.AddComponent<MagiData>().Constructor();
+        animData = this.gameObject.AddComponent<AnimData>().Constructor();
+        Behavior = gameObject.AddComponent<UnknownCarolBehavior>();
+        Constructed = true;
         return this;
     }
 
-    virtual public void Awake()
+    void Awake() => Constructor();
+    void OnEnable() => DetectType();
+    void OnTransformParentChanged() => DetectType();
+
+    public void Dispose()
     {
-        Log.Debug($"{this}.Awake()");
-        if (!boneData) boneData = this.gameObject.AddComponent<BoneData>().Constructor();
-        if (!compData) compData = this.gameObject.AddComponent<CompData>().Constructor();
-        if (!magiData) magiData = this.gameObject.AddComponent<MagiData>().Constructor();
-        DetectType();
+        Behavior.Dispose();
+        List<MonoBehaviour> stuff = [boneData, compData, magiData, animData];
+        stuff.ForEach(Destroy);
+        Destroy(this);
     }
-
-    virtual protected void OnTransformParentChanged() => DetectType();
-
-    void SetupCheckList() =>
-        checks =
+    void SetupCheckList() => checks =
         [
-            (Check<VirtualCarol,    MPBotWatchdog>,  (x)=> true),
-            (Check<Entity,          PlayerWatchdog>, (x)=> x.rootName == "CAROL(Clone)"),
-            (Check<Entity,          NPCWatchdog>,    (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
-            (Check<Entity,          BotWatchdog>,    (x)=> true),
-            (Check<CutsceneActor,   ActressWatchdog>,(x)=> true),
-            (Check<Character,       NPCWatchdog>,    (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
-            (Check<Character,       ActressWatchdog>,(x)=> true),
-            (Check<MenuSwitchOutfit,MenuWatchdog>,   (x)=> true),
-            (Check<Transform,       NPCWatchdog>,    (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
-            (Check<Transform,       ActressWatchdog>,(x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error)
+            (Check<VirtualCarol,    MPBotBehavior>,       (x)=> true),
+            (Check<Entity,          PlayerModBehavior>,   (x)=> x.rootName == "CAROL(Clone)"),
+            (Check<Entity,          NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
+            (Check<Entity,          CampaignBot>,         (x)=> true),
+            (Check<CutsceneActor,   CarolActressBehavior>,(x)=> true),
+            (Check<Character,       NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
+            (Check<Character,       CarolActressBehavior>,(x)=> true),
+            (Check<MenuSwitchOutfit,MenuModBehavior>,     (x)=> true),
+            (Check<Transform,       NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
+            (Check<Transform,       CarolActressBehavior>,(x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error),
+            (Check<Transform,       UnknownCarolBehavior>,(x)=> true)
         ];
-
-    protected bool DetectType()
+    void DetectType()
     {
-        compData.RefreshParentComponents();
         SetupCheckList();
-        if (checks
-            .Select(tup => tup.func.Invoke(tup.pred))
+        checks.Select(tup => tup.func.Invoke(tup.pred))
             .Where(x => x is true)
-            .Any()) 
-            return true;
-        else return false;
+            .Any();
     }
 
     bool Check<SearchType, ResultType>(Predicate<PelvisWatchdog> predicate)
         where SearchType : Component
-        where ResultType : PelvisWatchdog
+        where ResultType : MonoBehaviour, ICustomizable
     {
         try { if (!predicate.Invoke(this)) return false; }
         catch (NullReferenceException e)
         { Log.Warning($"{nameof(ResultType)} predicate caused an exception: {e.Message}"); return false; }
 
-        var component = compData.GetParentComponent(typeof(SearchType));
+        var component = GetComponentInParent<SearchType>(true);
         if (!component) return false;
-
-        if (GetType() == typeof(ResultType)) return true;
+        if (Behavior.GetType() == typeof(ResultType)) return true;
 
         Log.Info($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
-        gameObject.AddComponent<ResultType>().BuildFromExisting(this, component);
-        //Destroy(this);
+        //Behavior?.Dispose();
+        GetComponents<ICustomizable>().ForEach(x => x.Dispose());
+        Behavior = gameObject.AddComponent<ResultType>().Constructor(this);
         return true;
     }
 
-    public void DisableAnimator()
-    {
-        if (!compData.Animator) return;
-
-        disableAnimator = true;
-        compData.Animator.enabled = false;
-        compData.Animator.Rebind();
-        OutfitAssetManager
-            .GetPyjamas().boneData
-            .StandardBones
-            .Select(kvp => 
-                (found: this.boneData
-                    .StandardBones
-                    .TryGetValue(kvp.Key, out var result)
-                ,resting: kvp.Value
-                ,live: result))
-            .Where(tup => tup.found)
-            .ForEach(tup => tup.live.CopyFrom(tup.resting));
-    }
-
-    void LateUpdate()
-    {
-        if (!disableAnimator) return;
-        if (!compData.Animator) return;
-
-        compData.Animator.enabled = false;
-    }
-
-    public void EnableAnimator()
-    {
-        if (!compData.Animator) return;
-
-        disableAnimator = false;
-        compData.Animator.enabled = true;
-        compData.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-    }
-
-    public virtual void SetBaseOutfit(Outfit outfit) { }
-
-    public virtual void SetAnimator(Outfit outfit) { }
-
-    public virtual void SetHeightOffset(float height) { }
-    
-    public virtual void SetBaseVisibility(bool visible)
-    {
-        Log.Debug("PelvisWatchdog.SetBaseVisibility()");
-        if (compData?.allSMRs is null) return;
-
-        CompData
-            .allSMRs
-            .Where(x => x && !x.transform.IsChildOf(this.transform))
-            .ForEach(x => x.gameObject.SetActive(visible));
-        Log.Debug("done");
-    }
-
-    public override string ToString() => $"{GetType()}@{rootName}->{grandparentName}({Guid})";
 }

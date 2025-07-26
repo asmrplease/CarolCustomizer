@@ -44,7 +44,7 @@ internal class MagicaManager(SkeletonManager skeleton)
     {
         var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
         liveMagica.name = outfit.DisplayName + " BoneCloth";
-        targetPelvis.DisableAnimator();
+        targetPelvis.AnimData.DisableAnimator();
         liveMagica.ReplaceTransform(skeleton.GetAddBoneSet(outfit));
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.AddRange(
@@ -92,7 +92,7 @@ internal class MagicaManager(SkeletonManager skeleton)
 
         if (!acc.isActive) return;
 
-        targetPelvis.DisableAnimator();
+        targetPelvis.AnimData.DisableAnimator();
         MeshClothAccs.Remove(acc.storedAcc);
         var boneDict = skeleton.GetAddBoneSet(acc.outfit);
 
@@ -129,6 +129,6 @@ internal class MagicaManager(SkeletonManager skeleton)
 
         if (processing.Any()) return;
         //Log.Info("enabling animator");
-        targetPelvis.EnableAnimator();
+        targetPelvis.AnimData.EnableAnimator();
     }
 }

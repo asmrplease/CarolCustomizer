@@ -19,21 +19,22 @@ public class NPCInstanceCreator : IDisposable
         "SECTOR_STORMYSEA",
     };
 
-    public static List<PelvisWatchdog> dedicatedActresses = new();
-    private static HashSet<PelvisWatchdog> carolBotPrefabs = new();
-    static List<GameObject> pelvises = new();
+    public static List<PelvisWatchdog> dedicatedActresses = [];
+    private static HashSet<PelvisWatchdog> carolBotPrefabs = [];
+    static List<GameObject> pelvises = [];
 
     #region Lifecycle
     public NPCInstanceCreator(Transform parent)
     {
-        SceneManager.sceneLoaded += FindDedicatedActresses;
-        SceneManager.sceneLoaded += FindBotEntities;
-        //SceneManager.sceneLoaded += FindAllPelvises;
+        //SceneManager.sceneLoaded += FindDedicatedActresses;
+        //SceneManager.sceneLoaded += FindBotEntities;
+        SceneManager.sceneLoaded += FindAllPelvises;
     }
 
-    private void FindAllPelvises(Scene _, LoadSceneMode mode)
+    void FindAllPelvises(Scene scene, LoadSceneMode mode)
     {
         if (mode == LoadSceneMode.Additive) return;
+        if (scene.name == Constants.MenuSceneName) return;
 
         pelvises = Resources
             .FindObjectsOfTypeAll<GameObject>()
@@ -50,12 +51,13 @@ public class NPCInstanceCreator : IDisposable
 
     public void Dispose()
     {
-        SceneManager.sceneLoaded -= FindDedicatedActresses;
-        SceneManager.sceneLoaded -= FindBotEntities;
-        //SceneManager.sceneLoaded -= FindAllPelvises;
-
-        foreach (var actress in dedicatedActresses) { if (actress) GameObject.Destroy(actress); }
-        foreach (var botPrefab in carolBotPrefabs) { if (botPrefab) GameObject.Destroy(botPrefab); }
+        //SceneManager.sceneLoaded -= FindDedicatedActresses;
+        //SceneManager.sceneLoaded -= FindBotEntities;
+        SceneManager.sceneLoaded -= FindAllPelvises;
+        dedicatedActresses.Where(x => x).ForEach(GameObject.Destroy);
+        carolBotPrefabs.Where(x => x).ForEach(GameObject.Destroy);
+        //foreach (var actress in dedicatedActresses) { if (actress) GameObject.Destroy(actress); }
+        //foreach (var botPrefab in carolBotPrefabs) { if (botPrefab) GameObject.Destroy(botPrefab); }
     }
     #endregion
 
