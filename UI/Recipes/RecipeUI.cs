@@ -142,7 +142,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             var unloadedScenes = SceneResourceProvider.CheckMaterialsReady(mats);
             foreach (var scene in unloadedScenes) { message += scene + Environment.NewLine; }
         }
-        messageDialogue.Show(message, cancelText: "Nevermind", confirmText: "Load Anyway", confirmAction: () => OnContextMenuLoad(PlayerInstances.DefaultPlayer));
+        messageDialogue.Show(message, cancelText: "Don't Load", confirmText: "Load", confirmAction: () => OnContextMenuLoad(PlayerInstances.DefaultPlayer));
     }
 
     void OnContextMenuRename()

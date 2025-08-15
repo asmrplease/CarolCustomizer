@@ -32,7 +32,7 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
         this.contextMenu = contextMenu;
 
         displayName = transform.Find(displayNameAddress).GetComponent<Text>();
-        displayName.text = this.material.Name;
+        displayName.text = this.material.Name.DeInstance();
 
         sceneName = transform.Find(materialNameAddress).GetComponent<Text>();
         sceneName.text = material.Source;
