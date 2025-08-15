@@ -71,8 +71,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         yield return new WaitForEndOfFrame();
 
         var bytes = File.ReadAllBytes(recipe.Path);
-        var sprite = displayImage.sprite;
-        Texture2D thumbnail = new Texture2D(512, 512, TextureFormat.RGBA32, false);
+        Texture2D thumbnail = new(512, 512, TextureFormat.RGBA32, false);
         if (!ImageConversion.LoadImage(thumbnail, bytes)) { Log.Warning($"failed to load png for {recipe.Name}"); yield break; }
 
         displayImage.sprite = Sprite
@@ -94,14 +93,14 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     string GetStatusMessage()
     {
-        switch (recipe.Error)
+        return recipe.Error switch
         {
-            case Recipe.Status.MissingSource:   return $"Missing {RecipeApplier.GetMissingSources(recipe.Descriptor).Count()} sources";
-            case Recipe.Status.SlowSource:      return $"{SceneResourceProvider.CheckMaterialsReady(RecipeApplier.GetWorldMats(recipe.Descriptor)).Count()} scenes required.";
-            case Recipe.Status.InvalidJson:     return "Recipe data invalid";
-            case Recipe.Status.FileError:       return "Error loading file";
-            default: return "";
-        }
+            Recipe.Status.MissingSource => $"Missing {RecipeApplier.GetMissingSources(recipe.Descriptor).Count()} sources",
+            Recipe.Status.SlowSource => $"{SceneResourceProvider.CheckMaterialsReady(RecipeApplier.GetWorldMats(recipe.Descriptor)).Count()} scenes required.",
+            Recipe.Status.InvalidJson => "Recipe data invalid",
+            Recipe.Status.FileError => "Error loading file",
+            _ => "",
+        };
     }
 
     Color GetUIColor()
