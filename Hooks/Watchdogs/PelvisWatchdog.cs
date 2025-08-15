@@ -57,12 +57,6 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
         return this;
     }
 
-    void Awake() => Constructor();
-    void OnEnable() => DetectChanges();
-
-    void OnDisable() => DetectChanges();
-    void OnTransformParentChanged() => DetectChanges();
-
     public void Dispose()
     {
         Log.Debug($"{parentName} PelvisWatchdog.Destroy()");
@@ -71,6 +65,13 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
         stuff.ForEach(Destroy);
         Destroy(this);
     }
+
+    void Awake() => Constructor();
+    void OnEnable() => DetectChanges();
+
+    void OnDisable() => DetectChanges();
+    void OnTransformParentChanged() => DetectChanges();
+
     void SetupCheckList() => checks =
         [   
             (Check<VirtualCarol,    MPBotBehavior>,       (x)=> true),
@@ -82,8 +83,8 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
             (Check<Character,       CarolActressBehavior>,(x)=> true),
             (Check<MenuSwitchOutfit,MenuModBehavior>,     (x)=> true),
             (Check<Transform,       NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
-            (Check<Transform,       CarolActressBehavior>,(x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error),
             (Check<Transform,       OutfitModelBehavior>, (x)=> x.gameObject.scene.buildIndex == -1),
+            (Check<Transform,       CarolActressBehavior>,(x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error),
             (Check<Transform,       UnknownCarolBehavior>,(x)=> true)
         ];
     void DetectChanges()
