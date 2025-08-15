@@ -5,6 +5,7 @@ using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace CarolCustomizer.UI.Materials;
 internal class MaterialsListUI : MonoBehaviour
@@ -66,7 +67,7 @@ internal class MaterialsListUI : MonoBehaviour
         eyedropperMaterialUIs
             .Where(x => x)
             .Select(x => x.gameObject)
-            .ForEach(Destroy);//foreach (var item in materialUIs) { if (item) Destroy(item.gameObject); }
+            .ForEach(Destroy);
         eyedropperMaterialUIs.Clear();
         materials
             .Select(x =>
@@ -82,6 +83,7 @@ internal class MaterialsListUI : MonoBehaviour
         if (!Input.GetMouseButtonDown(0)) return;
         if (this.contextMenu.isActiveAndEnabled) return;
         if (!MenuToggle.IsVisible) return;
+        if (EventSystem.current.IsPointerOverGameObject()) return;
 
         Log.Debug("Toggling Eyedropper");
         this.eyedropper.enabled = !this.eyedropper.enabled;

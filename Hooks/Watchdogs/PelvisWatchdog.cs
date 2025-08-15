@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using BepInEx.Logging;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
@@ -71,8 +72,7 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
         Destroy(this);
     }
     void SetupCheckList() => checks =
-        [
-            (Check<Transform,       OutfitModelBehavior>, (x)=> x.gameObject.scene.buildIndex == -1),    
+        [   
             (Check<VirtualCarol,    MPBotBehavior>,       (x)=> true),
             (Check<Entity,          PlayerModBehavior>,   (x)=> x.rootName == "CAROL(Clone)"),
             (Check<Entity,          NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
@@ -83,15 +83,17 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
             (Check<MenuSwitchOutfit,MenuModBehavior>,     (x)=> true),
             (Check<Transform,       NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
             (Check<Transform,       CarolActressBehavior>,(x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error),
+            (Check<Transform,       OutfitModelBehavior>, (x)=> x.gameObject.scene.buildIndex == -1),
             (Check<Transform,       UnknownCarolBehavior>,(x)=> true)
         ];
     void DetectChanges()
     {
-        VisibilityChanged?.Invoke(this.Visible);
+        Log.Debug("DetectChanges()");
         SetupCheckList();
         checks.Select(tup => tup.func.Invoke(tup.pred))
             .Where(x => x is true)
             .Any();
+        VisibilityChanged?.Invoke(this.Visible);
     }
 
     bool Check<SearchType, ResultType>(Predicate<PelvisWatchdog> predicate)

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 namespace CarolCustomizer.UI.Materials;
@@ -37,6 +38,8 @@ internal class Eyedropper : MonoBehaviour
         if (Time.time < nextScan) return;
 
         nextScan = Time.time + scanInterval;
+        if (EventSystem.current.IsPointerOverGameObject()) return; //don't change the list if the pointer is over a UI element
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Physics.Raycast(ray, out RaycastHit cast, 1000f);
         if (!cast.transform) return;
