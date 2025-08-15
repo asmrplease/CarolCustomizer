@@ -51,7 +51,8 @@ internal class SceneResourceProvider
     {
         Log.Info("BatchLoad()");
         if (Loading) { Log.Warning("Tried to BatchLoad() while already loading a scene."); yield break; }
-    
+
+        Loading = true;
         var reference = CCPlugin.uiInstance.loadingIndicator.NotifyLoadingStart();
         var currentScene = SceneManager.GetActiveScene().name;
         var batchLoadScenes = batchLoad

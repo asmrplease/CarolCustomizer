@@ -10,26 +10,6 @@ namespace CarolCustomizer.Hooks;
 
 public static class OnirismPatches
 {
-    //[HarmonyPatch(typeof(GameManager), "Awake")]
-    public class DontWakeManager
-    {
-        public static bool Prefix()
-        {
-            Log.Info($"DontWakeManager patch, FakeLoad: {SceneResourceProvider.Loading}");
-            return !SceneResourceProvider.Loading;
-        }
-    }
-
-    //[HarmonyPatch(typeof(GameManager), "Start")]
-    public class DontStartManager
-    {
-        public static bool Prefix()
-        {
-            Log.Info($"DontStartManager patch, FakeLoad: {SceneResourceProvider.Loading}");
-            return !SceneResourceProvider.Loading;
-        }
-    }
-
     [HarmonyPatch(typeof(CostumeSwapUI), nameof(CostumeSwapUI.ChangeCostume))]
     public static class CostumeSwapPatch
     {
