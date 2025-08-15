@@ -81,6 +81,7 @@ internal class MaterialsListUI : MonoBehaviour
     {
         if (!Input.GetMouseButtonDown(0)) return;
         if (this.contextMenu.isActiveAndEnabled) return;
+        if (!MenuToggle.IsVisible) return;
 
         Log.Debug("Toggling Eyedropper");
         this.eyedropper.enabled = !this.eyedropper.enabled;

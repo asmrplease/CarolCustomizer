@@ -15,7 +15,7 @@ public class MenuToggle : MonoBehaviour
     #endregion
 
     #region State Variables
-    bool isVisible = false;
+    public static bool IsVisible { get; private set; } = false;
     Scene currentScene;
     GameObject mainMenuPages;
     #endregion
@@ -83,21 +83,21 @@ public class MenuToggle : MonoBehaviour
     {
         if (!mainMenuPages) return;
 
-        if (CheckInput()) { MainMenuSetMenuState(!isVisible); return; }
-        if (isVisible && Input.GetKeyDown(KeyCode.Escape)) { MainMenuSetMenuState(false); return; }
+        if (CheckInput()) { MainMenuSetMenuState(!IsVisible); return; }
+        if (IsVisible && Input.GetKeyDown(KeyCode.Escape)) { MainMenuSetMenuState(false); return; }
     }
 
     void MainMenuSetMenuState(bool newVisibility)
     {
         //if we're told to switch to the state we're already in, don't do anything lol
-        if (newVisibility == isVisible) { return; }
+        if (newVisibility == IsVisible) { return; }
 
         //if we are currently visible and asked to go back to regular menu
-        if (isVisible && !newVisibility)
+        if (IsVisible && !newVisibility)
         {
             OnMenuToggle?.Invoke(false);// uiInstance.Hide();
             mainMenuPages.transform.GetChild(0).gameObject.SetActive(true);
-            isVisible = newVisibility;
+            IsVisible = newVisibility;
             return;
         }
 
@@ -111,19 +111,19 @@ public class MenuToggle : MonoBehaviour
         Log.Debug("hid menu");
 
         //store the visibility state
-        isVisible = newVisibility;
+        IsVisible = newVisibility;
     }
 
     void GameplayUpdate()
     {
         //if we're in a cutscene, exit menu regardless of any other conditions
-        if (isVisible && GameManager.manager.isInCutscene) { GameplaySetMenuState(false); return; }
+        if (IsVisible && GameManager.manager.isInCutscene) { GameplaySetMenuState(false); return; }
 
         //don't change the menu state if we're already in a state change
         if (!PlayerInstances.DefaultPlayer.CanOpenMenu()) return;
 
         //hide the menu if it's visible and we pause
-        if (isVisible && (Input.GetKeyDown(KeyCode.Escape) || CheckInput()))
+        if (IsVisible && (Input.GetKeyDown(KeyCode.Escape) || CheckInput()))
         { GameplaySetMenuState(false); return; }
 
         //if we're in any invalid states for opening the menu
@@ -142,6 +142,6 @@ public class MenuToggle : MonoBehaviour
         OnMenuToggle?.Invoke(visible);
         if (visible) PlayerInstances.DefaultPlayer.LockPlayer();
         else PlayerInstances.DefaultPlayer.UnlockPlayer();
-        isVisible = visible;
+        IsVisible = visible;
     }
 }
