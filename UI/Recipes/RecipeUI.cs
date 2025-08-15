@@ -96,23 +96,23 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         return recipe.Error switch
         {
             Recipe.Status.MissingSource => $"Missing {RecipeApplier.GetMissingSources(recipe.Descriptor).Count()} sources",
-            Recipe.Status.SlowSource => $"{SceneResourceProvider.CheckMaterialsReady(RecipeApplier.GetWorldMats(recipe.Descriptor)).Count()} scenes required.",
-            Recipe.Status.InvalidJson => "Recipe data invalid",
-            Recipe.Status.FileError => "Error loading file",
+            Recipe.Status.SlowSource    => $"{SceneResourceProvider.CheckMaterialsReady(RecipeApplier.GetWorldMats(recipe.Descriptor)).Count()} scenes required.",
+            Recipe.Status.InvalidJson   => "Recipe data invalid",
+            Recipe.Status.FileError     => "Error loading file",
             _ => "",
         };
     }
 
     Color GetUIColor()
     {
-        switch (recipe.Error)
+        return recipe.Error switch
         {
-            case Recipe.Status.MissingSource: return Constants.DefaultColor;
-            case Recipe.Status.SlowSource: return Constants.DefaultColor.RGBMultiplied(0.5f);
-            case Recipe.Status.InvalidJson: return Color.gray;
-            case Recipe.Status.FileError: return Color.gray;
-            default: return Constants.DefaultColor;
-        }
+            Recipe.Status.MissingSource => Constants.DefaultColor,
+            Recipe.Status.SlowSource    => Constants.DefaultColor.RGBMultiplied(0.5f),
+            Recipe.Status.InvalidJson   => Color.gray,
+            Recipe.Status.FileError     => Color.gray,
+            _ => Constants.DefaultColor,
+        };
     }
 
     void OnContextMenuOverwrite()
