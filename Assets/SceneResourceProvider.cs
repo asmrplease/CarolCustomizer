@@ -127,7 +127,7 @@ internal class SceneResourceProvider
 
     internal static void AddToLazyLoad(MaterialDescriptor material)
     {
-        if (loaded.Contains(material)) { Log.Info("Material already loaded"); return; }
+        if (loaded.Contains(material)) { Log.Debug("Material already loaded"); return; }
 
         lazyLoad.Add(material);
         OnMaterialLoaded?.Invoke(material);

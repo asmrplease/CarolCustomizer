@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Carol;
 
-internal enum NPC
+public enum NPC
 {
     Shezara,
     Cherryl,
@@ -18,7 +18,7 @@ internal enum NPC
     Error,
 }
 
-internal class NPCManager
+public class NPCManager
 {
     static RecipeFileWatcher recipesManager;
 
@@ -47,6 +47,11 @@ internal class NPCManager
         return NPC.Error;
     }
 
+    public static IEnumerable<NPC> NPCTypes() => 
+        Enum.GetValues(typeof(NPC))
+            .Cast<NPC>()
+            .Except([NPC.Error]);
+
     public static void OnBotSpawn(CampaignBot bot)
     {
         Log.Debug("OnBotSpawn()");
@@ -62,14 +67,16 @@ internal class NPCManager
         
         var npcInstance = NPCs[npc.npcType];
         if (npcInstance is null) { Log.Error($"Failed to find NPC CarolInstance in NPC dict of type {npc.npcType}"); }
+        var (enable, recipe) = Settings.Settings.Plugin.customNPCs[npc.npcType];
+        if (!enable.Value) { Log.Info($"{npc.npcType} customization disabled."); return; }
 
-        string recipeName = Settings.Settings.Plugin.shezaraRecipe.Value;
-        var shezaraRecipe = recipesManager.Recipes.First(x => x.Name == recipeName);
-        if (shezaraRecipe is null) { Log.Warning($"didn't find shezara recipe {recipeName}"); return; }
+        string recipeName = recipe.Value;
+        var npcRecipe = recipesManager.Recipes.First(x => x.Name == recipeName);
+        if (npcRecipe is null) { Log.Warning($"didn't find {npc.npcType} recipe {recipeName}"); return; }
+
         npcInstance.NotifySpawned(npc.watchdog);
-        Log.Info($"applying {shezaraRecipe.Name} to NPC");
-        RecipeApplier.ActivateRecipe(npcInstance.outfitManager, shezaraRecipe.Descriptor);
-        //RecipeApplier.ActivateRecipe(npcInstance.outfitManager, GetRandomOutfit().Descriptor);
+        Log.Info($"applying {npcRecipe.Name} to NPC");
+        RecipeApplier.ActivateRecipe(npcInstance.outfitManager, npcRecipe.Descriptor);
     }
 
     public static void OnBotDespawn(PelvisWatchdog pelvis)

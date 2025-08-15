@@ -5,9 +5,9 @@ using CarolCustomizer.Models.Outfits;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-internal class NPCModBehavior : MonoBehaviour, ICustomizable
+public class NPCModBehavior : MonoBehaviour, ICustomizable
 {
-    bool customNPCsEnabled;
+    bool thisNPCEnabled;
     public NPC npcType { get; private set; }
     public PelvisWatchdog watchdog { get; private set; }
 
@@ -19,13 +19,13 @@ internal class NPCModBehavior : MonoBehaviour, ICustomizable
     }
     void Awake()
     {
-        customNPCsEnabled = Settings.Plugin.customShezara.Value;
+        thisNPCEnabled = Settings.Plugin.customNPCs[npcType].enable.Value;
         this.npcType = NPCManager.GetNPCType(this.transform.parent.name);
     }
 
     public void SetBaseVisibility(bool visible)
     {
-        if (customNPCsEnabled is not true) return;
+        if (thisNPCEnabled is not true) return;
         watchdog.CompData.SetBaseVisibility(visible);
     }
 
@@ -33,7 +33,7 @@ internal class NPCModBehavior : MonoBehaviour, ICustomizable
 
     void OnEnable() 
     {
-        if (!customNPCsEnabled) return;
+        if (!thisNPCEnabled) return;
 
         this.watchdog = GetComponent<PelvisWatchdog>();
         SetBaseVisibility(false);
@@ -43,7 +43,7 @@ internal class NPCModBehavior : MonoBehaviour, ICustomizable
 
     void OnDestroy() 
     { 
-        if (customNPCsEnabled) NPCManager.NPCs[npcType].RestorePrevious(watchdog); 
+        if (thisNPCEnabled) NPCManager.NPCs[npcType].RestorePrevious(watchdog); 
     }
 
     public void SetBaseOutfit(Outfit outfit)

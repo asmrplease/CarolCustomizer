@@ -13,6 +13,7 @@ public class CampaignBot : MonoBehaviour, ICustomizable
 
     void Awake()
     {
+        watchdog = GetComponent<PelvisWatchdog>();
         SetBaseVisibility(false);
         NPCManager.OnBotSpawn(this);
     }
@@ -41,17 +42,17 @@ public class CampaignBot : MonoBehaviour, ICustomizable
 
     public void SetBaseOutfit(Outfit outfit)
     {
-        throw new System.NotImplementedException();
+        
     }
 
     public void SetAnimator(Outfit outfit)
     {
-        throw new System.NotImplementedException();
+        
     }
 
     public void SetHeightOffset(float height)
     {
-        throw new System.NotImplementedException();
+        
     }
 
     public void Dispose()

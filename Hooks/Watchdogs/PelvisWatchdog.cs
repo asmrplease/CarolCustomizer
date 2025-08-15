@@ -11,6 +11,9 @@ using UnityEngine;
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PelvisWatchdog : MonoBehaviour, IDisposable
 {
+    public event Action<bool> VisibilityChanged;
+    public bool Visible => gameObject.activeInHierarchy;
+
     [SerializeField]
     AnimData animData;
     public AnimData AnimData { get {  return animData; } }
@@ -26,34 +29,42 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
     [SerializeField]
     MagiData magiData;
     public MagiData MagiData { get { return magiData; } }
-    List<(Func<Predicate<PelvisWatchdog>, bool> func,
-        Predicate<PelvisWatchdog> pred)> checks;
+    List<(Func<Predicate<PelvisWatchdog>, bool> func, Predicate<PelvisWatchdog> pred)> checks;
     public ICustomizable Behavior { get; private set; }
     string parentName => transform.parent?.name ?? "none";
-    string grandparentName => transform.parent?.parent?.name ?? "none";
     string rootName => transform.root?.name ?? "none";
     bool Constructed = false;
 
-    public PelvisWatchdog Constructor()
+    public static PelvisWatchdog GetAddWatchdog(GameObject pelvis)
+    {
+        if (pelvis.GetComponent<PelvisWatchdog>() is PelvisWatchdog watchdog) return watchdog;
+        return pelvis.AddComponent<PelvisWatchdog>().Constructor();
+    }
+
+    PelvisWatchdog Constructor()
     {
         if (Constructed) return this;
+        Constructed = true;
 
         Log.Debug($"{this}.Awake()");
-        boneData = this.gameObject.AddComponent<BoneData>().Constructor();
-        compData = this.gameObject.AddComponent<CompData>().Constructor();
-        magiData = this.gameObject.AddComponent<MagiData>().Constructor();
-        animData = this.gameObject.AddComponent<AnimData>().Constructor();
+        boneData = this.gameObject.GetAddComponent<BoneData>().Constructor();
+        compData = this.gameObject.GetAddComponent<CompData>().Constructor();
+        magiData = this.gameObject.GetAddComponent<MagiData>().Constructor();
+        animData = this.gameObject.GetAddComponent<AnimData>().Constructor();
         Behavior = gameObject.AddComponent<UnknownCarolBehavior>();
-        Constructed = true;
+        DetectChanges();
         return this;
     }
 
     void Awake() => Constructor();
-    void OnEnable() => DetectType();
-    void OnTransformParentChanged() => DetectType();
+    void OnEnable() => DetectChanges();
+
+    void OnDisable() => DetectChanges();
+    void OnTransformParentChanged() => DetectChanges();
 
     public void Dispose()
     {
+        Log.Debug($"{parentName} PelvisWatchdog.Destroy()");
         Behavior.Dispose();
         List<MonoBehaviour> stuff = [boneData, compData, magiData, animData];
         stuff.ForEach(Destroy);
@@ -61,6 +72,7 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
     }
     void SetupCheckList() => checks =
         [
+            (Check<Transform,       OutfitModelBehavior>, (x)=> x.gameObject.scene.buildIndex == -1),    
             (Check<VirtualCarol,    MPBotBehavior>,       (x)=> true),
             (Check<Entity,          PlayerModBehavior>,   (x)=> x.rootName == "CAROL(Clone)"),
             (Check<Entity,          NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
@@ -73,8 +85,9 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
             (Check<Transform,       CarolActressBehavior>,(x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error),
             (Check<Transform,       UnknownCarolBehavior>,(x)=> true)
         ];
-    void DetectType()
+    void DetectChanges()
     {
+        VisibilityChanged?.Invoke(this.Visible);
         SetupCheckList();
         checks.Select(tup => tup.func.Invoke(tup.pred))
             .Where(x => x is true)
@@ -94,7 +107,6 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
         if (Behavior.GetType() == typeof(ResultType)) return true;
 
         Log.Info($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
-        //Behavior?.Dispose();
         GetComponents<ICustomizable>().ForEach(x => x.Dispose());
         Behavior = gameObject.AddComponent<ResultType>().Constructor(this);
         return true;

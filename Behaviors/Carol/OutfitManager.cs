@@ -24,8 +24,8 @@ public class OutfitManager : IDisposable
     #endregion
 
     #region State Management
-    Dictionary<StoredAccessory, LiveAccessory> liveAccessories = new();
-    HashSet<Outfit> outfitEffects = new();
+    Dictionary<StoredAccessory, LiveAccessory> liveAccessories = [];
+    HashSet<Outfit> outfitEffects = [];
     Outfit animatorSource;
     HaDSOutfit configurationSource;
     Outfit colliderSource;
@@ -146,13 +146,18 @@ public class OutfitManager : IDisposable
     void HandleNewPelvis(PelvisWatchdog pelvis)
     {
         Log.Debug("HandleNewPelvis()");
+        if (this.pelvis) this.pelvis.VisibilityChanged -= OnPelvisVisibleChanged;
         this.pelvis = pelvis;
+        this.pelvis.VisibilityChanged += OnPelvisVisibleChanged;
+        OnPelvisVisibleChanged(pelvis.Visible);
         RefreshSMRs(pelvis);
         if (outfitEffects.Any()) RefreshEffects();
         if (animatorSource is not null) SetAnimator(animatorSource);
         if (configurationSource is not null) ApplyConfig();
         if (colliderSource is not null) ApplyCollider();
     }
+
+    void OnPelvisVisibleChanged(bool visible) => liveAccessories.Values.ForEach(x => x.Visible(visible));
 
     public void SetAnimator(Outfit outfit)
     {

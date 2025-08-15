@@ -23,6 +23,7 @@ public class AnimData : MonoBehaviour
         return this;
     }
 
+
     public void SetAnimator(RuntimeAnimatorController rac)
     {
         Animator.runtimeAnimatorController = rac;

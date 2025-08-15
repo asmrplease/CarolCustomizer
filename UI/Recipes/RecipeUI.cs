@@ -160,10 +160,15 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     void DeleteRecipe() => File.Delete(recipe.Path);
 
-    void SetAsShezara()
+    void ApplyToNPC(NPC type)
     {
-        Log.Debug($"Setting {recipe.Name} as shezara recipe");
-        Settings.Plugin.shezaraRecipe.Value = recipe.Name;
+        Log.Debug($"Setting {recipe.Name} as {type} recipe");
+        Settings.Plugin.customNPCs[type].recipe.Value = recipe.Name;
+        var npc = NPCManager.NPCs[type];
+        if (!npc.outfitManager.pelvis) return;
+
+        Log.Debug($"{type} is currently active in scene, applying recipe.");
+        RecipeApplier.ActivateRecipe(npc.outfitManager, recipe.Descriptor);
     }
 
     void OnContextMenuListMissing()
@@ -247,8 +252,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             output.Add(("Overwrite", OnContextMenuOverwrite));
             output.Add(("Delete", OnContextMenuDelete));
             output.Add(("Rename", OnContextMenuRename));
-            output.Add(("Set Shezara", SetAsShezara));  
-            
+            NPCManager.NPCTypes().ForEach(x => output.Add(($"Set as {x}", () => ApplyToNPC(x))));
         }
         if (recipe.Error == Recipe.Status.MissingSource || recipe.Error == Recipe.Status.SlowSource)
         {

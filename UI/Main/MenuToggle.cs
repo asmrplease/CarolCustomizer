@@ -46,7 +46,7 @@ public class MenuToggle : MonoBehaviour
         if (mode == LoadSceneMode.Additive) return;
 
         currentScene = newScene;
-        if (currentScene.name == Constants.MenuSceneName) return;
+        if (currentScene.name != Constants.MenuSceneName) return;
         StartCoroutine(OnMainMenuLoaded()); 
     }
 
@@ -72,7 +72,7 @@ public class MenuToggle : MonoBehaviour
     IEnumerator OnMainMenuLoaded()
     {
         yield return new WaitUntil(() => MainMenuManager.manager);
-        Log.Debug("OnMainMenuLoaded()");
+        Log.Debug("MenuToggle.OnMainMenuLoaded()");
 
         var pagesFolder = MainMenuManager.manager.transform.Find("PAGES");
         if (!pagesFolder) { Log.Error("didn't find main menu page."); yield return null; }

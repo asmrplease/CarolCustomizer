@@ -6,7 +6,6 @@ using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Hooks;
 using CarolCustomizer.Hooks.Watchdogs;
-using CarolCustomizer.Tests;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using FaceCam.Behaviors;
@@ -33,7 +32,7 @@ public class CCPlugin : BaseUnityPlugin
     #region Instance Components
     Harmony HarmonyInstance;
     OutfitAssetManager outfitAssetManager;
-    NPCInstanceCreator npcInstances;
+    ScenePelvisFinder npcInstances;
     HaDSOutfitLoader outfitLoader;
     SaveDataAdjuster saveAdjuster;
     UIAssetLoader uiAssetLoader;
@@ -94,21 +93,17 @@ public class CCPlugin : BaseUnityPlugin
         if (MainMenuManager.manager)
         {
             var menu = OnirismExtensions.GetMenuCarolPelvis();
-            if (menu.GetComponent<PelvisWatchdog>()) return;
-
-            menu.AddComponent<PelvisWatchdog>();
+            PelvisWatchdog.GetAddWatchdog(menu);
             return;
         }
         if (Entity.players is null) { Log.Debug("no players to refresh."); return; }
 
-        foreach (var player in Entity.players)
-        {
-            player
-                .transform
-                .RecursiveFindTransform(x => x.name == "CarolPelvis")
-                .gameObject
-                .AddComponent<PelvisWatchdog>();
-        }
+        Entity.players
+            .Select(x => 
+                x.transform
+                .RecursiveFindTransform(x => x.name == "CarolPevis")
+                .gameObject)
+            .Select(PelvisWatchdog.GetAddWatchdog);
     }
 
     void OnDisable()
@@ -123,8 +118,6 @@ public class CCPlugin : BaseUnityPlugin
         npcInstances.Dispose();
         outfitLoader.Dispose();
         AccessoryDissolver.Dispose();
-        Log.Info("Customizer unloaded.");
+        Log.Info("Customizer unload completed successfully.");
     }
-
-    void TestCutscenes() => CutsceneTest.RunAllCutscenes();
 }

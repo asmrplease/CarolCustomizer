@@ -8,7 +8,7 @@ namespace CarolCustomizer.Behaviors.Carol;
 public class PlayerCarolInstance : CarolInstance
 {
     PlayerModBehavior player;
-    static Type playerWatchdogType = typeof(PlayerModBehavior);
+    static Type playerType = typeof(PlayerModBehavior);
     readonly AutoSaver autoSaver;
     public readonly int playerIndex;
 
@@ -23,7 +23,7 @@ public class PlayerCarolInstance : CarolInstance
     public override void NotifySpawned(PelvisWatchdog pelvis)
     {
         base.NotifySpawned(pelvis);
-        if (!pelvis.Behavior.GetType().IsAssignableFrom(playerWatchdogType)) return;
+        if (!pelvis.Behavior.GetType().IsAssignableFrom(playerType)) return;
 
         player = pelvis.Behavior as PlayerModBehavior;
     }

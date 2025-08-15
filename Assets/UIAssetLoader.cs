@@ -17,6 +17,7 @@ public class UIAssetLoader : IDisposable
     const string messageDialogueAddress = "Assets/Mods/TabUI/MessageDialogue.prefab";
     const string pirateIconAddress = "assets/mods/tabui/pirateicon.png";
     const string eyedropperCursorAddress = "Assets/Mods/TabUI/eyedropper32.png";
+    const string customizeNPCAddress = "Assets/Mods/TabUI/Customize NPC.prefab";
 
     AssetBundle assetBundle;
 
@@ -30,11 +31,13 @@ public class UIAssetLoader : IDisposable
     public GameObject MaterialsView { get; private set; }
     public GameObject RecipesView { get; private set; }
     public GameObject SettingsView { get; private set; }
+    public GameObject CustomizeNPC { get; private set; }
     public GameObject HairstyleView { get; private set; }
     public GameObject FilenameDialogue { get; private set; }
     public GameObject MessageDialogue { get; private set; }
     public Sprite PirateIcon { get; private set; }
     public Texture2D CursorTexture { get; private set; }
+
 
     public UIAssetLoader()
     {
@@ -72,7 +75,7 @@ public class UIAssetLoader : IDisposable
         MessageDialogue = assetBundle.LoadAsset<GameObject>(messageDialogueAddress);
         PirateIcon = assetBundle.LoadAsset<Sprite>(pirateIconAddress);
         CursorTexture = assetBundle.LoadAsset<Texture2D>(eyedropperCursorAddress);
+        CustomizeNPC = assetBundle.LoadAsset<GameObject>(customizeNPCAddress);
         ContextMenuButton = ContextMenu.transform.GetChild(0).gameObject;
-
     }
 }

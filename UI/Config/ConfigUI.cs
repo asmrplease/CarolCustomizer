@@ -42,8 +42,8 @@ public class ConfigUI : MonoBehaviour
         SetupToggle(RunInBackgroundToggleAddress, Settings.Game.RunInBackgroundCE);
         SetupToggle(CampaignBotToggleAddress, Settings.Plugin.customCampaignBots);
         SetupToggle(MultiplayerBotToggleAddress, Settings.Plugin.customMPBots);        
-        SetupToggle(CustomShezaraToggleAddress, Settings.Plugin.customShezara);
-        Settings.Plugin.customShezara.SettingChanged += ShowLevelReloadPopup;
+        //SetupToggle(CustomShezaraToggleAddress, Settings.Plugin.customShezara);
+        //Settings.Plugin.customShezara.SettingChanged += ShowLevelReloadPopup;
         Settings.Plugin.customCampaignBots.SettingChanged += ShowLevelReloadPopup;
         Settings.Plugin.customMPBots.SettingChanged += ShowLevelReloadPopup;
 
