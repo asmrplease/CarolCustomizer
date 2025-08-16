@@ -53,8 +53,6 @@ internal class HaDSOutfitLoader : IDisposable
 
     void LoadHaDSOutfit(ModelData outfit)
     {
-        if (outfit.GetComponentInChildren<PelvisWatchdog>()) { return; }
-
         var hads = new HaDSOutfit(outfit.transform);
         HaDSOutfits.Add(hads.AssetName, hads);
         OutfitAssetManager.OnOutfitLoaded?.Invoke(hads);
@@ -62,7 +60,7 @@ internal class HaDSOutfitLoader : IDisposable
 
     public void Dispose()
     {
-        HaDSOutfits.Values.ForEach(x=>x.Dispose());
+        HaDSOutfits.Values.ForEach(x => x.Dispose());
         //foreach (var outfit in HaDSOutfits.Values) { outfit.Dispose(); }
     }
 

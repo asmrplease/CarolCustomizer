@@ -11,6 +11,7 @@ public class PluginConfig
     public readonly ConfigEntry<string> menuSpeed;
     public readonly ConfigEntry<bool> customMPBots;
     public readonly ConfigEntry<bool> customCampaignBots;
+    public readonly ConfigEntry<bool> customAllNPCs;
     public readonly Dictionary<NPC, (ConfigEntry<bool> enable, ConfigEntry<string> recipe)> customNPCs;
     public float MenuSpeed => Constants.MenuSpeeds[menuSpeed.Value];
     public PluginConfig(ConfigFile config)
@@ -30,6 +31,11 @@ public class PluginConfig
             "Customize Campaign Bots",
             true,
             "Enable loading recipes on campaign bots");
+        customAllNPCs = config.Bind<bool>(
+            Constants.Preferences,
+            "Customize All NPCs",
+            true,
+            "Enable loading a custom outfits on NPCs");
         customNPCs = NPCManager.NPCTypes()
             .Select(type => (type, NPCBinding(type, config)))
             .ToDictionary(x => x.type, x => x.Item2);
@@ -47,7 +53,7 @@ public class PluginConfig
             Constants.Preferences,
             $"{npcName} file name",
             npcName,
-            $"Determines which recipe {npcName} is dressed with when enabled.");
+            $"Determines which recipe {npcName} is dressed with when enabled. This setting will be enabled in a future patch. ");
         return (enabled, recipe);
     }
 }

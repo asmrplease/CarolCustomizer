@@ -30,16 +30,7 @@ public class HaDSOutfit : Outfit
         if (!hair) return;
 
         this.hairData = new HairData(hair.transform);
-        //GameObject.Destroy(this.hairData.hairstyle);
-        //this.hairData.hairstyle.gameObject.SetActive(false);
         this.hairData.models.ForEach(x => x.gameObject.SetActive(false));//disables built in hair when it's instantiated on carol by game
-        //TODO: We're violating look but don't touch here but idk what else to do 
-        /*
-        this.boneData.BespokeBones.Add(this.hairData.armatureRoot);
-        this.hairData.models
-            .Select(x => new StoredAccessory(this, x))
-            .ForEach(x => this.AccDict[x] = x);
-        */
     }
 
     protected virtual void BuildVariants()

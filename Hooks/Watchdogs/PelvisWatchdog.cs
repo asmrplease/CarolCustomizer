@@ -47,7 +47,7 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
         if (Constructed) return this;
         Constructed = true;
 
-        Log.Debug($"{this}.Awake()");
+        Log.Debug($"{this.rootName}.{this.parentName}.PelvisWatchdog.Constructor()");
         boneData = this.gameObject.GetAddComponent<BoneData>().Constructor();
         compData = this.gameObject.GetAddComponent<CompData>().Constructor();
         magiData = this.gameObject.GetAddComponent<MagiData>().Constructor();
@@ -63,7 +63,7 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
         Behavior.Dispose();
         List<MonoBehaviour> stuff = [boneData, compData, magiData, animData];
         stuff.ForEach(Destroy);
-        Destroy(this);
+        DestroyImmediate(this);
     }
 
     void Awake() => Constructor();

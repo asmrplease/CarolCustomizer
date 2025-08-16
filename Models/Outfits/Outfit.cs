@@ -59,6 +59,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
             int i = 0;
             grouping.ForEach(x => x.name += i++);
         }
+        if (pelvis.GetComponent<PelvisWatchdog>() is PelvisWatchdog existing) { existing.Dispose(); }
         prefabWatchdog = PelvisWatchdog.GetAddWatchdog(pelvis.gameObject);
         if (!prefabWatchdog.CompData) Log.Warning("Failed to instantiate meshdata in time.");
         var smrs = prefabWatchdog?.CompData?.allSMRs;

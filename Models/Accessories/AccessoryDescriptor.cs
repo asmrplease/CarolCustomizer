@@ -33,6 +33,8 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
 
     public AccessoryDescriptor(SkinnedMeshRenderer smr, string source)
     {
+        if (!smr) Log.Error($"AccessoryDescriptor in {source} was passed a null smr.");
+
         Name = smr.name;
         Source = source;
         Materials = new MaterialDescriptor[smr.materials.Length];
