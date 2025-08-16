@@ -31,11 +31,6 @@ public class PluginConfig
             "Customize Campaign Bots",
             true,
             "Enable loading recipes on campaign bots");
-        customAllNPCs = config.Bind<bool>(
-            Constants.Preferences,
-            "Customize All NPCs",
-            true,
-            "Enable loading a custom outfits on NPCs");
         customNPCs = NPCManager.NPCTypes()
             .Select(type => (type, NPCBinding(type, config)))
             .ToDictionary(x => x.type, x => x.Item2);
@@ -47,13 +42,13 @@ public class PluginConfig
         var enabled = file.Bind<bool>(
             Constants.Preferences,
             $"Customize {npcName}",
-            true,
+            false,
             $"Enable load a custom outfit on {npcName}");
         var recipe = file.Bind<string>(
             Constants.Preferences,
             $"{npcName} file name",
             npcName,
-            $"Determines which recipe {npcName} is dressed with when enabled. This setting will be enabled in a future patch. ");
+            $"Determines which recipe {npcName} is dressed with when enabled.");
         return (enabled, recipe);
     }
 }

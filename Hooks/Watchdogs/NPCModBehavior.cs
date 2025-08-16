@@ -19,15 +19,11 @@ public class NPCModBehavior : MonoBehaviour, ICustomizable
     }
     void Awake()
     {
-        thisNPCEnabled = Settings.Plugin.customNPCs[npcType].enable.Value;
         this.npcType = NPCManager.GetNPCType(this.transform.parent.name);
+        thisNPCEnabled = Settings.Plugin.customNPCs[npcType].enable.Value;
     }
 
-    public void SetBaseVisibility(bool visible)
-    {
-        if (thisNPCEnabled is not true) return;
-        watchdog.CompData.SetBaseVisibility(visible);
-    }
+    public void SetBaseVisibility(bool visible) { }
 
     public void SetAnimator(Outfit outfit) { }
 
@@ -35,9 +31,9 @@ public class NPCModBehavior : MonoBehaviour, ICustomizable
     {
         if (!thisNPCEnabled) return;
 
-        this.watchdog = GetComponent<PelvisWatchdog>();
-        SetBaseVisibility(false);
+        this.watchdog = PelvisWatchdog.GetAddWatchdog(this.gameObject);
         this.npcType = NPCManager.GetNPCType(this.transform.parent.name);
+        watchdog.CompData.SetBaseVisibility(false);
         NPCManager.OnNPCAwake(this); 
     }
 
@@ -46,15 +42,9 @@ public class NPCModBehavior : MonoBehaviour, ICustomizable
         if (thisNPCEnabled) NPCManager.NPCs[npcType].RestorePrevious(watchdog); 
     }
 
-    public void SetBaseOutfit(Outfit outfit)
-    {
-        
-    }
+    public void SetBaseOutfit(Outfit outfit) { }
 
-    public void SetHeightOffset(float height)
-    {
-        
-    }
+    public void SetHeightOffset(float height) { }
 
     public void Dispose()
     {
