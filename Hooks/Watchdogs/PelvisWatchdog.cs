@@ -48,11 +48,11 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
         Constructed = true;
 
         Log.Debug($"{this.rootName}.{this.parentName}.PelvisWatchdog.Constructor()");
-        boneData = this.gameObject.GetAddComponent<BoneData>().Constructor();
-        compData = this.gameObject.GetAddComponent<CompData>().Constructor();
-        magiData = this.gameObject.GetAddComponent<MagiData>().Constructor();
-        animData = this.gameObject.GetAddComponent<AnimData>().Constructor();
-        Behavior = gameObject.AddComponent<UnknownCarolBehavior>();
+        boneData = this.gameObject.AddComponent<BoneData>().Constructor();
+        compData = this.gameObject.AddComponent<CompData>().Constructor();
+        magiData = this.gameObject.AddComponent<MagiData>().Constructor();
+        animData = this.gameObject.AddComponent<AnimData>().Constructor();
+        Behavior = this.gameObject.AddComponent<UnknownCarolBehavior>();
         DetectChanges();
         return this;
     }

@@ -44,23 +44,16 @@ public class MPBotBehavior : MonoBehaviour, ICustomizable
     public ICustomizable Constructor(PelvisWatchdog watchdog)
     {
         this.watchdog = watchdog;
+        virtualCarol ??= GetComponentInParent<VirtualCarol>(true);
+        this.watchdog.AnimData.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
         return this;
     }
 
-    public void SetBaseOutfit(Outfit outfit)
-    {
-        
-    }
+    public void SetBaseOutfit(Outfit outfit) { }
 
-    public void SetAnimator(Outfit outfit)
-    {
-        
-    }
+    public void SetAnimator(Outfit outfit) { }
 
-    public void SetHeightOffset(float height)
-    {
-        
-    }
+    public void SetHeightOffset(float height) { }
 
     public void Dispose()
     {
