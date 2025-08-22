@@ -48,6 +48,7 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
         Constructed = true;
 
         Log.Debug($"{this.rootName}.{this.parentName}.PelvisWatchdog.Constructor()");
+        CCPlugin.OnPluginDestroy += this.Dispose;
         boneData = this.gameObject.AddComponent<BoneData>().Constructor();
         compData = this.gameObject.AddComponent<CompData>().Constructor();
         magiData = this.gameObject.AddComponent<MagiData>().Constructor();
@@ -59,7 +60,8 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
 
     public void Dispose()
     {
-        Log.Debug($"{parentName} PelvisWatchdog.Destroy()");
+        Log.Debug($"{parentName} PelvisWatchdog.Dispose()");
+        CCPlugin.OnPluginDestroy -= this.Dispose;
         Behavior.Dispose();
         List<MonoBehaviour> stuff = [boneData, compData, magiData, animData];
         stuff.ForEach(Destroy);
@@ -70,7 +72,12 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
     void OnEnable() => DetectChanges();
 
     void OnDisable() => DetectChanges();
-    void OnTransformParentChanged() => DetectChanges();
+    void OnTransformParentChanged() 
+    {
+        if (Behavior.GetType() == typeof(PlayerModBehavior)) return;
+
+        DetectChanges();
+    }
 
     void SetupCheckList() => checks =
         [   

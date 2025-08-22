@@ -25,6 +25,7 @@ public class CCPlugin : BaseUnityPlugin
     public static MonoBehaviour CoroutineRunner;
     public static UIInstance uiInstance;
     public static event Action<CCPlugin> OnSetupComplete;
+    public static event Action OnPluginDestroy;
     public static RecipeFileWatcher recipesManager { get; private set; }
     public static ThumbnailCamera thumbnailCamera;
     #endregion
@@ -118,6 +119,7 @@ public class CCPlugin : BaseUnityPlugin
         npcInstances.Dispose();
         outfitLoader.Dispose();
         AccessoryDissolver.Dispose();
+        OnPluginDestroy?.Invoke();
         Log.Info("Customizer unload completed successfully.");
     }
 }

@@ -71,6 +71,8 @@ internal class HairstyleManager : IDisposable
         if (hairstyle is null) return;
 
         liveHair = GameObject.Instantiate(hairstyle.gameObject, head.transform);
+        if (!liveHair) { Log.Error("Failed to instantiate liveHair during InstantiateHairstyle"); return; }
+
         liveHair.transform.localScale = Vector3.one;
         liveHair.gameObject.SetActive(true);
         liveHair.GetComponentsInChildren<SkinnedMeshRenderer>(true)
@@ -88,6 +90,8 @@ internal class HairstyleManager : IDisposable
 
     public void UpdateColliders()
     {
+        if (!targetPelvis) { Log.Error("HairstyleManager.UpdateColliders() was invoked while the pelvis is null!"); return; }
+        if (!targetPelvis.MagiData) { Log.Error("targetPelvis.MagiData was invalid."); return; }
         if (!targetPelvis.MagiData.ClothCompanion) { Log.Warning("No cloth companion found on carol."); return; }
 
         var hairMagica = liveHair.GetComponentInChildren<MagicaCloth>();
@@ -95,6 +99,8 @@ internal class HairstyleManager : IDisposable
 
         var hairCompanion = targetPelvis.MagiData.ClothCompanion;
         hairCompanion.cloth = hairMagica;
+        if (hairCompanion.colliderRoots is null) { Log.Error("HairCompanion.ColliderRoots is null!"); return; }
+
         hairCompanion.colliderRoots.Clear();
         hairCompanion.colliderRoots.Add(targetPelvis.transform);
         hairCompanion.RebuildCollidersList();
