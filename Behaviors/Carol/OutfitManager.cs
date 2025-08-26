@@ -157,8 +157,10 @@ public class OutfitManager : IDisposable
         if (colliderSource is not null) ApplyCollider();
     }
 
-    void OnPelvisVisibleChanged(bool visible) => liveAccessories.Values.Where(x => x.isActive).ForEach(x => x.Visible(visible));
-    //void OnPelvisVisibleChanged(bool visible) { }
+    void OnPelvisVisibleChanged(bool visible) => 
+        liveAccessories.Values
+            .Where(x => x.isActive)
+            .ForEach(x => x.SetVisible(visible));
 
     public void SetAnimator(Outfit outfit)
     {

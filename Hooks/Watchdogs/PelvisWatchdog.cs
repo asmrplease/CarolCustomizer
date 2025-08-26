@@ -1,4 +1,5 @@
 ﻿using BepInEx.Logging;
+using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
@@ -30,7 +31,7 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
     [SerializeField]
     MagiData magiData;
     public MagiData MagiData { get { return magiData; } }
-    List<(Func<Predicate<PelvisWatchdog>, bool> func, Predicate<PelvisWatchdog> pred)> checks;
+    List<(Func<Predicate<PelvisWatchdog>, Result> func, Predicate<PelvisWatchdog> pred)> checks;
     public ICustomizable Behavior { get; private set; }
     string parentName => transform.parent?.name ?? "none";
     string rootName => transform.root?.name ?? "none";
@@ -74,52 +75,55 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
     void OnDisable() => DetectChanges();
     void OnTransformParentChanged() 
     {
+        //This check prevents issues with situations where the player is parented to a new object
         if (Behavior.GetType() == typeof(PlayerModBehavior)) return;
 
         DetectChanges();
     }
-
-    void SetupCheckList() => checks =
-        [   
-            (Check<VirtualCarol,    MPBotBehavior>,       (x)=> true),
-            (Check<Entity,          PlayerModBehavior>,   (x)=> x.rootName == "CAROL(Clone)"),
-            (Check<Entity,          NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
-            (Check<Entity,          CampaignBot>,         (x)=> true),
-            (Check<CutsceneActor,   CarolActressBehavior>,(x)=> true),
-            (Check<Character,       NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
-            (Check<Character,       CarolActressBehavior>,(x)=> true),
-            (Check<MenuSwitchOutfit,MenuModBehavior>,     (x)=> true),
-            (Check<Transform,       NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
-            (Check<Transform,       OutfitModelBehavior>, (x)=> x.gameObject.scene.buildIndex == -1),
-            (Check<Transform,       CarolActressBehavior>,(x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error),
-            (Check<Transform,       UnknownCarolBehavior>,(x)=> true)
-        ];
     void DetectChanges()
     {
         Log.Debug("DetectChanges()");
         SetupCheckList();
         checks.Select(tup => tup.func.Invoke(tup.pred))
-            .Where(x => x is true)
-            .Any();
+            .Where(x => x is Result.Detected)
+            .First();
         VisibilityChanged?.Invoke(this.Visible);
     }
 
-    bool Check<SearchType, ResultType>(Predicate<PelvisWatchdog> predicate)
+    enum Result { Detected, NotDetected, Error }
+
+    Result Check<SearchType, ResultType>(Predicate<PelvisWatchdog> predicate)
         where SearchType : Component
         where ResultType : MonoBehaviour, ICustomizable
     {
-        try { if (!predicate.Invoke(this)) return false; }
+        try { if (!predicate.Invoke(this)) return Result.NotDetected; }
         catch (NullReferenceException e)
-        { Log.Warning($"{nameof(ResultType)} predicate caused an exception: {e.Message}"); return false; }
+        { Log.Warning($"{nameof(ResultType)} predicate caused an exception: {e.Message}"); return Result.Error; }
 
         var component = GetComponentInParent<SearchType>(true);
-        if (!component) return false;
-        if (Behavior.GetType() == typeof(ResultType)) return true;
+        if (!component) return Result.NotDetected;
+        if (Behavior.GetType() == typeof(ResultType)) return Result.Detected;
 
-        Log.Info($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
+        Log.Debug($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
         GetComponents<ICustomizable>().ForEach(x => x.Dispose());
         Behavior = gameObject.AddComponent<ResultType>().Constructor(this);
-        return true;
+        return Result.Detected;
     }
+
+    void SetupCheckList() => checks =
+    [
+        (Check<VirtualCarol,    MPBotBehavior>,       (x)=> true),
+        (Check<Entity,          PlayerModBehavior>,   (x)=> x.rootName == "CAROL(Clone)"),
+        (Check<Entity,          NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
+        (Check<Entity,          CampaignBot>,         (x)=> true),
+        (Check<CutsceneActor,   CarolActressBehavior>,(x)=> true),
+        (Check<Character,       NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
+        (Check<Character,       CarolActressBehavior>,(x)=> true),
+        (Check<MenuSwitchOutfit,MenuModBehavior>,     (x)=> true),
+        (Check<Transform,       NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
+        (Check<Transform,       OutfitModelBehavior>, (x)=> x.gameObject.scene.buildIndex == -1),
+        (Check<Transform,       CarolActressBehavior>,(x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error),
+        (Check<Transform,       UnknownCarolBehavior>,(x)=> true)
+    ];
 
 }

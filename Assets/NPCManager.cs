@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
@@ -52,13 +53,22 @@ public class NPCManager
             .Cast<NPC>()
             .Except([NPC.Error]);
 
-    public static void OnBotSpawn(CampaignBot bot)
+    public static void OnBotSpawn(ICarolBot bot)
     {
         Log.Debug("OnBotSpawn()");
-        var botInstance = new CarolInstance(folder);
-        liveBots.Add(bot.watchdog, botInstance);
-        liveBots[bot.watchdog].NotifySpawned(bot.watchdog);
+        var botInstance = new CarolInstance(NPCManager.folder);
+        liveBots.Add(bot.Watchdog(), botInstance);
+        liveBots[bot.Watchdog()].NotifySpawned(bot.Watchdog());
         bot.CustomizeBot(GetRandomOutfit(), botInstance.outfitManager);
+    }
+
+    public static void OnBotDespawn(PelvisWatchdog pelvis)
+    {
+        if (!liveBots.ContainsKey(pelvis)) { Log.Warning("tried to despawn a bot not in the list"); return; }
+
+        var manager = liveBots[pelvis];
+        liveBots.Remove(pelvis);
+        manager.Dispose();
     }
 
     public static void OnNPCAwake(NPCModBehavior npc)
@@ -77,15 +87,7 @@ public class NPCManager
         npcInstance.NotifySpawned(npc.watchdog);
         Log.Info($"applying {npcRecipe.Name} to NPC");
         RecipeApplier.ActivateRecipe(npcInstance.outfitManager, npcRecipe.Descriptor);
-    }
-
-    public static void OnBotDespawn(PelvisWatchdog pelvis)
-    {
-        if (!liveBots.ContainsKey(pelvis)) { Log.Warning("tried to despawn a bot not in the list"); return; }
-        var manager = liveBots[pelvis];
-        liveBots.Remove(pelvis);
-        manager.Dispose();
-    }
+    }   
 
     public static Recipe GetRandomOutfit()
     {

@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using BepInEx.Logging;
+using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.UI.Main;

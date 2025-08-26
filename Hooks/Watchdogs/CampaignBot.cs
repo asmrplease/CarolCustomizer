@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
@@ -7,10 +8,10 @@ using CarolCustomizer.Models.Recipes;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class CampaignBot : MonoBehaviour, ICustomizable
+public class CampaignBot : MonoBehaviour, ICustomizable, ICarolBot
 {
     public PelvisWatchdog watchdog { get; private set; }
-
+    public PelvisWatchdog Watchdog() => watchdog;
     void Awake()
     {
         watchdog = GetComponent<PelvisWatchdog>();

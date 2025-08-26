@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
@@ -8,21 +9,24 @@ using CarolCustomizer.Utils;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class MPBotBehavior : MonoBehaviour, ICustomizable
+public class MPBotBehavior : MonoBehaviour, ICustomizable, ICarolBot
 {
     VirtualCarol virtualCarol;
     public PelvisWatchdog watchdog { get; private set; }
+
+    public PelvisWatchdog Watchdog() => watchdog;
 
     public void SetBaseVisibility(bool visible)
     {
         if (Settings.Plugin.customMPBots.Value is not true) return;
 
+        Log.Debug($"MPBotBehavior.SetBaseVisibility({visible})");
         watchdog.CompData.SetBaseVisibility(visible);
     }
 
     public void CustomizeBot(Recipe recipe, OutfitManager outfit)
     {
-        if (!Settings.Plugin.customMPBots.Value) return;
+        if (Settings.Plugin.customMPBots.Value is not true) return;
 
         RecipeApplier.ActivateRecipe(outfit, recipe.Descriptor);
         SetMPName(recipe.Name);
@@ -46,6 +50,8 @@ public class MPBotBehavior : MonoBehaviour, ICustomizable
         this.watchdog = watchdog;
         virtualCarol ??= GetComponentInParent<VirtualCarol>(true);
         this.watchdog.AnimData.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+        SetBaseVisibility(false);
+        NPCManager.OnBotSpawn(this);
         return this;
     }
 
@@ -57,6 +63,7 @@ public class MPBotBehavior : MonoBehaviour, ICustomizable
 
     public void Dispose()
     {
+        NPCManager.OnBotDespawn(this.watchdog);
         Destroy(this);
     }
 }

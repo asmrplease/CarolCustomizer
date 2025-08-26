@@ -78,9 +78,13 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         liveSMR.gameObject.SetActive(false); 
     }
 
-    public void Visible(bool visible)
+    public void SetVisible(bool visible)
     {
-        liveSMR.gameObject.SetActive(visible);
+        if (!liveSMR) return;
+        if (!liveSMR.gameObject) return;
+
+        liveSMR.enabled = visible;
+        //liveSMR.gameObject.SetActive(visible);
     }
 
     public void AddToMagica(MagicaCloth magica)

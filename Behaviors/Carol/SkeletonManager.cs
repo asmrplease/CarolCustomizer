@@ -19,15 +19,16 @@ public class SkeletonManager : IDisposable
 
     Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = [];
 
-    public SkeletonManager(CarolInstance player, Transform parent)
+    public SkeletonManager(CarolInstance player, GameObject parent)
     {
+        if (!parent) Log.Error("SkeletonManager was provided a null parent");
+        Log.Debug("SkeletonManager.Constructor()");
         MagicaManager = new MagicaManager(this);
         faceCopier = parent
-            .gameObject
             .AddComponent<FaceCopier>()
             .Constructor(player);
         player.SpawnEvent += MagicaManager.HandleNewPelvis;
-        player.SpawnEvent += HandleNewPelvis;
+        player.SpawnEvent += this.HandleNewPelvis;
     }
 
     void HandleNewPelvis(PelvisWatchdog newPelvis)

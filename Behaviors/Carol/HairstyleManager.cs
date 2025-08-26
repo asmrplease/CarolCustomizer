@@ -90,12 +90,18 @@ internal class HairstyleManager : IDisposable
 
     public void UpdateColliders()
     {
+        Log.Debug("HairstyleManager.UpdateColliders()");
         if (!targetPelvis) { Log.Error("HairstyleManager.UpdateColliders() was invoked while the pelvis is null!"); return; }
         if (!targetPelvis.MagiData) { Log.Error("targetPelvis.MagiData was invalid."); return; }
         if (!targetPelvis.MagiData.ClothCompanion) { Log.Warning("No cloth companion found on carol."); return; }
+        Log.Debug("targetPelvis.MagiData.ClothCompanion is not null.");
+
+        if (!liveHair) { Log.Error("HairstyleManager.liveHair is null"); return; }
+        Log.Debug("HairstyleManager.liveHair is valid");
 
         var hairMagica = liveHair.GetComponentInChildren<MagicaCloth>();
-        if (!hairMagica) { Log.Warning($"no magica cloth found for {liveHair.name}."); return; }
+        if (!hairMagica) { Log.Warning($"no magica cloth found for liveHair."); return; }
+        Log.Debug("live hair magica is valid.");
 
         var hairCompanion = targetPelvis.MagiData.ClothCompanion;
         hairCompanion.cloth = hairMagica;

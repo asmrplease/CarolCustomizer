@@ -30,7 +30,7 @@ public class CarolInstance : IDisposable
     #region Lifecycle
     public CarolInstance(Transform parent)
     {
-        skeletonManager = new(this, parent);
+        skeletonManager = new(this, parent.gameObject);
         outfitManager = new(this, skeletonManager);
     }
 
@@ -48,6 +48,7 @@ public class CarolInstance : IDisposable
         if (SceneResourceProvider.Loading) { Log.Info("FakeLoad is true, ignoring pelvis spawns"); return; }
         if (!pelvis) { Log.Error("Null pelviswatchdog on NotifySpawned()"); return; }
         if (pelvis == targetPelvis) { Log.Warning("PlayerManager was given its existing pelvis as a target."); return; }
+        if (pelvis.Behavior is UnknownCarolBehavior) { Log.Warning("Ignoring UnknownCarolBehavior."); return; }
 
         if (targetPelvis) { previousTargets.Add(targetPelvis); }
         previousTargets.RemoveAll(x => !x);

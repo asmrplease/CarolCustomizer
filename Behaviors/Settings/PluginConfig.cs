@@ -1,9 +1,10 @@
 ﻿using BepInEx.Configuration;
-using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Utils;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 
 namespace CarolCustomizer.Behaviors.Settings;
 public class PluginConfig
