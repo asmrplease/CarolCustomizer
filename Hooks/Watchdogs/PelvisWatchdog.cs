@@ -32,7 +32,7 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
     MagiData magiData;
     public MagiData MagiData { get { return magiData; } }
     List<(Func<Predicate<PelvisWatchdog>, Result> func, Predicate<PelvisWatchdog> pred)> checks;
-    public ICustomizable Behavior { get; private set; }
+    public ICustomizable Behavior;// { get; private set; }
     string parentName => transform.parent?.name ?? "none";
     string rootName => transform.root?.name ?? "none";
     bool Constructed = false;

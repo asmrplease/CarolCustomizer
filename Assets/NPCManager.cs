@@ -23,7 +23,7 @@ public class NPCManager
 {
     static RecipeFileWatcher recipesManager;
 
-    static Dictionary<PelvisWatchdog, CarolInstance> liveBots = new();
+    static Dictionary<PelvisWatchdog, CarolInstance> liveBots = [];
     public static Dictionary<NPC, CarolInstance> NPCs { get; private set; }
 
     static Transform folder;
@@ -64,7 +64,8 @@ public class NPCManager
 
     public static void OnBotDespawn(PelvisWatchdog pelvis)
     {
-        if (!liveBots.ContainsKey(pelvis)) { Log.Warning("tried to despawn a bot not in the list"); return; }
+        //if (!liveBots.ContainsKey(pelvis)) { Log.Warning("tried to despawn a bot not in the list"); return; }
+        if (Log.WarnOnCondition(!liveBots.ContainsKey(pelvis))) return;
 
         var manager = liveBots[pelvis];
         liveBots.Remove(pelvis);
@@ -76,7 +77,8 @@ public class NPCManager
         if (npc.npcType == NPC.Error) { Log.Error("OnNPCAwake() called on an NPC watchdog of type Error"); return; }
         
         var npcInstance = NPCs[npc.npcType];
-        if (npcInstance is null) { Log.Error($"Failed to find NPC CarolInstance in NPC dict of type {npc.npcType}"); }
+        if (npcInstance is null) { Log.Error($"Failed to find NPC CarolInstance in NPC dict of type {npc.npcType}"); return; }
+
         var (enable, recipe) = Settings.Settings.Plugin.customNPCs[npc.npcType];
         if (!enable.Value) { Log.Info($"{npc.npcType} customization disabled."); return; }
 

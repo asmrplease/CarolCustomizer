@@ -13,6 +13,7 @@ public class CarolActressBehavior : MonoBehaviour, ICustomizable
     {
         Log.Debug($"{this} OnEnable");
         watchdog = GetComponent<PelvisWatchdog>();
+        this.watchdog.Behavior = this;
         watchdog.Behavior.SetBaseVisibility(false);
         PlayerInstances.DefaultPlayer.NotifySpawned(watchdog);
     }
@@ -26,31 +27,17 @@ public class CarolActressBehavior : MonoBehaviour, ICustomizable
     public ICustomizable Constructor(PelvisWatchdog watchdog)
     {
         this.watchdog = watchdog;
+        this.watchdog.Behavior = this;
         return this;
     }
 
-    public void SetBaseOutfit(Outfit outfit)
-    {
-        
-    }
+    public void SetBaseOutfit(Outfit outfit) { }
 
-    public void SetAnimator(Outfit outfit)
-    {
-        
-    }
+    public void SetAnimator(Outfit outfit) { }
 
-    public void SetHeightOffset(float height)
-    {
-        
-    }
+    public void SetHeightOffset(float height) { }
 
-    public void SetBaseVisibility(bool visibility)
-    {
-        watchdog.CompData.SetBaseVisibility(visibility);
-    }
+    public void SetBaseVisibility(bool visibility) => watchdog.CompData.SetBaseVisibility(visibility);
 
-    public void Dispose()
-    {
-        Destroy(this);
-    }
+    public void Dispose() => Destroy(this);
 }

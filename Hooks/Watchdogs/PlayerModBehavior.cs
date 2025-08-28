@@ -34,6 +34,7 @@ public class PlayerModBehavior : MonoBehaviour, ICustomizable
     void OnEnable()
     {
         this.watchdog = GetComponent<PelvisWatchdog>();
+        this.watchdog.Behavior = this;
         carolController = this.gameObject.GetComponentInParent<CarolController>();
         watchdog.CompData.SetBaseVisibility(false);
         if (!carolEntity) carolEntity = GetComponentInParent<Entity>();

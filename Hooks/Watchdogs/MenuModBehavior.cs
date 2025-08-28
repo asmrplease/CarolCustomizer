@@ -21,11 +21,13 @@ public class MenuModBehavior : MonoBehaviour, ICustomizable
         return this;
     }
 
-    void Start() => StartCoroutine(MainMenuFix());
+    //void Start() => StartCoroutine(MainMenuFix());
 
     void OnEnable()
     {
+        Log.Info("MenuModBehavior.OnEnable()");
         this.watchdog = GetComponent<PelvisWatchdog>();
+        this.watchdog.Behavior = this;
         this.menuSwitchOutfit = this.gameObject.GetComponentInParent<MenuSwitchOutfit>(true);
         SetBaseVisibility(false);
         PlayerInstances.DefaultPlayer.NotifySpawned(this.watchdog);
@@ -33,7 +35,8 @@ public class MenuModBehavior : MonoBehaviour, ICustomizable
 
     private IEnumerator MainMenuFix()
     {
-        while (true)
+        
+        foreach(var i in Enumerable.Range(0,5))
         {
             if (watchdog.CompData.allSMRs.Any(x => x.gameObject.activeSelf))
             {

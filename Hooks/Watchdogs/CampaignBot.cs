@@ -14,7 +14,8 @@ public class CampaignBot : MonoBehaviour, ICustomizable, ICarolBot
     public PelvisWatchdog Watchdog() => watchdog;
     void Awake()
     {
-        watchdog = GetComponent<PelvisWatchdog>();
+        this.watchdog = GetComponent<PelvisWatchdog>();
+        this.watchdog.Behavior = this;
         SetBaseVisibility(false);
         NPCManager.OnBotSpawn(this);
     }

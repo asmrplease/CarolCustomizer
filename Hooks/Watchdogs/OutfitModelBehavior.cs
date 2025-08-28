@@ -10,6 +10,7 @@ internal class OutfitModelBehavior : MonoBehaviour, ICustomizable
     public ICustomizable Constructor(PelvisWatchdog watchdog)
     {
         this.watchdog = watchdog;
+        this.watchdog.Behavior = this;
         return this;
     }
 

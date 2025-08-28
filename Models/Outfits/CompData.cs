@@ -43,6 +43,8 @@ public class CompData : MonoBehaviour
 
     public CompData Constructor()
     {
+        GetComponentsInChildren<DynamicBone>()
+            .ForEach(x => x.enabled = false);
         allSMRs = transform.parent
             .GetComponentsInChildren<SkinnedMeshRenderer>(true)
             .ToList();

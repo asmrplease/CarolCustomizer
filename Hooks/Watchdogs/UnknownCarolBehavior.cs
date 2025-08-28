@@ -11,6 +11,7 @@ internal class UnknownCarolBehavior : MonoBehaviour, ICustomizable
     {
         Log.Error($"{this.gameObject.name} has an unknown behavior type");
         this.watchdog = watchdog;
+        this.watchdog.Behavior = this;
         return this;
     }
 

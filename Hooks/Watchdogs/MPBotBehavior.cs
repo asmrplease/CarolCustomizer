@@ -48,6 +48,7 @@ public class MPBotBehavior : MonoBehaviour, ICustomizable, ICarolBot
     public ICustomizable Constructor(PelvisWatchdog watchdog)
     {
         this.watchdog = watchdog;
+        this.watchdog.Behavior = this;
         virtualCarol ??= GetComponentInParent<VirtualCarol>(true);
         this.watchdog.AnimData.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
         SetBaseVisibility(false);

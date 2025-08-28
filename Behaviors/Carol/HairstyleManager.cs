@@ -54,6 +54,7 @@ internal class HairstyleManager : IDisposable
     void ApplyMaterial()
     {
         if (!hairMaterial) return;
+        if (!liveHair) { Log.Error("No valid HairstyleManager.liveHair during HairstyleManager.ApplyMaterial()"); return; }
 
         var smr = liveHair.GetComponentInChildren<SkinnedMeshRenderer>(true);
         smr.sharedMaterial = hairMaterial;
@@ -62,8 +63,11 @@ internal class HairstyleManager : IDisposable
     void InstantiateHairstyle()
     {
         if (liveHair) GameObject.Destroy(liveHair);
+        if (!targetPelvis) { Log.Error("No valid pelvis during HairstyleManager.InstantiateHairstyle()"); return; }
+
         var head = targetPelvis.BoneData.StandardBones["Bn_CarolHead"];
         if (!head) { Log.Error("No valid headbone when instantiating hairstyle"); return; }
+
         head.GetComponentsInChildren<Hairstyle>(true)
             .Select(x => x.gameObject)
             .ForEach(GameObject.Destroy);
