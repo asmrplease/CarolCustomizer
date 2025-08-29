@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static Entity;
 
 namespace CarolCustomizer.Behaviors.Carol;
 
@@ -23,7 +24,7 @@ public class NPCManager
 {
     static RecipeFileWatcher recipesManager;
 
-    static Dictionary<PelvisWatchdog, CarolInstance> liveBots = [];
+    static Dictionary<Guid, CarolInstance> liveBots = [];
     public static Dictionary<NPC, CarolInstance> NPCs { get; private set; }
 
     static Transform folder;
@@ -48,7 +49,7 @@ public class NPCManager
         return NPC.Error;
     }
 
-    public static IEnumerable<NPC> NPCTypes() => 
+    public static IEnumerable<NPC> ValidNPCs() => 
         Enum.GetValues(typeof(NPC))
             .Cast<NPC>()
             .Except([NPC.Error]);
@@ -56,20 +57,23 @@ public class NPCManager
     public static void OnBotSpawn(ICarolBot bot)
     {
         Log.Debug("OnBotSpawn()");
+        if (!bot.Watchdog()) { Log.Error("Tried to spawn bot will null watchdog!"); return; }
+        if (liveBots.ContainsKey(bot.ID())) { Log.Error("Tried to add bot to pool more than once"); return; }
+
+        Log.Debug("OnBotSpawn() Creating new CarolInstance");
         var botInstance = new CarolInstance(NPCManager.folder);
-        liveBots.Add(bot.Watchdog(), botInstance);
-        liveBots[bot.Watchdog()].NotifySpawned(bot.Watchdog());
+        liveBots.Add(bot.ID(), botInstance);
+        liveBots[bot.ID()].NotifySpawned(bot.Watchdog());
         bot.CustomizeBot(GetRandomOutfit(), botInstance.outfitManager);
     }
 
-    public static void OnBotDespawn(PelvisWatchdog pelvis)
+    public static void OnBotDespawn(ICarolBot bot)
     {
-        //if (!liveBots.ContainsKey(pelvis)) { Log.Warning("tried to despawn a bot not in the list"); return; }
-        if (Log.WarnOnCondition(!liveBots.ContainsKey(pelvis))) return;
+        if (!liveBots.ContainsKey(bot.ID())) { Log.Warning("tried to despawn a bot not in the list"); return; }
 
-        var manager = liveBots[pelvis];
-        liveBots.Remove(pelvis);
-        manager.Dispose();
+        var carolInstance = liveBots[bot.ID()];
+        liveBots.Remove(bot.ID());
+        carolInstance.Dispose();
     }
 
     public static void OnNPCAwake(NPCModBehavior npc)

@@ -33,8 +33,8 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
     public MagiData MagiData { get { return magiData; } }
     List<(Func<Predicate<PelvisWatchdog>, Result> func, Predicate<PelvisWatchdog> pred)> checks;
     public ICustomizable Behavior;// { get; private set; }
-    string parentName => transform.parent?.name ?? "none";
-    string rootName => transform.root?.name ?? "none";
+    public string parentName => transform.parent?.name ?? "none";
+    public string rootName => transform.root?.name ?? "none";
     bool Constructed = false;
 
     public static PelvisWatchdog GetAddWatchdog(GameObject pelvis)
@@ -49,7 +49,6 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
         Constructed = true;
 
         Log.Debug($"{this.rootName}.{this.parentName}.PelvisWatchdog.Constructor()");
-        CCPlugin.OnPluginDestroy += this.Dispose;
         boneData = this.gameObject.AddComponent<BoneData>().Constructor();
         compData = this.gameObject.AddComponent<CompData>().Constructor();
         magiData = this.gameObject.AddComponent<MagiData>().Constructor();
@@ -62,10 +61,9 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
     public void Dispose()
     {
         Log.Debug($"{parentName} PelvisWatchdog.Dispose()");
-        CCPlugin.OnPluginDestroy -= this.Dispose;
-        Behavior.Dispose();
         List<MonoBehaviour> stuff = [boneData, compData, magiData, animData];
-        stuff.ForEach(Destroy);
+        stuff.ForEach(DestroyImmediate);
+        Behavior.Dispose();
         DestroyImmediate(this);
     }
 
@@ -90,6 +88,8 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
         VisibilityChanged?.Invoke(this.Visible);
     }
 
+    //TODO: We move this code into a separate class 
+
     enum Result { Detected, NotDetected, Error }
 
     Result Check<SearchType, ResultType>(Predicate<PelvisWatchdog> predicate)
@@ -102,19 +102,21 @@ public class PelvisWatchdog : MonoBehaviour, IDisposable
 
         var component = GetComponentInParent<SearchType>(true);
         if (!component) return Result.NotDetected;
-        if (Behavior.GetType() == typeof(ResultType)) return Result.Detected;
+        if (this.Behavior.GetType() == typeof(ResultType)) return Result.Detected;
 
         Log.Debug($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
         GetComponents<ICustomizable>().ForEach(x => x.Dispose());
-        Behavior = gameObject.AddComponent<ResultType>().Constructor(this);
+        this.Behavior = this.gameObject.AddComponent<ResultType>().Constructor(this);
         return Result.Detected;
     }
 
     void SetupCheckList() => checks =
     [
+        //Check<MonoBehaviour,  ArmaturePurpose>,     (watchdog) => additional detection condition),
         (Check<VirtualCarol,    MPBotBehavior>,       (x)=> true),
         (Check<Entity,          PlayerModBehavior>,   (x)=> x.rootName == "CAROL(Clone)"),
         (Check<Entity,          NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
+        (Check<Entity,          SummerSlime>,         (x)=> x.transform.parent.name == "SummerSlimegirl2019"),
         (Check<Entity,          CampaignBot>,         (x)=> true),
         (Check<CutsceneActor,   CarolActressBehavior>,(x)=> true),
         (Check<Character,       NPCModBehavior>,      (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),

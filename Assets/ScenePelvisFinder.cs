@@ -1,6 +1,7 @@
 ﻿using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,6 +13,8 @@ namespace CarolCustomizer.Assets;
 /// </summary>
 public class ScenePelvisFinder : IDisposable
 {
+    List<PelvisWatchdog> allWatchdogs = [];
+
     public ScenePelvisFinder(Transform parent)
     {
         SceneManager.sceneLoaded += FindAllPelvises;
@@ -26,11 +29,15 @@ public class ScenePelvisFinder : IDisposable
         Resources
             .FindObjectsOfTypeAll<GameObject>()
             .Where(x => x.name == "CarolPelvis")
-            .ForEach(x => PelvisWatchdog.GetAddWatchdog(x));
+            .Select(PelvisWatchdog.GetAddWatchdog)
+            .ForEach(allWatchdogs.Add);
     }
 
     public void Dispose()
     {
         SceneManager.sceneLoaded -= FindAllPelvises;
+        allWatchdogs
+            .Where(x => x)
+            .ForEach(x => x.Dispose());
     }
 }

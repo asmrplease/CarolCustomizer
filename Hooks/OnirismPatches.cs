@@ -5,6 +5,7 @@ using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Hooks.Watchdogs;
 
 namespace CarolCustomizer.Hooks;
 
@@ -70,6 +71,23 @@ public static class OnirismPatches
                 .selected
                 .ForEach(x => 
                     x.skinPlaceholder = GameManager.manager.carolModel);
+        }
+    }
+
+    [HarmonyPatch(typeof(ZombieRandomizer), "Start")]
+    public static class SlimeCustomizationPatch
+    {
+        [HarmonyPrefix]
+        public static bool Prefix(ZombieRandomizer __instance)
+        {
+            Log.Debug("ZombieRandomizer.Start().Prefix");
+            if (Settings.Plugin.customSummerSlimes.Value is not true) return true;
+            if (__instance.GetComponentInChildren<SummerSlime>() is not SummerSlime slime) return true;
+
+            Log.Debug("ZombieRandomizer detected SummerSlime component.");
+            __instance.enabled = false;
+            slime.SetBaseVisibility(false);
+            return false;
         }
     }
 }

@@ -97,6 +97,7 @@ internal class HairstyleManager : IDisposable
         Log.Debug("HairstyleManager.UpdateColliders()");
         if (!targetPelvis) { Log.Error("HairstyleManager.UpdateColliders() was invoked while the pelvis is null!"); return; }
         if (!targetPelvis.MagiData) { Log.Error("targetPelvis.MagiData was invalid."); return; }
+
         if (!targetPelvis.MagiData.ClothCompanion) { Log.Warning("No cloth companion found on carol."); return; }
         Log.Debug("targetPelvis.MagiData.ClothCompanion is not null.");
 

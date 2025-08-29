@@ -55,7 +55,7 @@ public class ConfigUI : MonoBehaviour
         Log.Debug("Setting up NPC toggles");
         reference.gameObject.SetActive(false);
         int siblingIndex = 5;
-        foreach (var npc in NPCManager.NPCTypes())
+        foreach (var npc in NPCManager.ValidNPCs())
         {
             string name = Enum.GetName(typeof(NPC), npc);
             var label = $"Customize {name}";

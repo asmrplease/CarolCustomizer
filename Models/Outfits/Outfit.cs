@@ -23,13 +23,11 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
 
     virtual public RuntimeAnimatorController RuntimeAnimator => null;
 
-    protected Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = new();
+    protected Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = [];
 
     public List<StoredAccessory> Accessories => AccDict.Values.ToList();
-    public List<OutfitEffect> Effects
-        { get; protected set; }
-        = new();
-    public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = new();
+    public List<OutfitEffect> Effects { get; protected set; } = [];
+    public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = [];
 
     public PelvisWatchdog prefabWatchdog { get; private set; }
     public BoneData boneData => prefabWatchdog.BoneData;

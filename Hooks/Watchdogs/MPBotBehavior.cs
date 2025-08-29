@@ -1,11 +1,11 @@
-﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
+using System;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
@@ -15,6 +15,10 @@ public class MPBotBehavior : MonoBehaviour, ICustomizable, ICarolBot
     public PelvisWatchdog watchdog { get; private set; }
 
     public PelvisWatchdog Watchdog() => watchdog;
+
+    Guid id = Guid.NewGuid();
+
+    public Guid ID() => id;
 
     public void SetBaseVisibility(bool visible)
     {
@@ -64,7 +68,7 @@ public class MPBotBehavior : MonoBehaviour, ICustomizable, ICarolBot
 
     public void Dispose()
     {
-        NPCManager.OnBotDespawn(this.watchdog);
+        NPCManager.OnBotDespawn(this);
         Destroy(this);
     }
 }

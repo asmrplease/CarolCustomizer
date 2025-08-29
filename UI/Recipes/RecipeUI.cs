@@ -251,7 +251,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             output.Add(("Overwrite", OnContextMenuOverwrite));
             output.Add(("Delete", OnContextMenuDelete));
             output.Add(("Rename", OnContextMenuRename));
-            NPCManager.NPCTypes().ForEach(x => output.Add(($"Set as {x}", () => ApplyToNPC(x))));
+            NPCManager.ValidNPCs().ForEach(x => output.Add(($"Set as {x}", () => ApplyToNPC(x))));
         }
         if (recipe.Error == Recipe.Status.MissingSource || recipe.Error == Recipe.Status.SlowSource)
         {
