@@ -12,7 +12,7 @@ public class PluginConfig
     public readonly ConfigEntry<string> menuSpeed;
     public readonly ConfigEntry<bool> customMPBots;
     public readonly ConfigEntry<bool> customCampaignBots;
-    public readonly ConfigEntry<bool> customSummerSlimes;
+    public readonly ConfigEntry<int> customSummerSlimes;
     public readonly ConfigEntry<bool> customAllNPCs;
     public readonly Dictionary<NPC, (ConfigEntry<bool> enable, ConfigEntry<string> recipe)> customNPCs;
     public float MenuSpeed => Constants.MenuSpeeds[menuSpeed.Value];
@@ -33,10 +33,10 @@ public class PluginConfig
             "Customize Campaign Bots",
             true,
             "Enable loading recipes on campaign bots");
-        customSummerSlimes = config.Bind<bool>(
+        customSummerSlimes = config.Bind<int>(
             Constants.Preferences,
             "Customize Summer Slimes",
-            true,
+            0,
             "Enable loading recipes on Summer Slime Blast 1 Slimes");
         customNPCs = NPCManager.ValidNPCs()
             .Select(type => (type, NPCBinding(type, config)))

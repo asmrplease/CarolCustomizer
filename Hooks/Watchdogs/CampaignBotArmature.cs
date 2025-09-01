@@ -8,7 +8,7 @@ using System;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class CampaignBot : MonoBehaviour, ICustomizable, ICarolBot
+public class CampaignBotArmature : MonoBehaviour, ICarolType, ICarolBot
 {
     public PelvisWatchdog watchdog { get; private set; }
     public PelvisWatchdog Watchdog() => watchdog;
@@ -24,7 +24,7 @@ public class CampaignBot : MonoBehaviour, ICustomizable, ICarolBot
         NPCManager.OnBotSpawn(this);
     }
 
-    public ICustomizable Constructor(PelvisWatchdog pelvisWatchdog)
+    public ICarolType Constructor(PelvisWatchdog pelvisWatchdog)
     {
         this.watchdog = pelvisWatchdog;
         return this;

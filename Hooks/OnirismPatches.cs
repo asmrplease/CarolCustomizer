@@ -81,10 +81,11 @@ public static class OnirismPatches
         public static bool Prefix(ZombieRandomizer __instance)
         {
             Log.Debug("ZombieRandomizer.Start().Prefix");
-            if (Settings.Plugin.customSummerSlimes.Value is not true) return true;
-            if (__instance.GetComponentInChildren<SummerSlime>() is not SummerSlime slime) return true;
+            if (__instance.GetComponentInChildren<SummerSlimeArmature>() is not SummerSlimeArmature slime) return true;
 
             Log.Debug("ZombieRandomizer detected SummerSlime component.");
+            if (slime.custom is not true) return true;
+
             __instance.enabled = false;
             slime.SetBaseVisibility(false);
             return false;

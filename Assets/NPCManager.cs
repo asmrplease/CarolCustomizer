@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static Entity;
 
 namespace CarolCustomizer.Behaviors.Carol;
 
@@ -24,7 +23,7 @@ public class NPCManager
 {
     static RecipeFileWatcher recipesManager;
 
-    static Dictionary<Guid, CarolInstance> liveBots = [];
+    static Dictionary<PelvisWatchdog, CarolInstance> liveBots = [];
     public static Dictionary<NPC, CarolInstance> NPCs { get; private set; }
 
     static Transform folder;
@@ -58,25 +57,26 @@ public class NPCManager
     {
         Log.Debug("OnBotSpawn()");
         if (!bot.Watchdog()) { Log.Error("Tried to spawn bot will null watchdog!"); return; }
-        if (liveBots.ContainsKey(bot.ID())) { Log.Error("Tried to add bot to pool more than once"); return; }
+        if (liveBots.ContainsKey(bot.Watchdog())) { Log.Error("Tried to add bot to pool more than once"); return; }
 
         Log.Debug("OnBotSpawn() Creating new CarolInstance");
         var botInstance = new CarolInstance(NPCManager.folder);
-        liveBots.Add(bot.ID(), botInstance);
-        liveBots[bot.ID()].NotifySpawned(bot.Watchdog());
+        liveBots.Add(bot.Watchdog(), botInstance);
+        liveBots[bot.Watchdog()].NotifySpawned(bot.Watchdog());
         bot.CustomizeBot(GetRandomOutfit(), botInstance.outfitManager);
     }
 
     public static void OnBotDespawn(ICarolBot bot)
     {
-        if (!liveBots.ContainsKey(bot.ID())) { Log.Warning("tried to despawn a bot not in the list"); return; }
+        Log.Debug("OnBotDespawn()");
+        if (!liveBots.ContainsKey(bot.Watchdog())) { Log.Warning("tried to despawn a bot not in the list"); return; }
 
-        var carolInstance = liveBots[bot.ID()];
-        liveBots.Remove(bot.ID());
+        var carolInstance = liveBots[bot.Watchdog()];
+        liveBots.Remove(bot.Watchdog());
         carolInstance.Dispose();
     }
 
-    public static void OnNPCAwake(NPCModBehavior npc)
+    public static void OnNPCAwake(NPCArmature npc)
     {
         if (npc.npcType == NPC.Error) { Log.Error("OnNPCAwake() called on an NPC watchdog of type Error"); return; }
         

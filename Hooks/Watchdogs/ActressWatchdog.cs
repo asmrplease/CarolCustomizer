@@ -5,7 +5,7 @@ using CarolCustomizer.Utils;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class CarolActressBehavior : MonoBehaviour, ICustomizable
+public class ActressArmature : MonoBehaviour, ICarolType
 {
     PelvisWatchdog watchdog;
 
@@ -24,7 +24,7 @@ public class CarolActressBehavior : MonoBehaviour, ICustomizable
         PlayerInstances.DefaultPlayer?.RestorePrevious(watchdog);
     }
 
-    public ICustomizable Constructor(PelvisWatchdog watchdog)
+    public ICarolType Constructor(PelvisWatchdog watchdog)
     {
         this.watchdog = watchdog;
         this.watchdog.Behavior = this;

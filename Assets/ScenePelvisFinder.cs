@@ -13,7 +13,7 @@ namespace CarolCustomizer.Assets;
 /// </summary>
 public class ScenePelvisFinder : IDisposable
 {
-    List<PelvisWatchdog> allWatchdogs = [];
+    HashSet<PelvisWatchdog> allWatchdogs = [];
 
     public ScenePelvisFinder(Transform parent)
     {
@@ -30,14 +30,15 @@ public class ScenePelvisFinder : IDisposable
             .FindObjectsOfTypeAll<GameObject>()
             .Where(x => x.name == "CarolPelvis")
             .Select(PelvisWatchdog.GetAddWatchdog)
-            .ForEach(allWatchdogs.Add);
+            .ForEach(x => allWatchdogs.Add(x));
     }
 
     public void Dispose()
     {
+        Log.Debug("ScenePelvisFinder.Dispose()");
         SceneManager.sceneLoaded -= FindAllPelvises;
         allWatchdogs
             .Where(x => x)
-            .ForEach(x => x.Dispose());
+            .ForEach(GameObject.Destroy);
     }
 }

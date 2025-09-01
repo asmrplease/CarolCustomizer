@@ -63,6 +63,7 @@ internal class HairstyleManager : IDisposable
     void InstantiateHairstyle()
     {
         if (liveHair) GameObject.Destroy(liveHair);
+        if (hairstyle is null) { Log.Warning("no valid hairstyle during HairstyleManager.InstantiateHairstyle"); return; }
         if (!targetPelvis) { Log.Error("No valid pelvis during HairstyleManager.InstantiateHairstyle()"); return; }
 
         var head = targetPelvis.BoneData.StandardBones["Bn_CarolHead"];
@@ -72,11 +73,10 @@ internal class HairstyleManager : IDisposable
             .Select(x => x.gameObject)
             .ForEach(GameObject.Destroy);
 
-        if (hairstyle is null) return;
-
         liveHair = GameObject.Instantiate(hairstyle.gameObject, head.transform);
         if (!liveHair) { Log.Error("Failed to instantiate liveHair during InstantiateHairstyle"); return; }
 
+        Log.Debug("Instantiating Hairstyle");
         liveHair.transform.localScale = Vector3.one;
         liveHair.gameObject.SetActive(true);
         liveHair.GetComponentsInChildren<SkinnedMeshRenderer>(true)
@@ -88,8 +88,8 @@ internal class HairstyleManager : IDisposable
                 x.allowOcclusionWhenDynamic = false;
                 x.updateWhenOffscreen = true;
             });
-        //Magica activation
         UpdateColliders();
+        Log.Info("InstantiateHairstyle() Complete.");
     }
 
     public void UpdateColliders()

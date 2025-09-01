@@ -7,7 +7,7 @@ using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class PlayerModBehavior : MonoBehaviour, ICustomizable
+public class PlayerArmature : MonoBehaviour, ICarolType
 {
     private const float LockSpeed = 1.00f;
     private const float UnlockSpeed = 1.75f;
@@ -23,7 +23,7 @@ public class PlayerModBehavior : MonoBehaviour, ICustomizable
     public bool controllerDisabled => !carolController.enabled;
     public bool inDialogue => carolEntity.hud.dialogue.dialogue.activeSelf;
 
-    public ICustomizable Constructor(PelvisWatchdog watchdog)
+    public ICarolType Constructor(PelvisWatchdog watchdog)
     {
         this.watchdog ??= watchdog;
         carolController = this.gameObject.GetComponentInParent<CarolController>();

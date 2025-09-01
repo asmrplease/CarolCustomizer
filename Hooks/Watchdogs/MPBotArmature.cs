@@ -9,7 +9,7 @@ using System;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class MPBotBehavior : MonoBehaviour, ICustomizable, ICarolBot
+public class MPBotArmature : MonoBehaviour, ICarolType, ICarolBot
 {
     VirtualCarol virtualCarol;
     public PelvisWatchdog watchdog { get; private set; }
@@ -49,7 +49,7 @@ public class MPBotBehavior : MonoBehaviour, ICustomizable, ICarolBot
         stats.name = name;
     }
 
-    public ICustomizable Constructor(PelvisWatchdog watchdog)
+    public ICarolType Constructor(PelvisWatchdog watchdog)
     {
         this.watchdog = watchdog;
         this.watchdog.Behavior = this;

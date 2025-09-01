@@ -36,9 +36,10 @@ public class CarolInstance : IDisposable
 
     public virtual void Dispose()
     {
+        Log.Debug("CarolInstance.Dispose()");
         skeletonManager.Dispose();
         outfitManager.Dispose();
-        if (targetPelvis) targetPelvis.Dispose();
+        if (targetPelvis) GameObject.Destroy(targetPelvis);
     }
     #endregion
 
@@ -48,7 +49,7 @@ public class CarolInstance : IDisposable
         if (SceneResourceProvider.Loading) { Log.Info("Ignoring pelvis spawns due to SceneResourceProvider.Loading == true"); return; }
         if (!pelvis) { Log.Error("Null pelviswatchdog on NotifySpawned()"); return; }
         if (pelvis == targetPelvis) { Log.Warning("PlayerManager was given its existing pelvis as a target."); return; }
-        if (pelvis.Behavior is UnknownCarolBehavior) { Log.Warning("Ignoring UnknownCarolBehavior."); return; }
+        if (pelvis.Behavior is UnknownArmature) { Log.Warning("Ignoring UnknownCarolBehavior."); return; }
 
         Log.Info("CarolInstance.NotifySpawned");
         if (targetPelvis) { previousTargets.Add(targetPelvis); }

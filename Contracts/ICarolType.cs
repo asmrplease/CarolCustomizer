@@ -3,9 +3,9 @@ using CarolCustomizer.Models.Outfits;
 using System;
 
 namespace CarolCustomizer.Contracts;
-public interface ICustomizable : IDisposable
+public interface ICarolType : IDisposable
 {
-    ICustomizable Constructor(PelvisWatchdog watchdog);
+    ICarolType Constructor(PelvisWatchdog watchdog);
     void SetBaseOutfit(Outfit outfit);
     void SetAnimator(Outfit outfit);
     void SetHeightOffset(float height);

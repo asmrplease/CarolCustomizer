@@ -7,13 +7,13 @@ using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class NPCModBehavior : MonoBehaviour, ICustomizable
+public class NPCArmature : MonoBehaviour, ICarolType
 {
     bool thisNPCEnabled;
     public NPC npcType { get; private set; }
     public PelvisWatchdog watchdog { get; private set; }
 
-    public ICustomizable Constructor(PelvisWatchdog watchdog)
+    public ICarolType Constructor(PelvisWatchdog watchdog)
     {
         this.watchdog = watchdog;
         this.npcType = NPCManager.GetNPCType(this.transform.parent.name);

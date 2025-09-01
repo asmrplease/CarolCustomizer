@@ -20,7 +20,7 @@ public class PlayerInstances : IDisposable
             .ToList();
     }
 
-    public static void OnPlayerSpawn(PlayerModBehavior player)
+    public static void OnPlayerSpawn(PlayerArmature player)
     {
         Log.Debug("OnPlayerSpawn()");
         if (!player.carolEntity) { Log.Error("Watchdog spawned with null Entity"); return; }

@@ -1,6 +1,4 @@
 ﻿using BepInEx.Configuration;
-using BepInEx.Logging;
-using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.UI.Main;
@@ -29,10 +27,16 @@ public class ConfigUI : MonoBehaviour
     const string CampaignBotToggleAddress = "CustomCampaignBots/Toggle";
 
     const string CustomNpcUiAddress = "CustomShezara";
+    const string CustomSlimeSliderAddress = "CustomizeSlimes/Slider";
+    const string CustomSlimeIndicatorAddress = "CustomizeSlimes/Percentage/Label";
 
     const string RightMouseButtonToggle = "MouseButton/Toggles/Right";
     const string MenuSpeedToggleGroupAddress = "Menu Speed";
     #endregion
+
+    Slider SlimeSlider;
+    Text SlimeIndicator;
+
     #region Dependencies
     MessageDialogue dialoge;
     #endregion
@@ -99,6 +103,12 @@ public class ConfigUI : MonoBehaviour
         RMBToggle
             .SetIsOnWithoutNotify(
             Settings.HotKeys.mouseContextMenu.Value == PointerEventData.InputButton.Right);
+
+        SlimeSlider = transform.Find(CustomSlimeSliderAddress).GetComponent<Slider>();
+        SlimeIndicator = transform.Find(CustomSlimeIndicatorAddress).GetComponent<Text>();
+        SlimeSlider.value = Settings.Plugin.customSummerSlimes.Value;
+        SlimeIndicator.text = $"{SlimeSlider.value * 10}%";
+        SlimeSlider.onValueChanged.AddListener(OnSliderChanged);
         return this;
     }
 
@@ -126,6 +136,13 @@ public class ConfigUI : MonoBehaviour
 
     #endregion
     #region Callbacks
+    void OnSliderChanged(float value)
+    {
+        var slider = (int)value;
+        SlimeIndicator.text = $"{slider*10}%";
+        Settings.Plugin.customSummerSlimes.Value = slider;
+    }
+
     private void ShowLevelReloadPopup(object sender, System.EventArgs e)
     {
         if (SceneManager.GetActiveScene().name == Constants.MenuSceneName) return;

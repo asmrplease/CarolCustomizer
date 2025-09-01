@@ -10,32 +10,36 @@ using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class SummerSlime : MonoBehaviour, ICustomizable, ICarolBot
+public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
 {
     public PelvisWatchdog watchdog { get; private set; }
     public PelvisWatchdog Watchdog() => watchdog;
-    Guid id = Guid.NewGuid();
 
-    public Guid ID() => id;
+    static int spawnCount = 0;
+    public bool custom { get; private set; }
 
     void Awake()
     {
         this.watchdog = PelvisWatchdog.GetAddWatchdog(this.gameObject);
         if (!watchdog) { Log.Error("Failed to get watchdog during SummerSlime.Awake()"); return; }
 
+        spawnCount += 1; spawnCount %= 10;
+        custom = spawnCount <= Settings.Plugin.customSummerSlimes.Value;
+
         this.watchdog.Behavior = this;
+        if (custom is not true) return;
+
         NPCManager.OnBotSpawn(this);
     }
 
-    public ICustomizable Constructor(PelvisWatchdog pelvisWatchdog)
+    public ICarolType Constructor(PelvisWatchdog pelvisWatchdog)
     {
-        //this.watchdog = pelvisWatchdog;
         return this;
     }
 
     public void CustomizeBot(Recipe recipe, OutfitManager outfitManager) 
     {
-        if (Settings.Plugin.customSummerSlimes.Value is not true) return;
+        if (!custom) return;
 
         SetBaseVisibility(false);
         RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
@@ -49,11 +53,12 @@ public class SummerSlime : MonoBehaviour, ICustomizable, ICarolBot
         {
             outfitManager.PaintAccessoryShared(acc, acc.Materials.Select(x => smr.material).ToList());
         }
+        outfitManager.SetHairColor(smr.material);
     }
 
     public void SetBaseVisibility(bool visible)
     {
-        if (Settings.Plugin.customCampaignBots.Value is not true) return;
+        if (!custom) return;
         
         GetComponent<CompData>().SetBaseVisibility(visible);
         var randomizer = GetComponent<ZombieRandomizer>();
@@ -62,7 +67,11 @@ public class SummerSlime : MonoBehaviour, ICustomizable, ICarolBot
         randomizer.enabled = visible;
     }
 
-    void OnDestroy() => NPCManager.OnBotDespawn(this);
+    void OnDestroy() 
+    {
+        Log.Debug("SummerSlime.OnDestroy()");
+        NPCManager.OnBotDespawn(this);
+    }
 
     public void SetBaseOutfit(Outfit outfit) { }
 

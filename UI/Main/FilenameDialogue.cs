@@ -66,7 +66,7 @@ public class FilenameDialogue : MonoBehaviour
 
     IEnumerator idk()
     {
-        if (OutfitListUI.TargetOutfit.pelvis.Behavior is PlayerModBehavior player)
+        if (OutfitListUI.TargetOutfit.pelvis.Behavior is PlayerArmature player)
         {
             yield return player.UnlockRoutine();
             var carolEntity = player.carolEntity;
@@ -98,7 +98,7 @@ public class FilenameDialogue : MonoBehaviour
         if (textBox.text != "") onConfirm?.Invoke(recipe, textBox.text);
         var animator = OutfitListUI.TargetOutfit.pelvis.AnimData.Animator;
         StartCoroutine(Dialogue.controller.SetExpressionValue(animator, "Expression", 0));
-        if (OutfitListUI.TargetOutfit.pelvis.Behavior is PlayerModBehavior player) player.LockPlayer();
+        if (OutfitListUI.TargetOutfit.pelvis.Behavior is PlayerArmature player) player.LockPlayer();
         gameObject.SetActive(false);
     }
 
@@ -106,7 +106,7 @@ public class FilenameDialogue : MonoBehaviour
     {
         var animator = OutfitListUI.TargetOutfit.pelvis.AnimData.Animator;
         StartCoroutine(Dialogue.controller.SetExpressionValue(animator, "Expression", 0));
-        if (OutfitListUI.TargetOutfit.pelvis.Behavior is PlayerModBehavior player) player.LockPlayer();
+        if (OutfitListUI.TargetOutfit.pelvis.Behavior is PlayerArmature player) player.LockPlayer();
         gameObject.SetActive(false);
     }
 

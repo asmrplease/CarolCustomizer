@@ -7,12 +7,12 @@ using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class MenuModBehavior : MonoBehaviour, ICustomizable
+public class MenuArmature : MonoBehaviour, ICarolType
 {
     MenuSwitchOutfit menuSwitchOutfit;
     public PelvisWatchdog watchdog {  get; private set; }
 
-    public ICustomizable Constructor(PelvisWatchdog watchdog)
+    public ICarolType Constructor(PelvisWatchdog watchdog)
     {
         Log.Debug("MenuModBehavior.Constructor()");
         this.watchdog = watchdog;
