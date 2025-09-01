@@ -1,6 +1,7 @@
 ﻿using CarolCustomizer.Events;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Utils;
+using FuseBox.External.MagicaCloth2;
 using MagicaCloth2;
 using System;
 using System.Linq;
@@ -98,7 +99,10 @@ internal class HairstyleManager : IDisposable
         if (!targetPelvis) { Log.Error("HairstyleManager.UpdateColliders() was invoked while the pelvis is null!"); return; }
         if (!targetPelvis.MagiData) { Log.Error("targetPelvis.MagiData was invalid."); return; }
 
-        if (!targetPelvis.MagiData.ClothCompanion) { Log.Warning("No cloth companion found on carol."); return; }
+        if (!targetPelvis.MagiData.ClothCompanion) 
+        {
+            targetPelvis.MagiData.ClothCompanion = targetPelvis.transform.parent.gameObject.AddComponent<MagicaClothCompanion>();
+        }
         Log.Debug("targetPelvis.MagiData.ClothCompanion is not null.");
 
         if (!liveHair) { Log.Error("HairstyleManager.liveHair is null"); return; }
@@ -110,8 +114,7 @@ internal class HairstyleManager : IDisposable
 
         var hairCompanion = targetPelvis.MagiData.ClothCompanion;
         hairCompanion.cloth = hairMagica;
-        if (hairCompanion.colliderRoots is null) { Log.Error("HairCompanion.ColliderRoots is null!"); return; }
-
+        hairCompanion.colliderRoots ??= [];
         hairCompanion.colliderRoots.Clear();
         hairCompanion.colliderRoots.Add(targetPelvis.transform);
         hairCompanion.RebuildCollidersList();

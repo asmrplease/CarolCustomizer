@@ -11,7 +11,7 @@ using UnityEngine;
 namespace CarolCustomizer.Assets;
 internal class ArmatureIdentifier
 {
-    static List<(Func<PelvisWatchdog, Predicate<PelvisWatchdog>, Result> func, Predicate<PelvisWatchdog> pred)> checks;
+    static readonly List<(Func<PelvisWatchdog, Predicate<PelvisWatchdog>, Result> func, Predicate<PelvisWatchdog> pred)> checks;
     static ArmatureIdentifier() => checks =
         [
             //Check<MonoBehaviour,  ArmatureType>,        (watchdog) => additional detection condition),
@@ -27,7 +27,7 @@ internal class ArmatureIdentifier
             (Check<Transform,       NPCArmature>,         (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
             (Check<Transform,       OutfitArmature>,      (x)=> x.gameObject.scene.buildIndex == -1),
             (Check<Transform,       ActressArmature>,     (x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error),
-            (Check<Transform,       UnknownArmature>,     (x)=> true)
+            (Check<Transform,       UnknownArmature>,     (x)=> true),
         ];
 
     public static void DetectChanges(PelvisWatchdog watchdog)
