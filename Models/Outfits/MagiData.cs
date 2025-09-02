@@ -36,24 +36,19 @@ public class MagiData : MonoBehaviour
             .ToList();
 
         MagicaCloths
-            .Select(x =>
-                x.SerializeData.cullingSettings)
-            .ForEach(x =>
-                x.cameraCullingMode = CameraCullingMode.Off);
+            .Select(x => x.SerializeData.cullingSettings)
+            .ForEach(x => x.cameraCullingMode = CameraCullingMode.Off);
 
         MeshCloths = MagicaCloths
-            .Where(x => 
-                x.SerializeData.clothType == ClothType.MeshCloth)
+            .Where(x => x.SerializeData.clothType == ClothType.MeshCloth)
             .ToList();
 
         BoneCloths = MagicaCloths
-            .Where(x =>
-                x.SerializeData.clothType == ClothType.BoneCloth)
+            .Where(x => x.SerializeData.clothType == ClothType.BoneCloth)
             .ToList();
 
         BoneSprings = MagicaCloths
-            .Where(x =>
-                x.SerializeData.clothType == ClothType.BoneSpring)
+            .Where(x => x.SerializeData.clothType == ClothType.BoneSpring)
             .ToList();
 
         CapsuleColliders = transform

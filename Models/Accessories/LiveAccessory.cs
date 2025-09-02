@@ -84,7 +84,6 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         if (!liveSMR.gameObject) return;
 
         liveSMR.enabled = visible;
-        //liveSMR.gameObject.SetActive(visible);
     }
 
     public void AddToMagica(MagicaCloth magica)
@@ -114,9 +113,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
     {
         Materials
             .Select((mat,index) => (mat,index))
-            .ForEach((tup) => 
-                liveSMR
-                .ReplaceMaterialAtIndex(tup.mat.referenceMaterial, tup.index));
+            .ForEach((tup) => liveSMR.ReplaceMaterialAtIndex(tup.mat.referenceMaterial, tup.index));
     }
 
     internal void ApplySharedMaterials(List<Material> materials)

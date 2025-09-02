@@ -244,8 +244,7 @@ public class OutfitManager : IDisposable
                 ,found: sourceColliders.TryGetValue(x.name, out var reference)
                 ,reference))
             .Where(tup => tup.found)
-            .ForEach(tup => 
-                tup.live.CopyFrom(tup.reference));
+            .ForEach(tup => tup.live.CopyFrom(tup.reference));
         hairstyleManager.UpdateColliders();
     }
 
@@ -285,9 +284,15 @@ public class OutfitManager : IDisposable
         HairstyleChanged?.Invoke(e);
     } 
 
-    public void SetHairColor(Material hairMat) 
+    public void SetHairColor(Material hairMat, bool dissolve = false) 
     {
         if (hairMat is null) { Log.Warning("Tried to apply a null hair material"); return; }
+
+        if (dissolve)
+        {
+            hairstyleManager.ApplyDissolve(hairMat);
+            return;
+        }
 
         hairstyleManager.AssignMaterial(hairMat);
         var e = hairstyleManager.GetHairDescriptor();

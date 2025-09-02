@@ -52,13 +52,25 @@ internal class HairstyleManager : IDisposable
         ApplyMaterial();
     }
 
+    public void ApplyDissolve(Material dissolve)
+    {
+        var smrs = liveHair.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+        foreach (var smr in smrs)
+        {
+            var mats = smr.materials.Select(x => dissolve).ToList();
+            smr.SetSharedMaterials(mats);
+        }   
+    }
+
     void ApplyMaterial()
     {
         if (!hairMaterial) return;
         if (!liveHair) { Log.Error("No valid HairstyleManager.liveHair during HairstyleManager.ApplyMaterial()"); return; }
 
         var smr = liveHair.GetComponentInChildren<SkinnedMeshRenderer>(true);
-        smr.sharedMaterial = hairMaterial;
+        //smrs.ForEach(smr => smr.materials = smr.materials.Select(x => hairMaterial).ToArray());
+        //smrs.ForEach(smr => smr.material = hairMaterial);
+        smr.material = hairMaterial;
     }
 
     void InstantiateHairstyle()

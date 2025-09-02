@@ -108,7 +108,7 @@ internal static class AccessoryDissolver
         FadeFinish = false;
         var accs = outfitManager.ActiveAccessories;
         var liveDescriptions = outfitManager.LiveAccessoryDescriptors;
-        //var hairColor = outfitManager.HairColor;
+        var hairColor = outfitManager.HairColor;
         var dissolveMat = new MaterialDescriptor(dissolveMaterial, "Resources", MaterialDescriptor.SourceType.Resources);
         Dictionary<StoredAccessory, MaterialDescriptor[]> originalMaterials = [];
 
@@ -119,7 +119,7 @@ internal static class AccessoryDissolver
                 .Materials;
             outfitManager.PaintAccessoryShared(acc, acc.Materials.Select(x => dissolveMaterial).ToList());
         }
-        //outfitManager.SetHairColor(dissolveMat.referenceMaterial);
+        outfitManager.SetHairColor(dissolveMaterial, true);
         Log.Debug("Accessories Painted with dissolve, starting loop.");
 
         while (elapsedTime < time)
@@ -131,9 +131,6 @@ internal static class AccessoryDissolver
         }
         Log.Debug("Done dissolving, waiting for scene exit or player respawn");
 
-        //how do we recognize when this outfitmanager's player has respawned?
-        //we probably want to pass in the entity instead, or get the 
-
         yield return new WaitUntil(() => FadeFinish);
 
         foreach (var acc in accs)
@@ -143,7 +140,7 @@ internal static class AccessoryDissolver
                 outfitManager.PaintAccessory(acc, originalMaterials[acc][i], i);
             }
         }
-        //outfitManager.SetHairColor(OutfitAssetManager.GetHairColor(hairColor));
+        outfitManager.SetHairColor(OutfitAssetManager.GetHairColor(hairColor));
         Log.Debug("Restored original materials");
         ActiveDissolve = null;
         yield break;
