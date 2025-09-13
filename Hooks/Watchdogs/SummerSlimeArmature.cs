@@ -12,10 +12,13 @@ using UnityEngine;
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
 {
+    static int spawnCount = 0;
+    static Material eyeMat = null;
+
     public PelvisWatchdog watchdog { get; private set; }
     public PelvisWatchdog Watchdog() => watchdog;
 
-    static int spawnCount = 0;
+    
     public bool custom { get; private set; }
 
     void Awake()
@@ -27,7 +30,7 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
         custom = spawnCount <= Settings.Plugin.customSummerSlimes.Value;
 
         this.watchdog.Behavior = this;
-        if (custom is not true) return;
+        if (!custom) return;
 
         NPCManager.OnBotSpawn(this);
     }
@@ -49,9 +52,15 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
         var smr = swimsuit.GetComponent<SkinnedMeshRenderer>();
         if (!smr) { Log.Warning("Failed to find swimsuit SMR during SumemrSlime.CustomizeBot()"); return; }
 
+        if (!eyeMat) eyeMat = smr.materials.First(x => x.name.ToLower().Contains("eyes"));
+        if (!eyeMat) { Log.Warning("Failed to find slime eye material during SummerSlimeArmature.CustomizeBot"); }
+
+        var slimeMat = smr.material;
+
         foreach (var acc in outfitManager.ActiveAccessories)
         {
-            outfitManager.PaintAccessoryShared(acc, acc.Materials.Select(x => smr.material).ToList());
+            var mat = (acc.Name.ToLower().Contains("eyes")) ? eyeMat : slimeMat;
+            outfitManager.PaintAccessoryShared(acc, acc.Materials.Select(x => mat).ToList());
         }
         outfitManager.SetHairColor(smr.material);
     }
