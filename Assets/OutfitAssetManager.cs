@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Utils;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace CarolCustomizer.Assets;
 public class OutfitAssetManager : IDisposable
@@ -41,6 +42,15 @@ public class OutfitAssetManager : IDisposable
                 ,result: result))
             .FirstOrDefault(tup => tup.found)
             .result;
+    }
+
+    public static StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
+    {
+        var outfit = GetOutfitByAssetName(descriptor.Source);
+        if (outfit is null) { Log.Warning($"failed to find outfit {descriptor.Source}."); return null; }
+
+        Log.Debug("found source");
+        return outfit.GetAccessory(descriptor);
     }
 
     public static Hairstyle GetHairstyle(string name)

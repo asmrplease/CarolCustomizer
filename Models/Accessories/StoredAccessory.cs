@@ -9,13 +9,14 @@ public class StoredAccessory : AccessoryDescriptor
 {
     public readonly Outfit outfit;
     public readonly SkinnedMeshRenderer referenceSMR;
-    public string DisplayName => Name.Split('_').Last();
+    public string DisplayName;
 
     public StoredAccessory(Outfit outfit, SkinnedMeshRenderer smr)
         : base(smr, outfit.AssetName)
     {
         this.outfit = outfit;
         referenceSMR = smr;
+        DisplayName = Name.Split('_').Last();
     }
 
     public LiveAccessory MakeLive(SkeletonManager skeleton, Transform folder)

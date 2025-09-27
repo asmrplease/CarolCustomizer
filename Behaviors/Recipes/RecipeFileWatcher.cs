@@ -14,7 +14,7 @@ namespace CarolCustomizer.Behaviors.Recipes;
 public class RecipeFileWatcher : IDisposable
 {
     readonly FileSystemWatcher watcher;
-    readonly Dictionary<string, Recipe> recipes = new();
+    readonly Dictionary<string, Recipe> recipes = [];
     public List<Recipe> AllRecipes => recipes.Values.ToList();
 
     public event Action<Recipe> OnRecipeCreated;
@@ -99,7 +99,6 @@ public class RecipeFileWatcher : IDisposable
             recipes.Remove(entry.Key);
             OnRecipeFileCreated(new Recipe(entry.Key));
         }
-
     }
 
     void OnRecipeFileCreated(Recipe newRecipe)

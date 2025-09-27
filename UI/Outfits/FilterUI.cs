@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace CarolCustomizer.UI.Outfits;
-internal class FilterUI : MonoBehaviour
+public class FilterUI : MonoBehaviour
 {
     const string filtersAddress = "Filters";
     const string SearchModeHint = "Click here to search!";
@@ -42,7 +42,7 @@ internal class FilterUI : MonoBehaviour
         activeFilter.onValueChanged.AddListener(ProcessFilters);    
         searchBox.onEndEdit.AddListener(OnSearchBoxChanged);
         searchBoxHint.text = SearchModeHint;
-        Log.Debug($"search boxt set: {SearchModeHint}");
+        Log.Debug($"search box set: {SearchModeHint}");
         return this;
     }
     void OnSearchBoxChanged(string searchString)

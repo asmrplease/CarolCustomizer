@@ -70,14 +70,12 @@ public static class RecipeApplier
     static void SetAccessory(OutfitManager target, AccessoryDescriptor accessoryDescription)
     {
         Log.Debug($"Setting accessory {accessoryDescription.Source}:{accessoryDescription.Name}...");
-        var outfit = OutfitAssetManager.GetOutfitByAssetName(accessoryDescription.Source);
-        if (outfit is null) { Log.Warning($"failed to find outfit {accessoryDescription.Source}."); return; }
-        
-        Log.Debug("found source");
-        var accessory = outfit.GetAccessory(accessoryDescription);
+        var accessory = OutfitAssetManager.GetAccessory(accessoryDescription);
+
         if (accessory is null && accessoryDescription.Name.ToLower().Contains("hair"))
         {
             Log.Info("hair accessory was missing, setting hairstyle to outfit's hair.");
+            var outfit = accessory.outfit as HaDSOutfit;
             target.SetHairstyle(outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>());
             target.SetHairColor(outfit.modelData.defaultHaircolor);
             return;

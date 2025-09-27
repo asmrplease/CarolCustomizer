@@ -9,7 +9,7 @@ public class UIAssetLoader : IDisposable
     const string accessoryButtonAddress = "Assets/Mods/TabUI/Blank Accessory.prefab";
     const string outfitButtonAddress = "Assets/Mods/TabUI/Blank Outfit.prefab";
     const string contextMenuAddress = "Assets/Mods/TabUI/Context Menu.prefab";
-    const string outfitViewAddress = "Assets/Mods/TabUI/OutfitView 1.prefab";
+    const string outfitViewAddress = "Assets/Mods/TabUI/OutfitView.prefab";
     const string materialsViewAddress = "Assets/Mods/TabUI/MaterialsView.prefab";
     const string recipesViewAddress = "Assets/Mods/TabUI/RecipesView.prefab";
     const string settingsViewAddress = "Assets/Mods/TabUI/SettingsView.prefab";

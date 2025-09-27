@@ -129,7 +129,7 @@ public class OutfitListUI : MonoBehaviour
         if (eventData.ShowActive)
         {
             TargetOutfit.ActiveAccessories
-                .ForEach(acc => outfitUIs[acc.outfit].SetAccessoryVisible(acc));
+                .ForEach(acc => outfitUIs[acc.outfit].SetAccUIVisible(acc));
         }
         if (eventData.ShowFavorites)
         {
@@ -139,7 +139,7 @@ public class OutfitListUI : MonoBehaviour
                     (outfit: OutfitAssetManager.GetOutfitByAssetName(acc.Source)
                     ,acc))
                 .Where(tup => tup.outfit is not null)
-                .ForEach(tup => outfitUIs[tup.outfit].SetAccessoryVisible(tup.acc));
+                .ForEach(tup => outfitUIs[tup.outfit].SetAccUIVisible(tup.acc));
         }
         Log.Info(eventData.ToString());
     }

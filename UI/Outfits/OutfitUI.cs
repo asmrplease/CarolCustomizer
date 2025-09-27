@@ -75,7 +75,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     public void Show() => this.gameObject.SetActive(true);
 
-    public void Expand() => expanded = ShowAccessoriesWhere(x => true);
+    public void Expand() => expanded = ShowAccessoriesWhere(_ => true);
 
     void Collapse()
     {
@@ -124,13 +124,14 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         OnAccessoryToggled();
     }
 
-    public void SetAccessoryVisible(AccessoryDescriptor accessory)
+    public void SetAccUIVisible(AccessoryDescriptor accessory)
     {
         var ui = GetAccUI(accessory);
         if (!ui) { Log.Warning("didn't find accessory in outfit"); return; }
 
         Show();
         ui.gameObject.SetActive(true);
+        Log.Debug($"SetAccUIVisible({accessory})");
     }
 
     bool ShowAccessoriesWhere(Predicate<AccessoryDescriptor> predicate)
