@@ -100,10 +100,11 @@ internal class MagicaManager(SkeletonManager skeleton)
 
         var liveMagica = GameObject.Instantiate(referenceMagica, targetPelvis.transform.parent);
         liveMagica.SerializeData.cullingSettings.cameraCullingMode = CullingSettings.CameraCullingMode.Off;
-
+        liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();
+        liveMagica.SerializeData.sourceRenderers.Clear();
+        liveMagica.SerializeData.rootBones.Clear();
         acc.AddToMagica(liveMagica);
         skeleton.AssignLiveBones(acc);
-        liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.AddRange(
             targetPelvis
             .MagiData

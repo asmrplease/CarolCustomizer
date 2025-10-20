@@ -11,7 +11,7 @@ namespace CarolCustomizer.Models.Accessories;
 public class LiveAccessory : AccessoryDescriptor, IDisposable
 {
     #region Dependencies
-    protected readonly Transform folder;
+    Transform folder;
     public readonly StoredAccessory storedAcc;
     #endregion
 
@@ -25,8 +25,6 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
 
     public Outfit outfit => storedAcc?.outfit;
 
-    //public event Action OnAccessoryStateChanged;
-
     public bool isActive { get; private set; } = false;
 
     public LiveAccessory(StoredAccessory acc, Transform folder)
@@ -34,11 +32,16 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
     {
         this.folder = folder;
         storedAcc = acc;
-
         Materials = new MaterialDescriptor[acc.Materials.Length];
         acc.Materials
             .Select((mat, i) => (mat, i))
             .ForEach(tup => Materials[tup.i] = tup.mat);
+        Reinstantiate();
+    }
+
+    void Reinstantiate()
+    {
+        if (liveSMR) GameObject.Destroy(liveSMR.gameObject);
 
         var liveObj = UnityEngine.Object.Instantiate(storedAcc.referenceSMR.gameObject, folder);
         if (!liveObj) { Log.Error($"Failed to instantiate {storedAcc.referenceSMR.name}."); return; }
@@ -49,6 +52,10 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         liveSMR.allowOcclusionWhenDynamic = false;
         liveSMR.updateWhenOffscreen = true;
         liveObj.layer = Constants.SMRLayer;
+        Materials
+            .Select((mat, index) => (mat, index))
+            .ForEach((tup) => liveSMR.ReplaceMaterialAtIndex(tup.mat.referenceMaterial, tup.index));
+        liveSMR.gameObject.SetActive(isActive);
     }
 
     public bool IsOnArmature(Transform pelvis)
@@ -88,17 +95,9 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
 
     public void AddToMagica(MagicaCloth magica)
     {
-        GameObject.Destroy(liveSMR.gameObject);
-        liveSMR = GameObject.Instantiate(storedAcc.referenceSMR, folder).GetComponent<SkinnedMeshRenderer>();
-        liveSMR.allowOcclusionWhenDynamic = false;
-        liveSMR.updateWhenOffscreen = true;
-        ReapplyMaterials();
-        magica.SerializeData.sourceRenderers.Clear();
+        Reinstantiate();
         magica.SerializeData.sourceRenderers.Add(liveSMR);
-        magica.SerializeData.rootBones.Clear();
         magica.SerializeData.rootBones.Add(liveSMR.transform);
-        liveSMR.gameObject.layer = Constants.SMRLayer;
-        liveSMR.gameObject.SetActive(isActive);
     }
 
     internal void ApplyMaterial(MaterialDescriptor material, int index)
@@ -107,13 +106,6 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         Materials[index] = material;
         liveSMR.ReplaceMaterialAtIndex(material.referenceMaterial, index);
         Log.Debug($"The material is now {liveSMR.materials[index]}.");
-    }
-
-    void ReapplyMaterials()
-    {
-        Materials
-            .Select((mat,index) => (mat,index))
-            .ForEach((tup) => liveSMR.ReplaceMaterialAtIndex(tup.mat.referenceMaterial, tup.index));
     }
 
     internal void ApplySharedMaterials(List<Material> materials)

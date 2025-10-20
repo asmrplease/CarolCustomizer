@@ -115,7 +115,7 @@ public class OutfitManager : IDisposable
 
     public void DisableAccessory(StoredAccessory accessory)
     {
-        if (!liveAccessories.ContainsKey(accessory)) { Log.Warning("Tried to disable an accessory that was never instantiated."); return; }
+        if (!liveAccessories.ContainsKey(accessory)) { Log.Warning($"Tried to disable accessory {accessory} that was never instantiated."); return; }
 
         liveAccessories[accessory].Disable();
         var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
