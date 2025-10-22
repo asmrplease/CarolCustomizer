@@ -1,5 +1,4 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Hooks;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
@@ -11,27 +10,14 @@ using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Carol;
 
-public class SkeletonManager : IDisposable
+public class SkeletonManager
 {
-    public readonly FaceCopier faceCopier;
-    MagicaManager MagicaManager;
-    PelvisWatchdog targetPelvis;
-
+    PelvisWatchdog pelvis;
     Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = [];
+    public event Action<LiveAccessory> OnLiveBonesAssigned;
+    public event Action<Outfit> OnOutfitBonesAdded;
 
-    public SkeletonManager(CarolInstance player, GameObject parent)
-    {
-        if (!parent) Log.Error("SkeletonManager was provided a null parent");
-        Log.Debug("SkeletonManager.Constructor()");
-        MagicaManager = new MagicaManager(this);
-        faceCopier = parent
-            .AddComponent<FaceCopier>()
-            .Constructor(player);
-        player.SpawnEvent += MagicaManager.HandleNewPelvis;
-        player.SpawnEvent += this.HandleNewPelvis;
-    }
-
-    void HandleNewPelvis(PelvisWatchdog newPelvis)
+    public void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
         outfitBoneDicts
             .Values
@@ -41,7 +27,7 @@ public class SkeletonManager : IDisposable
             .ToList()
             .ForEach(GameObject.Destroy);
         outfitBoneDicts.Clear();
-        targetPelvis = newPelvis;
+        pelvis = newPelvis;
     }
 
     public void AssignLiveBones(LiveAccessory acc)
@@ -57,9 +43,9 @@ public class SkeletonManager : IDisposable
             bespokeDict.TryGetValue(acc.bones[i].name, out liveBones[i]);
         }
         bespokeDict.TryGetValue(acc.RootBoneName, out var rootBone);
-        rootBone ??= targetPelvis.BoneData.StandardBones["CarolPelvis"];
+        rootBone ??= pelvis.BoneData.StandardBones["CarolPelvis"];
         acc.SetLiveBones(liveBones, rootBone);
-        MagicaManager.HandleNewLiveAcc(acc);
+        OnLiveBonesAssigned?.Invoke(acc);
     }
 
     public Dictionary<string, Transform> GetAddBoneSet(Outfit outfit)
@@ -68,12 +54,12 @@ public class SkeletonManager : IDisposable
         if (outfitBoneDicts.TryGetValue(outfit, out var dict)) return dict;
 
         Log.Debug("Adding bones");
-        Dictionary<string, Transform> boneDict = new(targetPelvis.BoneData.StandardBones);
+        Dictionary<string, Transform> boneDict = new(pelvis.BoneData.StandardBones);
         foreach (var bespokeBone in outfit.boneData.BespokeBones)
         {
             Transform parentBone;
             if (!bespokeBone.parent){ parentBone = boneDict["Bn_CarolHead"]; }
-            else if (!targetPelvis.BoneData.StandardBones.TryGetValue(bespokeBone.parent.name, out parentBone))
+            else if (!pelvis.BoneData.StandardBones.TryGetValue(bespokeBone.parent.name, out parentBone))
             { Log.Error($"Could not find {bespokeBone.name}'s parent, {bespokeBone.parent.name}."); continue; }
 
             GameObject.Instantiate(bespokeBone.gameObject, parentBone.transform)
@@ -83,9 +69,7 @@ public class SkeletonManager : IDisposable
                 .ForEach(x => boneDict[x.name] = x);
         }
         outfitBoneDicts[outfit] = boneDict;
-        MagicaManager.HandleNewOutfit(outfit);
+        OnOutfitBonesAdded?.Invoke(outfit);
         return boneDict;
     }
-
-    public void Dispose() => GameObject.Destroy(faceCopier);
 }

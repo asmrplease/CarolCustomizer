@@ -14,11 +14,10 @@ internal class HairstyleManager : IDisposable
     GameObject liveHair;
     public Hairstyle hairstyle { get; private set; }
     public Material hairMaterial { get; private set; }
+    public event Action<HairChangeEvent> HairstyleChanged;
 
-    public HairstyleManager(CarolInstance player)
-    {
-        player.SpawnEvent += OnPelvisChanged;
-    }
+    public string HairstyleName => this.hairstyle ? this.hairstyle.name : "";
+    public string HairMaterialName => hairMaterial ? hairMaterial.name : "";
 
     public HairChangeEvent GetHairDescriptor()
     {
@@ -29,7 +28,7 @@ internal class HairstyleManager : IDisposable
         return new HairChangeEvent(style, color);
     }
 
-    public void OnPelvisChanged(PelvisWatchdog newPelvis)
+    public void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
         targetPelvis = newPelvis;
         InstantiateHairstyle();
@@ -38,18 +37,32 @@ internal class HairstyleManager : IDisposable
 
     public void AssignHairstyle(Hairstyle hairstyle)
     {
+        if (hairstyle is null) { Log.Warning("Tried to apply a null hairstyle"); return; }
+
+        Log.Debug($"Assigning hairstyle {hairstyle.name}");
         this.hairstyle = hairstyle;
         InstantiateHairstyle();
         ApplyMaterial();
+        var e = GetHairDescriptor();
+        HairstyleChanged?.Invoke(e);
     }
 
-    public void AssignMaterial(Material material)
+    public void AssignMaterial(Material material, bool dissolve = false)
     {
+        if (material is null) { Log.Warning("Tried to apply a null hair material"); return; }
+
+        if (dissolve)
+        {
+            ApplyDissolve(material);
+            return;
+        }
+
         Log.Debug($"Assigning hair material {material.name}");
-        if (!material) return;
 
         this.hairMaterial = material;
         ApplyMaterial();
+        var e = GetHairDescriptor();
+        HairstyleChanged?.Invoke(e);
     }
 
     public void ApplyDissolve(Material dissolve)

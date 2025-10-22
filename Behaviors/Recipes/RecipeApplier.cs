@@ -12,7 +12,7 @@ using static CarolCustomizer.Models.Materials.MaterialDescriptor;
 namespace CarolCustomizer.Behaviors.Recipes;
 public static class RecipeApplier
 {
-    public static void ActivateRecipe(OutfitManager target, RecipeDescriptor recipe)
+    public static void ActivateRecipe(OutfitCoordinator target, RecipeDescriptor recipe)
     {
         target.DisableAllAccessories();
         target.DisableAllEffects();
@@ -38,7 +38,7 @@ public static class RecipeApplier
             OutfitAssetManager.GetOutfitByAssetName(recipe.ColliderSource));
     }
 
-    public static void ActivateVariant(OutfitManager outfitManager, HaDSOutfit outfit, string variantName)
+    public static void ActivateVariant(OutfitCoordinator outfitManager, HaDSOutfit outfit, string variantName)
     {
         Log.Debug("ActivateVariant()");
         outfitManager.DisableAllAccessories();
@@ -56,7 +56,7 @@ public static class RecipeApplier
         outfitManager.SetColliderSource(outfit);
     }
 
-    public static void ActivateFirstVariant(OutfitManager outfitManager, string outfitName)
+    public static void ActivateFirstVariant(OutfitCoordinator outfitManager, string outfitName)
     {
         Log.Debug("ActivateVariant(OM, string, int");
         
@@ -67,7 +67,7 @@ public static class RecipeApplier
         ActivateVariant(outfitManager, outfit, variant);
     }
 
-    static void SetAccessory(OutfitManager target, AccessoryDescriptor accessoryDescription)
+    static void SetAccessory(OutfitCoordinator target, AccessoryDescriptor accessoryDescription)
     {
         Log.Debug($"Setting accessory {accessoryDescription.Source}:{accessoryDescription.Name}...");
         var accessory = OutfitAssetManager.GetAccessory(accessoryDescription);
@@ -89,7 +89,7 @@ public static class RecipeApplier
             .ForEach(tup => SetMaterial(target, accessory, tup.mat, tup.index));
     }
 
-    static void SetMaterial(OutfitManager target, StoredAccessory accessory, MaterialDescriptor materialDescription, int index)
+    static void SetMaterial(OutfitCoordinator target, StoredAccessory accessory, MaterialDescriptor materialDescription, int index)
     {
         Log.Debug("setting material...");
         if (materialDescription.Type == MaterialDescriptor.SourceType.World)

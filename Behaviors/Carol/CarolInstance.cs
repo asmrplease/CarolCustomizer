@@ -1,10 +1,11 @@
-﻿using System;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Hooks;
+using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using CarolCustomizer.Utils;
-using CarolCustomizer.Hooks.Watchdogs;
-using CarolCustomizer.Assets;
 
 namespace CarolCustomizer.Behaviors.Carol;
 /// <summary>
@@ -14,13 +15,12 @@ namespace CarolCustomizer.Behaviors.Carol;
 public class CarolInstance : IDisposable
 {
     #region Dependencies
-    SkeletonManager skeletonManager;
-    public OutfitManager outfitManager { get; private set; }
+    public OutfitCoordinator outfitManager { get; private set; }
     #endregion
 
     #region WatchDog Instances
     PelvisWatchdog targetPelvis;
-    List<PelvisWatchdog> previousTargets = new();
+    List<PelvisWatchdog> previousTargets = [];
     #endregion
 
     #region Events
@@ -30,14 +30,12 @@ public class CarolInstance : IDisposable
     #region Lifecycle
     public CarolInstance(Transform parent)
     {
-        skeletonManager = new(this, parent.gameObject);
-        outfitManager = new(this, skeletonManager);
+        outfitManager = new(this, parent.gameObject);
     }
 
     public virtual void Dispose()
     {
         Log.Debug("CarolInstance.Dispose()");
-        skeletonManager.Dispose();
         outfitManager.Dispose();
         if (targetPelvis) GameObject.Destroy(targetPelvis);
     }

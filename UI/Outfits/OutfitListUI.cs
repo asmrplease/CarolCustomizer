@@ -32,7 +32,7 @@ public class OutfitListUI : MonoBehaviour
     SortedList<Outfit, OutfitUI> outfitUIs = [];
 
     public Main.ContextMenu ContextMenu { get; private set; }
-    public static OutfitManager TargetOutfit => targetCarol?.outfitManager;
+    public static OutfitCoordinator TargetOutfit => targetCarol?.outfitManager;
     public UIElementFactory Factory { get; private set; }
     public Transform ListRoot { get; private set; }
 

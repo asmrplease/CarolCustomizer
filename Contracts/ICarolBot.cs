@@ -6,6 +6,6 @@ using System;
 namespace CarolCustomizer.Contracts;
 public interface ICarolBot
 {
-    public void CustomizeBot(Recipe recipe, OutfitManager outfit);
+    public void CustomizeBot(Recipe recipe, OutfitCoordinator outfit);
     public PelvisWatchdog Watchdog();
 }

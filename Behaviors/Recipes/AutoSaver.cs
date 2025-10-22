@@ -10,7 +10,7 @@ using UnityEngine;
 namespace CarolCustomizer.Behaviors.Recipes;
 internal class AutoSaver : IDisposable
 {
-    OutfitManager outfitManager;
+    OutfitCoordinator outfitManager;
     readonly int playerIndex;
     readonly string path;
 

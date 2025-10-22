@@ -101,14 +101,14 @@ internal static class AccessoryDissolver
     //TODO: we need to handle the 'downed' state better- making the player invisible when they're downed probably isn't how the game was meant to be played
     //TODO: either get the hair to act like another accessory, or create a SetHairColorShared that can apply the dissolve correctly
 
-    public static IEnumerator Dissolve(OutfitManager outfitManager, Material dissolveMaterial, float time)
+    public static IEnumerator Dissolve(OutfitCoordinator outfitManager, Material dissolveMaterial, float time)
     {
         Log.Debug("Dissolve()");
         float elapsedTime = 0f;
         FadeFinish = false;
         var accs = outfitManager.ActiveAccessories;
         var liveDescriptions = outfitManager.LiveAccessoryDescriptors;
-        var hairColor = outfitManager.HairColor;
+        var hairColor = outfitManager.HairMaterialName;
         var dissolveMat = new MaterialDescriptor(dissolveMaterial, "Resources", MaterialDescriptor.SourceType.Resources);
         Dictionary<StoredAccessory, MaterialDescriptor[]> originalMaterials = [];
 

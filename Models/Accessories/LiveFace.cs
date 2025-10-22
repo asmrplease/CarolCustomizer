@@ -11,9 +11,9 @@ public class LiveFace : LiveAccessory
     #endregion
 
     #region Behavior
-    public LiveFace(StoredAccessory acc, SkeletonManager skeleton, Transform folder) : base(acc, folder)
+    public LiveFace(StoredAccessory acc, SkeletonManager skeleton, FaceCopier faceCopier, Transform folder) : base(acc, folder)
     {
-        faceCopier = skeleton.faceCopier;
+        this.faceCopier = faceCopier;
     }
 
     public override void Enable()

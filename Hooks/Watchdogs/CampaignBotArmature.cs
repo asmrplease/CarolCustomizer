@@ -30,7 +30,7 @@ public class CampaignBotArmature : MonoBehaviour, ICarolType, ICarolBot
         return this;
     }
 
-    public void CustomizeBot(Recipe recipe, OutfitManager outfitManager) 
+    public void CustomizeBot(Recipe recipe, OutfitCoordinator outfitManager) 
     {
         if (Settings.Plugin.customCampaignBots.Value is not true) return;
 
