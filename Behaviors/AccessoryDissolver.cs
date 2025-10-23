@@ -2,7 +2,6 @@
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
-using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using HarmonyLib;
 using System.Collections;

@@ -58,12 +58,15 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
         this.accessoryManager = new AccessoryManager(skeletonManager, faceCopier);
         this.magicaManager    = new MagicaManager(skeletonManager);
         this.effectManager    = new EffectManager(skeletonManager);
-        
+
 
         carol.SpawnEvent += this.HandleNewPelvis;
         carol.SpawnEvent += this.accessoryManager.HandleNewPelvis;
         carol.SpawnEvent += this.skeletonManager.HandleNewPelvis;
         carol.SpawnEvent += this.magicaManager.HandleNewPelvis;
+        carol.SpawnEvent += this.hairstyleManager.HandleNewPelvis;
+        carol.SpawnEvent += this.faceCopier.HandleNewPelvis;
+        carol.SpawnEvent += this.effectManager.HandleNewPelvis;
 
         this.hairstyleManager.HairstyleChanged += OnHairChanged;
         this.accessoryManager.AccessoryChanged += OnAccessoryChanged;

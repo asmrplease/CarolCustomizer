@@ -41,6 +41,8 @@ internal class MaterialsListUI : MonoBehaviour
 
     void OnEnable()
     {
+        if (!this.eyedropper) return;
+
         this.eyedropper.enabled = true;
     }
 
