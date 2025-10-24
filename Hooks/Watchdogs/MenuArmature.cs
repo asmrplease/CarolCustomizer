@@ -5,6 +5,7 @@ using CarolCustomizer.Utils;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
+using Onirism.Ui;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class MenuArmature : MonoBehaviour, ICarolType
@@ -16,8 +17,8 @@ public class MenuArmature : MonoBehaviour, ICarolType
     {
         Log.Debug("MenuModBehavior.Constructor()");
         this.watchdog = watchdog;
-        menuSwitchOutfit = this.gameObject.GetComponentInParent<MenuSwitchOutfit>(true);
-        if (!menuSwitchOutfit) Log.Warning("No MenuSwitchOutfit component found!");
+        //menuSwitchOutfit = this.gameObject.GetComponentInParent<MenuSwitchOutfit>(true);
+        //if (!menuSwitchOutfit) Log.Warning("No MenuSwitchOutfit component found!");
         return this;
     }
 
@@ -28,7 +29,7 @@ public class MenuArmature : MonoBehaviour, ICarolType
         Log.Info("MenuModBehavior.OnEnable()");
         this.watchdog = GetComponent<PelvisWatchdog>();
         this.watchdog.Behavior = this;
-        this.menuSwitchOutfit = this.gameObject.GetComponentInParent<MenuSwitchOutfit>(true);
+        //this.menuSwitchOutfit = this.gameObject.GetComponentInParent<MenuSwitchOutfit>(true);
         SetBaseVisibility(false);
         PlayerInstances.DefaultPlayer.NotifySpawned(this.watchdog);
     }
@@ -56,7 +57,7 @@ public class MenuArmature : MonoBehaviour, ICarolType
         menuSwitchOutfit.loadedModel.transform.SetParent(menuSwitchOutfit.transform);
         menuSwitchOutfit.loadedModel.transform.ResetLocalPosRot();
         menuSwitchOutfit.modelData = ((HaDSOutfit)outfit).modelData;
-        menuSwitchOutfit.PickHair(menuSwitchOutfit.transform);
+        //menuSwitchOutfit.PickHair(menuSwitchOutfit.transform);
     }
 
     public void SetAnimator(Outfit outfit)

@@ -6,6 +6,7 @@ using CarolCustomizer.UI.Materials;
 using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.UI.Recipes;
 using CarolCustomizer.Utils;
+using FuseBox.Lugh;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -29,6 +30,8 @@ public class UIInstance : MonoBehaviour
     Button materialsButton;
     Button configButton;
 
+    public LughPanel lughPanel;
+
     #region Common Component References
     Canvas canvas;
     List<Component> Views;
@@ -44,6 +47,7 @@ public class UIInstance : MonoBehaviour
             .Find(versionAddress)
             .GetComponent<Text>()
             .text = PluginInfo.PLUGIN_VERSION.ToString();
+        lughPanel = mainTransform.gameObject.AddComponent<LughPanel>();
 
         canvas = mainTransform.GetComponent<Canvas>();
         canvas.enabled = true;

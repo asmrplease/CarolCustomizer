@@ -60,7 +60,8 @@ public class PlayerArmature : MonoBehaviour, ICarolType
     public void SetBaseOutfit(Outfit outfit)
     {
         Log.Debug("Changing outfit via Entity.Swapmodel");
-        carolEntity.SwapModel(outfit.storedAsset.gameObject);
+        //TODO: Fix 1.0
+        //carolEntity.SwapModel(outfit.storedAsset.gameObject);
     }
 
     IEnumerator LockRoutine(float initialDelay = 0f)

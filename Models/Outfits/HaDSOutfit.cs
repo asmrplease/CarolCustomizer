@@ -18,6 +18,7 @@ public class HaDSOutfit : Outfit
 
     public HaDSOutfit(Transform storedAsset) : base(storedAsset)
     {
+        Log.Debug($"Loading HaDSOutfit {storedAsset.name}");
         modelData = this.storedAsset.gameObject.GetComponent<ModelData>();
         if (!modelData) { Log.Error("No ModelData component was found during HaDS constructor."); return; }
         BuildVariants();

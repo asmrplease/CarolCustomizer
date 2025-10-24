@@ -25,6 +25,7 @@ public class MenuToggle : MonoBehaviour
     public void Constructor(UIInstance uiInstance)
     {
         this.uiInstance = uiInstance;
+
         SceneManager.sceneLoaded += OnSceneChange;
     }
     void OnDestroy()
@@ -60,7 +61,7 @@ public class MenuToggle : MonoBehaviour
         if (!uiInstance) return; 
 
         if (currentScene.name == Constants.MenuSceneName) { MainMenuUpdate(); return; }
-        if (PauseDiary.manager) { GameplayUpdate(); return; }
+        GameplayUpdate();
     }
 
     bool CheckInput()
@@ -133,15 +134,36 @@ public class MenuToggle : MonoBehaviour
         GameplaySetMenuState(true);
     }
 
+    void LateUpdate()
+    {
+        if (!IsVisible) return;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Confined;
+    }
+
     void GameplaySetMenuState(bool visible)
     {
         Log.Debug($"GameplaySetMenuState({visible})");
         if (!uiInstance) { Log.Warning("Tried to set ui state on missing uiInstance."); return; }
 
-        PauseDiary.manager.isPaused = visible;
+        //PauseDiary.manager.isPaused = visible;
+        //Onirism.Ui.PauseMenu.
+        //Onirism.Ui.UiManager.I.isInPauseMenu = visible;
+        //GameManager.manager.ToggleCursorState(visible ? CursorLockMode.Confined : CursorLockMode.Locked);
+        //var cursorState = visible ? CursorLockMode.Confined : CursorLockMode.Locked;
+        //Log.Debug($"Set lockstate to {cursorState}");
+
+        if (visible) Onirism.Ui.UiManager.I.panelStacker.Stack(uiInstance.lughPanel, true);
+        if (!visible) Onirism.Ui.UiManager.I.panelStacker.DestackTopmost(true);
+
+        foreach (GameObject camera in CameraController.cameras)
+            camera.GetComponent<CameraController>().enabled = !visible;
+
+        Log.Debug($"Toggled LughPanel to {visible}");
         OnMenuToggle?.Invoke(visible);
         if (visible) PlayerInstances.DefaultPlayer.LockPlayer();
         else PlayerInstances.DefaultPlayer.UnlockPlayer();
         IsVisible = visible;
+        Log.Debug("GameplaySetMenuState Completed successfully");
     }
 }

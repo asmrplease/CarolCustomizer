@@ -2,6 +2,7 @@
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Utils;
+using Onirism.Ui;
 using Slate;
 using System;
 using System.Collections.Generic;

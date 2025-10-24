@@ -46,6 +46,9 @@
 		<Reference Include="Pngcs">
 			<HintPath>lib\Pngcs.dll</HintPath>
 		</Reference>
+		<Reference Include="FuseBox.Lugh">
+			<HintPath>lib\FuseBox.Lugh.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">

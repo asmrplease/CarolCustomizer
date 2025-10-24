@@ -12,10 +12,10 @@ internal class CutsceneTest
         //For each cutscene in scene
             //start cutscene
             //wait 10s after end of cutscene
-    static void LoadScene(string sceneName) => GameManager.manager.LoadScene(sceneName, TestData());
-    static SaveManager.SaveData TestData() => 
+    //static void LoadScene(string sceneName) => GameManager.manager.LoadScene(sceneName, TestData());
+    //static SaveManager.SaveData TestData() => 
         //SaveManager.manager.data[SaveManager.manager.saveSlotCurrent];
-        SaveManager.manager.NewSave();
+        //SaveManager.manager.NewSave();
     static int sceneIndex = 0;
     static bool readyForNextScene = true;
     static bool readyForNextCutscene = true;
@@ -48,7 +48,7 @@ internal class CutsceneTest
         {
             SceneManager.sceneLoaded += HandleSceneChanged;
             readyForNextScene = false;
-            LoadScene(scene);
+            //LoadScene(scene);
             yield return new WaitUntil(() => readyForNextScene);
         }
     }
