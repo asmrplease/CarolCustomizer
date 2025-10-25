@@ -18,7 +18,7 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
     public PelvisWatchdog watchdog { get; private set; }
     public PelvisWatchdog Watchdog() => watchdog;
 
-    
+
     public bool custom { get; private set; }
 
     void Awake()
@@ -40,7 +40,7 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
         return this;
     }
 
-    public void CustomizeBot(Recipe recipe, OutfitManager outfitManager) 
+    public void CustomizeBot(Recipe recipe, OutfitManager outfitManager)
     {
         if (!custom) return;
 
@@ -68,7 +68,7 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
     public void SetBaseVisibility(bool visible)
     {
         if (!custom) return;
-        
+
         GetComponent<CompData>().SetBaseVisibility(visible);
         var randomizer = GetComponent<ZombieRandomizer>();
         if (!randomizer) { Log.Warning("Failed to find ZombieRandomizer in SummerSlime.SetBaseVisibility()"); return; }
@@ -76,7 +76,7 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
         randomizer.enabled = visible;
     }
 
-    void OnDestroy() 
+    void OnDestroy()
     {
         Log.Debug("SummerSlime.OnDestroy()");
         NPCManager.OnBotDespawn(this);
@@ -88,5 +88,5 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
 
     public void SetHeightOffset(float height) { }
 
-    public void Dispose() => Destroy(this);
+    public void Dispose() {}//Destroy(this);
 }

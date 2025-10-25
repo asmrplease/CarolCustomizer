@@ -184,8 +184,8 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     }
     #endregion
 
-    void OnDestroy() => AccUIs.Values
-        .Where(x => x)
-        .Select(x => x.gameObject)
-        .ForEach(GameObject.Destroy);
+    //void OnDestroy() => AccUIs.Values
+    //    .Where(x => x)
+    //    .Select(x => x.gameObject)
+    //    .ForEach(GameObject.Destroy);
 }

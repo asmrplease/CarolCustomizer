@@ -169,6 +169,6 @@ public class PlayerArmature : MonoBehaviour, ICarolType
 
     public void Dispose()
     {
-        Destroy(this);
+        //Destroy(this);
     }
 }

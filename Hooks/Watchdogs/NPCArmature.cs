@@ -54,6 +54,6 @@ public class NPCArmature : MonoBehaviour, ICarolType
 
     public void Dispose()
     {
-        Destroy(this);
+        //Destroy(this);
     }
 }

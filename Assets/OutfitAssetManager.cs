@@ -39,7 +39,7 @@ public class OutfitAssetManager : IDisposable
         return outfitSets.Values
             .Select(dict =>
                 (found: dict.TryGetValue(assetName, out var result)
-                ,result: result))
+                , result: result))
             .FirstOrDefault(tup => tup.found)
             .result;
     }
@@ -74,5 +74,5 @@ public class OutfitAssetManager : IDisposable
         OnHairLoaded?.Invoke((hair, colors));
     }
 
-    public void Dispose() => GameObject.Destroy(liveFolder);
+    public void Dispose() { if (liveFolder.gameObject) GameObject.Destroy(liveFolder.gameObject); }
 }

@@ -60,7 +60,7 @@ public class PelvisWatchdog : MonoBehaviour
     void OnEnable() => OnChange();
 
     void OnDisable() => OnChange();
-    void OnTransformParentChanged()
+    void OnTransformParentChanged() 
     {
         //This check prevents issues with situations where the player becomes parented to a vehicle or other object
         if (Behavior.GetType() == typeof(PlayerArmature)) return;
@@ -72,8 +72,8 @@ public class PelvisWatchdog : MonoBehaviour
     {
         Log.Debug($"{parentName} PelvisWatchdog.Dispose()");
         //List<MonoBehaviour> stuff = [boneData, compData, magiData, animData];
-        Destroy(boneData); Destroy(compData); Destroy(magiData); Destroy(animData);
+        //Destroy(boneData); Destroy(compData); Destroy(magiData); Destroy(animData);
         //stuff.ForEach(DestroyImmediate);
-        Behavior.Dispose();
+        //Behavior.Dispose();
     }
 }

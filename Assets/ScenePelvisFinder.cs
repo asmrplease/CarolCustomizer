@@ -37,8 +37,8 @@ public class ScenePelvisFinder : IDisposable
     {
         Log.Debug("ScenePelvisFinder.Dispose()");
         SceneManager.sceneLoaded -= FindAllPelvises;
-        allWatchdogs
-            .Where(x => x)
-            .ForEach(GameObject.Destroy);
+        //allWatchdogs
+        //    .Where(x => x)
+        //    .ForEach(GameObject.Destroy);
     }
 }
