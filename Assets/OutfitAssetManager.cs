@@ -64,14 +64,15 @@ public class OutfitAssetManager : IDisposable
     public static Material GetHairColorMaterial(string assetName)
     {
         if (!HairColors.TryGetValue(assetName, out var style)) { Log.Warning($"failed to find material named {assetName}"); return null; }
-        var color = HairColors[assetName];
+        Log.Debug($"requested {assetName}, found hair dye{style.name}");
         return style.material;
     }
 
     public static void NotifyHairReady(List<Hairstyle> hair, List<HairDye> dye)
     {
-        Hairstyles.AddRange(hair);        
-        HairColors = dye.ToDictionary(x => x.name, x => x);
+        Hairstyles.AddRange(hair);
+        //TODO: this will fail if we ever load more hair dye colors
+        HairColors = dye.ToDictionary(x => x.locKey, x => x);
         OnHairLoaded?.Invoke((hair, dye));
     }
 

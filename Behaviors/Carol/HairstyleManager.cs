@@ -3,6 +3,7 @@ using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Utils;
 using FuseBox.External.MagicaCloth2;
 using MagicaCloth2;
+using Onirism.Gameplay;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -70,7 +71,8 @@ internal class HairstyleManager : IDisposable
         var smr = liveHair.GetComponentInChildren<SkinnedMeshRenderer>(true);
         //smrs.ForEach(smr => smr.materials = smr.materials.Select(x => hairMaterial).ToArray());
         //smrs.ForEach(smr => smr.material = hairMaterial);
-        smr.material = hairMaterial;
+        //smr.material = hairMaterial;
+        smr.ReplaceMaterialAtIndex(hairMaterial, hairstyle.mainMaterialIndex);
     }
 
     void InstantiateHairstyle()
