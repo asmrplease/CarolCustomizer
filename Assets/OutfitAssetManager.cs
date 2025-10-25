@@ -1,6 +1,7 @@
 ﻿using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
+using Onirism.Gameplay;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,11 @@ public class OutfitAssetManager : IDisposable
     public static Action<Outfit> OnOutfitUnloaded;
     public static Action OnOutfitSetLoaded;
     public static Action OnOutfitSetUnloaded;
-    public static event Action<(List<Hairstyle>, List<Material>)> OnHairLoaded;
+    public static event Action<(List<Hairstyle>, List<HairDye>)> OnHairLoaded;
 
     public static Dictionary<string, Dictionary<string, HaDSOutfit>> outfitSets = new();
     public static List<Hairstyle> Hairstyles = new();
-    public static List<Material> HairColors = new();
+    public static Dictionary<string, HairDye> HairColors = new();
 
     public OutfitAssetManager(Transform parent)
     {
@@ -60,18 +61,18 @@ public class OutfitAssetManager : IDisposable
         return hair;
     }
 
-    public static Material GetHairColor(string name)
+    public static Material GetHairColorMaterial(string assetName)
     {
-        var style = HairColors.FirstOrDefault(x => x.name == name);
-        if (!style) Log.Warning($"When searching for hairstyle '{name}', no results were found. ");
-        return style;
+        if (!HairColors.TryGetValue(assetName, out var style)) { Log.Warning($"failed to find material named {assetName}"); return null; }
+        var color = HairColors[assetName];
+        return style.material;
     }
 
-    public static void NotifyHairReady(List<Hairstyle> hair, List<Material> colors)
+    public static void NotifyHairReady(List<Hairstyle> hair, List<HairDye> dye)
     {
-        Hairstyles.AddRange(hair);
-        HairColors.AddRange(colors);
-        OnHairLoaded?.Invoke((hair, colors));
+        Hairstyles.AddRange(hair);        
+        HairColors = dye.ToDictionary(x => x.name, x => x);
+        OnHairLoaded?.Invoke((hair, dye));
     }
 
     public void Dispose() { if (liveFolder.gameObject) GameObject.Destroy(liveFolder.gameObject); }

@@ -1,6 +1,7 @@
 ﻿using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
+using Onirism.Gameplay;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -45,10 +46,12 @@ internal class HaDSOutfitLoader : IDisposable
         var hair = Resources.FindObjectsOfTypeAll<Hairstyle>()
             .Where(x => !x.gameObject.name.Contains("(Clone)"))
             .ToList();
-        var colors = Resources.FindObjectsOfTypeAll<Material>()
-            .Where(x => x.name.StartsWith("CRL") && !x.name.Contains("(Instance)"))
+        //var colors = Resources.FindObjectsOfTypeAll<Material>()
+        //    .Where(x => x.name.StartsWith("CRL") && !x.name.Contains("(Instance)"))
+        //    .ToList();
+        var dyes = Resources.FindObjectsOfTypeAll<HairDye>()
             .ToList();
-        OutfitAssetManager.NotifyHairReady(hair, colors);
+        OutfitAssetManager.NotifyHairReady(hair, dyes);
     }
 
     void LoadHaDSOutfit(ModelData outfit)

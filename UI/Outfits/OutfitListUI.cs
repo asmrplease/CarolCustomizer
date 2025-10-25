@@ -6,6 +6,7 @@ using CarolCustomizer.Events;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
+using Onirism.Gameplay;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -66,7 +67,7 @@ public class OutfitListUI : MonoBehaviour
         return this;
     }
 
-    private void HandleHairLoaded((List<Hairstyle> styles, List<Material> colors) hairData)
+    private void HandleHairLoaded((List<Hairstyle> styles, List<HairDye> colors) hairData)
     {
         Log.Debug("OutfitListUI.HandleHairLoaded");
         ColorSelector = transform
@@ -85,10 +86,10 @@ public class OutfitListUI : MonoBehaviour
         Log.Debug("Hair dropdown callbacks set up!");
 
         hairData.colors
-            .Select(x => new Dropdown.OptionData() { text = x.name })
+            .Select(x => new Dropdown.OptionData() { text = LocalizationIndex.GetLine(x.localizationName) })
             .ForEach(ColorSelector.options.Add);
         hairData.styles
-            .Select(x => new Dropdown.OptionData() { text = x.name })
+            .Select(x => new Dropdown.OptionData() { text =  x.name})
             .ForEach(ModelSelector.options.Add);
         Log.Debug($"hair ui initialized, {ModelSelector.options.Count()} model options and {ColorSelector.options.Count()} color options.");
     }
@@ -183,11 +184,12 @@ public class OutfitListUI : MonoBehaviour
             .Select(x => x.text)
             .ToList()
             .IndexOf(style);
+        var localized = LocalizationIndex.GetLine(e.Color);
         var colorIndex = ColorSelector
             .options
             .Select(x => x.text)
             .ToList()
-            .IndexOf(color);
+            .IndexOf(localized);
 
         ModelSelector.SetValueWithoutNotify(styleIndex);
         ColorSelector.SetValueWithoutNotify(colorIndex);
@@ -207,8 +209,9 @@ public class OutfitListUI : MonoBehaviour
 
     void OnColorDropdownChanged(int index)
     {
-        var mat = OutfitAssetManager.HairColors[index];
-        OutfitListUI.TargetOutfit.SetHairColor(mat);
+        var dye = OutfitAssetManager.HairColors.ElementAt(index).Value;
+        //var dye = OutfitAssetManager.HairColors[assetName];
+        OutfitListUI.TargetOutfit.SetHairColor(dye.material);
     }
 
     void OnModelDropdownChanged(int index)

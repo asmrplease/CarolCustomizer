@@ -7,6 +7,7 @@ using CarolCustomizer.Utils;
 using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.UIElements;
 using static CarolCustomizer.Models.Materials.MaterialDescriptor;
 
 namespace CarolCustomizer.Behaviors.Recipes;
@@ -18,7 +19,7 @@ public static class RecipeApplier
         target.DisableAllEffects();
         //load hair first so if it's replaced later, we don't overwrite it. 
         target.SetHairstyle(OutfitAssetManager.GetHairstyle(recipe.Hairstyle));
-        target.SetHairColor(OutfitAssetManager.GetHairColor(recipe.HairMaterial));
+        target.SetHairColor(OutfitAssetManager.GetHairColorMaterial(recipe.HairMaterial));
         recipe
             .ActiveAccessories
             .ForEach(x => SetAccessory(target, x));
@@ -41,6 +42,9 @@ public static class RecipeApplier
     public static void ActivateVariant(OutfitManager outfitManager, HaDSOutfit outfit, string variantName)
     {
         Log.Debug("ActivateVariant()");
+        if (outfitManager is null) { Log.Error("RecipeApplier.ActivateVariant() null outfit manager"); return; }
+        if (outfit is null) { Log.Error("RecipeApplier.ActivateVariant() null outfit"); return; }
+
         outfitManager.DisableAllAccessories();
         outfitManager.DisableAllEffects();
 

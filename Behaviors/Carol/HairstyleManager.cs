@@ -132,7 +132,6 @@ internal class HairstyleManager : IDisposable
         hairCompanion.RebuildCollidersList();
     }
 
-
-    public void Dispose() => GameObject.Destroy(liveHair);
+    public void Dispose() => GameObject.Destroy(liveHair.gameObject);
 
 }

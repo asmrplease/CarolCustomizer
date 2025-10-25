@@ -140,7 +140,7 @@ internal static class AccessoryDissolver
                 outfitManager.PaintAccessory(acc, originalMaterials[acc][i], i);
             }
         }
-        outfitManager.SetHairColor(OutfitAssetManager.GetHairColor(hairColor));
+        outfitManager.SetHairColor(OutfitAssetManager.GetHairColorMaterial(hairColor));
         Log.Debug("Restored original materials");
         ActiveDissolve = null;
         yield break;
