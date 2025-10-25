@@ -13,6 +13,7 @@ public class PlayerArmature : MonoBehaviour, ICarolType
     private const float UnlockSpeed = 1.75f;
 
     CarolController carolController;
+    ModelData playerModelData;
     public PelvisWatchdog watchdog { get; private set; }
     public Entity carolEntity { get; private set; }
 
@@ -27,7 +28,10 @@ public class PlayerArmature : MonoBehaviour, ICarolType
     {
         this.watchdog ??= watchdog;
         carolController = this.gameObject.GetComponentInParent<CarolController>();
+        playerModelData = this.gameObject.GetComponentInParent<ModelData>();
         if (!carolController) Log.Error("Failed to find CarolController in PlayerModBehavior.Constructor()");
+        if (!playerModelData) Log.Error("Failed to find ModelData on player armature");
+        if (playerModelData) { playerModelData.hairIsVisible = false; }
         return this;
     }
 
@@ -153,7 +157,15 @@ public class PlayerArmature : MonoBehaviour, ICarolType
         Log.Debug($"{this}.OnDisable()");
     }
 
-    public void SetBaseVisibility(bool visibility) => watchdog.CompData.SetBaseVisibility(visibility);
+    public void SetBaseVisibility(bool visibility) 
+    {
+        watchdog.CompData.SetBaseVisibility(visibility);
+        playerModelData.hairIsVisible = visibility;
+        var inventory = GetComponentInParent<Inventory>();
+        if (!inventory) return;
+
+        inventory.currentHairstyle.GetComponent<Hairstyle>().Hide(visibility);
+    } 
 
     public void Dispose()
     {
