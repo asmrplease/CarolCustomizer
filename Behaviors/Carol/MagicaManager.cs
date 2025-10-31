@@ -25,7 +25,7 @@ internal class MagicaManager(SkeletonManager skeleton)
         Log.Debug("magicamanager.handleNewPelvis()");
         targetPelvis = newPelvis;
         MeshClothAccs.Clear();
-        BoneCloths.Where(x => x).ForEach(GameObject.DestroyImmediate);
+        BoneCloths.Where(x => x).ForEach(GameObject.Destroy);
         BoneCloths.Clear();
     }
 
@@ -42,10 +42,11 @@ internal class MagicaManager(SkeletonManager skeleton)
 
     void BoneClothSetup(MagicaCloth magica, Outfit outfit)
     {
+        Log.Debug($"BoneClothSetup({magica.name}, {outfit.DisplayName})");
         var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
         liveMagica.name = outfit.DisplayName + " BoneCloth";
         targetPelvis.AnimData.DisableAnimator();
-        liveMagica.ReplaceTransform(skeleton.GetAddBoneSet(outfit));
+        //liveMagica.ReplaceTransform(skeleton.GetAddBoneSet(outfit));
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.AddRange(
             targetPelvis
@@ -85,16 +86,16 @@ internal class MagicaManager(SkeletonManager skeleton)
 
     public void HandleNewLiveAcc(LiveAccessory acc)
     {
-        if (!MeshClothAccs.TryGetValue(acc.storedAcc, out var referenceMagica)) return;
+        if (!MeshClothAccs.TryGetValue(acc.AsDescriptor(), out var referenceMagica)) return;
         Log.Debug($"HandleNewLiveAcc({acc.Name})");
 
-        if (LiveCloths.TryGetValue(acc, out var existing) && existing) GameObject.DestroyImmediate(existing.gameObject);
+        if (LiveCloths.TryGetValue(acc, out var existing) && existing) GameObject.Destroy(existing.gameObject);
 
         if (!acc.isActive) return;
 
         targetPelvis.AnimData.DisableAnimator();
-        MeshClothAccs.Remove(acc.storedAcc);
-        var boneDict = skeleton.GetAddBoneSet(acc.outfit);
+        MeshClothAccs.Remove(acc.AsDescriptor());
+        var boneDict = skeleton.GetAddBoneSet(acc.Source, acc.BespokeBones);
 
         referenceMagica.gameObject.SetActive(false);
 

@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Models.Materials;
+﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
@@ -12,7 +13,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
 {
     #region Dependencies
     Transform folder;
-    public readonly StoredAccessory storedAcc;
+    readonly SkinnedMeshRenderer referenceSMR;
     #endregion
 
     #region Common Components
@@ -20,10 +21,14 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
     #endregion
 
     #region Public Interface
-    public Transform[] bones => storedAcc.referenceSMR.bones;
-    public string RootBoneName => storedAcc.referenceSMR.rootBone?.name ?? "CarolPelvis";
+    public Transform[] bones => referenceSMR.bones;
+    public string RootBoneName => referenceSMR.rootBone?.name ?? "CarolPelvis";
 
-    public Outfit outfit => storedAcc?.outfit;
+    public readonly Outfit outfit;
+
+    public readonly List<Transform> BespokeBones;
+
+    public readonly MagicaCloth magicaCloth;
 
     public bool isActive { get; private set; } = false;
 
@@ -31,11 +36,28 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         : base(acc.Name, acc.Source)
     {
         this.folder = folder;
-        storedAcc = acc;
-        Materials = new MaterialDescriptor[acc.Materials.Length];
+        this.referenceSMR = acc.referenceSMR;
+        this.outfit = acc.outfit;
+        this.BespokeBones = outfit.boneData.BespokeBones;
+        this.Materials = new MaterialDescriptor[acc.Materials.Length];
         acc.Materials
             .Select((mat, i) => (mat, i))
             .ForEach(tup => Materials[tup.i] = tup.mat);
+        Reinstantiate();
+    }
+
+    public LiveAccessory(StoredHair hair, Transform folder)
+        :base (hair.Name, hair.Source)
+    {
+        this.folder = folder;
+        this.referenceSMR = hair.smr;
+        this.outfit = null;
+        this.BespokeBones = hair.BespokeBones;
+        this.referenceSMR = hair.smr;
+        this.Materials = new MaterialDescriptor[hair.smr.sharedMaterials.Length];
+        hair.smr.sharedMaterials
+            .Select((mat, i) => (mat, i))
+            .ForEach(tup => Materials[tup.i] = new MaterialDescriptor(tup.mat, hair.Source, MaterialDescriptor.SourceType.Hair));
         Reinstantiate();
     }
 
@@ -43,11 +65,11 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
     {
         if (liveSMR) GameObject.Destroy(liveSMR.gameObject);
 
-        var liveObj = UnityEngine.Object.Instantiate(storedAcc.referenceSMR.gameObject, folder);
-        if (!liveObj) { Log.Error($"Failed to instantiate {storedAcc.referenceSMR.name}."); return; }
+        var liveObj = UnityEngine.Object.Instantiate(referenceSMR.gameObject, folder);
+        if (!liveObj) { Log.Error($"Failed to instantiate {referenceSMR.name}."); return; }
 
         liveSMR = liveObj.GetComponent<SkinnedMeshRenderer>();
-        if (!liveSMR) { Log.Error($"{storedAcc.referenceSMR.name} was instantiated without an SMR."); return; }
+        if (!liveSMR) { Log.Error($"{referenceSMR.name} was instantiated without an SMR."); return; }
 
         liveSMR.allowOcclusionWhenDynamic = false;
         liveSMR.updateWhenOffscreen = true;
@@ -111,6 +133,11 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
     internal void ApplySharedMaterials(List<Material> materials)
     {
         liveSMR.SetSharedMaterials(materials);
+    }
+
+    public AccessoryDescriptor AsDescriptor()
+    {
+        return new AccessoryDescriptor(this);
     }
 
     public void Dispose()

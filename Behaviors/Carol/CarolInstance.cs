@@ -56,7 +56,7 @@ public class CarolInstance : IDisposable
         previousTargets.RemoveAll(x => !x);
         targetPelvis = pelvis;
 
-        Log.Debug($"SpawnEvent.Invoke({pelvis})");
+        Log.Info($"Calling SpawnEvent.Invoke({pelvis.transform.GetPath()})");
         SpawnEvent?.Invoke(targetPelvis);
     }
 

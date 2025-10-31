@@ -35,7 +35,8 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>, IComparable<Ma
     {
         AssetBundle = 0,
         World = 1,
-        Resources = 2
+        Resources = 2,
+        Hair = 3,
     }
 
     public bool Equals(MaterialDescriptor other)

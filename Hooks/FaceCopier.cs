@@ -29,7 +29,7 @@ public class FaceCopier : MonoBehaviour
 
     void OnOutfitUnloaded(Outfit outfit)
     {
-        targets.RemoveWhere(x => x is null || x.outfit == outfit);
+        targets.RemoveWhere(x => x is null); // || x.outfit == outfit
     }
 
     void OnDestroy()

@@ -81,6 +81,7 @@ public static class Constants
     public const string Preferences = "Preferences";
     public const string AutoSave = "AutoSave";
     public const string PNGChunkKeyword = "RecipeData";
+    public const string HairstyleSourceName = "Hairstyles";
 
     public static readonly string ApplicationPath = Directory.GetParent(Application.dataPath).FullName;
     public static readonly string RecipeFolderPath = Path.Combine(ApplicationPath, RecipeFolderName);

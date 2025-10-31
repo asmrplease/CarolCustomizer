@@ -195,7 +195,7 @@ public class OutfitManager : IDisposable
         if (!pelvis || pelvis.Behavior is null || outfit is null) return;
         if (!outfit.Effects.Any()) return;
 
-        skeletonManager.GetAddBoneSet(outfit);
+        skeletonManager.GetAddBoneSet(outfit.AssetName, outfit.boneData.BespokeBones);
         foreach (var effect in outfit.Effects)
         {
             var transform = pelvis.transform.Find(effect.RelativePath);

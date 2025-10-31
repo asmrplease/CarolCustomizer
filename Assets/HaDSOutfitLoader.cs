@@ -57,7 +57,8 @@ internal class HaDSOutfitLoader : IDisposable
     void LoadHaDSOutfit(ModelData outfit)
     {
         var hads = new HaDSOutfit(outfit.transform);
-        HaDSOutfits.Add(hads.AssetName, hads);
+        if (!HaDSOutfits.TryAdd(hads.AssetName, hads)) return;
+
         OutfitAssetManager.OnOutfitLoaded?.Invoke(hads);
     }
 

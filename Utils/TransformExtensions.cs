@@ -164,4 +164,15 @@ public static class TransformExtensions
         target.localRotation = source.localRotation;
         target.localScale = source.localScale;
     }
+
+    public static string GetPath(this Transform obj)
+    {
+        string path = "/" + obj.name;
+        while (obj.parent)
+        {
+            obj = obj.parent;
+            path = "/" + obj.name + path;
+        }
+        return path;
+    }
 }

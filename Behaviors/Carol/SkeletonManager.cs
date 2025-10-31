@@ -17,7 +17,7 @@ public class SkeletonManager : IDisposable
     MagicaManager MagicaManager;
     PelvisWatchdog targetPelvis;
 
-    Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = [];
+    Dictionary<string, Dictionary<string, Transform>> outfitBoneDicts = [];
 
     public SkeletonManager(CarolInstance player, GameObject parent)
     {
@@ -49,7 +49,11 @@ public class SkeletonManager : IDisposable
         Log.Debug($"AssignLiveBones({acc.Name})");
         if (acc is null) { Log.Error("Requested bones for null accessory"); return; }
 
-        var bespokeDict = GetAddBoneSet(acc.outfit);
+        var source = acc.Source == Constants.HairstyleSourceName ?
+            acc.Name : acc.Source; //if this is a hairstyle, use the hairstyle name not the source
+        //probbaly not a good system but i'm getting tired of this problem so we can fix it later if it matters
+
+        var bespokeDict = GetAddBoneSet(acc.Source, acc.BespokeBones);
         Transform[] liveBones = new Transform[acc.bones.Length];
         foreach (int i in Enumerable.Range(0, acc.bones.Length))
         {
@@ -62,14 +66,14 @@ public class SkeletonManager : IDisposable
         MagicaManager.HandleNewLiveAcc(acc);
     }
 
-    public Dictionary<string, Transform> GetAddBoneSet(Outfit outfit)
+    public Dictionary<string, Transform> GetAddBoneSet(string source, List<Transform> bespokeBones)
     {
-        Log.Debug($"AddBespokeBones({outfit.DisplayName})");
-        if (outfitBoneDicts.TryGetValue(outfit, out var dict)) return dict;
+        Log.Debug($"AddBespokeBones({source})");
+        if (outfitBoneDicts.TryGetValue(source, out var dict)) return dict;
 
         Log.Debug("Adding bones");
         Dictionary<string, Transform> boneDict = new(targetPelvis.BoneData.StandardBones);
-        foreach (var bespokeBone in outfit.boneData.BespokeBones)
+        foreach (var bespokeBone in bespokeBones)
         {
             Transform parentBone;
             if (!bespokeBone.parent){ parentBone = boneDict["Bn_CarolHead"]; }
@@ -82,8 +86,8 @@ public class SkeletonManager : IDisposable
                 .AllChildTransforms()
                 .ForEach(x => boneDict[x.name] = x);
         }
-        outfitBoneDicts[outfit] = boneDict;
-        MagicaManager.HandleNewOutfit(outfit);
+        outfitBoneDicts[source] = boneDict;
+        //if (acc.outfit is not null) MagicaManager.HandleNewOutfit(acc.outfit);
         return boneDict;
     }
 

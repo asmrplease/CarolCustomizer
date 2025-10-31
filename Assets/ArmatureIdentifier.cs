@@ -17,8 +17,10 @@ internal class ArmatureIdentifier
         [
             //Check<MonoBehaviour,  ArmatureType>,        (watchdog) => additional detection condition),
             (Check<VirtualCarol,    MPBotArmature>,       (x)=> true),
+            //toybox outfit preview
             (Check<Entity,          PlayerArmature>,      (x)=> x.rootName == "CAROL(Clone)"),
             (Check<Entity,          NPCArmature>,         (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
+            //zombie entity
             (Check<Entity,          SummerSlimeArmature>, (x)=> x.transform.parent.name == "SummerSlimegirl2019"),
             (Check<Entity,          CampaignBotArmature>, (x)=> true),
             (Check<CutsceneActor,   ActressArmature>,     (x)=> true),

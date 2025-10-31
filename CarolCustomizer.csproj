@@ -34,6 +34,9 @@
 		<Reference Include="Assembly">
 			<HintPath>lib\Assembly-CSharp.dll</HintPath>
 		</Reference>
+		<Reference Include="Assembly_Firstpass">
+			<HintPath>lib\Assembly-CSharp-firstpass.dll</HintPath>
+		</Reference>
 		<Reference Include="Rewired_Core">
 			<HintPath>lib\Rewired_Core.dll</HintPath>
 		</Reference>

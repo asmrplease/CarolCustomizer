@@ -44,7 +44,7 @@ public class PlayerArmature : MonoBehaviour, ICarolType
         if (!carolEntity) carolEntity = GetComponentInParent<Entity>();
         if (!carolEntity)
         {
-            Log.Error("Failed to find Entity during PlayerWatchdog.OnEnable()!");
+            Log.Warning("Failed to find Entity during PlayerWatchdog.OnEnable()!");
             PlayerInstances.DefaultPlayer.NotifySpawned(watchdog);
             return;
         }

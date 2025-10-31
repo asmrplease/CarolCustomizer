@@ -22,9 +22,9 @@ public class ThumbnailCamera : MonoBehaviour
 
     void Awake()
     {
-        Log.Debug("InsetCamera.Awake()");
+        Log.Debug("ThumbnailCamera.Awake()");
         camera = this.GetComponent<Camera>();
-        if (!camera) { Log.Error("InsetCamera instantiated on an object without a camera component!"); return; }
+        if (!camera) { Log.Error("ThumbnailCamera instantiated on an object without a camera component!"); return; }
 
         this.name = "Thumbnail Camera";
         var collider = GetComponent<SphereCollider>();
@@ -41,6 +41,9 @@ public class ThumbnailCamera : MonoBehaviour
 
         PlayerInstances.DefaultPlayer.SpawnEvent += HandleNewPelvis;
         Slate.Cutscene.OnCutsceneStopped += HandleCutsceneEnd;
+
+        if (GetComponent<HxVolumetricCamera>() is HxVolumetricCamera hxvc) { Destroy(hxvc); }
+        if (GetComponent<HxVolumetricImageEffect>() is HxVolumetricImageEffect hxvie) { Destroy(hxvie); }
 
         cameraController = this.GetComponent<CameraController>();
         if (!cameraController) { Log.Warning("didn't find cameracontroller component"); return; }
