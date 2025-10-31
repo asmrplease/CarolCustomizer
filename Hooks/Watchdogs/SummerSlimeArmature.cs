@@ -40,7 +40,7 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
         return this;
     }
 
-    public void CustomizeBot(Recipe recipe, OutfitManager outfitManager)
+    public void CustomizeBot(Recipe recipe, OutfitCoordinator outfitManager) 
     {
         if (!custom) return;
 

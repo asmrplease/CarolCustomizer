@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Hooks;
 using CarolCustomizer.Models.Outfits;
 using System.Linq;
 using UnityEngine;
@@ -19,10 +20,10 @@ public class StoredAccessory : AccessoryDescriptor
         DisplayName = Name.Split('_').Last();
     }
 
-    public LiveAccessory MakeLive(SkeletonManager skeleton, Transform folder)
+    public LiveAccessory MakeLive(SkeletonManager skeleton, FaceCopier faceCopier, Transform folder)
     {
         return outfit.FaceDefinition.Invoke(this.referenceSMR) ?
-            new LiveFace(this, skeleton, folder) :
+            new LiveFace(this, skeleton,faceCopier, folder) :
             new LiveAccessory(this, folder);
     }
 }

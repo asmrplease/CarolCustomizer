@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Hooks.Watchdogs;
@@ -22,7 +21,6 @@ public class FaceCopier : MonoBehaviour
     public FaceCopier Constructor(CarolInstance playerManager)
     {
         this.playerManager = playerManager;
-        this.playerManager.SpawnEvent += UpdateBaseFace;
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
         return this;
     }
@@ -34,12 +32,12 @@ public class FaceCopier : MonoBehaviour
 
     void OnDestroy()
     {
-        playerManager.SpawnEvent -= UpdateBaseFace;
+        playerManager.SpawnEvent -= HandleNewPelvis;
     }
     #endregion
 
     #region Source Management
-    public void UpdateBaseFace(PelvisWatchdog watchdog)
+    public void HandleNewPelvis(PelvisWatchdog watchdog)
     {
         this.baseFace = watchdog.CompData.BaseFace;
     }

@@ -3,7 +3,6 @@ using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CarolCustomizer.Models.Recipes;
 public class RecipeDescriptor24
@@ -38,15 +37,15 @@ public class RecipeDescriptor24
         Version = version;
     }
 
-    public RecipeDescriptor24(OutfitManager manager)
+    public RecipeDescriptor24(OutfitCoordinator manager)
     {
         BaseOutfitName = manager.ConfigurationSource;
         AnimatorSource = manager.AnimatorSource;
         ColliderSource = manager.ColliderSource;
         ActiveAccessories = manager.LiveAccessoryDescriptors;
         ActiveEffects = manager.ActiveEffects;
-        Hairstyle = manager.Hairstyle;
-        HairMaterial = manager.HairColor;
+        Hairstyle = manager.HairstyleName;
+        HairMaterial = manager.HairMaterialName;
         Version = PluginInfo.PLUGIN_VERSION;
     }
 }

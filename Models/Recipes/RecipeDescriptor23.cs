@@ -31,7 +31,7 @@ public class RecipeDescriptor23
         Version = version;
     }
 
-    public RecipeDescriptor23(OutfitManager manager)
+    public RecipeDescriptor23(OutfitCoordinator manager)
     {
         BaseOutfitName = manager.ConfigurationSource;
         AnimatorSource = manager.AnimatorSource;

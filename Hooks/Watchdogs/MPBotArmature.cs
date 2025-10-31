@@ -28,7 +28,7 @@ public class MPBotArmature : MonoBehaviour, ICarolType, ICarolBot
         watchdog.CompData.SetBaseVisibility(visible);
     }
 
-    public void CustomizeBot(Recipe recipe, OutfitManager outfit)
+    public void CustomizeBot(Recipe recipe, OutfitCoordinator outfit)
     {
         if (Settings.Plugin.customMPBots.Value is not true) return;
 

@@ -9,24 +9,62 @@ using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Carol;
-internal class MagicaManager(SkeletonManager skeleton)
+internal class MagicaManager
 {
     Dictionary<LiveAccessory, MagicaCloth> LiveCloths = [];
 
-    SkeletonManager skeleton = skeleton;
+    SkeletonManager skeleton;
     PelvisWatchdog targetPelvis;
 
     List<MagicaCloth> processing = [];
     Dictionary<AccessoryDescriptor, MagicaCloth> MeshClothAccs = [];
     List<MagicaCloth> BoneCloths = [];
+    Outfit colliderSource;
+
+    public string ColliderSourceName => colliderSource?.AssetName ?? Constants.Pyjamas;
+
+    public MagicaManager(SkeletonManager skeletonManager)
+    {
+        this.skeleton = skeletonManager;
+        this.skeleton.OnOutfitBonesAdded += HandleNewOutfit;
+        this.skeleton.OnLiveBonesAssigned += HandleNewLiveAcc;
+    }
 
     public void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
         Log.Debug("magicamanager.handleNewPelvis()");
         targetPelvis = newPelvis;
+        if (colliderSource is not null) ApplyCollider();
         MeshClothAccs.Clear();
         BoneCloths.Where(x => x).ForEach(GameObject.Destroy);
         BoneCloths.Clear();
+    }
+
+    public void SetColliderSource(Outfit outfit)
+    {
+        if (outfit is null) { Log.Warning("outfit was null when setting collider source"); return; }
+
+        colliderSource = outfit;
+        ApplyCollider();
+    }
+
+    void ApplyCollider()
+    {
+        if (!targetPelvis || targetPelvis.Behavior is null) return;
+
+        var sourceColliders = colliderSource
+            .magiData
+            .CapsuleColliders
+            .Where(x => x)
+            .ToDictionary(x => x.name);
+        targetPelvis.MagiData
+            .CapsuleColliders
+            .Select(x =>
+                (live: x
+                , found: sourceColliders.TryGetValue(x.name, out var reference)
+                , reference))
+            .Where(tup => tup.found)
+            .ForEach(tup => tup.live.CopyFrom(tup.reference));
     }
 
     public void HandleNewOutfit(Outfit outfit)
@@ -98,7 +136,6 @@ internal class MagicaManager(SkeletonManager skeleton)
         var boneDict = skeleton.GetAddBoneSet(acc.Source, acc.BespokeBones);
 
         referenceMagica.gameObject.SetActive(false);
-
         var liveMagica = GameObject.Instantiate(referenceMagica, targetPelvis.transform.parent);
         liveMagica.SerializeData.cullingSettings.cameraCullingMode = CullingSettings.CameraCullingMode.Off;
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();
