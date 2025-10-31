@@ -26,7 +26,7 @@ internal class MagicaManager
     public MagicaManager(SkeletonManager skeletonManager)
     {
         this.skeleton = skeletonManager;
-        this.skeleton.OnOutfitBonesAdded += HandleNewOutfit;
+        //this.skeleton.OnBonesAdded += HandleNewOutfit;
         this.skeleton.OnLiveBonesAssigned += HandleNewLiveAcc;
     }
 

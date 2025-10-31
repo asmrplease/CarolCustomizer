@@ -28,6 +28,7 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
     public PelvisWatchdog pelvis { get; private set; }
     public event Action<AccessoryChangedEvent> AccessoryChanged;
     public event Action<HairChangeEvent> HairstyleChanged;
+
     public string AnimatorSource => effectManager.AnimatorSource;
     public string ConfigurationSource => effectManager.ConfigurationSource;
     public string ColliderSource => magicaManager.ColliderSourceName;
@@ -59,10 +60,9 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
         this.magicaManager    = new MagicaManager(skeletonManager);
         this.effectManager    = new EffectManager(skeletonManager);
 
-
         carol.SpawnEvent += this.HandleNewPelvis;
-        carol.SpawnEvent += this.accessoryManager.HandleNewPelvis;
         carol.SpawnEvent += this.skeletonManager.HandleNewPelvis;
+        carol.SpawnEvent += this.accessoryManager.HandleNewPelvis;
         carol.SpawnEvent += this.magicaManager.HandleNewPelvis;
         carol.SpawnEvent += this.hairstyleManager.HandleNewPelvis;
         carol.SpawnEvent += this.faceCopier.HandleNewPelvis;

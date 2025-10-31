@@ -12,18 +12,14 @@ namespace CarolCustomizer.Behaviors.Carol;
 
 public class SkeletonManager
 {
-    public readonly FaceCopier faceCopier;
-    MagicaManager MagicaManager;
-    PelvisWatchdog targetPelvis;
-
     Dictionary<string, Dictionary<string, Transform>> outfitBoneDicts = [];
     PelvisWatchdog pelvis;
-    Dictionary<Outfit, Dictionary<string, Transform>> outfitBoneDicts = [];
     public event Action<LiveAccessory> OnLiveBonesAssigned;
-    public event Action<Outfit> OnOutfitBonesAdded;
+    public event Action<List<Transform>> OnBonesAdded;
 
     public void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
+        Log.Debug("SkeletonManager.HandleNewPelvis()");
         outfitBoneDicts
             .Values
             .SelectMany(dict => dict.Values)
@@ -63,7 +59,7 @@ public class SkeletonManager
         if (outfitBoneDicts.TryGetValue(source, out var dict)) return dict;
 
         Log.Debug("Adding bones");
-        Dictionary<string, Transform> boneDict = new(targetPelvis.BoneData.StandardBones);
+        Dictionary<string, Transform> boneDict = new(pelvis.BoneData.StandardBones);
         foreach (var bespokeBone in bespokeBones)
         {
             Transform parentBone;
@@ -77,8 +73,8 @@ public class SkeletonManager
                 .AllChildTransforms()
                 .ForEach(x => boneDict[x.name] = x);
         }
-        outfitBoneDicts[outfit] = boneDict;
-        OnOutfitBonesAdded?.Invoke(outfit);
+        outfitBoneDicts[source] = boneDict;
+        OnBonesAdded?.Invoke(bespokeBones);
         return boneDict;
     }
 }
