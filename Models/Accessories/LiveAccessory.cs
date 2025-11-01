@@ -32,7 +32,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
 
     public bool isActive { get; private set; } = false;
 
-    public LiveAccessory(StoredAccessory acc, Transform folder)
+    public LiveAccessory(StoredAccessory acc, Transform folder, MagicaCloth magica = null)
         : base(acc.Name, acc.Source)
     {
         this.folder = folder;
@@ -40,6 +40,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         this.outfit = acc.outfit;
         this.BespokeBones = outfit.boneData.BespokeBones;
         this.Materials = new MaterialDescriptor[acc.Materials.Length];
+        this.magicaCloth = magica;
         acc.Materials
             .Select((mat, i) => (mat, i))
             .ForEach(tup => Materials[tup.i] = tup.mat);
@@ -55,6 +56,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         this.BespokeBones = hair.BespokeBones;
         this.referenceSMR = hair.smr;
         this.Materials = new MaterialDescriptor[hair.smr.sharedMaterials.Length];
+        this.magicaCloth = hair.hairstyle.cloth;
         hair.smr.sharedMaterials
             .Select((mat, i) => (mat, i))
             .ForEach(tup => Materials[tup.i] = new MaterialDescriptor(tup.mat, hair.Source, MaterialDescriptor.SourceType.Hair));
@@ -63,6 +65,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
 
     void Reinstantiate()
     {
+        var savedBones = (liveSMR) ? liveSMR.bones : null;
         if (liveSMR) GameObject.Destroy(liveSMR.gameObject);
 
         var liveObj = UnityEngine.Object.Instantiate(referenceSMR.gameObject, folder);
@@ -77,6 +80,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         Materials
             .Select((mat, index) => (mat, index))
             .ForEach((tup) => liveSMR.ReplaceMaterialAtIndex(tup.mat.referenceMaterial, tup.index));
+        if (savedBones is not null) { Log.Debug($"applying saved bones to {liveSMR}"); liveSMR.bones = savedBones; }
         liveSMR.gameObject.SetActive(isActive);
     }
 

@@ -124,17 +124,18 @@ internal class MagicaManager
 
     public void HandleNewLiveAcc(LiveAccessory acc)
     {
-        if (!MeshClothAccs.TryGetValue(acc.AsDescriptor(), out var referenceMagica)) return;
-        Log.Debug($"HandleNewLiveAcc({acc.Name})");
+        //if (!MeshClothAccs.TryGetValue(acc.AsDescriptor(), out var referenceMagica)) return;
+        if (!acc.magicaCloth) return;
+        Log.Info($"MagicaManager.HandleNewLiveAcc({acc.Name})");
 
+        var referenceMagica = acc.magicaCloth;
         if (LiveCloths.TryGetValue(acc, out var existing) && existing) GameObject.Destroy(existing.gameObject);
-
         if (!acc.isActive) return;
 
         targetPelvis.AnimData.DisableAnimator();
-        MeshClothAccs.Remove(acc.AsDescriptor());
+        //MeshClothAccs.Remove(acc.AsDescriptor());
         var boneDict = skeleton.GetAddBoneSet(acc.Source, acc.BespokeBones);
-
+        
         referenceMagica.gameObject.SetActive(false);
         var liveMagica = GameObject.Instantiate(referenceMagica, targetPelvis.transform.parent);
         liveMagica.SerializeData.cullingSettings.cameraCullingMode = CullingSettings.CameraCullingMode.Off;
@@ -142,7 +143,7 @@ internal class MagicaManager
         liveMagica.SerializeData.sourceRenderers.Clear();
         liveMagica.SerializeData.rootBones.Clear();
         acc.AddToMagica(liveMagica);
-        skeleton.AssignLiveBones(acc);
+        //skeleton.AssignLiveBones(acc);
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.AddRange(
             targetPelvis
             .MagiData

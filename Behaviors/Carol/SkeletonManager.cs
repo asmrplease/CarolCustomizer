@@ -1,7 +1,6 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
-using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,6 @@ public class SkeletonManager
     Dictionary<string, Dictionary<string, Transform>> outfitBoneDicts = [];
     PelvisWatchdog pelvis;
     public event Action<LiveAccessory> OnLiveBonesAssigned;
-    public event Action<List<Transform>> OnBonesAdded;
 
     public void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
@@ -55,10 +53,13 @@ public class SkeletonManager
 
     public Dictionary<string, Transform> GetAddBoneSet(string source, List<Transform> bespokeBones)
     {
-        Log.Debug($"AddBespokeBones({source})");
-        if (outfitBoneDicts.TryGetValue(source, out var dict)) return dict;
+        if (source is null) { Log.Error("GetAddBoneSet was giving a null source string"); return null; }
+        if (bespokeBones is null) { Log.Error("GetAddBoneSet was given a null list of bones"); return null; }
 
-        Log.Debug("Adding bones");
+        Log.Debug($"GetAddBoneSet({source})");
+        if (outfitBoneDicts.TryGetValue(source, out var dict)) { Log.Debug("Returning cached bone dict"); return dict; }
+
+        Log.Debug($"Adding bone set for {source}");
         Dictionary<string, Transform> boneDict = new(pelvis.BoneData.StandardBones);
         foreach (var bespokeBone in bespokeBones)
         {
@@ -74,7 +75,6 @@ public class SkeletonManager
                 .ForEach(x => boneDict[x.name] = x);
         }
         outfitBoneDicts[source] = boneDict;
-        OnBonesAdded?.Invoke(bespokeBones);
         return boneDict;
     }
 }

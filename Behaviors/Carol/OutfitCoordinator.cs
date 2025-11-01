@@ -50,6 +50,8 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
     public void EnableAccessory(StoredAccessory accessory) => accessoryManager.EnableAccessory(accessory);
     public void DisableAccessory(StoredAccessory accessory) => accessoryManager.DisableAccessory(accessory);
     public MaterialDescriptor[] GetLiveMaterials(StoredAccessory accessory) => accessoryManager?.GetLiveMaterials(accessory);
+    public void HandleNewPelvis(PelvisWatchdog watchdog) => this.pelvis = watchdog;
+
 
     public OutfitCoordinator(CarolInstance carol, GameObject parent)
     {
@@ -61,18 +63,16 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
         this.effectManager    = new EffectManager(skeletonManager);
 
         carol.SpawnEvent += this.HandleNewPelvis;
+        carol.SpawnEvent += this.magicaManager.HandleNewPelvis;
         carol.SpawnEvent += this.skeletonManager.HandleNewPelvis;
         carol.SpawnEvent += this.accessoryManager.HandleNewPelvis;
-        carol.SpawnEvent += this.magicaManager.HandleNewPelvis;
+        carol.SpawnEvent += this.effectManager.HandleNewPelvis;
         carol.SpawnEvent += this.hairstyleManager.HandleNewPelvis;
         carol.SpawnEvent += this.faceCopier.HandleNewPelvis;
-        carol.SpawnEvent += this.effectManager.HandleNewPelvis;
 
         this.hairstyleManager.HairstyleChanged += OnHairChanged;
         this.accessoryManager.AccessoryChanged += OnAccessoryChanged;
     }
-
-    public void HandleNewPelvis(PelvisWatchdog watchdog) => this.pelvis = watchdog;
 
     public void Dispose()
     {

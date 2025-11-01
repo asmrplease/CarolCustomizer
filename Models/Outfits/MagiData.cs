@@ -28,6 +28,8 @@ public class MagiData : MonoBehaviour
     [SerializeField]
     public MagicaClothCompanion ClothCompanion;
 
+    public Dictionary<SkinnedMeshRenderer, MagicaCloth> smrMeshClothDict = [];
+
     public MagiData Constructor()
     {
         MagicaCloths = transform
@@ -42,6 +44,17 @@ public class MagiData : MonoBehaviour
         MeshCloths = MagicaCloths
             .Where(x => x.SerializeData.clothType == ClothType.MeshCloth)
             .ToList();
+
+        MeshCloths
+            .Select(meshCloth => (meshCloth, renderers: meshCloth.SerializeData.sourceRenderers))
+            .ForEach(tup =>
+            {
+                tup.renderers
+                    .Where(renderer => renderer.GetType() == typeof(SkinnedMeshRenderer))
+                    .Select(renderer => renderer as SkinnedMeshRenderer)
+                    .ForEach(smr => smrMeshClothDict.Add(smr, tup.meshCloth));
+            });
+        Log.Debug($"Found {smrMeshClothDict.Count()} smrs with meshcloths");
 
         BoneCloths = MagicaCloths
             .Where(x => x.SerializeData.clothType == ClothType.BoneCloth)
