@@ -65,7 +65,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
 
     void Reinstantiate()
     {
-        var savedBones = (liveSMR) ? liveSMR.bones : null;
+        Log.Debug($"LiveAccessory {this.Name}.Reinstantiate()");
         if (liveSMR) GameObject.Destroy(liveSMR.gameObject);
 
         var liveObj = UnityEngine.Object.Instantiate(referenceSMR.gameObject, folder);
@@ -80,7 +80,6 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         Materials
             .Select((mat, index) => (mat, index))
             .ForEach((tup) => liveSMR.ReplaceMaterialAtIndex(tup.mat.referenceMaterial, tup.index));
-        if (savedBones is not null) { Log.Debug($"applying saved bones to {liveSMR}"); liveSMR.bones = savedBones; }
         liveSMR.gameObject.SetActive(isActive);
     }
 

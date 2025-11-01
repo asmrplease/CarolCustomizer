@@ -97,7 +97,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         liveAccessories
             .Values
             .Where(x => x.isActive)
-            .ForEach(skeletonManager.AssignLiveBones);
+            .ForEach(x => skeletonManager.AssignLiveBones(x, true));
     }
 
     void OnPelvisVisibleChanged(bool visible) =>

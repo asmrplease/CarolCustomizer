@@ -51,7 +51,8 @@ public static class RecipeApplier
         outfit.Variants.TryGetValue(variantName, out var variantAccs);
         if (variantAccs is null) { Log.Warning($"variant {variantName} not found in {outfit.DisplayName}"); return; }
 
-        outfitManager.SetHairstyle(outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>());
+        var hairstyle = outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>();
+        outfitManager.SetHairstyle(new StoredHair(hairstyle));
         outfitManager.SetHairColor(outfit.modelData.defaultHaircolor);
         variantAccs.ForEach(x => SetAccessory(outfitManager, x));
         outfitManager.SetEffect(outfit, true);
@@ -80,7 +81,9 @@ public static class RecipeApplier
         {
             Log.Info("hair accessory was missing, setting hairstyle to outfit's hair.");
             var outfit = accessory.outfit as HaDSOutfit;
-            target.SetHairstyle(outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>());
+            var hairstyle = outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>();
+            var storedHair = new StoredHair(hairstyle);
+            target.SetHairstyle(storedHair);
             target.SetHairColor(outfit.modelData.defaultHaircolor);
             return;
         }

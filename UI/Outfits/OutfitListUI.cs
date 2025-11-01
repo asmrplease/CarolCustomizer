@@ -3,6 +3,7 @@ using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Events;
+using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
@@ -67,7 +68,7 @@ public class OutfitListUI : MonoBehaviour
         return this;
     }
 
-    private void HandleHairLoaded((List<Hairstyle> styles, List<HairDye> colors) hairData)
+    private void HandleHairLoaded((List<StoredHair> styles, List<HairDye> colors) hairData)
     {
         Log.Debug("OutfitListUI.HandleHairLoaded");
         ColorSelector = transform
@@ -89,7 +90,7 @@ public class OutfitListUI : MonoBehaviour
             .Select(x => new Dropdown.OptionData() { text = LocalizationIndex.GetLine(x.localizationName) })
             .ForEach(ColorSelector.options.Add);
         hairData.styles
-            .Select(x => new Dropdown.OptionData() { text =  x.name})
+            .Select(x => new Dropdown.OptionData() { text =  x.DisplayName})
             .ForEach(ModelSelector.options.Add);
         Log.Debug($"hair ui initialized, {ModelSelector.options.Count()} model options and {ColorSelector.options.Count()} color options.");
     }

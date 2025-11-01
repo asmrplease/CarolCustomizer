@@ -143,7 +143,7 @@ internal class MagicaManager
         liveMagica.SerializeData.sourceRenderers.Clear();
         liveMagica.SerializeData.rootBones.Clear();
         acc.AddToMagica(liveMagica);
-        //skeleton.AssignLiveBones(acc);
+        skeleton.AssignLiveBones(acc, false);
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.AddRange(
             targetPelvis
             .MagiData

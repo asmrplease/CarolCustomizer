@@ -29,7 +29,7 @@ public class SkeletonManager
         pelvis = newPelvis;
     }
 
-    public void AssignLiveBones(LiveAccessory acc)
+    public void AssignLiveBones(LiveAccessory acc, bool notify = true)
     {
         Log.Debug($"AssignLiveBones({acc.Name})");
         if (acc is null) { Log.Error("Requested bones for null accessory"); return; }
@@ -48,7 +48,7 @@ public class SkeletonManager
         bespokeDict.TryGetValue(acc.RootBoneName, out var rootBone);
         rootBone ??= pelvis.BoneData.StandardBones["CarolPelvis"];
         acc.SetLiveBones(liveBones, rootBone);
-        OnLiveBonesAssigned?.Invoke(acc);
+        if (notify) OnLiveBonesAssigned?.Invoke(acc);
     }
 
     public Dictionary<string, Transform> GetAddBoneSet(string source, List<Transform> bespokeBones)

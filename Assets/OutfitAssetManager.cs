@@ -16,10 +16,10 @@ public class OutfitAssetManager : IDisposable
     public static Action<Outfit> OnOutfitUnloaded;
     public static Action OnOutfitSetLoaded;
     public static Action OnOutfitSetUnloaded;
-    public static event Action<(List<Hairstyle>, List<HairDye>)> OnHairLoaded;
+    public static event Action<(List<StoredHair>, List<HairDye>)> OnHairLoaded;
 
     public static Dictionary<string, Dictionary<string, HaDSOutfit>> outfitSets = new();
-    public static List<Hairstyle> Hairstyles = new();
+    public static List<StoredHair> Hairstyles = new();
     public static Dictionary<string, HairDye> HairColors = new();
 
     public OutfitAssetManager(Transform parent)
@@ -54,10 +54,10 @@ public class OutfitAssetManager : IDisposable
         return outfit.GetAccessory(descriptor);
     }
 
-    public static Hairstyle GetHairstyle(string name)
+    public static StoredHair GetHairstyle(string name)
     {
-        var hair = Hairstyles.FirstOrDefault(x => x.name == name);
-        if (!hair) Log.Warning($"When searching for hairstyle '{name}', no results were found. ");
+        var hair = Hairstyles.FirstOrDefault(x => x.AssetName == name);
+        if (hair is null) Log.Warning($"When searching for hairstyle '{name}', no results were found. ");
         return hair;
     }
 
@@ -68,7 +68,7 @@ public class OutfitAssetManager : IDisposable
         return style.material;
     }
 
-    public static void NotifyHairReady(List<Hairstyle> hair, List<HairDye> dye)
+    public static void NotifyHairReady(List<StoredHair> hair, List<HairDye> dye)
     {
         Hairstyles.AddRange(hair);
         //TODO: this will fail if we ever load more hair dye colors

@@ -37,7 +37,7 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
     public IEnumerable<string> ActiveEffects => effectManager.ActiveEffects;
     public string HairstyleName => hairstyleManager.HairstyleName;
     public string HairMaterialName => hairstyleManager.HairMaterialName;
-    public void SetHairstyle(Hairstyle style) => hairstyleManager.AssignHairstyle(style);
+    public void SetHairstyle(StoredHair style) =>  hairstyleManager.AssignHairstyle(style.hairstyle);
     public void SetHairColor(Material hairMat, bool dissolve = false) => hairstyleManager.AssignMaterial(hairMat, dissolve);
     public void SetEffect(Outfit source, bool enabled) => effectManager.SetEffect(source, enabled);
     public void SetAnimator(Outfit source) => effectManager.SetAnimator(source);
