@@ -67,22 +67,26 @@ internal class MagicaManager
             .ForEach(tup => tup.live.CopyFrom(tup.reference));
     }
 
-    public void HandleNewOutfit(Outfit outfit)
+    public void SetupAccessoryMagica(LiveAccessory acc)
     {
         //Log.Info($"MagicaManager.HandleNewOutfit({outfit.DisplayName}");
         if (!targetPelvis) { Log.Warning("MagicaManager had no pelvis during HandleNewOutfit"); return; }
 
-        var magiData = outfit.magiData;
-        magiData.MeshCloths.ForEach(x => MeshClothSetup(x, outfit));
-        magiData.BoneCloths.ForEach(x => BoneClothSetup(x, outfit));
-        magiData.BoneSprings.ForEach(x => BoneSpringSetup(x, outfit));
+        var magiData = acc.magicaCloth;
+        switch(magiData.SerializeData.clothType)
+        {
+            case ClothProcess.ClothType.MeshCloth: MeshClothSetup(magiData, acc); break;
+            case ClothProcess.ClothType.BoneCloth: BoneClothSetup(magiData, acc); break;
+            case ClothProcess.ClothType.BoneSpring: BoneSpringSetup(magiData, acc); break;
+            default: break;
+        }
     }
 
-    void BoneClothSetup(MagicaCloth magica, Outfit outfit)
+    void BoneClothSetup(MagicaCloth magica, LiveAccessory acc)
     {
-        Log.Debug($"BoneClothSetup({magica.name}, {outfit.DisplayName})");
+        Log.Debug($"BoneClothSetup({magica.name}, {acc.Name})");
         var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
-        liveMagica.name = outfit.DisplayName + " BoneCloth";
+        liveMagica.name = acc.Name + " BoneCloth";
         targetPelvis.AnimData.DisableAnimator();
         //liveMagica.ReplaceTransform(skeleton.GetAddBoneSet(outfit));
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();
@@ -100,26 +104,23 @@ internal class MagicaManager
         magica.gameObject.SetActive(true);
     }
 
-    void MeshClothSetup(MagicaCloth magica, Outfit outfit)
+    void MeshClothSetup(MagicaCloth magica, LiveAccessory acc)
     {
-        magica
-            .SerializeData
-            .sourceRenderers
-            .Where(x => 
-                x.GetType() == typeof(SkinnedMeshRenderer))
-            .Select(x =>
-                new AccessoryDescriptor(
-                    x as SkinnedMeshRenderer,
-                    outfit.AssetName))
-            .ToDictionary(
-                x => x,
-                x => magica)
-            .ForEach(x => MeshClothAccs[x.Key] = x.Value);
+        //magica
+        //    .SerializeData
+        //    .sourceRenderers
+        //    .Where(x => 
+        //        x.GetType() == typeof(SkinnedMeshRenderer))
+        //    .Select(x => x )
+        //    .ToDictionary(
+        //        x => x,
+        //        x => magica)
+        //    .ForEach(x => MeshClothAccs[x.Key] = x.Value);
     }
 
-    void BoneSpringSetup(MagicaCloth magica, Outfit outfit)
+    void BoneSpringSetup(MagicaCloth magica, LiveAccessory acc)
     {
-        Log.Warning($"{outfit.DisplayName} had BoneSpring component {magica.name}, but CarolCustomizer has not implemented any bonespring handling behavior");
+        Log.Warning($"{acc.Name} had BoneSpring component {magica.name}, but CarolCustomizer has not implemented any bonespring handling behavior");
     }
 
     public void HandleNewLiveAcc(LiveAccessory acc)
@@ -128,6 +129,7 @@ internal class MagicaManager
         if (!acc.magicaCloth) return;
         Log.Info($"MagicaManager.HandleNewLiveAcc({acc.Name})");
 
+        SetupAccessoryMagica(acc);
         var referenceMagica = acc.magicaCloth;
         if (LiveCloths.TryGetValue(acc, out var existing) && existing) GameObject.Destroy(existing.gameObject);
         if (!acc.isActive) return;

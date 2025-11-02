@@ -34,7 +34,6 @@ internal class HairstyleManager : IDisposable
         targetPelvis = newPelvis;
         InstantiateHairstyle();
         ApplyMaterial();
-        UpdateColliders();
     }
 
     public void AssignHairstyle(Hairstyle hairstyle)
@@ -89,6 +88,14 @@ internal class HairstyleManager : IDisposable
         smr.ReplaceMaterialAtIndex(hairMaterial, hairstyle.mainMaterialIndex);
     }
 
+    void InstantiateHairstyle2()
+    {
+        if (liveHair) GameObject.DestroyImmediate(liveHair);
+        if (hairstyle is null) { Log.Warning("no valid hairstyle during HairstyleManager.InstantiateHairstyle"); return; }
+        if (!targetPelvis) { Log.Error("No valid pelvis during HairstyleManager.InstantiateHairstyle()"); return; }
+
+    }
+
     void InstantiateHairstyle()
     {
         if (liveHair) GameObject.DestroyImmediate(liveHair);
@@ -99,23 +106,20 @@ internal class HairstyleManager : IDisposable
         if (!head) { Log.Error("No valid headbone when instantiating hairstyle"); return; }
 
         var onModelHairstyles = head.GetComponentsInChildren<Hairstyle>(true);
-
-        Log.Info($"Found {onModelHairstyles.Count()} hairstyles during InstantiateHairstyle()");
-
+        Log.Debug($"Found {onModelHairstyles.Count()} hairstyles during InstantiateHairstyle()");
         onModelHairstyles
             .Select(x => x.gameObject)
-            .ForEach(x => Log.Debug($"InstantiateHairstyle Found {x.name}"));
-        //.ForEach(x => x.gameObject.SetActive(false));
-        onModelHairstyles
-            .Select(x => x.model)
-            //.ForEach(x => x.gameObject.SetActive(false));
             .ForEach(GameObject.Destroy);
-
+        Log.Debug($"Instantiating Hairstyle {hairstyle.name}");
         liveHair = GameObject.Instantiate(hairstyle.spawnPrefab, head.transform);
         if (!liveHair) { Log.Error("Failed to instantiate liveHair during InstantiateHairstyle"); return; }
 
-        Log.Debug($"Instantiating Hairstyle {hairstyle.name}");
+        if (targetPelvis.gameObject.GetComponentInParent<Entity>() is Entity player)
+        {
+            player.inventory.currentHairstyle = liveHair;
+        }
         liveHair.transform.localScale = Vector3.one;
+        liveHair.transform.ResetLocalPosRot();
         liveHair.gameObject.SetActive(true);
         liveHair.GetComponentsInChildren<SkinnedMeshRenderer>(true)
             .ForEach(x => 
@@ -127,6 +131,7 @@ internal class HairstyleManager : IDisposable
                 x.updateWhenOffscreen = true;
             });
         Log.Info("InstantiateHairstyle() Complete.");
+        UpdateColliders();
     }
 
     public void UpdateColliders()

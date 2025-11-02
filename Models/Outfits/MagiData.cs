@@ -45,7 +45,7 @@ public class MagiData : MonoBehaviour
             .Where(x => x.SerializeData.clothType == ClothType.MeshCloth)
             .ToList();
 
-        MeshCloths
+        MeshCloths//bonecloths don't have links to specific accessories? 
             .Select(meshCloth => (meshCloth, renderers: meshCloth.SerializeData.sourceRenderers))
             .ForEach(tup =>
             {
