@@ -12,11 +12,19 @@ namespace CarolCustomizer.Models.Accessories;
 public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
 {
     public readonly string Name;
-    public readonly string Source;
+    public readonly SourceDescriptor Source;
     public MaterialDescriptor[] Materials;
 
     [JsonConstructor]
     public AccessoryDescriptor(string name, string source, MaterialDescriptor[] materials)
+    {
+        Name = name;
+        Source = new SourceDescriptor(source);
+        Materials = materials;
+    }
+
+    [JsonConstructor]
+    public AccessoryDescriptor(string name,  SourceDescriptor source, MaterialDescriptor[] materials)
     {
         Name = name;
         Source = source;
@@ -26,12 +34,12 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
     public AccessoryDescriptor(string name, string source)
     {
         Name = name;
-        Source = source;
+        Source = new SourceDescriptor(source);
         //does having an empty list of materials cause problems here?
         //only thing that uses this is LiveAccessory
     }
 
-    public AccessoryDescriptor(SkinnedMeshRenderer smr, string source)
+    public AccessoryDescriptor(SkinnedMeshRenderer smr, SourceDescriptor source)
     {
         if (!smr) Log.Error($"AccessoryDescriptor in {source} was passed a null smr.");
 
@@ -42,7 +50,7 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
         int index = 0;
         foreach (var material in smr.materials)
         {
-            Materials[index++] = new(material, source, MaterialDescriptor.SourceType.AssetBundle);
+            Materials[index++] = new MaterialDescriptor(material, source);
         }
     }
 

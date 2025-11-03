@@ -11,7 +11,7 @@ namespace CarolCustomizer.Behaviors.Carol;
 
 public class SkeletonManager
 {
-    Dictionary<string, Dictionary<string, Transform>> outfitBoneDicts = [];
+    Dictionary<SourceDescriptor, Dictionary<string, Transform>> outfitBoneDicts = [];
     PelvisWatchdog pelvis;
     public event Action<LiveAccessory> OnLiveBonesAssigned;
 
@@ -34,8 +34,9 @@ public class SkeletonManager
         Log.Debug($"AssignLiveBones({acc.Name})");
         if (acc is null) { Log.Error("Requested bones for null accessory"); return; }
 
-        var source = acc.Source == Constants.HairstyleSourceName ?
-            acc.Name : acc.Source; //if this is a hairstyle, use the hairstyle name not the source
+        var source = OutfitAssetManager.GetAccessorySource(acc.Source);
+        //var source = acc.Source == Constants.HairstyleSourceName ?
+        //    acc.Name : acc.Source; //if this is a hairstyle, use the hairstyle name not the source
         //probbaly not a good system but i'm getting tired of this problem so we can fix it later if it matters
 
         var bespokeDict = GetAddBoneSet(acc.Source, acc.BespokeBones);
@@ -51,7 +52,7 @@ public class SkeletonManager
         if (notify) OnLiveBonesAssigned?.Invoke(acc);
     }
 
-    public Dictionary<string, Transform> GetAddBoneSet(string source, List<Transform> bespokeBones)
+    public Dictionary<string, Transform> GetAddBoneSet(SourceDescriptor source, List<Transform> bespokeBones)
     {
         if (source is null) { Log.Error("GetAddBoneSet was giving a null source string"); return null; }
         if (bespokeBones is null) { Log.Error("GetAddBoneSet was given a null list of bones"); return null; }

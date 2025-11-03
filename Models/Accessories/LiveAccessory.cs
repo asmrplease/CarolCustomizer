@@ -33,7 +33,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
     public bool isActive { get; private set; } = false;
 
     public LiveAccessory(StoredAccessory acc, Transform folder, MagicaCloth magica = null)
-        : base(acc.Name, acc.Source)
+        : base(acc.referenceSMR, acc.Source)
     {
         this.folder = folder;
         this.referenceSMR = acc.referenceSMR;
@@ -48,7 +48,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
     }
 
     public LiveAccessory(StoredHair hair, Transform folder)
-        :base (hair.Name, hair.Source)
+        :base (hair.smr, hair.Source)
     {
         this.folder = folder;
         this.referenceSMR = hair.smr;
@@ -59,7 +59,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         this.magicaCloth = hair.hairstyle.cloth;
         hair.smr.sharedMaterials
             .Select((mat, i) => (mat, i))
-            .ForEach(tup => Materials[tup.i] = new MaterialDescriptor(tup.mat, hair.Source, MaterialDescriptor.SourceType.Hair));
+            .ForEach(tup => Materials[tup.i] = new MaterialDescriptor(tup.mat, hair.Source));
         Reinstantiate();
     }
 

@@ -15,7 +15,7 @@ public class StoredAccessory : AccessoryDescriptor
     public string DisplayName;
 
     public StoredAccessory(Outfit outfit, SkinnedMeshRenderer smr)
-        : base(smr, outfit.AssetName)
+        : base(smr, new SourceDescriptor(outfit.AssetName, SourceType.Outfit))
     {
         this.outfit = outfit;
         referenceSMR = smr;

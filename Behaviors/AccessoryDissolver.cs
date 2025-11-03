@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
@@ -108,7 +109,7 @@ internal static class AccessoryDissolver
         var accs = outfitManager.ActiveAccessories;
         var liveDescriptions = outfitManager.LiveAccessoryDescriptors;
         var hairColor = outfitManager.HairMaterialName;
-        var dissolveMat = new MaterialDescriptor(dissolveMaterial, "Resources", MaterialDescriptor.SourceType.Resources);
+        var dissolveMat = new MaterialDescriptor(dissolveMaterial, "Resources", SourceType.Resources);
         Dictionary<StoredAccessory, MaterialDescriptor[]> originalMaterials = [];
 
         foreach (var acc in accs)

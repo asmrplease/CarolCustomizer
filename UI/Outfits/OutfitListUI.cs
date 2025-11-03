@@ -138,7 +138,7 @@ public class OutfitListUI : MonoBehaviour
             Settings.Favorites
                 .favorites
                 .Select(acc =>  
-                    (outfit: OutfitAssetManager.GetOutfitByAssetName(acc.Source)
+                    (outfit: OutfitAssetManager.GetOutfitByAssetName(acc.Source.Name)
                     ,acc))
                 .Where(tup => tup.outfit is not null)
                 .ForEach(tup => outfitUIs[tup.outfit].SetAccUIVisible(tup.acc));
@@ -200,7 +200,7 @@ public class OutfitListUI : MonoBehaviour
     {
         Settings.Favorites.favorites
             .ToList()
-            .Select(acc => OutfitAssetManager.GetOutfitByAssetName(acc.Source))
+            .Select(acc => OutfitAssetManager.GetOutfitByAssetName(acc.Source.Name))
             .Where(outfit => outfit is not null)
             .Distinct()
             .Select(outfit => (found: outfitUIs.TryGetValue(outfit, out var UI), UI))

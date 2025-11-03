@@ -1,4 +1,6 @@
 ﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Models;
+using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using System;
 using System.Collections.Generic;
@@ -55,7 +57,7 @@ internal class Eyedropper : MonoBehaviour
             .Concat(hit.GetComponentsInParent<Renderer>(true))
             .SelectMany(x => x.materials)
             .Distinct()
-            .Select(x => new MaterialDescriptor(x, scene, MaterialDescriptor.SourceType.World))
+            .Select(x => new MaterialDescriptor(x, new SourceDescriptor(scene, SourceType.World)))
             .ToList();
         if (results.Any()) OnMaterialsFound?.Invoke(results);
     }

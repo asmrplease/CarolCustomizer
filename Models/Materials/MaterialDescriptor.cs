@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace CarolCustomizer.Models.Materials;
 public class MaterialDescriptor : IEquatable<MaterialDescriptor>, IComparable<MaterialDescriptor>
 {
     public string Name;
-    public string Source;
+    public SourceDescriptor Source;
     public SourceType Type;
 
     [JsonIgnore]
@@ -18,25 +19,21 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>, IComparable<Ma
     public MaterialDescriptor(string name, string source, SourceType type)
     {
         Name = name;
-        Source = source;
-        Type = type;
+        Source = new SourceDescriptor(source, type);
         referenceMaterial = null;
     }
 
     public MaterialDescriptor(Material material, string sourceName, SourceType type)
     {
         referenceMaterial = material;
-        Source = sourceName;
+        Source = new SourceDescriptor(sourceName, type);
         Name = material.name;
-        Type = type;
     }
 
-    public enum SourceType
+    public MaterialDescriptor(Material material, SourceDescriptor descriptor)
     {
-        AssetBundle = 0,
-        World = 1,
-        Resources = 2,
-        Hair = 3,
+        referenceMaterial = material;
+        Source = descriptor;
     }
 
     public bool Equals(MaterialDescriptor other)

@@ -1,7 +1,9 @@
-﻿using CarolCustomizer.Hooks.Watchdogs;
+﻿using CarolCustomizer.Contracts;
+using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
+using MagicaCloth2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,7 @@ using UnityEngine;
 
 namespace CarolCustomizer.Models.Outfits;
 
-public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
+public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAccessorySource
 {
     #region Dependencies
     public Transform storedAsset { get; protected set; }
@@ -21,19 +23,37 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
     virtual public Sprite Sprite => null;
     virtual public string Author => "Crimson Tales";
 
+    public SourceDescriptor Descriptor { get; private set; }
+
     virtual public RuntimeAnimatorController RuntimeAnimator => null;
 
     protected Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = [];
 
     public List<StoredAccessory> Accessories => AccDict.Values.ToList();
     public List<OutfitEffect> Effects { get; protected set; } = [];
-    public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = [];
+    public Dictionary<MaterialDescriptor, MaterialDescriptor> MaterialDescriptors { get; private set; } = [];
 
     public PelvisWatchdog prefabWatchdog { get; private set; }
     public BoneData boneData => prefabWatchdog.BoneData;
     public CompData compData => prefabWatchdog.CompData;
     public MagiData magiData => prefabWatchdog.MagiData;
     virtual public Func<SkinnedMeshRenderer, bool> FaceDefinition => (x) => x.name == "tete";
+
+    public MaterialDescriptor GetMaterial(MaterialDescriptor descriptor)
+    {
+        MaterialDescriptors.TryGetValue(descriptor, out var result);
+        return result;
+    }
+
+    public List<Transform> GetBespokeBones()
+    {
+        return boneData.BespokeBones;
+    }
+   
+    public List<MagicaCloth> GetBoneCloths()
+    {
+        return magiData.BoneCloths;
+    }
 
     #endregion
 
@@ -45,6 +65,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
         this.storedAsset = storedAsset;
         AssetName = storedAsset.name;
         DisplayName = LocalizationIndex.GetLine(this.storedAsset.gameObject.name);
+        Descriptor = new SourceDescriptor(AssetName, SourceType.Outfit);
         var pelvis = storedAsset.RecursiveFindTransform(x => x.name == "CarolPelvis");
         if (!pelvis) { Log.Error("failed to find pelvis during Outfit construction."); return; }
 
@@ -69,7 +90,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>
             .ForEach(acc => AccDict[acc] = acc)
             .SelectMany(acc => acc.Materials)
             .Where(mat => mat is not null)
-            .ForEach(mat => MaterialDescriptors.Add(mat));
+            .ForEach(mat => MaterialDescriptors.Add(mat, mat));
 
         foreach (var effect in compData.EffectBehaviours)
         {

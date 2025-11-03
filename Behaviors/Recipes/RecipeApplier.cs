@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
@@ -99,7 +100,7 @@ public static class RecipeApplier
     static void SetMaterial(OutfitCoordinator target, StoredAccessory accessory, MaterialDescriptor materialDescription, int index)
     {
         Log.Debug("setting material...");
-        if (materialDescription.Type == MaterialDescriptor.SourceType.World)
+        if (materialDescription.Type == SourceType.World)
         {
             Log.Info("Attempting to load world material");
             CCPlugin
@@ -111,19 +112,19 @@ public static class RecipeApplier
                         (x) => target.PaintAccessory(accessory, x, index))
                 );
         }
-        else if (materialDescription.Type == MaterialDescriptor.SourceType.AssetBundle)
+        else if (materialDescription.Type == SourceType.Outfit)
         {
-            var outfit = OutfitAssetManager.GetOutfitByAssetName(materialDescription.Source);
-            if (outfit is null) { Log.Warning($"failed to find {materialDescription.Source}."); return; }
+            var source = OutfitAssetManager.GetAccessorySource(materialDescription.Source);
+            if (source is null) { Log.Warning($"failed to find {materialDescription.Source}."); return; }
             Log.Debug("found outfit again...");
-            if (outfit.MaterialDescriptors is null) { Log.Warning($"failed to get {materialDescription.Source} MaterialDescriptors"); return; }
+            //if (source.MaterialDescriptors is null) { Log.Warning($"failed to get {materialDescription.Source} MaterialDescriptors"); return; }
 
-            outfit.MaterialDescriptors.TryGetValue(materialDescription, out var liveMaterial);
+            var liveMaterial = source.GetMaterial(materialDescription);
             if (liveMaterial is null) { Log.Warning($"failed to find {materialDescription.Name} in source {materialDescription.Source}"); return; }
 
             target.PaintAccessory(accessory, liveMaterial, index);
         }
-        else if (materialDescription.Type == MaterialDescriptor.SourceType.Resources)
+        else if (materialDescription.Type == SourceType.Resources)
         {
             //we shouldn't be saving materials of this type probably idk lol
         }
@@ -131,12 +132,12 @@ public static class RecipeApplier
         
     }
 
-    public static IEnumerable<(string, SourceType)> GetMatSources(RecipeDescriptor recipe)
+    public static IEnumerable<SourceDescriptor> GetMatSources(RecipeDescriptor recipe)
     {
         var matSources = recipe
             .ActiveAccessories
             .SelectMany(x => x.Materials)
-            .Select(x => (x.Source, x.Type))
+            .Select(x => x.Source)
             .Distinct();
         return matSources;
     }
@@ -154,12 +155,12 @@ public static class RecipeApplier
     {
         var accSources = recipe
             .ActiveAccessories
-            .Select(x => x.Source);
+            .Select(x => x.Source.Name);
         var matSources = recipe
             .ActiveAccessories
             .SelectMany(x => x.Materials)
             .Where(x => x.Type != SourceType.World)
-            .Select(x => x.Source);
+            .Select(x => x.Source.Name);
         return accSources
             .Concat(matSources)
             .Concat(recipe.ActiveEffects)

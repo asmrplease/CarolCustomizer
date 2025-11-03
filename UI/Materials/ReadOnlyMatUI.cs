@@ -35,7 +35,7 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
         displayName.text = this.material.Name.DeInstance();
 
         sceneName = transform.Find(materialNameAddress).GetComponent<Text>();
-        sceneName.text = material.Source;
+        sceneName.text = material.Source.Name;
 
         var toggle = transform.Find(toggleAddress).gameObject;
         GameObject.Destroy(toggle.GetComponent<Toggle>());
@@ -61,7 +61,7 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
 
     void LoadMaterial()
     {
-        string scene = this.material.Source;
+        string scene = this.material.Source.Name;
         CCPlugin.CoroutineRunner.StartCoroutine(SceneResourceProvider.BatchQueueAndThen(
             this.material,
             (_) => { }));

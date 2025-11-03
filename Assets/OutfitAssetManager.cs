@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Models.Accessories;
+﻿using CarolCustomizer.Contracts;
+using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using Onirism.Gameplay;
@@ -45,13 +46,23 @@ public class OutfitAssetManager : IDisposable
             .result;
     }
 
+    public static IAccessorySource GetAccessorySource(SourceDescriptor descriptor)
+    {
+        Dictionary<SourceDescriptor, IAccessorySource> sources = [];
+        if (sources.TryGetValue(descriptor, out IAccessorySource result)) return result;
+
+        Log.Warning($"No source of type {descriptor.Type} named {descriptor.Name} was found.");
+        return null;
+    }
+
     public static StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
     {
-        var outfit = GetOutfitByAssetName(descriptor.Source);
-        if (outfit is null) { Log.Warning($"failed to find outfit {descriptor.Source}."); return null; }
+        //var outfit = GetOutfitByAssetName(descriptor.Source);
+        var source = GetAccessorySource(descriptor.Source);
+        if (source is null) { Log.Warning($"failed to find outfit {descriptor.Source}."); return null; }
 
         Log.Debug("found source");
-        return outfit.GetAccessory(descriptor);
+        return source.GetAccessory(descriptor);
     }
 
     public static StoredHair GetHairstyle(string name)

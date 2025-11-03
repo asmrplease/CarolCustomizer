@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Models.Materials;
+﻿using CarolCustomizer.Models;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections;
@@ -22,7 +23,7 @@ internal class SceneResourceProvider
     {
         return materials
             .Where(x => !loaded.Contains(x))
-            .Select(x => x.Source)
+            .Select(x => x.Source.Name)
             .Distinct();
     }
 
@@ -56,12 +57,12 @@ internal class SceneResourceProvider
         var reference = CCPlugin.uiInstance.loadingIndicator.NotifyLoadingStart();
         var currentScene = SceneManager.GetActiveScene().name;
         var batchLoadScenes = batchLoad
-            .Select(x => x.Key.Source)
+            .Select(x => x.Key.Source.Name)
             .Distinct()
             .Where(x => currentScene != x)
             .ToList();  
         lazyLoad
-            .Where(x => batchLoadScenes.Contains(x.Source))
+            .Where(x => batchLoadScenes.Contains(x.Name))
             .ForEach(x => batchLoad.TryAdd(x, []))
             .ToList()
             .ForEach(x => lazyLoad.Remove(x));
@@ -91,11 +92,11 @@ internal class SceneResourceProvider
     {
         Log.Info($"GetBatchResourcesFromScene({sceneName}");
         var batchInScene = batchLoad
-            .Where(x => x.Key.Source == sceneName)
+            .Where(x => x.Key.Source.Name == sceneName)
             .Select(x => x.Key.Name.DeInstance())
             .ToList();
         var lazyInScene = lazyLoad
-            .Where(x => x.Source == sceneName)
+            .Where(x => x.Source.Name == sceneName)
             .Select(x => x.Name.DeInstance())
             .ToList();
         var inThisScene = batchInScene
@@ -107,7 +108,7 @@ internal class SceneResourceProvider
         int pendingCount = inThisScene.Count;
         var foundList = Resources.FindObjectsOfTypeAll<Material>()
             .Where(x => x && inThisScene.Contains(x.name))
-            .Select(x => new MaterialDescriptor(x, sceneName, MaterialDescriptor.SourceType.World));
+            .Select(x => new MaterialDescriptor(x, sceneName, SourceType.World));
         int loadedCount = 0;
         foreach (var found in foundList) 
         {

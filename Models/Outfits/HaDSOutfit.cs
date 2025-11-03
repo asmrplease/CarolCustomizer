@@ -70,7 +70,7 @@ public class HaDSOutfit : Outfit
         foreach (int j in Range(0, compData.coopMeshes.Count()))
         {
             foreach (var acc in compData.coopMeshes[j]
-                .Select(x => GetAccessory(new AccessoryDescriptor(x, AssetName))))
+                .Select(x => GetAccessory(new AccessoryDescriptor(x, new SourceDescriptor(AssetName, SourceType.Outfit)))))
             {
                 if (!results[acc]) continue;//if it's already been disabled, don't turn it back on
                 results[acc] = (j == coopToggle);
