@@ -55,7 +55,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         displayName.text = outfit.DisplayName;
         pickupLocation = transform.Find(pickupLocationAddress)?.GetComponent<Text>();
         pickupLocation.text = "";
-        outfit.Accessories.ForEach(acc => AccUIs.Add(acc, null));
+        outfit.GetAccessories().ForEach(acc => AccUIs.Add(acc, null));
         return this;
     }
     #endregion

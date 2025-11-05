@@ -12,12 +12,12 @@ internal static class RecipeLoader
 {
     public static string[] GetRecipeFilePaths()
     {
-        return 
+        return
             Directory.GetFiles(
                 Constants.RecipeFolderPath, $"*",
                 SearchOption.AllDirectories)
-            .Select(x=> (ext: Path.GetExtension(x), path: x))
-            .Where(tup => 
+            .Select(x => (ext: Path.GetExtension(x), path: x))
+            .Where(tup =>
                 tup.ext == Constants.JsonFileExtension ||
                 tup.ext == Constants.PngFileExtension)
             .Select(tup => tup.path)
@@ -27,8 +27,8 @@ internal static class RecipeLoader
     public static string GetRecipeJson(string path)
     {
         string results = "";
-        
-        switch (Path.GetExtension(path)) 
+
+        switch (Path.GetExtension(path))
         {
             case ".json":
                 var file = File.OpenText(path);
@@ -41,11 +41,11 @@ internal static class RecipeLoader
                 results = PngMetadataUtil.GetMetadata(path, Constants.PNGChunkKeyword);
                 if (results == "") Log.Warning("empty json!");
                 break;
-            default: 
+            default:
                 Log.Warning("tried to load a recipe with an unsupported extension");
                 break;
         }
-        
+
         return results;
     }
 
@@ -57,10 +57,10 @@ internal static class RecipeLoader
         var results = new ValidationResults { Status = Recipe.Status.NoError, Recipe = null };
 
         try { json = GetRecipeJson(filePath); }
-        catch (Exception e) 
+        catch (Exception e)
         {
             Log.Error(e.StackTrace);
-            results.Status = Recipe.Status.FileError; return results; 
+            results.Status = Recipe.Status.FileError; return results;
         }
         return ValidateJson(json);
     }
@@ -110,7 +110,7 @@ internal static class RecipeLoader
                         .ToVersion210()
                         .ToVersion220()
                         .ToVersion230()
-                        .ToVersion240(); 
+                        .ToVersion240();
                     break;
             }
         }

@@ -53,7 +53,7 @@ public class HaDSOutfit : Outfit
 
     List<StoredAccessory> BuildVariant(int accessoryGroup, int coopToggle)
     {
-        var results = Accessories.ToDictionary(x => x, y => true);
+        var results = GetAccessories().ToDictionary(x => x, y => true);
 
         foreach (int i in Range(0, modelData.accessories.Count))
         {

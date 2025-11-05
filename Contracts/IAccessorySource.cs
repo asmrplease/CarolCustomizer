@@ -10,7 +10,9 @@ namespace CarolCustomizer.Contracts
     {
         SourceDescriptor Descriptor { get; }
         StoredAccessory GetAccessory(AccessoryDescriptor accessory);
+        List<StoredAccessory> GetAccessories();
         MaterialDescriptor GetMaterial(MaterialDescriptor material);
+        List<MaterialDescriptor> GetMaterials();
         List<Transform> GetBespokeBones();
         List<MagicaCloth> GetBoneCloths();
     }

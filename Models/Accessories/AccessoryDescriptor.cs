@@ -15,16 +15,16 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
     public readonly SourceDescriptor Source;
     public MaterialDescriptor[] Materials;
 
-    [JsonConstructor]
+    //[JsonConstructor]
     public AccessoryDescriptor(string name, string source, MaterialDescriptor[] materials)
     {
         Name = name;
-        Source = new SourceDescriptor(source);
+        Source = source;
         Materials = materials;
     }
 
     [JsonConstructor]
-    public AccessoryDescriptor(string name,  SourceDescriptor source, MaterialDescriptor[] materials)
+    public AccessoryDescriptor(string name, SourceDescriptor source, MaterialDescriptor[] materials)
     {
         Name = name;
         Source = source;
@@ -34,7 +34,7 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
     public AccessoryDescriptor(string name, string source)
     {
         Name = name;
-        Source = new SourceDescriptor(source);
+        Source = source;
         //does having an empty list of materials cause problems here?
         //only thing that uses this is LiveAccessory
     }

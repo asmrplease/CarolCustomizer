@@ -13,7 +13,7 @@ namespace CarolCustomizer.Assets;
 internal class HaDSOutfitLoader : IDisposable
 {
     static string ListName = "HaDS Outfits";
-    static Dictionary<string, HaDSOutfit> HaDSOutfits = new();
+    static Dictionary<SourceDescriptor, HaDSOutfit> HaDSOutfits = new();
 
     public HaDSOutfitLoader()
     {
@@ -59,7 +59,7 @@ internal class HaDSOutfitLoader : IDisposable
     void LoadHaDSOutfit(ModelData outfit)
     {
         var hads = new HaDSOutfit(outfit.transform);
-        if (!HaDSOutfits.TryAdd(hads.AssetName, hads)) return;
+        if (!HaDSOutfits.TryAdd(hads.Descriptor, hads)) return;
 
         OutfitAssetManager.OnOutfitLoaded?.Invoke(hads);
     }

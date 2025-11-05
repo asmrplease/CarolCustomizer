@@ -5,17 +5,19 @@ using System.Text;
 
 namespace CarolCustomizer.Models.Accessories;
 
-public class SourceDescriptor : IEquatable<SourceDescriptor>, IComparable<SourceDescriptor>
+public class SourceDescriptor : IEquatable<SourceDescriptor>
 {
-    public readonly SourceType Type;
     public readonly string Name;
+    public readonly SourceType Type;
 
     [JsonConstructor]
-    public SourceDescriptor(string name, SourceType type = 0)
+    public SourceDescriptor(string name, SourceType type)
     {
         Name = name; 
         Type = type;
     }
+
+    public static implicit operator SourceDescriptor(string name) => new(name, SourceType.Outfit);
 
     public bool Equals(SourceDescriptor other)
     {
@@ -36,11 +38,6 @@ public class SourceDescriptor : IEquatable<SourceDescriptor>, IComparable<Source
     public override int GetHashCode()
     {
         return Type.GetHashCode() ^ Name.GetHashCode();
-    }
-
-    public int CompareTo(SourceDescriptor other)
-    {
-        return Name.CompareTo(other.Name);
     }
 
     public override string ToString()

@@ -29,9 +29,10 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
 
     protected Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = [];
 
-    public List<StoredAccessory> Accessories => AccDict.Values.ToList();
+    public List<StoredAccessory> GetAccessories() => AccDict.Values.ToList();
+    public List<MaterialDescriptor> GetMaterials() => MaterialDescriptors.ToList();
     public List<OutfitEffect> Effects { get; protected set; } = [];
-    public Dictionary<MaterialDescriptor, MaterialDescriptor> MaterialDescriptors { get; private set; } = [];
+    public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = [];
 
     public PelvisWatchdog prefabWatchdog { get; private set; }
     public BoneData boneData => prefabWatchdog.BoneData;
@@ -90,7 +91,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
             .ForEach(acc => AccDict[acc] = acc)
             .SelectMany(acc => acc.Materials)
             .Where(mat => mat is not null)
-            .ForEach(mat => MaterialDescriptors.Add(mat, mat));
+            .ForEach(mat => MaterialDescriptors.Add(mat));
 
         foreach (var effect in compData.EffectBehaviours)
         {

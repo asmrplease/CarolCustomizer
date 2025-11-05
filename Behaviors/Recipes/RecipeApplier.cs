@@ -100,7 +100,7 @@ public static class RecipeApplier
     static void SetMaterial(OutfitCoordinator target, StoredAccessory accessory, MaterialDescriptor materialDescription, int index)
     {
         Log.Debug("setting material...");
-        if (materialDescription.Type == SourceType.World)
+        if (materialDescription.Source.Type == SourceType.World)
         {
             Log.Info("Attempting to load world material");
             CCPlugin
@@ -112,7 +112,7 @@ public static class RecipeApplier
                         (x) => target.PaintAccessory(accessory, x, index))
                 );
         }
-        else if (materialDescription.Type == SourceType.Outfit)
+        else if (materialDescription.Source.Type == SourceType.Outfit)
         {
             var source = OutfitAssetManager.GetAccessorySource(materialDescription.Source);
             if (source is null) { Log.Warning($"failed to find {materialDescription.Source}."); return; }
@@ -124,7 +124,7 @@ public static class RecipeApplier
 
             target.PaintAccessory(accessory, liveMaterial, index);
         }
-        else if (materialDescription.Type == SourceType.Resources)
+        else if (materialDescription.Source.Type == SourceType.Resources)
         {
             //we shouldn't be saving materials of this type probably idk lol
         }
@@ -147,7 +147,7 @@ public static class RecipeApplier
         return recipe
             .ActiveAccessories
             .SelectMany(x => x.Materials)
-            .Where(x => x.Type == SourceType.World)
+            .Where(x => x.Source.Type == SourceType.World)
             .Distinct();
     }
 
@@ -159,7 +159,7 @@ public static class RecipeApplier
         var matSources = recipe
             .ActiveAccessories
             .SelectMany(x => x.Materials)
-            .Where(x => x.Type != SourceType.World)
+            .Where(x => x.Source.Type != SourceType.World)
             .Select(x => x.Source.Name);
         return accSources
             .Concat(matSources)

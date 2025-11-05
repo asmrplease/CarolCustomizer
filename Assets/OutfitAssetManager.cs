@@ -19,7 +19,7 @@ public class OutfitAssetManager : IDisposable
     public static Action OnOutfitSetUnloaded;
     public static event Action<(List<StoredHair>, List<HairDye>)> OnHairLoaded;
 
-    public static Dictionary<string, Dictionary<string, HaDSOutfit>> outfitSets = new();
+    public static Dictionary<string, Dictionary<SourceDescriptor, HaDSOutfit>> outfitSets = new();
     public static List<StoredHair> Hairstyles = new();
     public static Dictionary<string, HairDye> HairColors = new();
 
@@ -48,8 +48,13 @@ public class OutfitAssetManager : IDisposable
 
     public static IAccessorySource GetAccessorySource(SourceDescriptor descriptor)
     {
-        Dictionary<SourceDescriptor, IAccessorySource> sources = [];
-        if (sources.TryGetValue(descriptor, out IAccessorySource result)) return result;
+        var idk = outfitSets.Values
+            .Select(dict =>
+                (found: dict.TryGetValue(descriptor, out var result)
+                , result: result))
+            .FirstOrDefault(tup => tup.found)
+            .result;
+        if (idk is not null) return idk;
 
         Log.Warning($"No source of type {descriptor.Type} named {descriptor.Name} was found.");
         return null;

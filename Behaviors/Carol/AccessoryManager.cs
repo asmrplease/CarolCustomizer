@@ -42,7 +42,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
     {
         this.skeletonManager = skeletonManager;
         this.faceCopier = faceCopier;
-        OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
+        OutfitAssetManager.OnOutfitUnloaded += OnSourceUnloaded;
     }
 
     public void EnableAccessory(StoredAccessory accessory)
@@ -105,9 +105,9 @@ public class AccessoryManager : IDisposable, IPelvisFollower
             .Where(x => x.isActive)
             .ForEach(x => x.SetVisible(visible));
 
-    void OnOutfitUnloaded(Outfit outfit)
+    void OnSourceUnloaded(IAccessorySource source)
     {
-        foreach (var storedAcc in outfit.Accessories)
+        foreach (var storedAcc in source.GetAccessories())
         {
             liveAccessories.TryGetValue(storedAcc, out var liveAcc);
             if (liveAcc is null) continue;

@@ -10,16 +10,16 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>, IComparable<Ma
 {
     public string Name;
     public SourceDescriptor Source;
-    public SourceType Type;
+
 
     [JsonIgnore]
     public readonly Material referenceMaterial;
 
     [JsonConstructor]
-    public MaterialDescriptor(string name, string source, SourceType type)
+    public MaterialDescriptor(string name, SourceDescriptor source)
     {
         Name = name;
-        Source = new SourceDescriptor(source, type);
+        Source = source;
         referenceMaterial = null;
     }
 
@@ -33,6 +33,7 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>, IComparable<Ma
     public MaterialDescriptor(Material material, SourceDescriptor descriptor)
     {
         referenceMaterial = material;
+        Name = material.name;
         Source = descriptor;
     }
 
@@ -41,8 +42,7 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>, IComparable<Ma
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return Type == other.Type 
-            && Name.DeInstance() == other.Name.DeInstance() 
+        return Name.DeInstance() == other.Name.DeInstance() 
             && Source == other.Source;
     }
 
@@ -57,7 +57,7 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>, IComparable<Ma
 
     public override int GetHashCode()
     {
-        return Type.GetHashCode() ^ Name.DeInstance().GetHashCode() ^ Source.GetHashCode();
+        return Name.DeInstance().GetHashCode() ^ Source.GetHashCode();
     }
 
     public int CompareTo(MaterialDescriptor other)
