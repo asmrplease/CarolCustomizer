@@ -70,6 +70,8 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
         carol.SpawnEvent += this.hairstyleManager.HandleNewPelvis;
         carol.SpawnEvent += this.faceCopier.HandleNewPelvis;
 
+        accessoryManager.AccessorySourceAdded += magicaManager.HandleSourceSetup;
+
         this.hairstyleManager.HairstyleChanged += OnHairChanged;
         this.accessoryManager.AccessoryChanged += OnAccessoryChanged;
     }

@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Hooks.Watchdogs;
+﻿using CarolCustomizer.Contracts;
+using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
@@ -76,17 +77,23 @@ internal class MagicaManager
         switch(magiData.SerializeData.clothType)
         {
             case ClothProcess.ClothType.MeshCloth: MeshClothSetup(magiData, acc); break;
-            case ClothProcess.ClothType.BoneCloth: BoneClothSetup(magiData, acc); break;
+            //case ClothProcess.ClothType.BoneCloth: BoneClothSetup(magiData, acc); break;
             case ClothProcess.ClothType.BoneSpring: BoneSpringSetup(magiData, acc); break;
             default: break;
         }
     }
 
-    void BoneClothSetup(MagicaCloth magica, LiveAccessory acc)
+    public void HandleSourceSetup(IAccessorySource source)
     {
-        Log.Debug($"BoneClothSetup({magica.name}, {acc.Name})");
+        Log.Info($"HandleSourceSetup({source.Descriptor})");
+        source.GetBoneCloths().ForEach(BoneClothSetup);
+    }
+
+    void BoneClothSetup(MagicaCloth magica)
+    {
+        Log.Debug($"BoneClothSetup({magica.name})");
         var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
-        liveMagica.name = acc.Name + " BoneCloth";
+        liveMagica.name = magica.name + " BoneCloth";
         targetPelvis.AnimData.DisableAnimator();
         //liveMagica.ReplaceTransform(skeleton.GetAddBoneSet(outfit));
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();

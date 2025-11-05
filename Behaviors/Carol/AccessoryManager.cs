@@ -22,6 +22,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
     FaceCopier faceCopier;
 
     public event Action<AccessoryChangedEvent> AccessoryChanged;
+    public event Action<IAccessorySource> AccessorySourceAdded;
 
     public IEnumerable<StoredAccessory> ActiveAccessories =>
         liveAccessories
@@ -53,11 +54,24 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         if (!liveAccessories.TryGetValue(accessory, out var live))
         {
             live = accessory.MakeLive(skeletonManager, faceCopier, OutfitAssetManager.liveFolder);
+            CheckExistingSources(accessory);
             liveAccessories.Add(accessory, live);
         }
         live.Enable();
         if (!live.IsOnArmature(pelvis.transform)) skeletonManager.AssignLiveBones(live);
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, live, true));
+    }
+
+    void CheckExistingSources(StoredAccessory acc)
+    {
+        bool exists = liveAccessories
+            .Select(kvp => kvp.Key)
+            .Where(existing => existing.Source == acc.Source)
+            .Any();
+        if (exists) { return; }
+
+        var source = OutfitAssetManager.GetAccessorySource(acc.Source);
+        AccessorySourceAdded?.Invoke(source);
     }
 
     public void DisableAccessory(StoredAccessory accessory)
