@@ -37,7 +37,7 @@ internal class MagicaManager
         targetPelvis = newPelvis;
         if (colliderSource is not null) ApplyCollider();
         MeshClothAccs.Clear();
-        BoneCloths.Where(x => x).ForEach(GameObject.Destroy);
+        BoneCloths.Where(x => x).ForEach(GameObject.DestroyImmediate);
         BoneCloths.Clear();
     }
 
@@ -86,16 +86,18 @@ internal class MagicaManager
     public void HandleSourceSetup(IAccessorySource source)
     {
         Log.Info($"HandleSourceSetup({source.Descriptor})");
-        source.GetBoneCloths().ForEach(BoneClothSetup);
+        source.GetBoneCloths()
+            .ForEach(x => BoneClothSetup(x, source));
     }
 
-    void BoneClothSetup(MagicaCloth magica)
+    void BoneClothSetup(MagicaCloth magica, IAccessorySource source)
     {
         Log.Debug($"BoneClothSetup({magica.name})");
         var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
         liveMagica.name = magica.name + " BoneCloth";
         targetPelvis.AnimData.DisableAnimator();
-        //liveMagica.ReplaceTransform(skeleton.GetAddBoneSet(outfit));
+        //TODO: can we refactor this?
+        liveMagica.ReplaceTransform(skeleton.GetAddBoneSet(source.Descriptor, source.GetBespokeBones()));
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.AddRange(
             targetPelvis

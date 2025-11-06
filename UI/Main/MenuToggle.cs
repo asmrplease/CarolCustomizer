@@ -130,6 +130,7 @@ public class MenuToggle : MonoBehaviour
         //if we're in any invalid states for opening the menu
         if (!CheckInput()) return;
         if (GameManager.manager.isInCutscene) return;
+        if (Onirism.Ui.UiManager.I.panelStacker.depth > 0) return;
 
         GameplaySetMenuState(true);
     }

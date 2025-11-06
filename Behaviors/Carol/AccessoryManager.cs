@@ -20,6 +20,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
     PelvisWatchdog pelvis;
     SkeletonManager skeletonManager;
     FaceCopier faceCopier;
+    HashSet<SourceDescriptor> InitializedSources = [];
 
     public event Action<AccessoryChangedEvent> AccessoryChanged;
     public event Action<IAccessorySource> AccessorySourceAdded;
@@ -64,13 +65,13 @@ public class AccessoryManager : IDisposable, IPelvisFollower
 
     void CheckExistingSources(StoredAccessory acc)
     {
-        bool exists = liveAccessories
-            .Select(kvp => kvp.Key)
-            .Where(existing => existing.Source == acc.Source)
-            .Any();
+        bool exists = InitializedSources.TryGetValue(acc.Source, out var existing);
         if (exists) { return; }
-
+       
         var source = OutfitAssetManager.GetAccessorySource(acc.Source);
+        if (source is null) { Log.Warning($"Failed to find {source}"); return; }
+
+        InitializedSources.Add(acc.Source);
         AccessorySourceAdded?.Invoke(source);
     }
 
@@ -108,10 +109,13 @@ public class AccessoryManager : IDisposable, IPelvisFollower
     void RefreshSMRs(PelvisWatchdog pelvis)
     {
         Log.Debug("RefreshSMRS()");
+        liveAccessories.Keys
+            .ForEach(CheckExistingSources);
         liveAccessories
             .Values
             .Where(x => x.isActive)
             .ForEach(x => skeletonManager.AssignLiveBones(x, true));
+        
     }
 
     void OnPelvisVisibleChanged(bool visible) =>
@@ -142,6 +146,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
     {
         if (this.pelvis) this.pelvis.VisibilityChanged -= OnPelvisVisibleChanged;
         this.pelvis = watchdog;
+        InitializedSources.Clear();
         this.pelvis.VisibilityChanged += OnPelvisVisibleChanged;
         OnPelvisVisibleChanged(pelvis.Visible);
         RefreshSMRs(pelvis);
