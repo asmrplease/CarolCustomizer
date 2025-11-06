@@ -1,4 +1,4 @@
-﻿using CarolCustomizer.Models.Accessories;
+﻿using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System;

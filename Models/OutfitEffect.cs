@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Outfits;
 
 namespace CarolCustomizer.Models;
 public class OutfitEffect : AccessoryDescriptor

@@ -29,12 +29,12 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
     public event Action<AccessoryChangedEvent> AccessoryChanged;
     public event Action<HairChangeEvent> HairstyleChanged;
 
-    public string AnimatorSource => effectManager.AnimatorSource;
-    public string ConfigurationSource => effectManager.ConfigurationSource;
-    public string ColliderSource => magicaManager.ColliderSourceName;
+    public SourceDescriptor AnimatorSource => effectManager.AnimatorSource;
+    public SourceDescriptor ConfigurationSource => effectManager.ConfigurationSource;
+    public SourceDescriptor ColliderSource => magicaManager.ColliderSourceName;
     public IEnumerable<StoredAccessory> ActiveAccessories => accessoryManager.ActiveAccessories;
     public IEnumerable<AccessoryDescriptor> LiveAccessoryDescriptors => accessoryManager.LiveAccessoryDescriptors;
-    public IEnumerable<string> ActiveEffects => effectManager.ActiveEffects;
+    public IEnumerable<SourceDescriptor> ActiveEffects => effectManager.ActiveEffects;
     public string HairstyleName => hairstyleManager.HairstyleName;
     public string HairMaterialName => hairstyleManager.HairMaterialName;
     public void SetHairstyle(StoredHair style) =>  hairstyleManager.AssignHairstyle(style.hairstyle);

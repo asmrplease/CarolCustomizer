@@ -2,6 +2,7 @@
 using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
+using CarolCustomizer.Models.Outfits;
 using System;
 using System.Collections.Generic;
 using System.Linq;

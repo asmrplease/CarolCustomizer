@@ -19,11 +19,11 @@ public class EffectManager : IPelvisFollower
     Outfit animatorSource;
     HaDSOutfit configurationSource;
 
-    public string AnimatorSource => animatorSource?.AssetName ?? Constants.Pyjamas;
-    public string ConfigurationSource => configurationSource?.AssetName ?? Constants.Pyjamas;
-    public IEnumerable<string> ActiveEffects =>
+    public SourceDescriptor AnimatorSource => animatorSource?.Descriptor ?? Constants.PyjamaDescriptor;
+    public SourceDescriptor ConfigurationSource => configurationSource?.Descriptor ?? Constants.PyjamaDescriptor;
+    public IEnumerable<SourceDescriptor> ActiveEffects =>
         outfitEffects
-        .Select(x => x.AssetName);
+        .Select(x => x.Descriptor);
 
     public EffectManager(SkeletonManager skeletonManager)
     {

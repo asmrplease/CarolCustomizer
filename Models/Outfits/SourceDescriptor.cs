@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace CarolCustomizer.Models.Accessories;
+namespace CarolCustomizer.Models.Outfits;
 
 public class SourceDescriptor : IEquatable<SourceDescriptor>
 {

@@ -1,27 +1,26 @@
-﻿using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.Models.Accessories;
+﻿using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace CarolCustomizer.Models.Recipes;
-public class RecipeDescriptor24
+internal class RecipeDescriptor24
 {
-    public string AnimatorSource;
-    public string BaseOutfitName;
-    public string ColliderSource;
-    public IEnumerable<AccessoryDescriptor> ActiveAccessories;
-    public IEnumerable<string> ActiveEffects;
-    public string Hairstyle;
-    public string HairMaterial;
-    public string Version;
+    internal string AnimatorSource;
+    internal string BaseOutfitName;
+    internal string ColliderSource;
+    internal IEnumerable<LegacyAccDescriptor> ActiveAccessories;
+    internal IEnumerable<string> ActiveEffects;
+    internal string Hairstyle;
+    internal string HairMaterial;
+    internal string Version;
 
     [JsonConstructor]
-    public RecipeDescriptor24(
+    internal RecipeDescriptor24(
         string animatorSource, 
         string baseOutfitName, 
         string colliderSource,
-        IEnumerable<AccessoryDescriptor> activeAccessories,
+        IEnumerable<LegacyAccDescriptor> activeAccessories,
         IEnumerable<string> activeEffects,
         string hairstyle,
         string hairMaterial,
@@ -37,15 +36,15 @@ public class RecipeDescriptor24
         Version = version;
     }
 
-    public RecipeDescriptor24(OutfitCoordinator manager)
-    {
-        BaseOutfitName = manager.ConfigurationSource;
-        AnimatorSource = manager.AnimatorSource;
-        ColliderSource = manager.ColliderSource;
-        ActiveAccessories = manager.LiveAccessoryDescriptors;
-        ActiveEffects = manager.ActiveEffects;
-        Hairstyle = manager.HairstyleName;
-        HairMaterial = manager.HairMaterialName;
-        Version = PluginInfo.PLUGIN_VERSION;
-    }
+    //public RecipeDescriptor24(OutfitCoordinator manager)
+    //{
+    //    BaseOutfitName = manager.ConfigurationSource;
+    //    AnimatorSource = manager.AnimatorSource;
+    //    ColliderSource = manager.ColliderSource;
+    //    ActiveAccessories = manager.LiveAccessoryDescriptors;
+    //    ActiveEffects = manager.ActiveEffects;
+    //    Hairstyle = manager.HairstyleName;
+    //    HairMaterial = manager.HairMaterialName;
+    //    Version = PluginInfo.PLUGIN_VERSION;
+    //}
 }

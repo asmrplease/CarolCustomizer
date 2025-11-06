@@ -19,25 +19,30 @@ public static class RecipeApplier
         target.DisableAllAccessories();
         target.DisableAllEffects();
         //load hair first so if it's replaced later, we don't overwrite it. 
-        target.SetHairstyle(OutfitAssetManager.GetHairstyle(recipe.Hairstyle));
-        target.SetHairColor(OutfitAssetManager.GetHairColorMaterial(recipe.HairMaterial));
+        //target.SetHairstyle(OutfitAssetManager.GetHairstyle(recipe.Hairstyle));
+        //target.SetHairColor(OutfitAssetManager.GetHairColorMaterial(recipe.HairMaterial));
         recipe
             .ActiveAccessories
             .ForEach(x => SetAccessory(target, x));
         CCPlugin.CoroutineRunner.StartCoroutine(SceneResourceProvider.BatchLoad());
         recipe
             .ActiveEffects
-            .Select(x => OutfitAssetManager.GetOutfitByAssetName(x))
-            .Where(x => x is not null)
+            .Select(OutfitAssetManager.GetAccessorySource)
+            //TODO: refactor for effect source
+            .Where(x => x is Outfit)
+            .Select(x => x as Outfit)
             .ForEach(x => 
                 target
                 .SetEffect(x, true));
-        target.SetAnimator(
-            OutfitAssetManager.GetOutfitByAssetName(recipe.AnimatorSource));
-        target.SetConfiguration(
-            OutfitAssetManager.GetOutfitByAssetName(recipe.BaseOutfitName));
-        target.SetColliderSource(
-            OutfitAssetManager.GetOutfitByAssetName(recipe.ColliderSource));
+        if (OutfitAssetManager.GetAccessorySource(recipe.AnimatorSource) is Outfit animSource) 
+            target.SetAnimator(animSource);
+        else { Log.Warning($"Failed to find valid animator source {recipe.AnimatorSource}"); }
+        if (OutfitAssetManager.GetAccessorySource(recipe.ConfigurationSource) is HaDSOutfit configSource)
+            target.SetConfiguration(configSource);
+        else { Log.Warning($"Failed to find valid configuration source {recipe.ConfigurationSource}"); }
+        if (OutfitAssetManager.GetAccessorySource(recipe.ColliderSource) is Outfit colliderSource)
+            target.SetColliderSource(colliderSource);
+        else { Log.Warning($"Failed to find valid collider source {recipe.ColliderSource}"); }
     }
 
     public static void ActivateVariant(OutfitCoordinator outfitManager, HaDSOutfit outfit, string variantName)
@@ -151,28 +156,29 @@ public static class RecipeApplier
             .Distinct();
     }
 
-    public static IEnumerable<string> GetSources(RecipeDescriptor recipe)
+    public static IEnumerable<SourceDescriptor> GetSources(RecipeDescriptor recipe)
     {
         var accSources = recipe
             .ActiveAccessories
-            .Select(x => x.Source.Name);
+            .Select(x => x.Source);
         var matSources = recipe
             .ActiveAccessories
             .SelectMany(x => x.Materials)
             .Where(x => x.Source.Type != SourceType.World)
-            .Select(x => x.Source.Name);
+            .Select(x => x.Source);
         return accSources
             .Concat(matSources)
             .Concat(recipe.ActiveEffects)
             .AddItem(recipe.AnimatorSource)
-            .AddItem(recipe.BaseOutfitName)
+            .AddItem(recipe.ConfigurationSource)
             .AddItem(recipe.ColliderSource)
             .Distinct();
     }
 
-    public static IEnumerable<string> GetMissingSources(RecipeDescriptor recipe)
+    public static IEnumerable<SourceDescriptor> GetMissingSources(RecipeDescriptor recipe)
     {
-        return GetSources(recipe).Where(x => OutfitAssetManager.GetOutfitByAssetName(x) is null);
+        return GetSources(recipe)
+            .Where(x => OutfitAssetManager.GetAccessorySource(x) is null);
     }
 
 }

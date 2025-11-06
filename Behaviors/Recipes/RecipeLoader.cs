@@ -80,39 +80,31 @@ internal static class RecipeLoader
         try
         {
             //TODO: this is gonna get out of hand sooner or later
-            switch (version)
+            Log.Debug($"VRF dectected recipe version as {version}");
+            results.Recipe = version switch
             {
-                case var x when x >= Constants.v240:
-                    Log.Debug("VRF dectected recipe version as >= 2.4.0");
-                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor24>(json);
-                    break;
-                case var x when x >= Constants.v230:
-                    Log.Debug("VRF dectected recipe version as >= 2.3.0");
-                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor23>(json)
-                        .ToVersion240();
-                    break;
-                case var x when x >= Constants.v220:
-                    Log.Debug("VRF dectected recipe version as >= 2.2.0");
-                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor22>(json)
-                        .ToVersion230()
-                        .ToVersion240();
-                    break;
-                case var x when x > Constants.v200:
-                    Log.Debug("VRF dectected recipe version as > 2.0.0");
-                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor21>(json)
-                        .ToVersion220()
-                        .ToVersion230()
-                        .ToVersion240();
-                    break;
-                default:
-                    Log.Debug("Legacy descriptor");
-                    results.Recipe = JsonConvert.DeserializeObject<RecipeDescriptor20>(json)
-                        .ToVersion210()
-                        .ToVersion220()
-                        .ToVersion230()
-                        .ToVersion240();
-                    break;
-            }
+                var x when x >= Constants.v250 => JsonConvert.DeserializeObject<RecipeDescriptor25>(json),
+                var x when x >= Constants.v240 => JsonConvert.DeserializeObject<RecipeDescriptor24>(json)
+                                        .ToVersion250(),
+                var x when x >= Constants.v230 => JsonConvert.DeserializeObject<RecipeDescriptor23>(json)
+                                        .ToVersion240()
+                                        .ToVersion250(),
+                var x when x >= Constants.v220 => JsonConvert.DeserializeObject<RecipeDescriptor22>(json)
+                                        .ToVersion230()
+                                        .ToVersion240()
+                                        .ToVersion250(),
+                var x when x > Constants.v200 => JsonConvert.DeserializeObject<RecipeDescriptor21>(json)
+                                        .ToVersion220()
+                                        .ToVersion230()
+                                        .ToVersion240()
+                                        .ToVersion250(),
+                _ => JsonConvert.DeserializeObject<RecipeDescriptor20>(json)
+                                        .ToVersion210()
+                                        .ToVersion220()
+                                        .ToVersion230()
+                                        .ToVersion240()
+                                        .ToVersion250(),
+            };
         }
         catch (Exception ex)
         {

@@ -22,7 +22,7 @@ internal class MagicaManager
     List<MagicaCloth> BoneCloths = [];
     Outfit colliderSource;
 
-    public string ColliderSourceName => colliderSource?.AssetName ?? Constants.Pyjamas;
+    public SourceDescriptor ColliderSourceName => colliderSource?.Descriptor ?? Constants.PyjamaDescriptor;
 
     public MagicaManager(SkeletonManager skeletonManager)
     {

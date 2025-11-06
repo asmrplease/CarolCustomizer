@@ -1,22 +1,21 @@
-﻿using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.Models.Accessories;
+﻿using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace CarolCustomizer.Models.Recipes;
-public class RecipeDescriptor21
+internal class RecipeDescriptor21
 {
-    public string AnimatorSource;
-    public string BaseOutfitName;
-    public IEnumerable<AccessoryDescriptor> ActiveAccessories;
-    public string Version;
+    internal string AnimatorSource;
+    internal string BaseOutfitName;
+    internal IEnumerable<LegacyAccDescriptor> ActiveAccessories;
+    internal string Version;
 
     [JsonConstructor]
-    public RecipeDescriptor21(
+    internal RecipeDescriptor21(
         string animatorSource, 
         string baseOutfitName, 
-        IEnumerable<AccessoryDescriptor> activeAccessories, 
+        IEnumerable<LegacyAccDescriptor> activeAccessories, 
         string version)
     {
         AnimatorSource = animatorSource ?? Constants.Pyjamas;
@@ -25,11 +24,11 @@ public class RecipeDescriptor21
         Version = version;
     }
 
-    public RecipeDescriptor21(OutfitCoordinator manager)
-    {
-        BaseOutfitName = manager.ConfigurationSource;
-        AnimatorSource = manager.AnimatorSource;
-        ActiveAccessories = manager.LiveAccessoryDescriptors;
-        Version = PluginInfo.PLUGIN_VERSION;
-    }
+    //public RecipeDescriptor21(OutfitCoordinator manager)
+    //{
+    //    BaseOutfitName = manager.ConfigurationSource;
+    //    AnimatorSource = manager.AnimatorSource;
+    //    ActiveAccessories = manager.LiveAccessoryDescriptors;
+    //    Version = PluginInfo.PLUGIN_VERSION;
+    //}
 }

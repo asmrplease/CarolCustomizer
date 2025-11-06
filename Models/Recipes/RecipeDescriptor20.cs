@@ -3,18 +3,18 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace CarolCustomizer.Models.Recipes;
-public class RecipeDescriptor20
+internal class RecipeDescriptor20
 {
-    public string BaseOutfitName;
-    public bool BaseVisible;
-    public IEnumerable<AccessoryDescriptor> ActiveAccessories;
-    public string Version;
+    internal string BaseOutfitName;
+    internal bool BaseVisible;
+    internal IEnumerable<LegacyAccDescriptor> ActiveAccessories;
+    internal string Version;
 
     [JsonConstructor]
-    public RecipeDescriptor20(
+    internal RecipeDescriptor20(
         string baseOutfitName, 
         bool baseVisible, 
-        IEnumerable<AccessoryDescriptor> activeAccessories, 
+        IEnumerable<LegacyAccDescriptor> activeAccessories, 
         string version)
     {
         BaseOutfitName = baseOutfitName;
