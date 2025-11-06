@@ -15,6 +15,7 @@ public class SourceDescriptor : IEquatable<SourceDescriptor>
         Type = type;
     }
 
+    //This operator is implicit for the purposes of automatically converting old descriptors left in json
     public static implicit operator SourceDescriptor(string name) => new(name, SourceType.Outfit);
 
     public bool Equals(SourceDescriptor other)
