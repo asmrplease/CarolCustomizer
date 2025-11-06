@@ -99,7 +99,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
                 new OutfitEffect(
                     effect.transform.GetAddressRelativeTo(prefabWatchdog.transform),
                     OutfitEffect.ComponentType.Behavior,
-                    AssetName)
+                    this.Descriptor)
                 );
         }
         foreach (var effect in compData.EffectGameObjects)
@@ -108,7 +108,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
                 new OutfitEffect(
                     effect.transform.GetAddressRelativeTo(prefabWatchdog.transform),
                     OutfitEffect.ComponentType.Component,
-                    AssetName)
+                    this.Descriptor)
                 );
         }
 

@@ -13,7 +13,8 @@ public class StoredHair : AccessoryDescriptor
     public readonly SkinnedMeshRenderer smr;
     public readonly List<Transform> BespokeBones;
 
-    public StoredHair(Hairstyle hairstyle) : base(hairstyle.name, Constants.HairstyleSourceName)
+    public StoredHair(Hairstyle hairstyle) : 
+        base(hairstyle.name, new SourceDescriptor(Constants.HairstyleSourceName, SourceType.Hair))
     {
         this.hairstyle = hairstyle;
         this.AssetName = hairstyle.name;

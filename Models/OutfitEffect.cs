@@ -3,7 +3,8 @@
 namespace CarolCustomizer.Models;
 public class OutfitEffect : AccessoryDescriptor
 {
-    public OutfitEffect(string RelativePath, ComponentType type, string source) : base("__effects", source)
+    public OutfitEffect(string RelativePath, ComponentType type, SourceDescriptor source) : 
+        base("__effects", source)
     {
         this.RelativePath = RelativePath;
         this.Type = type;

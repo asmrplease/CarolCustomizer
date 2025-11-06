@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Contracts;
+using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
@@ -33,14 +34,14 @@ public class OutfitAssetManager : IDisposable
 
     public static HaDSOutfit GetPyjamas() => GetOutfitByAssetName(Constants.Pyjamas);
 
-    public static HaDSOutfit GetOutfitByAssetName(string assetName)
+    public static HaDSOutfit GetOutfitByAssetName(string assetName, SourceType type = SourceType.Outfit)
     {
         if (outfitSets is null) { Log.Error("outfitSets was null when searching for asset"); return null; }
         if (assetName is null) { Log.Warning("GetOutfitByAssetName was given a null value"); return null; }
 
         return outfitSets.Values
             .Select(dict =>
-                (found: dict.TryGetValue(assetName, out var result)
+                (found: dict.TryGetValue(new SourceDescriptor(assetName, type), out var result)
                 , result: result))
             .FirstOrDefault(tup => tup.found)
             .result;

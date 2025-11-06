@@ -27,7 +27,7 @@ public static class RecipeApplier
         CCPlugin.CoroutineRunner.StartCoroutine(SceneResourceProvider.BatchLoad());
         recipe
             .ActiveEffects
-            .Select(OutfitAssetManager.GetOutfitByAssetName)
+            .Select(x => OutfitAssetManager.GetOutfitByAssetName(x))
             .Where(x => x is not null)
             .ForEach(x => 
                 target

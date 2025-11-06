@@ -16,12 +16,12 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
     public MaterialDescriptor[] Materials;
 
     //[JsonConstructor]
-    public AccessoryDescriptor(string name, string source, MaterialDescriptor[] materials)
-    {
-        Name = name;
-        Source = source;
-        Materials = materials;
-    }
+    //public AccessoryDescriptor(string name, string source, MaterialDescriptor[] materials)
+    //{
+    //    Name = name;
+    //    Source = source;
+    //    Materials = materials;
+    //}
 
     [JsonConstructor]
     public AccessoryDescriptor(string name, SourceDescriptor source, MaterialDescriptor[] materials)
@@ -31,7 +31,7 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
         Materials = materials;
     }
 
-    public AccessoryDescriptor(string name, string source)
+    public AccessoryDescriptor(string name, SourceDescriptor source)
     {
         Name = name;
         Source = source;
