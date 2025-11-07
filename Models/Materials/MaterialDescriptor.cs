@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CarolCustomizer.Models.Materials;
 [Serializable]
-public class MaterialDescriptor : IEquatable<MaterialDescriptor>, IComparable<MaterialDescriptor>
+public class MaterialDescriptor : IEquatable<MaterialDescriptor>
 {
     public string Name;
     public SourceDescriptor Source;
@@ -42,9 +42,14 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>, IComparable<Ma
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return Name.DeInstance() == other.Name.DeInstance() 
-            && Source == other.Source;
+        return this.GetHashCode() == other.GetHashCode();
+        //TODO: why did the below fail to return equals when the hashcode was equal?
+        //return Name.DeInstance() == other.Name.DeInstance() 
+        //    && Source == other.Source;
     }
+
+    public static bool operator ==(MaterialDescriptor left, MaterialDescriptor right) => Equals(left, right);
+    public static bool operator !=(MaterialDescriptor left, MaterialDescriptor right) => !Equals(left, right);
 
     public override bool Equals(object other)
     {
@@ -60,11 +65,5 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>, IComparable<Ma
         return Name.DeInstance().GetHashCode() ^ Source.GetHashCode();
     }
 
-    public int CompareTo(MaterialDescriptor other)
-    {
-        //var scene = this.Source.CompareTo(other.Source);
-        //if (scene != 0) return scene;
-        var name = this.Name.CompareTo(other.Name);
-        return name;
-    }
+    public override string ToString() => $"MD:{Source}.{Name}";
 }
