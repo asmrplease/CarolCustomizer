@@ -15,7 +15,7 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>
     [JsonIgnore]
     public readonly Material referenceMaterial;
 
-    [JsonConstructor]
+    [JsonConstructor]//if we remove this, 2.5 handling breaks
     public MaterialDescriptor(string name, SourceDescriptor source)
     {
         Name = name;

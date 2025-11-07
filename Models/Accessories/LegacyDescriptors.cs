@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System.Linq;
 
@@ -8,22 +9,23 @@ internal class LegacyMatDescriptor
 {
     public string Name;
     public string Source;
-    public SourceType SourceType;
+    public SourceType Type;
 
     [JsonConstructor]
     internal LegacyMatDescriptor(string name, string source, SourceType sourceType)
     {
+        //Log.Debug($"LegacyMatDescriptor.ctor({name},{source},{sourceType})");
         Name = name;
         Source = source;
-        SourceType = sourceType;
+        Type = sourceType;
     }
 
-    public static explicit operator MaterialDescriptor(LegacyMatDescriptor descriptor)
+    public static explicit operator MaterialDescriptor(LegacyMatDescriptor legacy)
     {
         return new MaterialDescriptor
         (
-            descriptor.Name, 
-            new SourceDescriptor(descriptor.Source, descriptor.SourceType)
+            legacy.Name, 
+            new SourceDescriptor(legacy.Source, legacy.Type)
         );
     }
 }
@@ -34,13 +36,22 @@ internal class LegacyAccDescriptor
     public string Source;
     public LegacyMatDescriptor[] Materials;
 
-    public static implicit operator AccessoryDescriptor(LegacyAccDescriptor descriptor)
+    [JsonConstructor]
+    internal LegacyAccDescriptor(string name, string source, LegacyMatDescriptor[] materials)
+    {
+        //Log.Debug($"LegacyAccDescriptor.ctor({name}, {source}, {materials})");
+        Name = name;
+        Source = source;
+        Materials = materials;
+    }
+
+    public static implicit operator AccessoryDescriptor(LegacyAccDescriptor legacy)
     {
         return new AccessoryDescriptor
         (
-            descriptor.Name,
-            new SourceDescriptor(descriptor.Source, SourceType.Outfit),
-            descriptor.Materials
+            legacy.Name,
+            new SourceDescriptor(legacy.Source, SourceType.Outfit),
+            legacy.Materials
                 .Select(x => (MaterialDescriptor) x)
                 .ToArray()
         );

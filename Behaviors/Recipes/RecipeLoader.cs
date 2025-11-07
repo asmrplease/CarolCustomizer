@@ -49,7 +49,12 @@ internal static class RecipeLoader
         return results;
     }
 
-    public struct ValidationResults { public Recipe.Status Status; public RecipeDescriptor Recipe; }
+    public struct ValidationResults 
+    { 
+        public Recipe.Status Status; 
+        public RecipeDescriptor Recipe; 
+        public string Json; 
+    }
 
     public static ValidationResults ValidateRecipeFile(string filePath)
     {
@@ -67,7 +72,12 @@ internal static class RecipeLoader
 
     public static ValidationResults ValidateJson(string json)
     {
-        var results = new ValidationResults { Status = Recipe.Status.NoError, Recipe = null };
+        var results = new ValidationResults 
+        { 
+            Status = Recipe.Status.NoError, 
+            Recipe = null,
+            Json = json,
+        };
         Version version;
 
         try

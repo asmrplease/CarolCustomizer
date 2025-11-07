@@ -63,9 +63,9 @@ internal static class RecipeConverter
             .Select(x => (SourceDescriptor)x);
         return new RecipeDescriptor25
         (
-            legacy.AnimatorSource,
-            legacy.BaseOutfitName,
-            legacy.ColliderSource,
+            (SourceDescriptor)legacy.AnimatorSource,
+            (SourceDescriptor)legacy.BaseOutfitName,
+            (SourceDescriptor)legacy.ColliderSource,
             accessories,
             effects,
             "2.5.0"

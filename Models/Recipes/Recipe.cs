@@ -8,6 +8,7 @@ public record Recipe
     public readonly string Extension;
     public readonly Status Error;
     public readonly RecipeDescriptor Descriptor;
+    public readonly string Json;
 
     public Recipe(string path)
     {
@@ -17,6 +18,7 @@ public record Recipe
         var results = RecipeLoader.ValidateRecipeFile(Path);
         Error = results.Status;
         Descriptor = results.Recipe;
+        Json = results.Json;
     }
 
     public enum Status
