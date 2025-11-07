@@ -19,7 +19,7 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
     readonly SkeletonManager skeletonManager;
     readonly AccessoryManager accessoryManager;
     readonly MagicaManager magicaManager;
-    readonly HairstyleManager hairstyleManager;
+    // readonly HairstyleManager hairstyleManager;
     readonly EffectManager effectManager;
     readonly FaceCopier faceCopier;
     #endregion
@@ -35,10 +35,10 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
     public IEnumerable<StoredAccessory> ActiveAccessories => accessoryManager.ActiveAccessories;
     public IEnumerable<AccessoryDescriptor> LiveAccessoryDescriptors => accessoryManager.LiveAccessoryDescriptors;
     public IEnumerable<SourceDescriptor> ActiveEffects => effectManager.ActiveEffects;
-    public string HairstyleName => hairstyleManager.HairstyleName;
-    public string HairMaterialName => hairstyleManager.HairMaterialName;
-    public void SetHairstyle(StoredHair style) =>  hairstyleManager.AssignHairstyle(style.hairstyle);
-    public void SetHairColor(Material hairMat, bool dissolve = false) => hairstyleManager.AssignMaterial(hairMat, dissolve);
+    //public string HairstyleName => hairstyleManager.HairstyleName;
+    //public string HairMaterialName => hairstyleManager.HairMaterialName;
+    //public void SetHairstyle(StoredHair style) =>  hairstyleManager.AssignHairstyle(style.hairstyle);
+    //public void SetHairColor(Material hairMat, bool dissolve = false) => hairstyleManager.AssignMaterial(hairMat, dissolve);
     public void SetEffect(Outfit source, bool enabled) => effectManager.SetEffect(source, enabled);
     public void SetAnimator(Outfit source) => effectManager.SetAnimator(source);
     public void PaintAccessory(StoredAccessory accessory, MaterialDescriptor material, int index) => accessoryManager.PaintAccessory(accessory, material, index);
@@ -57,7 +57,7 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
     {
         this.skeletonManager  = new SkeletonManager();
         this.faceCopier       = parent.AddComponent<FaceCopier>().Constructor(carol);
-        this.hairstyleManager = new HairstyleManager();
+        //this.hairstyleManager = new HairstyleManager();
         this.accessoryManager = new AccessoryManager(skeletonManager, faceCopier);
         this.magicaManager    = new MagicaManager(skeletonManager);
         this.effectManager    = new EffectManager(skeletonManager);
@@ -67,24 +67,24 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
         carol.SpawnEvent += this.skeletonManager.HandleNewPelvis;
         carol.SpawnEvent += this.accessoryManager.HandleNewPelvis;
         carol.SpawnEvent += this.effectManager.HandleNewPelvis;
-        carol.SpawnEvent += this.hairstyleManager.HandleNewPelvis;
+        //carol.SpawnEvent += this.hairstyleManager.HandleNewPelvis;
         carol.SpawnEvent += this.faceCopier.HandleNewPelvis;
 
         accessoryManager.AccessorySourceAdded += magicaManager.HandleSourceSetup;
 
-        this.hairstyleManager.HairstyleChanged += OnHairChanged;
+        //this.hairstyleManager.HairstyleChanged += OnHairChanged;
         this.accessoryManager.AccessoryChanged += OnAccessoryChanged;
     }
 
     public void Dispose()
     {
         accessoryManager.Dispose();
-        hairstyleManager.Dispose();
+        //hairstyleManager.Dispose();
         GameObject.Destroy(faceCopier);
     }
     #endregion
 
     void OnAccessoryChanged(AccessoryChangedEvent e) => AccessoryChanged?.Invoke(e);
-    void OnHairChanged(HairChangeEvent e) => HairstyleChanged?.Invoke(e);
+    //void OnHairChanged(HairChangeEvent e) => HairstyleChanged?.Invoke(e);
 
 }

@@ -74,15 +74,15 @@ public class OutfitListUI : MonoBehaviour
         ColorSelector = transform
             .Find(colorDropdownAddress)
             .GetComponent<Dropdown>();
-        ColorSelector
-            .onValueChanged
-            .AddListener(OnColorDropdownChanged);
+        //ColorSelector
+        //    .onValueChanged
+        //    .AddListener(OnColorDropdownChanged);
         ModelSelector = transform
             .Find(styleDropdownAddress)
             .GetComponent<Dropdown>();
-        ModelSelector
-            .onValueChanged
-            .AddListener(OnModelDropdownChanged);
+        //ModelSelector
+        //    .onValueChanged
+        //    .AddListener(OnModelDropdownChanged);
         
         Log.Debug("Hair dropdown callbacks set up!");
 
@@ -208,19 +208,19 @@ public class OutfitListUI : MonoBehaviour
             .ForEach(tup => tup.UI.ClearFavorites());
     }
 
-    void OnColorDropdownChanged(int index)
-    {
-        var dye = OutfitAssetManager.HairColors.ElementAt(index).Value;
-        //var dye = OutfitAssetManager.HairColors[assetName];
-        OutfitListUI.TargetOutfit.SetHairColor(dye.material);
-    }
+    //void OnColorDropdownChanged(int index)
+    //{
+    //    var dye = OutfitAssetManager.HairColors.ElementAt(index).Value;
+    //    //var dye = OutfitAssetManager.HairColors[assetName];
+    //    OutfitListUI.TargetOutfit.SetHairColor(dye.material);
+    //}
 
-    void OnModelDropdownChanged(int index)
-    {
-        Log.Debug($"OnHairModelChanged[{index}]");
-        var style = OutfitAssetManager.Hairstyles[index];
-        OutfitListUI.TargetOutfit.SetHairstyle(style);
-    }
+    //void OnModelDropdownChanged(int index)
+    //{
+    //    Log.Debug($"OnHairModelChanged[{index}]");
+    //    var style = OutfitAssetManager.Hairstyles[index];
+    //    OutfitListUI.TargetOutfit.SetHairstyle(style);
+    //}
 
     void OnEnable()
     {

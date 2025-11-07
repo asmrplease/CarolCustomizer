@@ -1,7 +1,8 @@
-﻿using CarolCustomizer.Models.Accessories;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace CarolCustomizer.Models.Recipes;
@@ -54,11 +55,39 @@ internal static class RecipeConverter
     internal static RecipeDescriptor25 ToVersion250(this RecipeDescriptor24 legacy)
     {
         //build hair accessory descriptor
-        Log.Warning("i forgot to finish implmenting conversion from old hair config to acc descriptor");
-        //AccessoryDescriptor hair = new("",new SourceDescriptor("",SourceType.Hair));
+        Log.Debug("RecipeDescriptor24 to RecipDescriptor25");
         var accessories = legacy.ActiveAccessories
             .Select(x => (AccessoryDescriptor)x);
-            //.Append(hair);
+        var hairSourceDescriptor = new SourceDescriptor(legacy.Hairstyle, SourceType.Hair);
+        var request = OutfitAssetManager.GetAccessorySource(hairSourceDescriptor);
+        if (request is StoredHair hairSource)
+        {
+            MaterialDescriptor[] mats = [];
+            if (legacy.HairMaterial != "CRLH_Default_Brown")
+            {
+                int index = hairSource.hairstyle.mainMaterialIndex;
+                mats = hairSource.smr.materials
+                    .Select(x => new MaterialDescriptor(x, hairSourceDescriptor))
+                    .ToArray();
+                mats[index] = new MaterialDescriptor
+                (
+                    legacy.HairMaterial, 
+                    new SourceDescriptor(Constants.HairDyeSourceName, SourceType.Hair)
+                );
+            }
+            
+            var hair = new AccessoryDescriptor
+            (
+                legacy.Hairstyle,
+                hairSourceDescriptor,
+                //figure out how to quickly set teh hair material to the correct hairstyle index
+                mats
+            );
+            accessories.Append(hair);
+        }
+        
+        
+            
         var effects = legacy.ActiveEffects
             .Select(x => (SourceDescriptor)x);
         return new RecipeDescriptor25

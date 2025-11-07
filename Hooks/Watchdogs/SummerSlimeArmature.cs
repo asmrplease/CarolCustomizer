@@ -62,7 +62,7 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
             var mat = (acc.Name.ToLower().Contains("eyes")) ? eyeMat : slimeMat;
             outfitManager.PaintAccessoryShared(acc, acc.Materials.Select(x => mat).ToList());
         }
-        outfitManager.SetHairColor(smr.material);
+        //outfitManager.SetHairColor(smr.material);
     }
 
     public void SetBaseVisibility(bool visible)

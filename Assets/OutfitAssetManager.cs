@@ -49,6 +49,19 @@ public class OutfitAssetManager : IDisposable
 
     public static IAccessorySource GetAccessorySource(SourceDescriptor descriptor)
     {
+        //return GetOutfitSource(descriptor);
+        return descriptor.Type switch
+        {
+            SourceType.Outfit => GetOutfitSource(descriptor),
+            SourceType.Hair => GetHairSource(descriptor),
+            SourceType.World => GetWorldSource(descriptor),
+            SourceType.Resources => null,
+            _ => null,
+        };
+    }
+
+    static IAccessorySource GetOutfitSource(SourceDescriptor descriptor)
+    {
         var idk = outfitSets.Values
             .Select(dict =>
                 (found: dict.TryGetValue(descriptor, out var result)
@@ -59,6 +72,16 @@ public class OutfitAssetManager : IDisposable
 
         Log.Warning($"No source of type {descriptor.Type} named {descriptor.Name} was found.");
         return null;
+    }
+
+    static IAccessorySource GetHairSource(SourceDescriptor descriptor)
+    {
+        throw new NotImplementedException();
+    }
+
+    static IAccessorySource GetWorldSource(SourceDescriptor descriptor)
+    {
+        throw new NotImplementedException();
     }
 
     public static StoredAccessory GetAccessory(AccessoryDescriptor descriptor)

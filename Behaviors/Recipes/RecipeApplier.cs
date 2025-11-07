@@ -58,8 +58,8 @@ public static class RecipeApplier
         if (variantAccs is null) { Log.Warning($"variant {variantName} not found in {outfit.DisplayName}"); return; }
 
         var hairstyle = outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>();
-        outfitManager.SetHairstyle(new StoredHair(hairstyle));
-        outfitManager.SetHairColor(outfit.modelData.defaultHaircolor);
+        //outfitManager.SetHairstyle(new StoredHair(hairstyle));
+        //outfitManager.SetHairColor(outfit.modelData.defaultHaircolor);
         variantAccs.ForEach(x => SetAccessory(outfitManager, x));
         outfitManager.SetEffect(outfit, true);
         outfitManager.SetAnimator(outfit);
@@ -89,8 +89,8 @@ public static class RecipeApplier
             var outfit = accessory.outfit as HaDSOutfit;
             var hairstyle = outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>();
             var storedHair = new StoredHair(hairstyle);
-            target.SetHairstyle(storedHair);
-            target.SetHairColor(outfit.modelData.defaultHaircolor);
+            //target.SetHairstyle(storedHair);
+            //target.SetHairColor(outfit.modelData.defaultHaircolor);
             return;
         }
         else if (accessory is null) { Log.Warning($"failed to find accessory {accessoryDescription.Name}"); return; }
@@ -180,5 +180,21 @@ public static class RecipeApplier
         return GetSources(recipe)
             .Where(x => OutfitAssetManager.GetAccessorySource(x) is null);
     }
+
+    public static IEnumerable<AccessoryDescriptor> GetRemovedAccessories(RecipeDescriptor recipe)
+    {
+        return recipe.ActiveAccessories
+            .Select(acc => (acc, source: OutfitAssetManager.GetAccessorySource(acc.Source)))
+            .Where(tup => tup.source is not null)
+            .Where(tup => tup.source.GetAccessory(tup.acc) is null)
+            .Select(tup => tup.acc);
+    }
+
+    //public static IEnumerable<AccessoryDescriptor> GetAllMissingAccessories(RecipeDescriptor recipe)
+    //{
+        
+    //    return recipe.ActiveAccessories
+
+    //}
 
 }

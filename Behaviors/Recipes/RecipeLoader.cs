@@ -5,7 +5,8 @@ using CarolCustomizer.Assets;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using MonoMod.Utils;
-using Newtonsoft.Json;
+using static Newtonsoft.Json.JsonConvert;
+using static CarolCustomizer.Utils.Constants;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 internal static class RecipeLoader
@@ -14,12 +15,12 @@ internal static class RecipeLoader
     {
         return
             Directory.GetFiles(
-                Constants.RecipeFolderPath, $"*",
+                RecipeFolderPath, $"*",
                 SearchOption.AllDirectories)
             .Select(x => (ext: Path.GetExtension(x), path: x))
             .Where(tup =>
-                tup.ext == Constants.JsonFileExtension ||
-                tup.ext == Constants.PngFileExtension)
+                tup.ext == JsonFileExtension ||
+                tup.ext == PngFileExtension)
             .Select(tup => tup.path)
             .ToArray();
     }
@@ -38,7 +39,7 @@ internal static class RecipeLoader
                 file.Close();
                 break;
             case ".png":
-                results = PngMetadataUtil.GetMetadata(path, Constants.PNGChunkKeyword);
+                results = PngMetadataUtil.GetMetadata(path, PNGChunkKeyword);
                 if (results == "") Log.Warning("empty json!");
                 break;
             default:
@@ -82,39 +83,21 @@ internal static class RecipeLoader
 
         try
         {
-            version = JsonConvert.DeserializeObject<VersionedObject>(json)?.version;
+            version = DeserializeObject<VersionedObject>(json)?.version;
             if (version is null) { Log.Warning($"Version deserialization failed: {json}"); }
-            version ??= Constants.v100;
+            version ??= v100;
         }
-        catch { version = Constants.v100; }
+        catch { version = v100; }
         try
         {
-            //TODO: this is gonna get out of hand sooner or later
             Log.Debug($"VRF dectected recipe version as {version}");
-            results.Recipe = version switch
-            {
-                var x when x >= Constants.v250 => JsonConvert.DeserializeObject<RecipeDescriptor25>(json),
-                var x when x >= Constants.v240 => JsonConvert.DeserializeObject<RecipeDescriptor24>(json)
-                                        .ToVersion250(),
-                var x when x >= Constants.v230 => JsonConvert.DeserializeObject<RecipeDescriptor23>(json)
-                                        .ToVersion240()
-                                        .ToVersion250(),
-                var x when x >= Constants.v220 => JsonConvert.DeserializeObject<RecipeDescriptor22>(json)
-                                        .ToVersion230()
-                                        .ToVersion240()
-                                        .ToVersion250(),
-                var x when x > Constants.v200 => JsonConvert.DeserializeObject<RecipeDescriptor21>(json)
-                                        .ToVersion220()
-                                        .ToVersion230()
-                                        .ToVersion240()
-                                        .ToVersion250(),
-                _ => JsonConvert.DeserializeObject<RecipeDescriptor20>(json)
-                                        .ToVersion210()
-                                        .ToVersion220()
-                                        .ToVersion230()
-                                        .ToVersion240()
-                                        .ToVersion250(),
-            };
+            version = new Version(version.Major, version.Minor, 0);
+            var v20 = version == v200 ? DeserializeObject<RecipeDescriptor20>(json) : null;
+            var v21 = version == v210 ? DeserializeObject<RecipeDescriptor21>(json) : v20?.ToVersion210();
+            var v22 = version == v220 ? DeserializeObject<RecipeDescriptor22>(json) : v21?.ToVersion220();
+            var v23 = version == v230 ? DeserializeObject<RecipeDescriptor23>(json) : v22?.ToVersion230();
+            var v24 = version == v240 ? DeserializeObject<RecipeDescriptor24>(json) : v23?.ToVersion240();
+            results.Recipe = v24?.ToVersion250() ?? DeserializeObject<RecipeDescriptor25>(json);
         }
         catch (Exception ex)
         {
@@ -125,7 +108,9 @@ internal static class RecipeLoader
 
         if (results.Recipe is null) { results.Status = Recipe.Status.InvalidJson; return results; }
 
-        bool slow = SceneResourceProvider.CheckMaterialsReady(RecipeApplier.GetWorldMats(results.Recipe)).Any();
+        bool slow = SceneResourceProvider
+            .CheckMaterialsReady(RecipeApplier.GetWorldMats(results.Recipe))
+            .Any();
         if (slow) results.Status = Recipe.Status.SlowSource;
 
         try

@@ -108,7 +108,7 @@ internal static class AccessoryDissolver
         FadeFinish = false;
         var accs = outfitManager.ActiveAccessories;
         var liveDescriptions = outfitManager.LiveAccessoryDescriptors;
-        var hairColor = outfitManager.HairMaterialName;
+        //var hairColor = outfitManager.HairMaterialName;
         var dissolveMat = new MaterialDescriptor(dissolveMaterial, "Resources", SourceType.Resources);
         Dictionary<StoredAccessory, MaterialDescriptor[]> originalMaterials = [];
 
@@ -119,7 +119,7 @@ internal static class AccessoryDissolver
                 .Materials;
             outfitManager.PaintAccessoryShared(acc, acc.Materials.Select(x => dissolveMaterial).ToList());
         }
-        outfitManager.SetHairColor(dissolveMaterial, true);
+        //outfitManager.SetHairColor(dissolveMaterial, true);
         Log.Debug("Accessories Painted with dissolve, starting loop.");
 
         while (elapsedTime < time)
@@ -140,7 +140,7 @@ internal static class AccessoryDissolver
                 outfitManager.PaintAccessory(acc, originalMaterials[acc][i], i);
             }
         }
-        outfitManager.SetHairColor(OutfitAssetManager.GetHairColorMaterial(hairColor));
+        //outfitManager.SetHairColor(OutfitAssetManager.GetHairColorMaterial(hairColor));
         Log.Debug("Restored original materials");
         ActiveDissolve = null;
         yield break;

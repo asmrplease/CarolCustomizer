@@ -21,6 +21,7 @@ internal class SceneResourceProvider
 
     internal static IEnumerable<string> CheckMaterialsReady(IEnumerable<MaterialDescriptor> materials)
     {
+        if (materials is null) return [];
         return materials
             .Where(x => !loaded.Contains(x))
             .Select(x => x.Source.Name)
