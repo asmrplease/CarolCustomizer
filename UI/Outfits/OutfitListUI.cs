@@ -168,7 +168,7 @@ public class OutfitListUI : MonoBehaviour
     void HandleAccessoryChanged(AccessoryChangedEvent e)
     {
         //TODO: make a bulk version of this so we can update the filter after the recipe changes/this event
-        if (!outfitUIs.TryGetValue(e.Target.Source, out var outfitUI)) { Log.Warning($"{e.Target.Source} is not in outfit list?"); return; }
+        if (!outfitUIs.TryGetValue(e.Target.Source, out var outfitUI)) { Log.Warning($"{e.Target.Source} is not in UI foutfit list?"); return; }
         
         outfitUI.HandleAccessoryChanged(e);
     }

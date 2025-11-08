@@ -28,7 +28,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
 
     public readonly List<Transform> BespokeBones;
 
-    public readonly MagicaCloth magicaCloth;
+    public readonly MagicaCloth meshCloth;
 
     public bool isActive { get; private set; } = false;
 
@@ -40,7 +40,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         this.outfit = acc.outfit;
         this.BespokeBones = outfit.boneData.BespokeBones;
         this.Materials = new MaterialDescriptor[acc.Materials.Length];
-        this.magicaCloth = magica;
+        this.meshCloth = magica;
         acc.Materials
             .Select((mat, i) => (mat, i))
             .ForEach(tup => Materials[tup.i] = tup.mat);
@@ -53,10 +53,10 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         this.folder = folder;
         this.referenceSMR = hair.smr;
         this.outfit = null;
-        this.BespokeBones = hair.BespokeBones;
+        this.BespokeBones = hair.GetBespokeBones();
         this.referenceSMR = hair.smr;
         this.Materials = new MaterialDescriptor[hair.smr.sharedMaterials.Length];
-        this.magicaCloth = hair.hairstyle.cloth;
+        this.meshCloth = hair.GetMeshCloths().FirstOrDefault();
         hair.smr.sharedMaterials
             .Select((mat, i) => (mat, i))
             .ForEach(tup => Materials[tup.i] = new MaterialDescriptor(tup.mat, hair.Source));

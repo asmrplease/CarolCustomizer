@@ -28,7 +28,6 @@ internal class MagicaManager
     public MagicaManager(SkeletonManager skeletonManager)
     {
         this.skeleton = skeletonManager;
-        //this.skeleton.OnBonesAdded += HandleNewOutfit;
         this.skeleton.OnLiveBonesAssigned += HandleNewLiveAcc;
     }
 
@@ -71,21 +70,6 @@ internal class MagicaManager
             .ForEach(tup => tup.live.CopyFrom(tup.reference));
     }
 
-    public void SetupAccessoryMagica(LiveAccessory acc)
-    {
-        //Log.Info($"MagicaManager.HandleNewOutfit({outfit.DisplayName}");
-        if (!targetPelvis) { Log.Warning("MagicaManager had no pelvis during HandleNewOutfit"); return; }
-
-        var magiData = acc.magicaCloth;
-        switch(magiData.SerializeData.clothType)
-        {
-            case ClothProcess.ClothType.MeshCloth: MeshClothSetup(magiData, acc); break;
-            //case ClothProcess.ClothType.BoneCloth: BoneClothSetup(magiData, acc); break;
-            case ClothProcess.ClothType.BoneSpring: BoneSpringSetup(magiData, acc); break;
-            default: break;
-        }
-    }
-
     public void HandleSourceSetup(IAccessorySource source)
     {
         Log.Info($"HandleSourceSetup({source.Descriptor})");
@@ -101,6 +85,7 @@ internal class MagicaManager
         targetPelvis.AnimData.DisableAnimator();
         //TODO: can we refactor this?
         liveMagica.ReplaceTransform(skeleton.GetAddBoneSet(source.Descriptor, source.GetBespokeBones()));
+        liveMagica.SerializeData.cullingSettings.cameraCullingMode = CullingSettings.CameraCullingMode.Off;
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.AddRange(
             targetPelvis
@@ -109,40 +94,20 @@ internal class MagicaManager
         liveMagica.SetParameterChange();
         processing.Add(liveMagica);
         var buildGuid = Guid.NewGuid();
-        Log.Debug(buildGuid.ToString());
+        Log.Debug($"Starting build {buildGuid.ToString()} for {source}");
         liveMagica.OnBuildComplete += (_, x) => HandleBuildComplete(x, liveMagica, buildGuid);
         liveMagica.BuildAndRun();
         BoneCloths.Add(liveMagica);
         magica.gameObject.SetActive(true);
     }
 
-    void MeshClothSetup(MagicaCloth magica, LiveAccessory acc)
-    {
-        //magica
-        //    .SerializeData
-        //    .sourceRenderers
-        //    .Where(x => 
-        //        x.GetType() == typeof(SkinnedMeshRenderer))
-        //    .Select(x => x )
-        //    .ToDictionary(
-        //        x => x,
-        //        x => magica)
-        //    .ForEach(x => MeshClothAccs[x.Key] = x.Value);
-    }
-
-    void BoneSpringSetup(MagicaCloth magica, LiveAccessory acc)
-    {
-        Log.Warning($"{acc.Name} had BoneSpring component {magica.name}, but CarolCustomizer has not implemented any bonespring handling behavior");
-    }
-
     public void HandleNewLiveAcc(LiveAccessory acc)
     {
         //if (!MeshClothAccs.TryGetValue(acc.AsDescriptor(), out var referenceMagica)) return;
-        if (!acc.magicaCloth) return;
+        if (!acc.meshCloth) return;
         Log.Info($"MagicaManager.HandleNewLiveAcc({acc.Name})");
 
-        SetupAccessoryMagica(acc);
-        var referenceMagica = acc.magicaCloth;
+        var referenceMagica = acc.meshCloth;
         if (LiveCloths.TryGetValue(acc, out var existing) && existing) GameObject.Destroy(existing.gameObject);
         if (!acc.isActive) return;
 
@@ -166,7 +131,7 @@ internal class MagicaManager
         liveMagica.ReplaceTransform(boneDict);
         liveMagica.SetParameterChange();
         var buildGuid = Guid.NewGuid();
-        Log.Debug(buildGuid.ToString());
+        Log.Debug($"Starting build {buildGuid.ToString()} for {acc.Name}");
         liveMagica.OnBuildComplete += (_, x) => HandleBuildComplete(x, liveMagica, buildGuid);
         liveMagica.BuildAndRun();
         liveMagica.gameObject.SetActive(true);
@@ -174,15 +139,15 @@ internal class MagicaManager
         LiveCloths[acc] = liveMagica;
     }
 
-    void HandleBuildComplete(bool _, MagicaCloth component, Guid __)
+    void HandleBuildComplete(bool success, MagicaCloth component, Guid buildGuid)
     {
         processing.Remove(component);
         processing.RemoveAll(x => !x);
-        //Log.Info($"HandleBuildComplete({buildGuid}): {success}.");
+        Log.Info($"HandleBuildComplete({success}, {component}, {buildGuid}.");
         if (!targetPelvis) { Log.Warning("build completed after pelvis was destroyed"); return; }
 
         if (processing.Any()) return;
-        //Log.Info("enabling animator");
+
         targetPelvis.AnimData.EnableAnimator();
     }
 }

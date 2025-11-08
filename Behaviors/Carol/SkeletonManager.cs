@@ -68,8 +68,9 @@ public class SkeletonManager
             Transform parentBone;
             if (!bespokeBone.parent){ parentBone = boneDict["Bn_CarolHead"]; }
             else if (!pelvis.BoneData.StandardBones.TryGetValue(bespokeBone.parent.name, out parentBone))
-            { Log.Error($"Could not find {bespokeBone.name}'s parent, {bespokeBone.parent.name}."); continue; }
+            if (!parentBone) { Log.Error($"Could not find {bespokeBone.name}'s parent, {bespokeBone.parent.name}."); continue; }
 
+            Log.Info($"Instantiating bone {bespokeBone.name} on {parentBone.name}");
             GameObject.Instantiate(bespokeBone.gameObject, parentBone.transform)
                 .transform
                 .DeCloneName()

@@ -50,11 +50,8 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
     {
         return boneData.BespokeBones;
     }
-   
-    public List<MagicaCloth> GetBoneCloths()
-    {
-        return magiData.BoneCloths;
-    }
+
+    public List<MagicaCloth> GetBoneCloths() => magiData.BoneCloths;
 
     #endregion
 

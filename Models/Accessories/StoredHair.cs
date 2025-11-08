@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks;
 using CarolCustomizer.Models.Materials;
@@ -16,7 +17,9 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
     public readonly string DisplayName;
     public readonly Hairstyle hairstyle;
     public readonly SkinnedMeshRenderer smr;
-    public readonly List<Transform> BespokeBones;
+    readonly List<Transform> BespokeBones;
+    List<MagicaCloth> boneCloths = [];
+    List<MagicaCloth> meshCloths = [];
 
     SourceDescriptor IAccessorySource.Descriptor => this.Source;
     AccessoryDescriptor IInstantiable.Descriptor => this;
@@ -28,8 +31,16 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
         this.AssetName = hairstyle.name;
         this.DisplayName = LocalizationIndex.GetLine(hairstyle.localizationName);
         var smr = hairstyle.model as SkinnedMeshRenderer;
-        this.BespokeBones = smr.rootBone.AllChildTransforms().ToList();
+        this.BespokeBones = [hairstyle.transform.root];
         this.smr = hairstyle.model as SkinnedMeshRenderer;
+        var magicas = hairstyle.transform.root
+            .GetComponentsInChildren<MagicaCloth>();
+        magicas
+            .Where(x => x.SerializeData.clothType == ClothProcess.ClothType.MeshCloth)
+            .ForEach(meshCloths.Add);
+        magicas
+            .Where(x => x.SerializeData.clothType == ClothProcess.ClothType.BoneCloth)
+            .ForEach(boneCloths.Add);
     }
     
 
@@ -49,9 +60,10 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
         return null;
     }
 
-    List<Transform> IAccessorySource.GetBespokeBones() => BespokeBones;
+    public List<Transform> GetBespokeBones() => BespokeBones;
 
-    List<MagicaCloth> IAccessorySource.GetBoneCloths() => [this.hairstyle.cloth];
+    List<MagicaCloth> IAccessorySource.GetBoneCloths() => this.boneCloths;
+    public List<MagicaCloth> GetMeshCloths() => this.meshCloths;
 
     MaterialDescriptor IAccessorySource.GetMaterial(MaterialDescriptor material)
     {
