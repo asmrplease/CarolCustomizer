@@ -61,7 +61,7 @@ public class PlayerArmature : MonoBehaviour, ICarolType
         StartCoroutine(carolEntity.anim.SetTriggerForOneFrame(animationName));
     }
 
-    public void SetBaseOutfit(Outfit outfit)
+    public void SetBaseOutfit(SourceDescriptor outfit)
     {
         Log.Debug("Changing outfit via Entity.Swapmodel");
         //TODO: Fix 1.0
@@ -121,11 +121,9 @@ public class PlayerArmature : MonoBehaviour, ICarolType
 
     public bool ManagesPlayer(Entity playerEntity) => carolEntity == playerEntity;
 
-    public void SetAnimator(Outfit outfit)
+    public void SetAnimator(RuntimeAnimatorController rac)
     {
-        if (watchdog.AnimData?.Animator is null) { Log.Warning($"null animator when trying to set animator on {this}"); return; }
-        Log.Debug($"Setting animator from {outfit.DisplayName}");
-        var rac = outfit?.RuntimeAnimator;
+        if (watchdog.AnimData?.Animator is null) { Log.Warning($"null target animator when trying to set animator on {this}"); return; }
         if (!rac) { Log.Warning("failed to get animator from outfit"); return; }
         
         watchdog.AnimData.SetAnimator(rac);

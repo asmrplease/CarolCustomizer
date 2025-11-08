@@ -14,12 +14,12 @@ internal class OutfitArmature : MonoBehaviour, ICarolType
         return this;
     }
 
-    public void SetAnimator(Outfit outfit)
+    public void SetAnimator(RuntimeAnimatorController outfit)
     {
         Log.Error("Tried to set animator on an outfit reference pelvis.");
     }
 
-    public void SetBaseOutfit(Outfit outfit)
+    public void SetBaseOutfit(SourceDescriptor outfit)
     {
         Log.Error("Tried to set base outfit on an outfit reference pelvis.");
     }

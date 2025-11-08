@@ -25,13 +25,13 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
 
     public SourceDescriptor Descriptor { get; private set; }
 
-    virtual public RuntimeAnimatorController RuntimeAnimator => null;
+    virtual public ModelData GetConfiguration() => null;
 
     protected Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = [];
 
     public List<StoredAccessory> GetAccessories() => AccDict.Values.ToList();
     public List<MaterialDescriptor> GetMaterials() => MaterialDescriptors.ToList();
-    public List<OutfitEffect> Effects { get; protected set; } = [];
+    List<OutfitEffect> Effects = [];
     public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = [];
 
     public PelvisWatchdog prefabWatchdog { get; private set; }
@@ -124,6 +124,8 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
 
     public StoredAccessory GetAccessory(string name) => AccDict.Values.FirstOrDefault(x => x.Name == name);
 
+    public virtual RuntimeAnimatorController GetAnimator() => null;
+
     public void Dispose()
     {
         Log.Debug("Outfit.Dispose()");
@@ -159,5 +161,9 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
     {
         return this.AssetName.GetHashCode();
     }
+
+    public List<OutfitEffect> GetEffects() => this.Effects;
+
+    List<MagicaCapsuleCollider> IAccessorySource.GetColliders() => this.magiData.CapsuleColliders;
     #endregion
 }

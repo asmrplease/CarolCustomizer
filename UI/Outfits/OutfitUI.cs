@@ -118,7 +118,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     {
         Log.Debug("OutfitUI.HandleAccessoryChanged()");
         var accUI = GetAccUI(eventData.Target);
-        if (!accUI) { Log.Error($"didn't find accessory {eventData.Target.DisplayName} for ACE in {outfit.DisplayName}"); return; }
+        if (!accUI) { Log.Error($"didn't find accessory {eventData.Target} for ACE in {outfit.DisplayName}"); return; }
 
         accUI.HandleAccessoryChanged(eventData);
         OnAccessoryToggled();
@@ -170,11 +170,11 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         var target = OutfitListUI.TargetOutfit;
         var results = new List<(string, UnityAction)>()
         {
-             ("Use Animator",     () => target.SetAnimator(outfit))
-            ,("Use Measurements", () => target.SetConfiguration(hads))
-            ,("Use Colliders",    () => target.SetColliderSource(outfit))
-            ,("Activate Effects", () => target.SetEffect(outfit, true))
-            ,("Disable Effects",  () => target.SetEffect(outfit, false))
+             ("Use Animator",     () => target.SetAnimator(outfit.Descriptor))
+            ,("Use Measurements", () => target.SetConfiguration(outfit.Descriptor))
+            ,("Use Colliders",    () => target.SetColliderSource(outfit.Descriptor))
+            ,("Activate Effects", () => target.SetEffect(outfit.Descriptor, true))
+            ,("Disable Effects",  () => target.SetEffect(outfit.Descriptor, false))
         };
         hads.Variants.Keys
             .ForEach(x =>

@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Contracts;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
@@ -20,9 +21,9 @@ internal class MagicaManager
     List<MagicaCloth> processing = [];
     Dictionary<AccessoryDescriptor, MagicaCloth> MeshClothAccs = [];
     List<MagicaCloth> BoneCloths = [];
-    Outfit colliderSource;
+    IAccessorySource colliderSource;
 
-    public SourceDescriptor ColliderSourceName => colliderSource?.Descriptor ?? Constants.PyjamaDescriptor;
+    public SourceDescriptor ColliderSourceName => colliderSource.Descriptor ?? Constants.PyjamaDescriptor;
 
     public MagicaManager(SkeletonManager skeletonManager)
     {
@@ -41,11 +42,14 @@ internal class MagicaManager
         BoneCloths.Clear();
     }
 
-    public void SetColliderSource(Outfit outfit)
+    public void SetColliderSource(SourceDescriptor descriptor)
     {
-        if (outfit is null) { Log.Warning("outfit was null when setting collider source"); return; }
+        if (descriptor is null) { Log.Warning("SetColliderSource was passed a null source descriptor"); return; }
 
-        colliderSource = outfit;
+        if (OutfitAssetManager.GetAccessorySource(descriptor) is not IAccessorySource source) return;
+        if (source.GetColliders() is null) { Log.Warning($"ColliderSource {descriptor} was valid but has no colliders"); return; }
+        colliderSource = source;
+
         ApplyCollider();
     }
 
@@ -54,8 +58,7 @@ internal class MagicaManager
         if (!targetPelvis || targetPelvis.Behavior is null) return;
 
         var sourceColliders = colliderSource
-            .magiData
-            .CapsuleColliders
+            .GetColliders()
             .Where(x => x)
             .ToDictionary(x => x.name);
         targetPelvis.MagiData

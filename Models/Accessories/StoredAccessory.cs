@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks;
 using CarolCustomizer.Models.Outfits;
 using MagicaCloth2;
@@ -7,7 +8,7 @@ using UnityEngine;
 
 namespace CarolCustomizer.Models.Accessories;
 
-public class StoredAccessory : AccessoryDescriptor
+public class StoredAccessory : AccessoryDescriptor, IInstantiable
 {
     public readonly Outfit outfit;
     public readonly SkinnedMeshRenderer referenceSMR;

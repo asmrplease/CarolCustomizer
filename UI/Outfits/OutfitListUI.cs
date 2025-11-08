@@ -31,7 +31,7 @@ public class OutfitListUI : MonoBehaviour
     Dropdown ColorSelector;
     Dropdown ModelSelector;
 
-    SortedList<Outfit, OutfitUI> outfitUIs = [];
+    SortedList<SourceDescriptor, OutfitUI> outfitUIs = [];
 
     public Main.ContextMenu ContextMenu { get; private set; }
     public static OutfitCoordinator TargetOutfit => targetCarol?.outfitManager;
@@ -104,21 +104,21 @@ public class OutfitListUI : MonoBehaviour
 
     void OnOutfitLoaded(Outfit outfit)
     {
-        if (outfitUIs.TryGetValue(outfit, out var existing)) { Log.Error($"{outfit.AssetName} was already in the UI list during OnOutfitLoaded"); return; }
+        if (outfitUIs.TryGetValue(outfit.Descriptor, out var existing)) { Log.Error($"{outfit.AssetName} was already in the UI list during OnOutfitLoaded"); return; }
 
         var outfitUI = Factory.BuildOutfitUI(outfit);
         if (!outfitUI) { Log.Error($"failed to instantiate {outfit.DisplayName}'s outfitUI"); return; }
 
-        outfitUIs.Add(outfit, outfitUI);
-        outfitUI.transform.SetSiblingIndex(outfitUIs.IndexOfKey(outfit));
+        outfitUIs.Add(outfit.Descriptor, outfitUI);
+        outfitUI.transform.SetSiblingIndex(outfitUIs.IndexOfKey(outfit.Descriptor));
     }
 
     void OnOutfitUnloaded(Outfit outfit)
     {
-        if (!outfitUIs.ContainsKey(outfit)) { Log.Warning("UI instance was asked to remove a UI element that was not in it's dict"); return; }
+        if (!outfitUIs.ContainsKey(outfit.Descriptor)) { Log.Warning("UI instance was asked to remove a UI element that was not in it's dict"); return; }
 
-        var outfitUI = outfitUIs[outfit];
-        outfitUIs.Remove(outfit);
+        var outfitUI = outfitUIs[outfit.Descriptor];
+        outfitUIs.Remove(outfit.Descriptor);
         Destroy(outfitUI.gameObject);
     }
 
@@ -131,17 +131,17 @@ public class OutfitListUI : MonoBehaviour
         if (eventData.ShowActive)
         {
             TargetOutfit.ActiveAccessories
-                .ForEach(acc => outfitUIs[acc.outfit].SetAccUIVisible(acc));
+                .ForEach(acc => outfitUIs[acc.Source].SetAccUIVisible(acc));
         }
         if (eventData.ShowFavorites)
         {
             Settings.Favorites
                 .favorites
-                .Select(acc =>  
-                    (outfit: OutfitAssetManager.GetOutfitByAssetName(acc.Source.Name)
-                    ,acc))
-                .Where(tup => tup.outfit is not null)
-                .ForEach(tup => outfitUIs[tup.outfit].SetAccUIVisible(tup.acc));
+                //.Select(acc =>  
+                //    (outfit: OutfitAssetManager.GetAccessorySource(acc.Source)
+                //    ,acc))
+                //.Where(tup => tup.outfit is not null)
+                .ForEach(acc => outfitUIs[acc.Source].SetAccUIVisible(acc));
         }
         Log.Info(eventData.ToString());
     }
@@ -153,7 +153,6 @@ public class OutfitListUI : MonoBehaviour
         if (targetCarol is not null)
         {
             targetCarol.outfitManager.AccessoryChanged -= HandleAccessoryChanged;
-            targetCarol.outfitManager.HairstyleChanged -= HandleHairChange;
             targetCarol.outfitManager.ActiveAccessories
                 .Select(x => new AccessoryChangedEvent(x, x, false))//fire events to 'clear' the ui?
                 .ForEach(HandleAccessoryChanged);
@@ -163,14 +162,13 @@ public class OutfitListUI : MonoBehaviour
                 .Select(x => new AccessoryChangedEvent(x, x, true))//notify the ui what the new outfit looks like
                 .ForEach(HandleAccessoryChanged);
         targetCarol.outfitManager.AccessoryChanged += HandleAccessoryChanged;
-        targetCarol.outfitManager.HairstyleChanged += HandleHairChange;
         filter.ProcessFilters();
     }
 
     void HandleAccessoryChanged(AccessoryChangedEvent e)
     {
         //TODO: make a bulk version of this so we can update the filter after the recipe changes/this event
-        if (!outfitUIs.TryGetValue(e.Target.outfit, out var outfitUI)) { Log.Warning($"{e.Target.outfit.DisplayName} is not in outfit list?"); return; }
+        if (!outfitUIs.TryGetValue(e.Target.Source, out var outfitUI)) { Log.Warning($"{e.Target.Source} is not in outfit list?"); return; }
         
         outfitUI.HandleAccessoryChanged(e);
     }
@@ -203,7 +201,7 @@ public class OutfitListUI : MonoBehaviour
             .Select(acc => OutfitAssetManager.GetOutfitByAssetName(acc.Source.Name))
             .Where(outfit => outfit is not null)
             .Distinct()
-            .Select(outfit => (found: outfitUIs.TryGetValue(outfit, out var UI), UI))
+            .Select(outfit => (found: outfitUIs.TryGetValue(outfit.Descriptor, out var UI), UI))
             .Where(tup => tup.found)
             .ForEach(tup => tup.UI.ClearFavorites());
     }

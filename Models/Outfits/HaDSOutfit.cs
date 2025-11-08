@@ -10,7 +10,8 @@ public class HaDSOutfit : Outfit
 {
     #region ModelData Handling 
     public override Sprite Sprite => modelData.portraitShop;
-    public override RuntimeAnimatorController RuntimeAnimator => modelData?.controller;
+    public override RuntimeAnimatorController GetAnimator() => modelData?.controller;
+    public override ModelData GetConfiguration() => modelData;
     public ModelData modelData { get; protected set; }
     public HairData hairData { get; protected set; }
 

@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Models.Accessories;
+﻿using CarolCustomizer.Models;
+using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using MagicaCloth2;
@@ -16,5 +17,9 @@ namespace CarolCustomizer.Contracts
         List<MaterialDescriptor> GetMaterials();
         List<Transform> GetBespokeBones();
         List<MagicaCloth> GetBoneCloths();
+        RuntimeAnimatorController GetAnimator();
+        List<OutfitEffect> GetEffects();
+        List<MagicaCapsuleCollider> GetColliders();
+        ModelData GetConfiguration();
     }
 }

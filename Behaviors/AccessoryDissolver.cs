@@ -110,7 +110,7 @@ internal static class AccessoryDissolver
         var liveDescriptions = outfitManager.LiveAccessoryDescriptors;
         //var hairColor = outfitManager.HairMaterialName;
         var dissolveMat = new MaterialDescriptor(dissolveMaterial, "Resources", SourceType.Resources);
-        Dictionary<StoredAccessory, MaterialDescriptor[]> originalMaterials = [];
+        Dictionary<AccessoryDescriptor, MaterialDescriptor[]> originalMaterials = [];
 
         foreach (var acc in accs)
         {

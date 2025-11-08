@@ -60,9 +60,9 @@ public class MPBotArmature : MonoBehaviour, ICarolType, ICarolBot
         return this;
     }
 
-    public void SetBaseOutfit(Outfit outfit) { }
+    public void SetBaseOutfit(SourceDescriptor outfit) { }
 
-    public void SetAnimator(Outfit outfit) { }
+    public void SetAnimator(RuntimeAnimatorController rac) { }
 
     public void SetHeightOffset(float height) { }
 

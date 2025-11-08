@@ -16,7 +16,7 @@ internal class CutsceneTest
     //static SaveManager.SaveData TestData() => 
         //SaveManager.manager.data[SaveManager.manager.saveSlotCurrent];
         //SaveManager.manager.NewSave();
-    static int sceneIndex = 0;
+    //static int sceneIndex = 0;
     static bool readyForNextScene = true;
     static bool readyForNextCutscene = true;
 

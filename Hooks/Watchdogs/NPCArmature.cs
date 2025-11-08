@@ -28,7 +28,7 @@ public class NPCArmature : MonoBehaviour, ICarolType
 
     public void SetBaseVisibility(bool visible) { }
 
-    public void SetAnimator(Outfit outfit) { }
+    public void SetAnimator(RuntimeAnimatorController outfit) { }
 
     void OnEnable() 
     {
@@ -48,7 +48,7 @@ public class NPCArmature : MonoBehaviour, ICarolType
         NPCManager.NPCs[npcType].RestorePrevious(watchdog); 
     }
 
-    public void SetBaseOutfit(Outfit outfit) { }
+    public void SetBaseOutfit(SourceDescriptor outfit) { }
 
     public void SetHeightOffset(float height) { }
 

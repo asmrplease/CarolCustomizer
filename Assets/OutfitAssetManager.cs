@@ -20,9 +20,9 @@ public class OutfitAssetManager : IDisposable
     public static Action OnOutfitSetUnloaded;
     public static event Action<(List<StoredHair>, List<HairDye>)> OnHairLoaded;
 
-    public static Dictionary<string, Dictionary<SourceDescriptor, HaDSOutfit>> outfitSets = new();
-    public static List<StoredHair> Hairstyles = new();
-    public static Dictionary<string, HairDye> HairColors = new();
+    public static Dictionary<string, Dictionary<SourceDescriptor, HaDSOutfit>> outfitSets = [];
+    public static Dictionary<SourceDescriptor, StoredHair> Hairstyles = [];
+    public static Dictionary<string, HairDye> HairColors = [];
 
     public OutfitAssetManager(Transform parent)
     {
@@ -49,15 +49,17 @@ public class OutfitAssetManager : IDisposable
 
     public static IAccessorySource GetAccessorySource(SourceDescriptor descriptor)
     {
-        //return GetOutfitSource(descriptor);
-        return descriptor.Type switch
+        var result =  descriptor.Type switch
         {
             SourceType.Outfit => GetOutfitSource(descriptor),
             SourceType.Hair => GetHairSource(descriptor),
             SourceType.World => GetWorldSource(descriptor),
-            SourceType.Resources => null,
+            SourceType.Resources => GetWorldSource(descriptor),
             _ => null,
         };
+
+        if (result is null) Log.Warning($"No source of type {descriptor.Type} named {descriptor.Name} was found.");
+        return result;
     }
 
     static IAccessorySource GetOutfitSource(SourceDescriptor descriptor)
@@ -65,54 +67,41 @@ public class OutfitAssetManager : IDisposable
         var idk = outfitSets.Values
             .Select(dict =>
                 (found: dict.TryGetValue(descriptor, out var result)
-                , result: result))
+                , result))
             .FirstOrDefault(tup => tup.found)
             .result;
-        if (idk is not null) return idk;
-
-        Log.Warning($"No source of type {descriptor.Type} named {descriptor.Name} was found.");
-        return null;
+        return idk;
     }
 
     static IAccessorySource GetHairSource(SourceDescriptor descriptor)
     {
-        throw new NotImplementedException();
+        Hairstyles.TryGetValue(descriptor, out var source); 
+        return source;
     }
 
     static IAccessorySource GetWorldSource(SourceDescriptor descriptor)
     {
-        throw new NotImplementedException();
+        Log.Warning("GetWorldSource() not implemented");
+        return null;
+    }
+
+    static IAccessorySource GetResourcesSource(SourceDescriptor descriptor)
+    {
+        Log.Warning($"GetResourcesSource() not implemented");
+        return null;
     }
 
     public static StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
     {
-        //var outfit = GetOutfitByAssetName(descriptor.Source);
-        var source = GetAccessorySource(descriptor.Source);
-        if (source is null) { Log.Warning($"failed to find outfit {descriptor.Source}."); return null; }
-
-        Log.Debug("found source");
-        return source.GetAccessory(descriptor);
-    }
-
-    public static StoredHair GetHairstyle(string name)
-    {
-        var hair = Hairstyles.FirstOrDefault(x => x.AssetName == name);
-        if (hair is null) Log.Warning($"When searching for hairstyle '{name}', no results were found. ");
-        return hair;
-    }
-
-    public static Material GetHairColorMaterial(string assetName)
-    {
-        if (!HairColors.TryGetValue(assetName, out var style)) { Log.Warning($"failed to find material named {assetName}"); return null; }
-        Log.Debug($"requested {assetName}, found hair dye{style.name}");
-        return style.material;
+        return GetAccessorySource(descriptor.Source)?.GetAccessory(descriptor);
     }
 
     public static void NotifyHairReady(List<StoredHair> hair, List<HairDye> dye)
     {
-        Hairstyles.AddRange(hair);
-        //TODO: this will fail if we ever load more hair dye colors
-        HairColors = dye.ToDictionary(x => x.locKey, x => x);
+        hair.Select(x => (Key: x.Source, Value: x))
+            .ForEach(x => Hairstyles.TryAdd(x.Key, x.Value));
+        dye.Select(x => (Key: x.locKey, Value: x))
+            .ForEach(x => HairColors.Add(x.Key, x.Value));
         OnHairLoaded?.Invoke((hair, dye));
     }
 

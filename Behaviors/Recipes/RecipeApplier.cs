@@ -8,8 +8,6 @@ using CarolCustomizer.Utils;
 using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.UIElements;
-using static CarolCustomizer.Models.Materials.MaterialDescriptor;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 public static class RecipeApplier
@@ -18,31 +16,17 @@ public static class RecipeApplier
     {
         target.DisableAllAccessories();
         target.DisableAllEffects();
-        //load hair first so if it's replaced later, we don't overwrite it. 
-        //target.SetHairstyle(OutfitAssetManager.GetHairstyle(recipe.Hairstyle));
-        //target.SetHairColor(OutfitAssetManager.GetHairColorMaterial(recipe.HairMaterial));
+
         recipe
             .ActiveAccessories
             .ForEach(x => SetAccessory(target, x));
         CCPlugin.CoroutineRunner.StartCoroutine(SceneResourceProvider.BatchLoad());
         recipe
             .ActiveEffects
-            .Select(OutfitAssetManager.GetAccessorySource)
-            //TODO: refactor for effect source
-            .Where(x => x is Outfit)
-            .Select(x => x as Outfit)
-            .ForEach(x => 
-                target
-                .SetEffect(x, true));
-        if (OutfitAssetManager.GetAccessorySource(recipe.AnimatorSource) is Outfit animSource) 
-            target.SetAnimator(animSource);
-        else { Log.Warning($"Failed to find valid animator source {recipe.AnimatorSource}"); }
-        if (OutfitAssetManager.GetAccessorySource(recipe.ConfigurationSource) is HaDSOutfit configSource)
-            target.SetConfiguration(configSource);
-        else { Log.Warning($"Failed to find valid configuration source {recipe.ConfigurationSource}"); }
-        if (OutfitAssetManager.GetAccessorySource(recipe.ColliderSource) is Outfit colliderSource)
-            target.SetColliderSource(colliderSource);
-        else { Log.Warning($"Failed to find valid collider source {recipe.ColliderSource}"); }
+            .ForEach(x => target.SetEffect(x, true));
+        target.SetAnimator(recipe.AnimatorSource);
+        target.SetConfiguration(recipe.ConfigurationSource);
+        target.SetColliderSource(recipe.ColliderSource);
     }
 
     public static void ActivateVariant(OutfitCoordinator outfitManager, HaDSOutfit outfit, string variantName)
@@ -58,19 +42,16 @@ public static class RecipeApplier
         if (variantAccs is null) { Log.Warning($"variant {variantName} not found in {outfit.DisplayName}"); return; }
 
         var hairstyle = outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>();
-        //outfitManager.SetHairstyle(new StoredHair(hairstyle));
-        //outfitManager.SetHairColor(outfit.modelData.defaultHaircolor);
         variantAccs.ForEach(x => SetAccessory(outfitManager, x));
-        outfitManager.SetEffect(outfit, true);
-        outfitManager.SetAnimator(outfit);
-        outfitManager.SetConfiguration(outfit);
-        outfitManager.SetColliderSource(outfit);
+        outfitManager.SetEffect(outfit.Descriptor, true);
+        outfitManager.SetAnimator(outfit.Descriptor);
+        outfitManager.SetConfiguration(outfit.Descriptor);
+        outfitManager.SetColliderSource(outfit.Descriptor);
     }
 
     public static void ActivateFirstVariant(OutfitCoordinator outfitManager, string outfitName)
     {
         Log.Debug("ActivateVariant(OM, string, int");
-        
         HaDSOutfit outfit = OutfitAssetManager.GetOutfitByAssetName(outfitName);
         if (outfit is null) { Log.Debug($"Didn't find outfit named: {outfitName}"); return; }
             
@@ -78,31 +59,17 @@ public static class RecipeApplier
         ActivateVariant(outfitManager, outfit, variant);
     }
 
-    static void SetAccessory(OutfitCoordinator target, AccessoryDescriptor accessoryDescription)
+    static void SetAccessory(OutfitCoordinator target, AccessoryDescriptor acc)
     {
-        Log.Debug($"Setting accessory {accessoryDescription.Source}:{accessoryDescription.Name}...");
-        var accessory = OutfitAssetManager.GetAccessory(accessoryDescription);
-
-        if (accessory is null && accessoryDescription.Name.ToLower().Contains("hair"))
-        {
-            Log.Info("hair accessory was missing, setting hairstyle to outfit's hair.");
-            var outfit = accessory.outfit as HaDSOutfit;
-            var hairstyle = outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>();
-            var storedHair = new StoredHair(hairstyle);
-            //target.SetHairstyle(storedHair);
-            //target.SetHairColor(outfit.modelData.defaultHaircolor);
-            return;
-        }
-        else if (accessory is null) { Log.Warning($"failed to find accessory {accessoryDescription.Name}"); return; }
-
-        target.EnableAccessory(accessory);
-        accessoryDescription
+        Log.Debug($"Setting accessory {acc.Source}:{acc.Name}");
+        target.EnableAccessory(acc);
+        acc
             .Materials
             .Select((mat, index) => (mat, index))
-            .ForEach(tup => SetMaterial(target, accessory, tup.mat, tup.index));
+            .ForEach(tup => SetMaterial(target, acc, tup.mat, tup.index));
     }
 
-    static void SetMaterial(OutfitCoordinator target, StoredAccessory accessory, MaterialDescriptor materialDescription, int index)
+    static void SetMaterial(OutfitCoordinator target, AccessoryDescriptor accessory, MaterialDescriptor materialDescription, int index)
     {
         Log.Debug("setting material...");
         if (materialDescription.Source.Type == SourceType.World)
@@ -122,7 +89,6 @@ public static class RecipeApplier
             var source = OutfitAssetManager.GetAccessorySource(materialDescription.Source);
             if (source is null) { Log.Warning($"failed to find {materialDescription.Source}."); return; }
             Log.Debug("found outfit again...");
-            //if (source.MaterialDescriptors is null) { Log.Warning($"failed to get {materialDescription.Source} MaterialDescriptors"); return; }
 
             var liveMaterial = source.GetMaterial(materialDescription);
             if (liveMaterial is null) { Log.Warning($"failed to find {materialDescription.Name} in source {materialDescription.Source}"); return; }
@@ -133,8 +99,6 @@ public static class RecipeApplier
         {
             //we shouldn't be saving materials of this type probably idk lol
         }
-        
-        
     }
 
     public static IEnumerable<SourceDescriptor> GetMatSources(RecipeDescriptor recipe)

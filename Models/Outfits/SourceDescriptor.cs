@@ -3,7 +3,7 @@ using System;
 
 namespace CarolCustomizer.Models.Outfits;
 
-public class SourceDescriptor : IEquatable<SourceDescriptor>
+public class SourceDescriptor : IEquatable<SourceDescriptor>, IComparable<SourceDescriptor>
 {
     public readonly string Name;
     public readonly SourceType Type;
@@ -47,5 +47,11 @@ public class SourceDescriptor : IEquatable<SourceDescriptor>
     public override string ToString()
     {
         return $"SD:{Type}-{Name}";
+    }
+
+    public int CompareTo(SourceDescriptor other)
+    {
+        //TODO: this comparison doesn't use the DisplayName of the outfits. 
+        return this.Name.CompareTo(other.Name);
     }
 }

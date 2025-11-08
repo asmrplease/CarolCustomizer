@@ -15,15 +15,13 @@ public class EffectManager : IPelvisFollower
     PelvisWatchdog pelvis;
     SkeletonManager skeletonManager;
 
-    HashSet<Outfit> outfitEffects = [];
-    Outfit animatorSource;
-    HaDSOutfit configurationSource;
+    HashSet<SourceDescriptor> outfitEffects = [];
+    IAccessorySource animatorSource;
+    IAccessorySource configurationSource;
 
-    public SourceDescriptor AnimatorSource => animatorSource?.Descriptor ?? Constants.PyjamaDescriptor;
-    public SourceDescriptor ConfigurationSource => configurationSource?.Descriptor ?? Constants.PyjamaDescriptor;
-    public IEnumerable<SourceDescriptor> ActiveEffects =>
-        outfitEffects
-        .Select(x => x.Descriptor);
+    public SourceDescriptor AnimatorSource => animatorSource.Descriptor ?? Constants.PyjamaDescriptor;
+    public SourceDescriptor ConfigurationSource => configurationSource.Descriptor ?? Constants.PyjamaDescriptor;
+    public IEnumerable<SourceDescriptor> ActiveEffects => outfitEffects;
 
     public EffectManager(SkeletonManager skeletonManager)
     {
@@ -37,8 +35,8 @@ public class EffectManager : IPelvisFollower
     {
         this.pelvis = watchdog;
         if (outfitEffects.Any()) RefreshEffects();
-        if (animatorSource is not null) SetAnimator(animatorSource);
-        if (configurationSource is not null) ApplyConfig();
+        if (animatorSource is not null) SetAnimator(animatorSource.Descriptor);
+        if (configurationSource is not null) SetConfiguration(configurationSource.Descriptor);
     }
 
     void RefreshEffects()
@@ -55,13 +53,14 @@ public class EffectManager : IPelvisFollower
             .ForEach(x => SetEffect(x, false));
     }
 
-    public void SetEffect(Outfit outfit, bool enabled)
+    public void SetEffect(SourceDescriptor desc, bool enabled)
     {
-        if (!pelvis || pelvis.Behavior is null || outfit is null) return;
-        if (!outfit.Effects.Any()) return;
-
-        skeletonManager.GetAddBoneSet(outfit.Descriptor, outfit.boneData.BespokeBones);
-        foreach (var effect in outfit.Effects)
+        var source = OutfitAssetManager.GetAccessorySource(desc);
+        if (!pelvis || pelvis.Behavior is null || source is null) return;
+        if (!source.GetEffects().Any()) return;
+        
+        skeletonManager.GetAddBoneSet(desc, source.GetBespokeBones());
+        foreach (var effect in source.GetEffects())
         {
             var transform = pelvis.transform.Find(effect.RelativePath);
             if (!transform) continue;
@@ -81,35 +80,25 @@ public class EffectManager : IPelvisFollower
             }
         }
 
-        if (enabled) outfitEffects.Add(outfit);
-        if (!enabled) outfitEffects.Remove(outfit);
+        if (enabled) outfitEffects.Add(desc);
+        if (!enabled) outfitEffects.Remove(desc);
     }
 
-    void ApplyConfig()
-    {
-        if (!pelvis || pelvis.Behavior is null) return;
-        if (configurationSource is null) return;
-
-        Log.Debug("ApplyConfig()");
-        pelvis.Behavior.SetHeightOffset(configurationSource.modelData.height);
-    }
-
-    public void SetConfiguration(HaDSOutfit outfit)
+    public void SetConfiguration(SourceDescriptor source)
     {
         Log.Debug("SetConfiguration()");
-        if (outfit is null) { Log.Warning("outfit is null"); return; }
+        if (source is null) { Log.Warning("outfit is null"); return; }
 
-        this.configurationSource = outfit;
-        ApplyConfig();
+        if (source != configurationSource.Descriptor) { configurationSource = OutfitAssetManager.GetAccessorySource(source); }
+        pelvis.Behavior.SetHeightOffset(configurationSource.GetConfiguration().height);
     }
 
-    public void SetAnimator(Outfit outfit)
+    public void SetAnimator(SourceDescriptor source)
     {
         if (!pelvis || pelvis.Behavior is null) { Log.Warning("Tried to swap animators with no pelviswatchdog instantiated."); return; }
-        if (outfit is null) { Log.Warning("Tried to load animator from null outfit"); return; }
+        if (source is null) { Log.Warning("Tried to load animator from null outfit"); return; }
 
-        Log.Debug($"changing animator to {outfit.DisplayName}");
-        pelvis.Behavior.SetAnimator(outfit);
-        this.animatorSource = outfit;
+        if (source != animatorSource.Descriptor) { animatorSource = OutfitAssetManager.GetAccessorySource(source); }
+        pelvis.Behavior.SetAnimator(animatorSource.GetAnimator());
     }
 }

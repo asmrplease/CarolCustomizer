@@ -16,7 +16,7 @@ namespace CarolCustomizer.Behaviors.Carol;
 
 public class AccessoryManager : IDisposable, IPelvisFollower
 {
-    Dictionary<StoredAccessory, LiveAccessory> liveAccessories = [];
+    Dictionary<AccessoryDescriptor, LiveAccessory> liveAccessories = [];
     PelvisWatchdog pelvis;
     SkeletonManager skeletonManager;
     FaceCopier faceCopier;
@@ -25,7 +25,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
     public event Action<AccessoryChangedEvent> AccessoryChanged;
     public event Action<IAccessorySource> AccessorySourceAdded;
 
-    public IEnumerable<StoredAccessory> ActiveAccessories =>
+    public IEnumerable<AccessoryDescriptor> ActiveAccessories =>
         liveAccessories
         .Where(x => x.Value.isActive)
         .Select(x => x.Key);
@@ -35,10 +35,10 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         .Values
         .Where(x => x.isActive)
         .Select(x => new AccessoryDescriptor(x));
-    public IEnumerable<Outfit> ActiveOutfits =>
-        ActiveAccessories
-        .Select(x => x.outfit)
-        .Distinct();
+    //public IEnumerable<Outfit> ActiveOutfits =>
+    //    ActiveAccessories
+    //    .Select(x => x.outfit)
+    //    .Distinct();
 
     public AccessoryManager(SkeletonManager skeletonManager, FaceCopier faceCopier)
     {
@@ -47,26 +47,28 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         OutfitAssetManager.OnOutfitUnloaded += OnSourceUnloaded;
     }
 
-    public void EnableAccessory(StoredAccessory accessory)
+    public void EnableAccessory(AccessoryDescriptor desc)
     {
-        Log.Debug($"EnableAccessory({accessory.Name})");
+        Log.Debug($"EnableAccessory({desc.Name})");
         if (!pelvis) { Log.Warning("No pelvis during EnableAccessory"); return; }
 
-        if (!liveAccessories.TryGetValue(accessory, out var live))
+        if (!liveAccessories.TryGetValue(desc, out var live))
         {
-            live = accessory.MakeLive(skeletonManager, faceCopier, OutfitAssetManager.liveFolder);
-            CheckExistingSources(accessory);
-            liveAccessories.Add(accessory, live);
+            var target = OutfitAssetManager.GetAccessory(desc);
+            if (target is null) { Log.Warning("failed to find accessory"); return; }
+
+            live = target.MakeLive(skeletonManager, faceCopier, OutfitAssetManager.liveFolder);
+            CheckExistingSources(desc);
+            liveAccessories.Add(desc, live);
         }
         live.Enable();
         if (!live.IsOnArmature(pelvis.transform)) skeletonManager.AssignLiveBones(live);
-        AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, live, true));
+        AccessoryChanged?.Invoke(new AccessoryChangedEvent(desc, live, true));
     }
 
-    void CheckExistingSources(StoredAccessory acc)
+    void CheckExistingSources(AccessoryDescriptor acc)
     {
-        bool exists = InitializedSources.TryGetValue(acc.Source, out var existing);
-        if (exists) { return; }
+        if (InitializedSources.Contains(acc.Source)) { return; }
        
         var source = OutfitAssetManager.GetAccessorySource(acc.Source);
         if (source is null) { Log.Warning($"Failed to find {source}"); return; }
@@ -75,30 +77,30 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         AccessorySourceAdded?.Invoke(source);
     }
 
-    public void DisableAccessory(StoredAccessory accessory)
+    public void DisableAccessory(AccessoryDescriptor target)
     {
-        if (!liveAccessories.ContainsKey(accessory)) { Log.Warning($"Tried to disable accessory {accessory} that was never instantiated."); return; }
+        if (!liveAccessories.ContainsKey(target)) { Log.Warning($"Tried to disable accessory {target} that was never instantiated."); return; }
 
-        liveAccessories[accessory].Disable();
-        var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
-        AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, false));
+        liveAccessories[target].Disable();
+        var liveAccessory = liveAccessories[target] as AccessoryDescriptor;
+        AccessoryChanged?.Invoke(new AccessoryChangedEvent(target, liveAccessory, false));
     }
 
-    public void PaintAccessory(StoredAccessory accessory, MaterialDescriptor material, int index)
+    public void PaintAccessory(AccessoryDescriptor accessory, MaterialDescriptor material, int index)
     {
         liveAccessories[accessory].ApplyMaterial(material, index);
         var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, true));
     }
 
-    public void PaintAccessoryShared(StoredAccessory accessory, List<Material> materials)
+    public void PaintAccessoryShared(AccessoryDescriptor accessory, List<Material> materials)
     {
         EnableAccessory(accessory);
         if (!liveAccessories.ContainsKey(accessory)) { Log.Warning("asked to paint disabled accessory"); return; }
         liveAccessories[accessory].ApplySharedMaterials(materials);
     }
 
-    public MaterialDescriptor[] GetLiveMaterials(StoredAccessory accessory)
+    public MaterialDescriptor[] GetLiveMaterials(AccessoryDescriptor accessory)
     {
         if (!liveAccessories.ContainsKey(accessory)) { return null; }
         return liveAccessories[accessory].Materials;

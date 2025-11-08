@@ -15,12 +15,12 @@ internal class UnknownArmature : MonoBehaviour, ICarolType
         return this;
     }
 
-    public void SetAnimator(Outfit outfit)
+    public void SetAnimator(RuntimeAnimatorController rac)
     {
         Log.Error("Tried to set animator on an unknown carol type.");
     }
 
-    public void SetBaseOutfit(Outfit outfit)
+    public void SetBaseOutfit(SourceDescriptor outfit)
     {
         Log.Error("Tried to set base outfit on an unknown carol type.");
     }

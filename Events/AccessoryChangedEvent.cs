@@ -3,10 +3,10 @@
 namespace CarolCustomizer.Events;
 public class AccessoryChangedEvent
 {
-    public readonly StoredAccessory Target;
+    public readonly AccessoryDescriptor Target;
     public readonly AccessoryDescriptor State;
     public readonly bool Visible;
-    public AccessoryChangedEvent(StoredAccessory target, AccessoryDescriptor state, bool visible)
+    public AccessoryChangedEvent(AccessoryDescriptor target, AccessoryDescriptor state, bool visible)
     {
         this.Target = target;
         this.State = state;

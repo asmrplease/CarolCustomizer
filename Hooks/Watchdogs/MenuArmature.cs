@@ -6,6 +6,7 @@ using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
 using Onirism.Ui;
+using CarolCustomizer.Assets;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class MenuArmature : MonoBehaviour, ICarolType
@@ -17,8 +18,8 @@ public class MenuArmature : MonoBehaviour, ICarolType
     {
         Log.Debug("MenuModBehavior.Constructor()");
         this.watchdog = watchdog;
-        //menuSwitchOutfit = this.gameObject.GetComponentInParent<MenuSwitchOutfit>(true);
-        //if (!menuSwitchOutfit) Log.Warning("No MenuSwitchOutfit component found!");
+        menuSwitchOutfit = this.gameObject.GetComponentInParent<MenuSwitchOutfit>(true);
+        if (!menuSwitchOutfit) Log.Warning("No MenuSwitchOutfit component found!");
         return this;
     }
 
@@ -29,7 +30,7 @@ public class MenuArmature : MonoBehaviour, ICarolType
         Log.Info("MenuModBehavior.OnEnable()");
         this.watchdog = GetComponent<PelvisWatchdog>();
         this.watchdog.Behavior = this;
-        //this.menuSwitchOutfit = this.gameObject.GetComponentInParent<MenuSwitchOutfit>(true);
+        this.menuSwitchOutfit = this.gameObject.GetComponentInParent<MenuSwitchOutfit>(true);
         SetBaseVisibility(false);
         PlayerInstances.DefaultPlayer.NotifySpawned(this.watchdog);
     }
@@ -48,27 +49,23 @@ public class MenuArmature : MonoBehaviour, ICarolType
         }
     }
 
-    public void SetBaseOutfit(Outfit outfit)
+    public void SetBaseOutfit(SourceDescriptor descriptor)
     {
         Log.Debug("SetBaseOutfit(MenuSwitchOutfit)");
+        var source = OutfitAssetManager.GetAccessorySource(descriptor);
+        if (source is not HaDSOutfit outfit) { Log.Warning($"SetBaseOutfit({descriptor}) found a source that was not an outfit"); return; }
+
         if (menuSwitchOutfit.loadedModel) { Destroy(menuSwitchOutfit.loadedModel); }
         menuSwitchOutfit.loadedModel = Util.SpawnOverTarget(outfit.storedAsset.gameObject, menuSwitchOutfit.gameObject);
         menuSwitchOutfit.loadedModel.SetActive(true);
         menuSwitchOutfit.loadedModel.transform.SetParent(menuSwitchOutfit.transform);
         menuSwitchOutfit.loadedModel.transform.ResetLocalPosRot();
-        menuSwitchOutfit.modelData = ((HaDSOutfit)outfit).modelData;
-        //menuSwitchOutfit.PickHair(menuSwitchOutfit.transform);
+        menuSwitchOutfit.modelData = outfit.modelData;
     }
 
-    public void SetAnimator(Outfit outfit)
-    {
-        
-    }
+    public void SetAnimator(RuntimeAnimatorController rac) { }
 
-    public void SetHeightOffset(float height)
-    {
-        
-    }
+    public void SetHeightOffset(float height) { }
 
     public void SetBaseVisibility(bool visibility)
     {
