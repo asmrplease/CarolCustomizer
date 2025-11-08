@@ -53,22 +53,13 @@ public static class RecipeApplier
                         materialDescription, 
                         (x) => target.PaintAccessory(accessory, x, index))
                 );
+            return;
         }
-        else if (materialDescription.Source.Type == SourceType.Outfit)
-        {
-            var source = OutfitAssetManager.GetAccessorySource(materialDescription.Source);
-            if (source is null) { Log.Warning($"failed to find {materialDescription.Source}."); return; }
-            Log.Debug("found outfit again...");
 
-            var liveMaterial = source.GetMaterial(materialDescription);
-            if (liveMaterial is null) { Log.Warning($"failed to find {materialDescription.Name} in source {materialDescription.Source}"); return; }
+        var mat = OutfitAssetManager.GetMaterial(materialDescription);
+        if (mat is null) { Log.Warning($"Failed to find material {materialDescription}"); return; }
 
-            target.PaintAccessory(accessory, liveMaterial, index);
-        }
-        else if (materialDescription.Source.Type == SourceType.Resources)
-        {
-            //we shouldn't be saving materials of this type probably idk lol
-        }
+        target.PaintAccessory(accessory, mat, index);
     }
 
     public static IEnumerable<SourceDescriptor> GetMatSources(RecipeDescriptor recipe)

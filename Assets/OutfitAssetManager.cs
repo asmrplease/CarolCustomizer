@@ -1,6 +1,7 @@
 ﻿using CarolCustomizer.Contracts;
 using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using Onirism.Gameplay;
@@ -22,6 +23,7 @@ public class OutfitAssetManager : IDisposable
 
     public static Dictionary<string, Dictionary<SourceDescriptor, HaDSOutfit>> outfitSets = [];
     public static Dictionary<SourceDescriptor, StoredHair> Hairstyles = [];
+    static HairDyeSource hairDyes;
     public static Dictionary<string, HairDye> HairColors = [];
 
     public OutfitAssetManager(Transform parent)
@@ -75,6 +77,12 @@ public class OutfitAssetManager : IDisposable
 
     static IAccessorySource GetHairSource(SourceDescriptor descriptor)
     {
+        if (descriptor.Name == Constants.HairDyeSourceName)
+        {
+            if (hairDyes is null) { Log.Error("Requested a hairdye before the dyes were loaded!"); }
+
+            return hairDyes;
+        }
         Hairstyles.TryGetValue(descriptor, out var source); 
         return source;
     }
@@ -96,14 +104,18 @@ public class OutfitAssetManager : IDisposable
         return GetAccessorySource(descriptor.Source)?.GetInstantiable(descriptor);
     }
 
+    public static MaterialDescriptor GetMaterial(MaterialDescriptor descriptor)
+    {
+        return GetAccessorySource(descriptor.Source)?.GetMaterial(descriptor);
+    }
+
     public static void NotifyHairReady(List<StoredHair> hair, List<HairDye> dye)
     {
         Log.Debug($"NotifyHairReady({hair.Count()} hairstyles, {dye.Count()} dyes");
         hair.Select(x => (Key: x.Source, Value: x))
             .ForEach(tup => Log.Debug($"Adding {tup.Key}, {tup.Value} to StoredHair dict"))
             .ForEach(x => Hairstyles.TryAdd(x.Key, x.Value));
-        dye.Select(x => (Key: x.locKey, Value: x))
-            .ForEach(x => HairColors.Add(x.Key, x.Value));
+        hairDyes = new HairDyeSource(dye);
         OnHairLoaded?.Invoke((hair, dye));
     }
 
