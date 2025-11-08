@@ -29,36 +29,6 @@ public static class RecipeApplier
         target.SetColliderSource(recipe.ColliderSource);
     }
 
-    public static void ActivateVariant(OutfitCoordinator outfitManager, HaDSOutfit outfit, string variantName)
-    {
-        Log.Debug("ActivateVariant()");
-        if (outfitManager is null) { Log.Error("RecipeApplier.ActivateVariant() null outfit manager"); return; }
-        if (outfit is null) { Log.Error("RecipeApplier.ActivateVariant() null outfit"); return; }
-
-        outfitManager.DisableAllAccessories();
-        outfitManager.DisableAllEffects();
-
-        outfit.Variants.TryGetValue(variantName, out var variantAccs);
-        if (variantAccs is null) { Log.Warning($"variant {variantName} not found in {outfit.DisplayName}"); return; }
-
-        var hairstyle = outfit.modelData.defaultHairstyle.GetComponent<Hairstyle>();
-        variantAccs.ForEach(x => SetAccessory(outfitManager, x));
-        outfitManager.SetEffect(outfit.Descriptor, true);
-        outfitManager.SetAnimator(outfit.Descriptor);
-        outfitManager.SetConfiguration(outfit.Descriptor);
-        outfitManager.SetColliderSource(outfit.Descriptor);
-    }
-
-    public static void ActivateFirstVariant(OutfitCoordinator outfitManager, string outfitName)
-    {
-        Log.Debug("ActivateVariant(OM, string, int");
-        HaDSOutfit outfit = OutfitAssetManager.GetOutfitByAssetName(outfitName);
-        if (outfit is null) { Log.Debug($"Didn't find outfit named: {outfitName}"); return; }
-            
-        var variant = outfit.Variants.First().Key;
-        ActivateVariant(outfitManager, outfit, variant);
-    }
-
     static void SetAccessory(OutfitCoordinator target, AccessoryDescriptor acc)
     {
         Log.Debug($"Setting accessory {acc.Source}:{acc.Name}");

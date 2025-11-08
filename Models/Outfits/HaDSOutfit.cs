@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ public class HaDSOutfit : Outfit
     public ModelData modelData { get; protected set; }
     public HairData hairData { get; protected set; }
 
-    public Dictionary<string, List<StoredAccessory>> Variants { get; private set; } = new();
+    public Dictionary<string, RecipeDescriptor> Variants { get; private set; } = new();
 
     public HaDSOutfit(Transform storedAsset) : base(storedAsset)
     {
@@ -41,15 +42,37 @@ public class HaDSOutfit : Outfit
         {
             if (compData.coopToggles.Count() == 0)
             {
-                Variants[modelData.accessories[i].name] = BuildVariant(i, -1);
+                Variants[modelData.accessories[i].name] = BuildRecipe(i, -1);
                 continue;
             }
             foreach (int j in Range(0, compData.coopMeshes.Count()))
             {
                 string variantName = $"P({j + 1}) {modelData.accessories[i].name}";
-                Variants[variantName] = BuildVariant(i, j);
+                Variants[variantName] = BuildRecipe(i, j);
             }
         }
+    }
+
+    RecipeDescriptor BuildRecipe(int accessoryGroup, int coopToggle)
+    {
+        var accessories = BuildVariant(accessoryGroup, coopToggle)
+            .Select(x => x as AccessoryDescriptor)
+            .ToList();
+        if (modelData && modelData.defaultHairstyle && modelData.defaultHaircolor)
+        {
+            var hairstyle = RecipeConverter.GetHairFromStrings(modelData.defaultHairstyle.name, modelData.defaultHaircolor.name);
+            accessories.Add(hairstyle);
+        }
+
+        return new RecipeDescriptor25
+        (
+            this.Descriptor,
+            this.Descriptor,
+            this.Descriptor,
+            accessories,
+            [this.Descriptor],
+            PluginInfo.PLUGIN_VERSION
+        );
     }
 
     List<StoredAccessory> BuildVariant(int accessoryGroup, int coopToggle)

@@ -60,37 +60,9 @@ internal static class RecipeConverter
         var accessories = legacy.ActiveAccessories
             .Select(x => (AccessoryDescriptor)x)
             .ToList();
-        var hairSourceDescriptor = new SourceDescriptor(legacy.Hairstyle, SourceType.Hair);
-        var request = OutfitAssetManager.GetAccessorySource(hairSourceDescriptor);
-        var hair = new AccessoryDescriptor
-            (
-                legacy.Hairstyle,
-                hairSourceDescriptor,
-                []
-            );
-        if (request is StoredHair hairSource)
-        {
-            MaterialDescriptor[] mats = [];
-            if (legacy.HairMaterial != "CRLH_Default_Brown")
-            {
-                int index = hairSource.hairstyle.mainMaterialIndex;
-                mats = hairSource.smr.materials
-                    .Select(x => new MaterialDescriptor(x, hairSourceDescriptor))
-                    .ToArray();
-                mats[index] = new MaterialDescriptor
-                (
-                    legacy.HairMaterial,
-                    new SourceDescriptor(Constants.HairDyeSourceName, SourceType.Hair)
-                );
-            }
-            hair.Materials = mats;
-        }
-        else { Log.Warning($"failed to find hair source {hairSourceDescriptor}"); }
-        
-
-
         var effects = legacy.ActiveEffects
             .Select(x => (SourceDescriptor)x);
+        var hair = GetHairFromStrings(legacy.Hairstyle, legacy.HairMaterial);
         return new RecipeDescriptor25
         (
             (SourceDescriptor)legacy.AnimatorSource,
@@ -101,4 +73,37 @@ internal static class RecipeConverter
             "2.5.0"
         );
     }
+
+    internal static AccessoryDescriptor GetHairFromStrings(string hairstyle, string dye)
+    {
+        var hairSourceDescriptor = new SourceDescriptor(hairstyle, SourceType.Hair);
+        var hair = new AccessoryDescriptor
+        (
+            hairstyle,
+            hairSourceDescriptor,
+            []
+        );
+        var request = OutfitAssetManager.GetAccessorySource(hairSourceDescriptor);
+        if (request is StoredHair hairSource)
+        {
+            MaterialDescriptor[] mats = [];
+            if (dye != "CRLH_Default_Brown")
+            {
+                int index = hairSource.hairstyle.mainMaterialIndex;
+                mats = hairSource.smr.materials
+                    .Select(x => new MaterialDescriptor(x, hairSourceDescriptor))
+                    .ToArray();
+                mats[index] = new MaterialDescriptor
+                (
+                    dye,
+                    new SourceDescriptor(Constants.HairDyeSourceName, SourceType.Hair)
+                );
+            }
+            hair.Materials = mats;
+        }
+        else { Log.Warning($"failed to find hair source {hairSourceDescriptor}"); }
+
+        return hair;
+    }
+
 }

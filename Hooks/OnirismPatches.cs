@@ -6,9 +6,7 @@ using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Hooks.Watchdogs;
-using Onirism.Ui;
-using CarolCustomizer.UI.Main;
-using System;
+using System.Linq;
 
 namespace CarolCustomizer.Hooks;
 
@@ -29,9 +27,11 @@ public static class OnirismPatches
             if (player is null) return false;
 
             Log.Debug($"CostumeSwapUI: {modelData.name}");
-            RecipeApplier.ActivateFirstVariant(
+            var recipe = OutfitAssetManager.GetOutfitByAssetName(modelData.name)?.Variants.FirstOrDefault().Value;
+            if (recipe is null) { Log.Error($"Failed to find any recipes in outfit {modelData.name}"); return false; }
+            RecipeApplier.ActivateRecipe(
                 player.outfitManager,
-                OutfitAssetManager.GetOutfitByAssetName(modelData.name).AssetName);
+                recipe);
             return false;
         }
     }

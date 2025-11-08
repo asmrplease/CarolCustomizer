@@ -139,7 +139,6 @@ internal class MagicaManager
         processing.RemoveAll(x => !x);
         Log.Info($"HandleBuildComplete({success}, {component}, {buildGuid}.");
         if (!targetPelvis) { Log.Warning("build completed after pelvis was destroyed"); return; }
-
         if (processing.Any()) return;
 
         targetPelvis.AnimData.EnableAnimator();

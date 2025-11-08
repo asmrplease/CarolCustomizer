@@ -58,7 +58,7 @@ public class OutfitListUI : MonoBehaviour
 
         OutfitAssetManager.OnOutfitLoaded += OnOutfitLoaded;
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
-        OutfitAssetManager.OnHairLoaded += HandleHairLoaded;
+        //OutfitAssetManager.OnHairLoaded += HandleHairLoaded;
         Settings.Favorites.OnFavoritesCleared += UnfavoriteAllAccessories;
         deselectAll.onClick.AddListener(HandleDisableAllAccessories);
         deselectAll.onClick.AddListener(HandleDisableAllEffects);

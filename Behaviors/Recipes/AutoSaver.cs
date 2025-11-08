@@ -64,7 +64,7 @@ internal class AutoSaver : IDisposable
                 .Variants
                 .Keys
                 .ElementAt(playerIndex);
-            RecipeApplier.ActivateVariant(outfitManager, outfit, variant);
+            RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
             yield break;
         }
         Log.Info("Loading autosave recipe");

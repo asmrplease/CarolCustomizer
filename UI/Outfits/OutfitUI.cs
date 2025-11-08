@@ -176,10 +176,9 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             ,("Activate Effects", () => target.SetEffect(outfit.Descriptor, true))
             ,("Disable Effects",  () => target.SetEffect(outfit.Descriptor, false))
         };
-        hads.Variants.Keys
-            .ForEach(x =>
-                results.Add(($"Load: {x}", () => 
-                    RecipeApplier.ActivateVariant(target, hads, x))));
+        hads.Variants
+            .ForEach(tup =>
+                results.Add(($"Load: {tup.Key}", () => RecipeApplier.ActivateRecipe(target, tup.Value))));
         return results;
     }
     #endregion
