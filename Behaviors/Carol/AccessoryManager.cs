@@ -74,6 +74,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         if (source is null) { Log.Warning($"Failed to find {source}"); return; }
 
         InitializedSources.Add(acc.Source);
+        Log.Debug("Notifying Source Setup");
         AccessorySourceAdded?.Invoke(source);
     }
 

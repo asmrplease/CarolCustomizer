@@ -32,6 +32,7 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
         this.DisplayName = LocalizationIndex.GetLine(hairstyle.localizationName);
         var smr = hairstyle.model as SkinnedMeshRenderer;
         this.BespokeBones = [hairstyle.transform.root];
+        this.BespokeBones.ForEach(x => x.transform.localScale = Vector3.one);
         this.smr = hairstyle.model as SkinnedMeshRenderer;
         var magicas = hairstyle.transform.root
             .GetComponentsInChildren<MagicaCloth>();

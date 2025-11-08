@@ -13,14 +13,12 @@ using UnityEngine;
 namespace CarolCustomizer.Behaviors.Carol;
 internal class MagicaManager
 {
-    Dictionary<LiveAccessory, MagicaCloth> LiveCloths = [];
-
     SkeletonManager skeleton;
     PelvisWatchdog targetPelvis;
 
     List<MagicaCloth> processing = [];
-    Dictionary<AccessoryDescriptor, MagicaCloth> MeshClothAccs = [];
-    List<MagicaCloth> BoneCloths = [];
+    Dictionary<AccessoryDescriptor, MagicaCloth> MeshCloths = [];
+    Dictionary<int, MagicaCloth> BoneCloths = [];
     IAccessorySource colliderSource;
 
     public SourceDescriptor ColliderSourceName => colliderSource.Descriptor ?? Constants.PyjamaDescriptor;
@@ -28,7 +26,7 @@ internal class MagicaManager
     public MagicaManager(SkeletonManager skeletonManager)
     {
         this.skeleton = skeletonManager;
-        this.skeleton.OnLiveBonesAssigned += HandleNewLiveAcc;
+        this.skeleton.OnLiveBonesAssigned += AccMeshClothSetup;
     }
 
     public void HandleNewPelvis(PelvisWatchdog newPelvis)
@@ -36,8 +34,15 @@ internal class MagicaManager
         Log.Debug("magicamanager.handleNewPelvis()");
         targetPelvis = newPelvis;
         if (colliderSource is not null) ApplyCollider();
-        MeshClothAccs.Clear();
-        BoneCloths.Where(x => x).ForEach(GameObject.DestroyImmediate);
+        MeshCloths
+            .Select(kvp => kvp.Value)
+            .Where(x => x)
+            .ForEach(GameObject.DestroyImmediate);
+        MeshCloths.Clear();
+        BoneCloths
+            .Select(kvp => kvp.Value)
+            .Where(x => x)
+            .ForEach(GameObject.DestroyImmediate);
         BoneCloths.Clear();
     }
 
@@ -77,66 +82,55 @@ internal class MagicaManager
             .ForEach(x => BoneClothSetup(x, source));
     }
 
-    void BoneClothSetup(MagicaCloth magica, IAccessorySource source)
+    void BoneClothSetup(MagicaCloth refMagica, IAccessorySource source)
     {
-        Log.Debug($"BoneClothSetup({magica.name})");
-        var liveMagica = GameObject.Instantiate(magica, targetPelvis.transform.parent);
-        liveMagica.name = magica.name + " BoneCloth";
-        targetPelvis.AnimData.DisableAnimator();
-        //TODO: can we refactor this?
-        liveMagica.ReplaceTransform(skeleton.GetAddBoneSet(source.Descriptor, source.GetBespokeBones()));
-        liveMagica.SerializeData.cullingSettings.cameraCullingMode = CullingSettings.CameraCullingMode.Off;
-        liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();
-        liveMagica.SerializeData.colliderCollisionConstraint.colliderList.AddRange(
-            targetPelvis
-            .MagiData
-            .CapsuleColliders);
-        liveMagica.SetParameterChange();
-        processing.Add(liveMagica);
-        var buildGuid = Guid.NewGuid();
-        Log.Debug($"Starting build {buildGuid.ToString()} for {source}");
-        liveMagica.OnBuildComplete += (_, x) => HandleBuildComplete(x, liveMagica, buildGuid);
-        liveMagica.BuildAndRun();
-        BoneCloths.Add(liveMagica);
-        magica.gameObject.SetActive(true);
+        if (BoneCloths.TryGetValue(refMagica.GetInstanceID(), out var existing) && existing) { GameObject.Destroy(existing); }
+
+        var liveMagica = GameObject.Instantiate(refMagica, targetPelvis.transform.parent);
+        liveMagica.name = refMagica.name + " BoneCloth";
+        CommonSetup(liveMagica, source.Descriptor, source.GetBespokeBones());
+        BoneCloths[refMagica.GetInstanceID()] = liveMagica;
     }
 
-    public void HandleNewLiveAcc(LiveAccessory acc)
+    public void AccMeshClothSetup(LiveAccessory acc)
     {
-        //if (!MeshClothAccs.TryGetValue(acc.AsDescriptor(), out var referenceMagica)) return;
         if (!acc.meshCloth) return;
-        Log.Info($"MagicaManager.HandleNewLiveAcc({acc.Name})");
 
-        var referenceMagica = acc.meshCloth;
-        if (LiveCloths.TryGetValue(acc, out var existing) && existing) GameObject.Destroy(existing.gameObject);
+        Log.Info($"MagicaManager.HandleNewLiveAcc({acc.Name})");
+        if (MeshCloths.TryGetValue(acc, out var existing) && existing) GameObject.Destroy(existing);
         if (!acc.isActive) return;
 
-        targetPelvis.AnimData.DisableAnimator();
-        //MeshClothAccs.Remove(acc.AsDescriptor());
-        var boneDict = skeleton.GetAddBoneSet(acc.Source, acc.BespokeBones);
-        
+        var referenceMagica = acc.meshCloth;
         referenceMagica.gameObject.SetActive(false);
         var liveMagica = GameObject.Instantiate(referenceMagica, targetPelvis.transform.parent);
-        liveMagica.SerializeData.cullingSettings.cameraCullingMode = CullingSettings.CameraCullingMode.Off;
-        liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();
         liveMagica.SerializeData.sourceRenderers.Clear();
         liveMagica.SerializeData.rootBones.Clear();
         acc.AddToMagica(liveMagica);
         skeleton.AssignLiveBones(acc, false);
+        CommonSetup(liveMagica, acc.Source, acc.BespokeBones);
+        liveMagica.name = acc.Name + " MeshCloth";
+        referenceMagica.gameObject.SetActive(true);
+        MeshCloths[acc] = liveMagica;
+    }
+
+    void CommonSetup(MagicaCloth liveMagica, SourceDescriptor source, List<Transform> bespokeBones)
+    {
+        targetPelvis.AnimData.DisableAnimator();
+        var boneDict = skeleton.GetAddBoneSet(source, bespokeBones);
+        liveMagica.ReplaceTransform(boneDict);
+        liveMagica.SerializeData.cullingSettings.cameraCullingMode = CullingSettings.CameraCullingMode.Off;
+        liveMagica.SerializeData.colliderCollisionConstraint.colliderList.Clear();
         liveMagica.SerializeData.colliderCollisionConstraint.colliderList.AddRange(
             targetPelvis
             .MagiData
             .CapsuleColliders);
-        liveMagica.name = acc.Name + " MeshCloth";
-        liveMagica.ReplaceTransform(boneDict);
         liveMagica.SetParameterChange();
         var buildGuid = Guid.NewGuid();
-        Log.Debug($"Starting build {buildGuid.ToString()} for {acc.Name}");
+        Log.Debug($"Starting build {buildGuid.ToString()} for {source}");
         liveMagica.OnBuildComplete += (_, x) => HandleBuildComplete(x, liveMagica, buildGuid);
         liveMagica.BuildAndRun();
+        processing.Add(liveMagica);
         liveMagica.gameObject.SetActive(true);
-        referenceMagica.gameObject.SetActive(true);
-        LiveCloths[acc] = liveMagica;
     }
 
     void HandleBuildComplete(bool success, MagicaCloth component, Guid buildGuid)
