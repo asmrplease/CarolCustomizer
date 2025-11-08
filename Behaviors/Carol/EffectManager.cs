@@ -89,16 +89,29 @@ public class EffectManager : IPelvisFollower
         Log.Debug("SetConfiguration()");
         if (source is null) { Log.Warning("outfit is null"); return; }
 
-        if (source != configurationSource.Descriptor) { configurationSource = OutfitAssetManager.GetAccessorySource(source); }
-        pelvis.Behavior.SetHeightOffset(configurationSource.GetConfiguration().height);
+        if (source != configurationSource?.Descriptor) { configurationSource = OutfitAssetManager.GetAccessorySource(source); }
+        if (configurationSource.GetConfiguration() is not ModelData modelData) { Log.Warning("Configuration source does not have ModelData."); return; }
+
+        pelvis.Behavior.SetHeightOffset(modelData.height);
     }
 
-    public void SetAnimator(SourceDescriptor source)
+    public void SetAnimator(SourceDescriptor desc)
     {
+        Log.Debug($"EffectManager.SetAnimator({desc})");
         if (!pelvis || pelvis.Behavior is null) { Log.Warning("Tried to swap animators with no pelviswatchdog instantiated."); return; }
-        if (source is null) { Log.Warning("Tried to load animator from null outfit"); return; }
+        Log.Debug("pelvis and pelvis.behavior were valid.");
+        if (desc is null) { Log.Warning("Tried to load animator from null outfit"); return; }
+        Log.Debug("Input descriptor is valid");
 
-        if (source != animatorSource.Descriptor) { animatorSource = OutfitAssetManager.GetAccessorySource(source); }
-        pelvis.Behavior.SetAnimator(animatorSource.GetAnimator());
+        if (desc == animatorSource?.Descriptor) { pelvis.Behavior.SetAnimator(animatorSource.GetAnimator()); return; }
+
+        Log.Debug("input descriptor doesn't match existing, replacing");
+        if (OutfitAssetManager.GetAccessorySource(desc) is not IAccessorySource source) return;
+        Log.Debug("iaccessorysource is valid");
+        if (source.GetAnimator() is not RuntimeAnimatorController rac) { Log.Warning($"{desc} had a null RAC"); return; }
+        Log.Debug("rac is valid");
+        animatorSource = source;
+        pelvis.Behavior.SetAnimator(rac);
+        Log.Debug("SetAnimator() completed.");
     }
 }

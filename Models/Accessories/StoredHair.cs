@@ -19,9 +19,10 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
     public readonly List<Transform> BespokeBones;
 
     SourceDescriptor IAccessorySource.Descriptor => this.Source;
+    AccessoryDescriptor IInstantiable.Descriptor => this;
 
     public StoredHair(Hairstyle hairstyle) :
-        base(hairstyle.name, new SourceDescriptor(Constants.HairstyleSourceName, SourceType.Hair))
+        base(hairstyle.name, new SourceDescriptor(hairstyle.name, SourceType.Hair))
     {
         this.hairstyle = hairstyle;
         this.AssetName = hairstyle.name;
@@ -74,4 +75,11 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
     ModelData IAccessorySource.GetConfiguration() => null;
 
     List<MagicaCapsuleCollider> IAccessorySource.GetColliders() => [];
+
+    IInstantiable IAccessorySource.GetInstantiable(AccessoryDescriptor accessory)
+    {
+        //jif (accessory != this) return null;
+
+        return this;
+    }
 }

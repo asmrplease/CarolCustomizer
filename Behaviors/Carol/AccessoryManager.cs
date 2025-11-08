@@ -54,7 +54,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
 
         if (!liveAccessories.TryGetValue(desc, out var live))
         {
-            var target = OutfitAssetManager.GetAccessory(desc);
+            var target = OutfitAssetManager.GetInstantiable(desc);
             if (target is null) { Log.Warning("failed to find accessory"); return; }
 
             live = target.MakeLive(skeletonManager, faceCopier, OutfitAssetManager.liveFolder);

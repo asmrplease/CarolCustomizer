@@ -13,6 +13,7 @@ namespace CarolCustomizer.Contracts
         SourceDescriptor Descriptor { get; }
         StoredAccessory GetAccessory(AccessoryDescriptor accessory);
         List<StoredAccessory> GetAccessories();
+        IInstantiable GetInstantiable(AccessoryDescriptor accessory);
         MaterialDescriptor GetMaterial(MaterialDescriptor material);
         List<MaterialDescriptor> GetMaterials();
         List<Transform> GetBespokeBones();

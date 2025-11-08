@@ -150,7 +150,7 @@ public static class RecipeApplier
         return recipe.ActiveAccessories
             .Select(acc => (acc, source: OutfitAssetManager.GetAccessorySource(acc.Source)))
             .Where(tup => tup.source is not null)
-            .Where(tup => tup.source.GetAccessory(tup.acc) is null)
+            .Where(tup => tup.source.GetInstantiable(tup.acc) is null)
             .Select(tup => tup.acc);
     }
 

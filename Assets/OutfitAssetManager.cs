@@ -91,14 +91,16 @@ public class OutfitAssetManager : IDisposable
         return null;
     }
 
-    public static StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
+    public static IInstantiable GetInstantiable(AccessoryDescriptor descriptor)
     {
-        return GetAccessorySource(descriptor.Source)?.GetAccessory(descriptor);
+        return GetAccessorySource(descriptor.Source)?.GetInstantiable(descriptor);
     }
 
     public static void NotifyHairReady(List<StoredHair> hair, List<HairDye> dye)
     {
+        Log.Debug($"NotifyHairReady({hair.Count()} hairstyles, {dye.Count()} dyes");
         hair.Select(x => (Key: x.Source, Value: x))
+            .ForEach(tup => Log.Debug($"Adding {tup.Key}, {tup.Value} to StoredHair dict"))
             .ForEach(x => Hairstyles.TryAdd(x.Key, x.Value));
         dye.Select(x => (Key: x.locKey, Value: x))
             .ForEach(x => HairColors.Add(x.Key, x.Value));

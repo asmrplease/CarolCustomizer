@@ -3,6 +3,7 @@ using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
+using System;
 using System.Linq;
 
 namespace CarolCustomizer.Models.Recipes;
@@ -57,9 +58,16 @@ internal static class RecipeConverter
         //build hair accessory descriptor
         Log.Debug("RecipeDescriptor24 to RecipDescriptor25");
         var accessories = legacy.ActiveAccessories
-            .Select(x => (AccessoryDescriptor)x);
+            .Select(x => (AccessoryDescriptor)x)
+            .ToList();
         var hairSourceDescriptor = new SourceDescriptor(legacy.Hairstyle, SourceType.Hair);
         var request = OutfitAssetManager.GetAccessorySource(hairSourceDescriptor);
+        var hair = new AccessoryDescriptor
+            (
+                legacy.Hairstyle,
+                hairSourceDescriptor,
+                []
+            );
         if (request is StoredHair hairSource)
         {
             MaterialDescriptor[] mats = [];
@@ -71,23 +79,16 @@ internal static class RecipeConverter
                     .ToArray();
                 mats[index] = new MaterialDescriptor
                 (
-                    legacy.HairMaterial, 
+                    legacy.HairMaterial,
                     new SourceDescriptor(Constants.HairDyeSourceName, SourceType.Hair)
                 );
             }
-            
-            var hair = new AccessoryDescriptor
-            (
-                legacy.Hairstyle,
-                hairSourceDescriptor,
-                //figure out how to quickly set teh hair material to the correct hairstyle index
-                mats
-            );
-            accessories.Append(hair);
+            hair.Materials = mats;
         }
+        else { Log.Warning($"failed to find hair source {hairSourceDescriptor}"); }
         
-        
-            
+
+
         var effects = legacy.ActiveEffects
             .Select(x => (SourceDescriptor)x);
         return new RecipeDescriptor25
@@ -95,7 +96,7 @@ internal static class RecipeConverter
             (SourceDescriptor)legacy.AnimatorSource,
             (SourceDescriptor)legacy.BaseOutfitName,
             (SourceDescriptor)legacy.ColliderSource,
-            accessories,
+            accessories.Append(hair),
             effects,
             "2.5.0"
         );

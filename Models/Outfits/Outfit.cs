@@ -165,5 +165,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
     public List<OutfitEffect> GetEffects() => this.Effects;
 
     List<MagicaCapsuleCollider> IAccessorySource.GetColliders() => this.magiData.CapsuleColliders;
+
+    IInstantiable IAccessorySource.GetInstantiable(AccessoryDescriptor accessory) => GetAccessory(accessory);
     #endregion
 }

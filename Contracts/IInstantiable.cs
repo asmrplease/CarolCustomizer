@@ -4,8 +4,9 @@ using CarolCustomizer.Models.Accessories;
 using UnityEngine;
 
 namespace CarolCustomizer.Contracts;
-internal interface IInstantiable
+public interface IInstantiable
 {
+    AccessoryDescriptor Descriptor { get; }
     LiveAccessory MakeLive(SkeletonManager skeleton, FaceCopier faceCopier, Transform folder);
 
 }

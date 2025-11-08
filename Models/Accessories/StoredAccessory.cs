@@ -24,6 +24,8 @@ public class StoredAccessory : AccessoryDescriptor, IInstantiable
         outfit.magiData.smrMeshClothDict.TryGetValue(smr, out this.magica);
     }
 
+    AccessoryDescriptor IInstantiable.Descriptor => this;
+
     public LiveAccessory MakeLive(SkeletonManager skeleton, FaceCopier faceCopier, Transform folder)
     {
         return outfit.FaceDefinition.Invoke(this.referenceSMR) ?
