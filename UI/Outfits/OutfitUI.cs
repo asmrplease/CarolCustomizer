@@ -118,7 +118,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     {
         Log.Debug("OutfitUI.HandleAccessoryChanged()");
         var accUI = GetAccUI(eventData.Target);
-        if (!accUI) { Log.Error($"didn't find accessory {eventData.Target} for ACE in {outfit.DisplayName}"); return; }
+        if (!accUI) { Log.Error($"OutfitUI.HandleAccessoryChanged: no target {eventData.Target} in {outfit.Descriptor}"); return; }
 
         accUI.HandleAccessoryChanged(eventData);
         OnAccessoryToggled();

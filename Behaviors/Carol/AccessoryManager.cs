@@ -35,10 +35,6 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         .Values
         .Where(x => x.isActive)
         .Select(x => new AccessoryDescriptor(x));
-    //public IEnumerable<Outfit> ActiveOutfits =>
-    //    ActiveAccessories
-    //    .Select(x => x.outfit)
-    //    .Distinct();
 
     public AccessoryManager(SkeletonManager skeletonManager, FaceCopier faceCopier)
     {

@@ -130,17 +130,17 @@ public class OutfitListUI : MonoBehaviour
         outfitUIs.Values.ForEach(x => x.HandleFilterEvent(eventData));
         if (eventData.ShowActive)
         {
-            TargetOutfit.ActiveAccessories
-                .ForEach(acc => outfitUIs[acc.Source].SetAccUIVisible(acc));
+            foreach(var acc in TargetOutfit.ActiveAccessories)
+            {
+                if (!outfitUIs.TryGetValue(acc.Source, out var ui)) continue;
+
+                ui.SetAccUIVisible(acc);
+            }
         }
         if (eventData.ShowFavorites)
         {
             Settings.Favorites
                 .favorites
-                //.Select(acc =>  
-                //    (outfit: OutfitAssetManager.GetAccessorySource(acc.Source)
-                //    ,acc))
-                //.Where(tup => tup.outfit is not null)
                 .ForEach(acc => outfitUIs[acc.Source].SetAccUIVisible(acc));
         }
         Log.Info(eventData.ToString());

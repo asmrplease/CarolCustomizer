@@ -64,17 +64,15 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
 
     public bool Equals(AccessoryDescriptor other)
     {
-        if (ReferenceEquals(null, other)) return false;
+        if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return Name.DeInstance() == other.Name.DeInstance() 
-            && Source == other.Source 
-            && Materials.SequenceEqual(other.Materials);
+        return this.GetHashCode() == other.GetHashCode();
     }
 
     public override bool Equals(object other)
     {
-        if (ReferenceEquals(null, other)) return false;
+        if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
         if (other.GetType() != GetType()) return false;
 
