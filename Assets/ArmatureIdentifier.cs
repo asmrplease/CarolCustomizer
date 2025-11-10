@@ -16,6 +16,7 @@ internal class ArmatureIdentifier
     static ArmatureIdentifier() => checks =
         [
             //Check<MonoBehaviour,  ArmatureType>,        (watchdog) => additional detection condition),
+            (Check<MenuSwitchOutfit,MenuArmature>,        (x)=> true),
             (Check<VirtualCarol,    MPBotArmature>,       (x)=> true),
             //toybox outfit preview
             (Check<Entity,          PlayerArmature>,      (x)=> x.rootName == "CAROL(Clone)"),
@@ -26,7 +27,7 @@ internal class ArmatureIdentifier
             (Check<CutsceneActor,   ActressArmature>,     (x)=> true),
             (Check<Character,       NPCArmature>,         (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
             (Check<Character,       ActressArmature>,     (x)=> true),
-            (Check<MenuSwitchOutfit,MenuArmature>,        (x)=> true),
+            //old MSO location
             (Check<Transform,       NPCArmature>,         (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
             (Check<Transform,       OutfitArmature>,      (x)=> x.gameObject.scene.buildIndex == -1),
             (Check<Transform,       ActressArmature>,     (x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error),

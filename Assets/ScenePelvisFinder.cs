@@ -24,7 +24,7 @@ public class ScenePelvisFinder : IDisposable
     {
         Log.Debug("FindAllPelvises");
         if (mode == LoadSceneMode.Additive) return;
-        if (scene.name == Constants.MenuSceneName) return;
+        //if (scene.name == Constants.MenuSceneName) return;
         
         Resources
             .FindObjectsOfTypeAll<GameObject>()

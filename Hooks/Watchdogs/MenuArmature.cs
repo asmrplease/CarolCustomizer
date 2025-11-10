@@ -70,6 +70,9 @@ public class MenuArmature : MonoBehaviour, ICarolType
     public void SetBaseVisibility(bool visibility)
     {
         watchdog?.CompData?.SetBaseVisibility(visibility);
+        GetComponentsInChildren<Hairstyle>()
+            .ToList()
+            .ForEach(x => GameObject.Destroy(x.gameObject));
     }
 
     public void Dispose()

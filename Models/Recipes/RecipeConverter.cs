@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace CarolCustomizer.Models.Recipes;
 
-internal static class RecipeConverter
+public static class RecipeConverter
 {
     internal static RecipeDescriptor21 ToVersion210(this RecipeDescriptor20 legacy)
     {
@@ -74,7 +74,7 @@ internal static class RecipeConverter
         );
     }
 
-    internal static AccessoryDescriptor GetHairFromStrings(string hairstyle, string dye)
+    public static AccessoryDescriptor GetHairFromStrings(string hairstyle, string dye)
     {
         var hairSourceDescriptor = new SourceDescriptor(hairstyle, SourceType.Hair);
         var hair = new AccessoryDescriptor

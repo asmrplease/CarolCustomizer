@@ -125,7 +125,13 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
         return result;
     }
 
-    public StoredAccessory GetAccessoryByName(string name) => AccDict.Values.FirstOrDefault(x => x.Name == name);
+    public StoredAccessory GetAccessoryByName(string name)
+    {
+        var result = AccDict.Values.FirstOrDefault(x => x.Name == name);
+        if (result is null) { Log.Warning($"failed to find {name} by name in {Descriptor}."); }
+        //else { Log.Debug($"found {name} in {Descriptor}"); }
+        return result;
+    }
 
     public virtual RuntimeAnimatorController GetAnimator() => null;
 
