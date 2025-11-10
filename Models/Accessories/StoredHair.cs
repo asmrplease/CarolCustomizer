@@ -50,10 +50,7 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
         return new LiveAccessory(this, folder);
     }
 
-    List<StoredAccessory> IAccessorySource.GetAccessories()
-    {
-        return [];
-    }
+    List<StoredAccessory> IAccessorySource.GetAccessories() => [];
 
     StoredAccessory IAccessorySource.GetAccessory(AccessoryDescriptor accessory)
     {
@@ -66,15 +63,9 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
     List<MagicaCloth> IAccessorySource.GetBoneCloths() => this.boneCloths;
     public List<MagicaCloth> GetMeshCloths() => this.meshCloths;
 
-    MaterialDescriptor IAccessorySource.GetMaterial(MaterialDescriptor material)
-    {
-        return null;
-    }
+    MaterialDescriptor IAccessorySource.GetMaterial(MaterialDescriptor material) => null;
 
-    List<MaterialDescriptor> IAccessorySource.GetMaterials()
-    {
-        return [];
-    }
+    List<MaterialDescriptor> IAccessorySource.GetMaterials() => [];
 
     public LiveAccessory MakeLive(SkeletonManager skeleton, FaceCopier faceCopier, Transform folder)
     {
@@ -91,7 +82,7 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
 
     IInstantiable IAccessorySource.GetInstantiable(AccessoryDescriptor accessory)
     {
-        //jif (accessory != this) return null;
+        //if (accessory != this) return null;
 
         return this;
     }

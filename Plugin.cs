@@ -107,6 +107,11 @@ public class CCPlugin : BaseUnityPlugin
             .Select(PelvisWatchdog.GetAddWatchdog);
     }
 
+    static void Tests()
+    {
+        EqualityTests.SourceDescriptorTest();
+    }
+
     void OnDisable()
     {
         Log.Info("Plugin OnDisable()");

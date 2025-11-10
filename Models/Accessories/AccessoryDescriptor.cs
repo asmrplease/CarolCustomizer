@@ -16,14 +16,6 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
     public readonly SourceDescriptor Source;
     public MaterialDescriptor[] Materials;
 
-    //[JsonConstructor]
-    //public AccessoryDescriptor(string name, string source, MaterialDescriptor[] materials)
-    //{
-    //    Name = name;
-    //    Source = source;
-    //    Materials = materials;
-    //}
-
     [JsonConstructor]
     public AccessoryDescriptor(string name, SourceDescriptor source, MaterialDescriptor[] materials)
     {
@@ -36,8 +28,6 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
     {
         Name = name;
         Source = source;
-        //does having an empty list of materials cause problems here?
-        //only thing that uses this is LiveAccessory
     }
 
     public AccessoryDescriptor(SkinnedMeshRenderer smr, SourceDescriptor source)
@@ -67,7 +57,9 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return this.GetHashCode() == other.GetHashCode();
+        return this.Name.DeInstance().Equals(other.Name.DeInstance()) 
+            && this.Source.Equals(other.Source)
+            && this.Materials.SequenceEqual(other.Materials);
     }
 
     public override bool Equals(object other)

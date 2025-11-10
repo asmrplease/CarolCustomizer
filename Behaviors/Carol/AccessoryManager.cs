@@ -83,11 +83,13 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(target, liveAccessory, false));
     }
 
-    public void PaintAccessory(AccessoryDescriptor accessory, MaterialDescriptor material, int index)
+    public void PaintAccessory(AccessoryDescriptor target, MaterialDescriptor material, int index)
     {
-        liveAccessories[accessory].ApplyMaterial(material, index);
-        var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
-        AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, true));
+        if (!liveAccessories.TryGetValue(target, out var live)) { Log.Warning($"PaintAccessory failed to find {target}."); return; }
+
+        live.ApplyMaterial(material, index);
+        var newState = liveAccessories[target] as AccessoryDescriptor;
+        AccessoryChanged?.Invoke(new AccessoryChangedEvent(target, newState, true));
     }
 
     public void PaintAccessoryShared(AccessoryDescriptor accessory, List<Material> materials)

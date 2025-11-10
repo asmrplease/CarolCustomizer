@@ -1,12 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using JetBrains.Annotations;
+using Newtonsoft.Json;
 using System;
 
 namespace CarolCustomizer.Models.Outfits;
 
-public class SourceDescriptor : IEquatable<SourceDescriptor>, IComparable<SourceDescriptor>
+public record SourceDescriptor : IEquatable<SourceDescriptor>, IComparable<SourceDescriptor>
 {
-    public readonly string Name;
-    public readonly SourceType Type;
+    public string Name;
+    public SourceType Type;
 
     [JsonConstructor]
     public SourceDescriptor(string name, SourceType type)
@@ -17,32 +18,6 @@ public class SourceDescriptor : IEquatable<SourceDescriptor>, IComparable<Source
 
     //This operator is implicit for the purposes of automatically converting old descriptors left in json
     public static implicit operator SourceDescriptor(string name) => new(name, SourceType.Outfit);
-
-    //public static SourceDescriptor FromString(string name)
-    //{
-    //    return new SourceDescriptor(name, SourceType.Outfit);
-    //}
-
-    public bool Equals(SourceDescriptor other)
-    {
-        if (other is null) { return false; }
-        if (ReferenceEquals(this, other)) { return true; }
-
-        return Type == other.Type
-            && Name == other.Name;
-    }
-
-    public override bool Equals(object other)
-    {
-        if (other is null) return false;
-        if (other.GetType() != GetType()) return false;
-        return base.Equals((SourceDescriptor) other);
-    }
-
-    public override int GetHashCode()
-    {
-        return Type.GetHashCode() ^ Name.GetHashCode();
-    }
 
     public override string ToString()
     {
