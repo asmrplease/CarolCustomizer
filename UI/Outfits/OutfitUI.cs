@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Recipes;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Events;
@@ -93,8 +94,12 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
         if (!AccUIs.TryGetValue(descriptor, out var UI))
         {
-            Log.Warning($"Key {descriptor} wasn't in {outfit.DisplayName}.");
-            return null;
+            if (OutfitAssetManager.GetInstantiable(descriptor) is not StoredAccessory stored)
+            {
+                Log.Warning($"Key {descriptor} wasn't in {outfit.DisplayName}.");
+                return null;
+            }
+            if (!AccUIs.TryGetValue(stored, out UI)) { Log.Warning("failed twice to find accUI, good job."); return null; }
         }
 
         if (!UI) UI = AccUIs[descriptor] = ui.Factory.BuildAccUI(this, descriptor);

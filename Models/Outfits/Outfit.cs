@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace CarolCustomizer.Models.Outfits;
 
@@ -115,11 +116,16 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
     public StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
     {
         AccDict.TryGetValue(descriptor, out StoredAccessory result);
-        result ??= GetAccessory(descriptor.Name);
+        if (result == null)
+        {
+            Log.Warning($"failed to match {descriptor}, looking up accessory by name.");
+            result = GetAccessoryByName(descriptor.Name);
+            if (result == null) Log.Warning($"Accessory {descriptor.Name} is not in {descriptor.Source}.");
+        }
         return result;
     }
 
-    public StoredAccessory GetAccessory(string name) => AccDict.Values.FirstOrDefault(x => x.Name == name);
+    public StoredAccessory GetAccessoryByName(string name) => AccDict.Values.FirstOrDefault(x => x.Name == name);
 
     public virtual RuntimeAnimatorController GetAnimator() => null;
 

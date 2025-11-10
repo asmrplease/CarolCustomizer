@@ -147,10 +147,11 @@ public static class MiscExtensions
         return sequence;
     }
 
-    public static void ForEach<T>(this T[] sequence, Action<T> action)
+    public static T[] ForEach<T>(this T[] sequence, Action<T> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
         foreach (T item in sequence) action(item);
+        return sequence;
     }
 
     public static ConfigEntry<T> AsConfigEntry<T>(this EventArgs e)

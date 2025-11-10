@@ -82,7 +82,7 @@ public class HaDSOutfit : Outfit
         foreach (int i in Range(0, modelData.accessories.Count))
         {
             foreach (var acc in modelData.accessories[i].objects
-                .Select(x=> x? GetAccessory(x.name) : null))
+                .Select(x => x? GetAccessoryByName(x.name) : null))
             {
                 if (acc is null) continue;
                 if (!results[acc]) continue;//if it's already been disabled, don't turn it back on
