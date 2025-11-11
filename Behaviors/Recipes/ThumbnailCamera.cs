@@ -8,7 +8,7 @@ using System.IO;
 using System.Collections;
 using UnityEngine;
 using System.Linq;
-using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Assets;
 
 namespace FaceCam.Behaviors;
 public class ThumbnailCamera : MonoBehaviour

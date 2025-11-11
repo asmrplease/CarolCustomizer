@@ -1,4 +1,4 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;

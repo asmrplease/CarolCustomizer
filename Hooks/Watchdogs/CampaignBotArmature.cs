@@ -4,6 +4,7 @@ using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Models.Recipes;
+using CarolCustomizer.Utils;
 using System;
 using UnityEngine;
 
@@ -42,6 +43,7 @@ public class CampaignBotArmature : MonoBehaviour, ICarolType, ICarolBot
         if (Settings.Plugin.customCampaignBots.Value is not true) return;
         
         watchdog.CompData.SetBaseVisibility(visible);
+        if (transform.parent.name == "Spacesuit") StartCoroutine(watchdog.EnableSpacesuit());
     }
 
     void OnDestroy() => NPCManager.OnBotDespawn(this);

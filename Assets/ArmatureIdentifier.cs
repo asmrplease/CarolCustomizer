@@ -1,6 +1,7 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Hooks.Watchdogs.UnhandledArmatures;
 using CarolCustomizer.Utils;
 using Onirism.Ui;
 using Slate;
@@ -15,23 +16,25 @@ internal class ArmatureIdentifier
     static readonly List<(Func<PelvisWatchdog, Predicate<PelvisWatchdog>, Result> func, Predicate<PelvisWatchdog> pred)> checks;
     static ArmatureIdentifier() => checks =
         [
-            //Check<MonoBehaviour,  ArmatureType>,        (watchdog) => additional detection condition),
-            (Check<MenuSwitchOutfit,MenuArmature>,        (x)=> true),
-            (Check<VirtualCarol,    MPBotArmature>,       (x)=> true),
-            //toybox outfit preview
-            (Check<Entity,          PlayerArmature>,      (x)=> x.rootName == "CAROL(Clone)"),
-            (Check<Entity,          NPCArmature>,         (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
-            //zombie entity
-            (Check<Entity,          SummerSlimeArmature>, (x)=> x.transform.parent.name == "SummerSlimegirl2019"),
-            (Check<Entity,          CampaignBotArmature>, (x)=> true),
-            (Check<CutsceneActor,   ActressArmature>,     (x)=> true),
-            (Check<Character,       NPCArmature>,         (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
-            (Check<Character,       ActressArmature>,     (x)=> true),
-            //old MSO location
-            (Check<Transform,       NPCArmature>,         (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),
-            (Check<Transform,       OutfitArmature>,      (x)=> x.gameObject.scene.buildIndex == -1),
-            (Check<Transform,       ActressArmature>,     (x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error),
-            (Check<Transform,       UnknownArmature>,     (x)=> true),
+          ///Check<SearchType,      ArmatureType>,        (watchdog) => additional detection condition),            //Purpose
+            (Check<Transform,       SpoilerArmature>,     (x)=> x.parentName.Contains("Carol_Adult")),              //Adult Carol
+            (Check<MenuSwitchOutfit,MenuArmature>,        (x)=> true),                                              //Menu
+            (Check<VirtualCarol,    MPBotArmature>,       (x)=> true),                                              //Multiplayer Bots
+            (Check<Transform,       ShopArmature>,        (x)=> x.rootName   == "GameManager"),                     //Shop Dummy
+            (Check<Entity,          PCBBArmature>,        (x)=> x.parentName == "BlueberryPlayerRig"),              //Playable Blueberry
+            (Check<Entity,          PlayerArmature>,      (x)=> x.rootName   == "CAROL(Clone)"),                    //Standard Player
+            (Check<Entity,          NPCArmature>,         (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),  //NPC Entities
+            (Check<Entity,          SummerSlimeArmature>, (x)=> x.parentName == "SummerSlimegirl2019"),             //Summer Slimes
+            (Check<Entity,          SpaceCorpArmature>,   (x)=> x.rootName   == "Corp_space(Clone)"),               //Space station enemies
+            (Check<Entity,          WitchArmature>,       (x)=> x.parentName == "witchStudent"),                    //Cursed Forest enemies
+            (Check<Entity,          CampaignBotArmature>, (x)=> true),                                              //Campaign bots
+            (Check<CutsceneActor,   ActressArmature>,     (x)=> true),                                              //Carol Actress
+            (Check<Character,       NPCArmature>,         (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),  //NPC Actresses
+            (Check<Character,       ActressArmature>,     (x)=> true),                                              //Carol Actress
+            (Check<Transform,       NPCArmature>,         (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),  //NPCs 
+            (Check<Transform,       OutfitArmature>,      (x)=> x.gameObject.scene.buildIndex == -1),               //Outfit references
+            (Check<Transform,       ActressArmature>,     (x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error),  //Carol Actress?
+            (Check<Transform,       UnknownArmature>,     (x)=> true),                                              //Catch-All
         ];
 
     public static void DetectChanges(PelvisWatchdog watchdog)
@@ -51,16 +54,14 @@ internal class ArmatureIdentifier
         where ResultType : MonoBehaviour, ICarolType
     {
         try { if (!predicate.Invoke(armature)) return Result.NotDetected; }
-        catch (NullReferenceException e)
-        { Log.Warning($"{nameof(ResultType)} predicate caused an exception: {e.Message}"); return Result.Error; }
+        catch (NullReferenceException e){ Log.Error($"{nameof(ResultType)} predicate caused an exception: {e.Message}"); return Result.Error; }
 
         var component = armature.GetComponentInParent<SearchType>(true);
         if (!component) return Result.NotDetected;
         if (armature.Behavior.GetType() == typeof(ResultType)) return Result.Detected;
 
         Log.Debug($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
-        armature.GetComponents<ICarolType>()
-            .ForEach(x => x.Dispose());
+        //armature.GetComponents<ICarolType>().ForEach(x => x.Dispose());
         armature.Behavior = armature.gameObject
             .AddComponent<ResultType>()
             .Constructor(armature);

@@ -1,4 +1,4 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Utils;
 using Onirism.Ui;

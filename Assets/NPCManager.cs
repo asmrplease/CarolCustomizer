@@ -16,6 +16,7 @@ public enum NPC
     Cherryl,
     Prunelle,
     Blueberry,
+    //Spoiler,
     Error,
 }
 
@@ -45,6 +46,7 @@ public class NPCManager
         if (name.Contains("Cherryl"))     return NPC.Cherryl;
         if (name.Contains("Prunelle"))    return NPC.Prunelle;
         if (name.Contains("Blueberry"))   return NPC.Blueberry;
+        //if (name.Contains("Adult"))       return NPC.Spoiler;
         return NPC.Error;
     }
 
@@ -103,6 +105,7 @@ public class NPCManager
             .Where(x => 
                 x.Error == Recipe.Status.NoError
                 && x.Name != Constants.AutoSave);
+        //var outfits = 
         if (recipes.Count() == 0) return null;
 
         int index = random.Next(recipes.Count());

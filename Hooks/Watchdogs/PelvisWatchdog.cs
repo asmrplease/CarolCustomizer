@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Contracts;
+using CarolCustomizer.Hooks.Watchdogs.UnhandledArmatures;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using System;

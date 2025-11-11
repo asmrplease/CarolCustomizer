@@ -3,9 +3,8 @@ using CarolCustomizer.Utils;
 using System.Collections;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Settings;
-using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
-using System.Linq;
+using CarolCustomizer.Assets;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PlayerArmature : MonoBehaviour, ICarolType
@@ -24,6 +23,8 @@ public class PlayerArmature : MonoBehaviour, ICarolType
     public bool isSwimming => carolController.swim.swimming;
     public bool controllerDisabled => !carolController.enabled;
     public bool inDialogue => carolEntity.hud.dialogue.dialogue.activeSelf;
+
+    Vector3 lockPos = Vector3.zero;
 
     public ICarolType Constructor(PelvisWatchdog watchdog)
     {
@@ -71,6 +72,7 @@ public class PlayerArmature : MonoBehaviour, ICarolType
 
     IEnumerator LockRoutine(float initialDelay = 0f)
     {
+        lockPos = carolEntity.transform.root.position;
         float speed = LockSpeed * Settings.Plugin.MenuSpeed;
         Log.Debug($"Locking player, speed: {speed}");
         Busy = true;
@@ -96,6 +98,14 @@ public class PlayerArmature : MonoBehaviour, ICarolType
         Busy = false;
         Log.Debug("Locked.");
         yield break;
+    }
+
+    void LateUpdate()
+    {
+        if (!Locked) return;
+
+        //Probably bad practice to modify the transform of another object but whatever. 
+        carolEntity.transform.root.position = lockPos;
     }
 
     internal IEnumerator UnlockRoutine()
@@ -159,22 +169,13 @@ public class PlayerArmature : MonoBehaviour, ICarolType
     public void SetBaseVisibility(bool visibility) 
     {
         watchdog.CompData.SetBaseVisibility(visibility);
-        if (transform.parent.name == "Carol_Hazmat") StartCoroutine(EnableSpaceHelmet());
+        if (transform.parent.name == "Carol_Hazmat") StartCoroutine(watchdog.EnableSpacesuit());
         if (!playerModelData) return;
 
         playerModelData.hairIsVisible = visibility;
         var inventory = GetComponentInParent<Inventory>();
         if (inventory) inventory.currentHairstyle.GetComponent<Hairstyle>().SetVisible(visibility);  
     } 
-
-    IEnumerator EnableSpaceHelmet()
-    {
-        Log.Info("EnableSpaceHelmet()");
-        this.watchdog.CompData.allSMRs
-            .Where(x => x.name == "Spacehelmet")
-            .ForEach(x => x.gameObject.SetActive(true));
-        yield break;
-    }
 
     public void Dispose()
     {

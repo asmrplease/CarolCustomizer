@@ -3,7 +3,6 @@ using System.Linq;
 using UnityEngine;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
 using Onirism.Ui;
 using CarolCustomizer.Assets;

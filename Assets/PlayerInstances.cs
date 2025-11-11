@@ -1,11 +1,12 @@
-﻿using CarolCustomizer.Hooks.Watchdogs;
+﻿using CarolCustomizer.Behaviors.Carol;
+using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace CarolCustomizer.Behaviors.Carol;
+namespace CarolCustomizer.Assets;
 public class PlayerInstances : IDisposable
 {
     static List<PlayerCarolInstance> Players;

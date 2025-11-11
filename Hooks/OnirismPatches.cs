@@ -3,7 +3,6 @@ using UnityEngine;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Hooks.Watchdogs;
 using System.Linq;
