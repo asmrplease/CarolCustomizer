@@ -1,8 +1,10 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Utils;
+using Onirism.Ui;
 using System;
 using System.Collections;
+using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -97,22 +99,38 @@ public class MenuToggle : MonoBehaviour
         if (IsVisible && !newVisibility)
         {
             OnMenuToggle?.Invoke(false);// uiInstance.Hide();
-            mainMenuPages.transform.GetChild(0).gameObject.SetActive(true);
+            SetGameMainMenuVisibility(true);
+            //mainMenuPages.transform.GetChild(0).gameObject.SetActive(true);
             IsVisible = newVisibility;
             return;
         }
 
         //if we are not currently visible and asked to become visible
-        var activePage = mainMenuPages.transform.Cast<Transform>().FirstOrDefault(x => x.gameObject.activeSelf);
-        if (!activePage) { Log.Warning("tried to hide menu screen but no active page was found."); return; }
-        if (activePage.GetSiblingIndex() != 0) { Log.Debug("tried to open accUI but we weren't on the main page"); return; }
+        //var activePage = mainMenuPages.transform.Cast<Transform>().FirstOrDefault(x => x.gameObject.activeSelf);
+        //if (!activePage) { Log.Warning("tried to hide menu screen but no active page was found."); return; }
+        //if (activePage.GetSiblingIndex() != 0) { Log.Debug("tried to open accUI but we weren't on the main page"); return; }
 
         OnMenuToggle?.Invoke(true);
-        activePage.gameObject.SetActive(false);
+        //activePage.gameObject.SetActive(false);
+        SetGameMainMenuVisibility(false);
         Log.Debug("hid menu");
 
         //store the visibility state
         IsVisible = newVisibility;
+    }
+
+    void SetGameMainMenuVisibility(bool visible)
+    {
+        MainMenuTopPanel.I.gameObject.SetActive(visible);
+        if (!visible) return;
+
+        var animator = MainMenuTopPanel.I.transform.Find("Screens Container")?.GetChild(0)?.GetComponent<Animator>();
+        if (!animator) return;
+
+        animator.SetBool("opened", true);
+        animator.Update(0.0f);
+        animator.Play("Opened", -1, 1f);
+        animator.Update(0.0f);
     }
 
     void GameplayUpdate()

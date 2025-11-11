@@ -45,18 +45,20 @@ internal class EqualityTests
         list.ForEach(_ => AssertTrue(x.Equals(y), "execution"));
         AssertTrue(!x.Equals(null), "null inequality");
         try { n.Equals(y); }
-        catch (Exception e) { Log.Info("calling equals on null caused an exception"); }
+        catch { Log.Info("calling equals on null correctly caused an exception"); }
 
         Log.Info("Testing operator overloads");
-        
+
+        #pragma warning disable CS1718 // Comparison made to same variable
         AssertTrue(x == x, "reflexive");
+        #pragma warning restore CS1718 // Comparison made to same variable
         AssertTrue(x != a, "inequality");
         AssertTrue(x == y && y == x, "symmetric");
         AssertTrue(x == y && y == z && x == z, "transitive");
         list.ForEach(_ => AssertTrue(x == y, "execution"));
         AssertTrue(x != null, "null inequality");
         try { var r = n == y; }
-        catch (Exception e) { Log.Info("calling equals on null caused an exception"); }
+        catch { Log.Info("calling equals on null correctly caused an exception"); }
 
         Log.Info("Test complete!");
     }

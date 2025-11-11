@@ -14,7 +14,7 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
 {
     public readonly string Name;
     public readonly SourceDescriptor Source;
-    public MaterialDescriptor[] Materials;
+    public MaterialDescriptor[] Materials = [];
 
     [JsonConstructor]
     public AccessoryDescriptor(string name, SourceDescriptor source, MaterialDescriptor[] materials)
