@@ -5,6 +5,7 @@ using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
+using System.Linq;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PlayerArmature : MonoBehaviour, ICarolType
@@ -40,7 +41,7 @@ public class PlayerArmature : MonoBehaviour, ICarolType
         this.watchdog = GetComponent<PelvisWatchdog>();
         this.watchdog.Behavior = this;
         carolController = this.gameObject.GetComponentInParent<CarolController>();
-        watchdog.CompData.SetBaseVisibility(false);
+        this.SetBaseVisibility(false);
         if (!carolEntity) carolEntity = GetComponentInParent<Entity>();
         if (!carolEntity)
         {
@@ -158,12 +159,22 @@ public class PlayerArmature : MonoBehaviour, ICarolType
     public void SetBaseVisibility(bool visibility) 
     {
         watchdog.CompData.SetBaseVisibility(visibility);
+        if (transform.parent.name == "Carol_Hazmat") StartCoroutine(EnableSpaceHelmet());
+        if (!playerModelData) return;
+
         playerModelData.hairIsVisible = visibility;
         var inventory = GetComponentInParent<Inventory>();
-        if (!inventory) return;
-
-        inventory.currentHairstyle.GetComponent<Hairstyle>().SetVisible(visibility);
+        if (inventory) inventory.currentHairstyle.GetComponent<Hairstyle>().SetVisible(visibility);  
     } 
+
+    IEnumerator EnableSpaceHelmet()
+    {
+        Log.Info("EnableSpaceHelmet()");
+        this.watchdog.CompData.allSMRs
+            .Where(x => x.name == "Spacehelmet")
+            .ForEach(x => x.gameObject.SetActive(true));
+        yield break;
+    }
 
     public void Dispose()
     {

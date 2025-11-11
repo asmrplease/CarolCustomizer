@@ -43,7 +43,7 @@ public class MenuArmature : MonoBehaviour, ICarolType
             if (watchdog.CompData.allSMRs.Any(x => x.gameObject.activeSelf))
             {
                 //Log.Debug("MainMenuFix RefreshBaseVisibility");
-                watchdog.CompData.SetBaseVisibility(false);
+                this.SetBaseVisibility(false);
             }
             yield return new WaitForSeconds(1);
         }
