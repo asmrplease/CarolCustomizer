@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Recipes;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Recipes;
@@ -65,7 +66,8 @@ public class NPCManager
         var botInstance = new CarolInstance(NPCManager.folder);
         liveBots.Add(bot.Watchdog(), botInstance);
         liveBots[bot.Watchdog()].NotifySpawned(bot.Watchdog());
-        bot.CustomizeBot(GetRandomOutfit(), botInstance.outfitManager);
+        var recipe = GetRandomRecipe();
+        bot.CustomizeBot(recipe.Item2, botInstance.outfitManager, recipe.Item1);
     }
 
     public static void OnBotDespawn(ICarolBot bot)
@@ -97,18 +99,20 @@ public class NPCManager
         RecipeApplier.ActivateRecipe(npcInstance.outfitManager, npcRecipe.Descriptor);
     }   
 
-    public static Recipe GetRandomOutfit()
+    public static (string, RecipeDescriptor) GetRandomRecipe()
     {
         var random = new System.Random();
         var recipes = recipesManager
             .Recipes
             .Where(x => 
                 x.Error == Recipe.Status.NoError
-                && x.Name != Constants.AutoSave);
-        //var outfits = 
-        if (recipes.Count() == 0) return null;
+                && x.Name != Constants.AutoSave)
+            .Select(x => (x.Name, x.Descriptor));
+        var outfits = OutfitAssetManager.GetAllRecipes();
+        var all = recipes;//recipes.Concat(outfits);
+        if (recipes.Count() == 0) return ("", null);
 
-        int index = random.Next(recipes.Count());
-        return recipes.ElementAt(index);
+        int index = random.Next(all.Count());
+        return all.ElementAt(index);
     }
 }

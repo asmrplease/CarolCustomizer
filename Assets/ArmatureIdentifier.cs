@@ -27,19 +27,19 @@ internal class ArmatureIdentifier
             (Check<Entity,          SummerSlimeArmature>, (x)=> x.parentName == "SummerSlimegirl2019"),             //Summer Slimes
             (Check<Entity,          SpaceCorpArmature>,   (x)=> x.rootName   == "Corp_space(Clone)"),               //Space station enemies
             (Check<Entity,          WitchArmature>,       (x)=> x.parentName == "witchStudent"),                    //Cursed Forest enemies
-            (Check<Entity,          CampaignBotArmature>, (x)=> true),                                              //Campaign bots
+            (Check<Entity,          CampaignBotArmature>, (x)=> x.parentName == "Carol_Robot"),                                              //Campaign bots
             (Check<CutsceneActor,   ActressArmature>,     (x)=> true),                                              //Carol Actress
             (Check<Character,       NPCArmature>,         (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),  //NPC Actresses
             (Check<Character,       ActressArmature>,     (x)=> true),                                              //Carol Actress
             (Check<Transform,       NPCArmature>,         (x)=> NPCManager.GetNPCType(x.parentName) != NPC.Error),  //NPCs 
             (Check<Transform,       OutfitArmature>,      (x)=> x.gameObject.scene.buildIndex == -1),               //Outfit references
             (Check<Transform,       ActressArmature>,     (x)=> NPCManager.GetNPCType(x.parentName) == NPC.Error),  //Carol Actress?
+            (Check<Transform,       MenuDummyArmature>,   (x)=> x.rootName   == "MenuDummySvc"),                    //Menu Dummy
             (Check<Transform,       UnknownArmature>,     (x)=> true),                                              //Catch-All
         ];
 
     public static void DetectChanges(PelvisWatchdog watchdog)
     {
-        Log.Debug("ArmatureIdentifier.DetectChanges()");
         if (!watchdog) { Log.Warning("DetectChanges() called on a destroyed Watchdog"); return; }
 
         checks.Select(tup => tup.func.Invoke(watchdog, tup.pred))
@@ -61,7 +61,7 @@ internal class ArmatureIdentifier
         if (armature.Behavior.GetType() == typeof(ResultType)) return Result.Detected;
 
         Log.Debug($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
-        //armature.GetComponents<ICarolType>().ForEach(x => x.Dispose());
+        armature.GetComponents<ICarolType>().ForEach(x => x.Dispose());
         armature.Behavior = armature.gameObject
             .AddComponent<ResultType>()
             .Constructor(armature);

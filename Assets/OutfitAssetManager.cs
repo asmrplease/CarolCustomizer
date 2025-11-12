@@ -119,5 +119,12 @@ public class OutfitAssetManager : IDisposable
         OnHairLoaded?.Invoke((hair, dye));
     }
 
+    public static IEnumerable<(string, RecipeDescriptor)> GetAllRecipes()
+    {
+        return outfitSets.Values
+            .SelectMany(sourceDict => sourceDict.Values)
+            .SelectMany(outfit => outfit.Variants.Select(kvp => (outfit.DisplayName, kvp.Value)));
+    }
+
     public void Dispose() { if (liveFolder.gameObject) GameObject.Destroy(liveFolder.gameObject); }
 }

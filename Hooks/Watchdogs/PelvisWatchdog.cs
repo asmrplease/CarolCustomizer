@@ -34,13 +34,14 @@ public class PelvisWatchdog : MonoBehaviour
 
     bool started = false;
 
+
     public static PelvisWatchdog GetAddWatchdog(GameObject pelvis)
     {
         if (pelvis.GetComponent<PelvisWatchdog>() is PelvisWatchdog watchdog) return watchdog;
         return pelvis.AddComponent<PelvisWatchdog>();
     }
 
-    public void Awake()
+    public void Awake() //would it be better to use Start() here?
     {
         if (this.started) return;
         this.started = true;
