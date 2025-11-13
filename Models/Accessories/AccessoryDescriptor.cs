@@ -57,9 +57,9 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return this.Name.DeInstance().Equals(other.Name.DeInstance()) 
-            && this.Source.Equals(other.Source)
-            && this.Materials.SequenceEqual(other.Materials);
+        return this.Name.DeInstance().Equals(other.Name.DeInstance())
+            && this.Source.Equals(other.Source);
+            //&& this.Materials.SequenceEqual(other.Materials);
     }
 
     public override bool Equals(object other)
@@ -78,7 +78,7 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
     {
         var mats = Materials as IStructuralEquatable;
         var matsHash = mats.GetHashCode(EqualityComparer<MaterialDescriptor>.Default);
-        unchecked { return Name.DeInstance().GetHashCode() << 12 ^ Source.GetHashCode() << 8 ^ matsHash; }
+        unchecked { return Name.DeInstance().GetHashCode() << 12 ^ Source.GetHashCode() << 8; }// ^ matsHash; }
     }
 
     public override string ToString() => $"AD:{Source}.{Name}";
