@@ -7,6 +7,9 @@ using CarolCustomizer.Utils;
 using MonoMod.Utils;
 using static Newtonsoft.Json.JsonConvert;
 using static CarolCustomizer.Utils.Constants;
+using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Outfits;
+using System.Collections.Generic;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 internal static class RecipeLoader
@@ -54,13 +57,16 @@ internal static class RecipeLoader
     { 
         public Recipe.Status Status; 
         public RecipeDescriptor Recipe; 
-        public string Json; 
+        public string Json;
+        public IEnumerable<AccessoryDescriptor> MissingAccs;
+        public IEnumerable<SourceDescriptor> MissingSources;
     }
 
     public static ValidationResults ValidateRecipeFile(string filePath)
     {
+        Log.Debug($"ValidateRecipeFile({filePath})");
         string json;
-        var results = new ValidationResults { Status = Recipe.Status.NoError, Recipe = null };
+        var results = new ValidationResults { Status = Recipe.Status.NoError, Recipe = null, MissingAccs = [], MissingSources = [] };
 
         try { json = GetRecipeJson(filePath); }
         catch (Exception e)
@@ -68,19 +74,8 @@ internal static class RecipeLoader
             Log.Error(e.StackTrace);
             results.Status = Recipe.Status.FileError; return results;
         }
-        return ValidateJson(json);
-    }
 
-    public static ValidationResults ValidateJson(string json)
-    {
-        var results = new ValidationResults 
-        { 
-            Status = Recipe.Status.NoError, 
-            Recipe = null,
-            Json = json,
-        };
         Version version;
-
         try
         {
             version = DeserializeObject<VersionedObject>(json)?.version;
@@ -115,10 +110,15 @@ internal static class RecipeLoader
 
         try
         {
-            if (RecipeApplier.GetMissingSources(results.Recipe).Any())
-            { results.Status = Recipe.Status.MissingSource; }
+            results.MissingSources = RecipeApplier.GetMissingSources(results.Recipe);
+            if (results.MissingSources.Any())
+            { results.Status = Recipe.Status.Incomplete; }
+
+            results.MissingAccs = RecipeApplier.GetRemovedAccessories(results.Recipe);
+            if (results.MissingAccs.Any())
+            { results.Status |= Recipe.Status.Incomplete; }
         }
-        catch { results.Status = Recipe.Status.MissingSource; }
+        catch { results.Status = Recipe.Status.Incomplete; }
         return results;
     }
 }

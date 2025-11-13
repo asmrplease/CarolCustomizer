@@ -42,7 +42,7 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return this.Name.Equals(other.Name)
+        return this.Name.DeInstance().Equals(other.Name.DeInstance())
             && this.Source.Equals(other.Source);
     }
 

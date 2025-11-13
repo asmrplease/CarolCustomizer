@@ -1,4 +1,9 @@
 ﻿using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Outfits;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CarolCustomizer.Models.Recipes;
 public record Recipe
@@ -9,6 +14,8 @@ public record Recipe
     public readonly Status Error;
     public readonly RecipeDescriptor Descriptor;
     public readonly string Json;
+    public readonly List<AccessoryDescriptor> MissingAccessories;
+    public readonly List<SourceDescriptor> MissingSources;
 
     public Recipe(string path)
     {
@@ -19,14 +26,16 @@ public record Recipe
         Error = results.Status;
         Descriptor = results.Recipe;
         Json = results.Json;
+        MissingSources = results.MissingSources.ToList();
+        MissingAccessories = results.MissingAccs.ToList();
     }
 
     public enum Status
     {
         NoError,
-        MissingSource,
+        Incomplete,
         SlowSource,
         InvalidJson,
-        FileError
+        FileError,
     }
 }
