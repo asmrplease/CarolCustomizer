@@ -64,6 +64,11 @@ public class HaDSOutfit : Outfit
             accessories.Add(hairstyle);
         }
 
+        return BuildRecipe(accessories);
+    }
+
+    protected RecipeDescriptor BuildRecipe(IEnumerable<AccessoryDescriptor> accessories)
+    {
         return new RecipeDescriptor25
         (
             this.Descriptor,
