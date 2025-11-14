@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static CarolController;
 
 namespace CarolCustomizer.Behaviors.Carol;
 
@@ -59,7 +60,13 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         }
         live.Enable();
         if (!live.IsOnArmature(pelvis.transform)) skeletonManager.AssignLiveBones(live);
-        AccessoryChanged?.Invoke(new AccessoryChangedEvent(desc, live, true));
+        //desc.Materials
+        //    .Select((mat, index) => (mat, index))
+        //    .Where(tup => tup.mat.referenceMaterial)
+        //    .ForEach(tup => PaintAccessory(desc, tup.mat, tup.index));
+        var e = new AccessoryChangedEvent(desc, live, true);
+        AccessoryChanged?.Invoke(e);
+        Log.Debug(e.ToString());
     }
 
     void CheckExistingSources(AccessoryDescriptor acc)

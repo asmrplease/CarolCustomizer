@@ -11,7 +11,7 @@ using System.Text;
 using UnityEngine;
 
 namespace CarolCustomizer.Models.Materials;
-internal class HairDyeSource : IAccessorySource
+public class HairDyeSource : IAccessorySource
 {
     SourceDescriptor descriptor = new(Constants.HairDyeSourceName, SourceType.Hair);
     Dictionary<MaterialDescriptor, MaterialDescriptor> hairDyes = [];
