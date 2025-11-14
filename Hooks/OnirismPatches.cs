@@ -6,6 +6,7 @@ using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Hooks.Watchdogs;
 using System.Linq;
+using Onirism.Ui;
 
 namespace CarolCustomizer.Hooks;
 
@@ -93,4 +94,6 @@ public static class OnirismPatches
             return false;
         }
     }
+
+    
 }

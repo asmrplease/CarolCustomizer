@@ -22,7 +22,7 @@ public class MenuArmature : MonoBehaviour, ICarolType
         return this;
     }
 
-    //void Start() => StartCoroutine(MainMenuFix());
+    void Start() => StartCoroutine(MainMenuFix());
 
     void OnEnable()
     {
@@ -39,11 +39,10 @@ public class MenuArmature : MonoBehaviour, ICarolType
         
         foreach(var i in Enumerable.Range(0,5))
         {
-            if (watchdog.CompData.allSMRs.Any(x => x.gameObject.activeSelf))
-            {
-                //Log.Debug("MainMenuFix RefreshBaseVisibility");
-                this.SetBaseVisibility(false);
-            }
+            watchdog.GetComponentsInChildren<SkinnedMeshRenderer>(true)
+                .Where(x => x.gameObject.activeSelf)
+                .ForEach(x => x.gameObject.SetActive(false));
+
             yield return new WaitForSeconds(1);
         }
     }

@@ -20,6 +20,7 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
     readonly List<Transform> BespokeBones;
     List<MagicaCloth> boneCloths = [];
     List<MagicaCloth> meshCloths = [];
+    
 
     SourceDescriptor IAccessorySource.Descriptor => this.Source;
     AccessoryDescriptor IInstantiable.Descriptor => this;
@@ -31,7 +32,13 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
         this.AssetName = hairstyle.name;
         this.DisplayName = LocalizationIndex.GetLine(hairstyle.localizationName);
         var smr = hairstyle.model as SkinnedMeshRenderer;
-        this.BespokeBones = [hairstyle.transform.root];
+        var boneCopy = GameObject.Instantiate(hairstyle.transform.root);
+        //boneCopy.hideFlags = HideFlags.HideAndDontSave | HideFlags.DontUnloadUnusedAsset;
+        GameObject.DontDestroyOnLoad(boneCopy);
+        boneCopy.GetComponentsInChildren<Component>()
+            .Where(x => !x.GetType().IsAssignableFrom(typeof(Transform)))
+            .ToList().ForEach(GameObject.Destroy);
+        this.BespokeBones = [boneCopy];
         this.BespokeBones.ForEach(x => x.transform.localScale = Vector3.one);
         this.smr = hairstyle.model as SkinnedMeshRenderer;
         var magicas = hairstyle.transform.root
@@ -43,7 +50,14 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
             .Where(x => x.SerializeData.clothType == ClothProcess.ClothType.BoneCloth)
             .ForEach(boneCloths.Add);
     }
-    
+ 
+    //static Transform GetFolder()
+    //{
+    //    if (CCPlugin.CoroutineRunner.transform.Find("HairBoneFolder") is Transform folder) return folder;
+    //    var newFolder = new GameObject("HairBoneFolder");
+    //    newFolder.transform.parent = CCPlugin.CoroutineRunner.transform;
+    //    return newFolder.transform;
+    //}
 
     public LiveAccessory MakeLive(SkeletonManager skeleton, Transform folder)
     {
