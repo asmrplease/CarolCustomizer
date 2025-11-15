@@ -63,7 +63,9 @@ public class CompData : MonoBehaviour
         GetComponentsInChildren<Animator>(true)
             .ForEach(x =>x.cullingMode = AnimatorCullingMode.AlwaysAnimate);
 
-        var effectComponents = allComponents.Where(x => !SkipTypes.Contains(x.GetType()));
+        var effectComponents = allComponents
+            .Where(x => !SkipTypes.Contains(x.GetType()))
+            .Where(x => x.gameObject.name != "headcritbox");
 
         EffectBehaviours = 
             effectComponents
