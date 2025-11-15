@@ -38,6 +38,7 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
         boneCopy.GetComponentsInChildren<Component>()
             .Where(x => !x.GetType().IsAssignableFrom(typeof(Transform)))
             .ToList().ForEach(GameObject.Destroy);
+        boneCopy.transform.ResetLocalPosRot();
         this.BespokeBones = [boneCopy];
         this.BespokeBones.ForEach(x => x.transform.localScale = Vector3.one);
         this.smr = hairstyle.model as SkinnedMeshRenderer;

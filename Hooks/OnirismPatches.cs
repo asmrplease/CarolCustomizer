@@ -94,6 +94,4 @@ public static class OnirismPatches
             return false;
         }
     }
-
-    
 }
