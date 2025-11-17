@@ -55,7 +55,7 @@ public class MenuToggle : MonoBehaviour
 
     public void ToggleMenu(bool visible) {
         if (currentScene.name == Constants.MenuSceneName) { MainMenuSetMenuState(visible); return; }
-        if (PauseDiary.manager) { GameplaySetMenuState(visible); return; }
+        GameplaySetMenuState(visible);
     }
 
     void Update()
@@ -153,12 +153,12 @@ public class MenuToggle : MonoBehaviour
         GameplaySetMenuState(true);
     }
 
-    void LateUpdate()
-    {
-        if (!IsVisible) return;
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.Confined;
-    }
+    //void LateUpdate()
+    //{
+    //    if (!IsVisible) return;
+    //    Cursor.visible = true;
+    //    Cursor.lockState = CursorLockMode.Confined;
+    //}
 
     void GameplaySetMenuState(bool visible)
     {

@@ -49,26 +49,29 @@ internal class AutoSaver : IDisposable
         CCPlugin.CoroutineRunner.StartCoroutine(LoadRecipeRoutine(recipe));
     }
 
-    IEnumerator LoadRecipeRoutine(Recipe recipe)
+    IEnumerator LoadRecipeRoutine(Recipe recipeFile)
     {
         if (!outfitManager.pelvis) yield return new WaitUntil(() => outfitManager.pelvis);
+        RecipeDescriptor recipe;
 
-        if (recipe is null 
-            || recipe.Error == Recipe.Status.FileError
-            || recipe.Error == Recipe.Status.InvalidJson
-            || !recipe.Descriptor.ActiveAccessories.Any())
+        if (recipeFile is null
+            || recipeFile.Error == Recipe.Status.FileError
+            || recipeFile.Error == Recipe.Status.InvalidJson
+            || !recipeFile.Descriptor.ActiveAccessories.Any())
         {
             Log.Warning("Loading pyjamas instead of autosave");
             var outfit = OutfitAssetManager.GetPyjamas();
-            var variant = outfit
+            recipe = outfit
                 .Variants
-                .Keys
-                .ElementAt(playerIndex);
-            RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
-            yield break;
+                .ElementAt(playerIndex)
+                .Value;
         }
-        Log.Info("Loading autosave recipe");
-        RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
+        else 
+        { 
+            Log.Info("Loading autosave recipe");
+            recipe = recipeFile.Descriptor;
+        }
+        RecipeApplier.ActivateRecipe(outfitManager, recipe);
         Log.Debug("Load completed succesfully");
         yield break;
     }
