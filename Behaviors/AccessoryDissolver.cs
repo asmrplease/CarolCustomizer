@@ -114,9 +114,12 @@ internal static class AccessoryDissolver
 
         foreach (var acc in accs)
         {
-            originalMaterials[acc] = liveDescriptions
-                .FirstOrDefault(x => x.Name == acc.Name && x.Source == acc.Source)
+            var liveMats = liveDescriptions
+                .FirstOrDefault(x => x.Equals(acc))?
                 .Materials;
+            if (liveMats is null) { Log.Warning("Dissolve() failed to look up an accessory"); continue; }
+
+            originalMaterials[acc] = liveMats;
             outfitManager.PaintAccessoryShared(acc, acc.Materials.Select(x => dissolveMaterial).ToList());
         }
         //outfitManager.SetHairColor(dissolveMaterial, true);
