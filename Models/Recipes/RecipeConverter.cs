@@ -62,13 +62,17 @@ public static class RecipeConverter
             .ToList();
         var effects = legacy.ActiveEffects
             .Select(x => (SourceDescriptor)x);
-        var hair = GetHairFromStrings(legacy.Hairstyle, legacy.HairMaterial);
+        if (legacy.Hairstyle != "Haircut_Powerhelmet")
+        {
+            var hair = GetHairFromStrings(legacy.Hairstyle, legacy.HairMaterial);
+            accessories.Add(hair);
+        }
         return new RecipeDescriptor25
         (
             (SourceDescriptor)legacy.AnimatorSource,
             (SourceDescriptor)legacy.BaseOutfitName,
             (SourceDescriptor)legacy.ColliderSource,
-            accessories.Append(hair),
+            accessories,
             effects,
             "2.5.0"
         );
