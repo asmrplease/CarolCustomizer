@@ -104,7 +104,7 @@ public class OutfitListUI : MonoBehaviour
 
     void OnOutfitLoaded(Outfit outfit)
     {
-        if (outfitUIs.TryGetValue(outfit.Descriptor, out var existing)) { Log.Error($"{outfit.AssetName} was already in the UI list during OnOutfitLoaded"); return; }
+        if (outfitUIs.ContainsKey(outfit.Descriptor)) { Log.Error($"{outfit.AssetName} was already in the UI list during OnOutfitLoaded"); return; }
 
         var outfitUI = Factory.BuildOutfitUI(outfit);
         if (!outfitUI) { Log.Error($"failed to instantiate {outfit.DisplayName}'s outfitUI"); return; }

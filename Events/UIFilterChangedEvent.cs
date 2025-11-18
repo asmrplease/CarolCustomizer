@@ -1,4 +1,11 @@
-﻿namespace CarolCustomizer.Events;
+﻿using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Contracts;
+using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Materials;
+using CarolCustomizer.UI.Outfits;
+using System.Linq;
+
+namespace CarolCustomizer.Events;
 public class UIFilterChangedEvent
 {
     public readonly string Text;
@@ -26,5 +33,27 @@ public class UIFilterChangedEvent
             $"Text: '{Text}', " +
             $"ShowFavorites: {ShowFavorites}, " +
             $"ShowActive: {ShowActive}.";
+    }
+
+    public bool Filter(IAccessorySource source)
+    {
+        //if (this.ShowFavorites && Settings.Favorites.IsInFavorites(accessory)) return true;
+        //if (this.ShowActive && OutfitListUI.TargetOutfit.ActiveAccessories.Contains(accessory)) return true;
+        if (this.HasText && source.ToString().Contains(this.Text)) return true;
+        return false;
+    }
+
+    public bool Filter(MaterialDescriptor material)
+    {
+        if (this.HasText && material.Name.Contains(this.Text)) return true;
+        return false;
+    }
+
+    public bool Filter(AccessoryDescriptor accessory)
+    {
+        if (this.ShowFavorites && Settings.Favorites.IsInFavorites(accessory)) return true;
+        if (this.ShowActive && OutfitListUI.TargetOutfit.ActiveAccessories.Contains(accessory)) return true;
+        if (this.HasText && accessory.ToString().Contains(this.Text)) return true;
+        return false;
     }
 }

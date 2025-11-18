@@ -162,7 +162,8 @@ public class PlayerArmature : MonoBehaviour, ICarolType
         var inventory = GetComponentInParent<Inventory>();
         if (!inventory) return;
 
-        inventory.currentHairstyle.GetComponent<Hairstyle>().SetVisible(visibility);
+        inventory.currentHairstyle.GetComponent<Hairstyle>().Hide(visibility);
+        //inventory.currentHairstyle.GetComponent<Hairstyle>().SetVisible(visibility);
     } 
 
     public void Dispose()

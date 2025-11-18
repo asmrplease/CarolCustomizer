@@ -50,7 +50,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         background = transform.GetChild(0).gameObject.GetComponent<Image>();
         background.color = color;
         displayImage = transform.Find(displayImageAddress)?.GetComponent<Image>();
-        displayImage.sprite = outfit.Sprite;
+        displayImage.sprite = outfit.Thumbnail;
         displayName = transform.Find(outfitNameAddress)?.GetComponentInChildren<Text>();
         displayName.text = outfit.DisplayName;
         pickupLocation = transform.Find(pickupLocationAddress)?.GetComponent<Text>();

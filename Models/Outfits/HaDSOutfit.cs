@@ -10,7 +10,7 @@ namespace CarolCustomizer.Models.Outfits;
 public class HaDSOutfit : Outfit
 {
     #region ModelData Handling 
-    public override Sprite Sprite => modelData.portraitShop;
+    //public override Sprite Thumbnail => modelData.portraitShop;
     public override RuntimeAnimatorController GetAnimator() => modelData?.controller;
     public override ModelData GetConfiguration() => modelData;
     public ModelData modelData { get; protected set; }
@@ -23,6 +23,7 @@ public class HaDSOutfit : Outfit
         Log.Debug($"Loading HaDSOutfit {storedAsset.name}");
         modelData = this.storedAsset.gameObject.GetComponent<ModelData>();
         if (!modelData) { Log.Error("No ModelData component was found during HaDS constructor."); return; }
+        this.Thumbnail = modelData.portraitShop;
         BuildVariants();
         GetHair();
     }

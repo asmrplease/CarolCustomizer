@@ -2,16 +2,18 @@
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
+using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace CarolCustomizer.Models.Outfits;
 
-public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAccessorySource
+public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAccessorySource, IListable
 {
     #region Dependencies
     public Transform storedAsset { get; protected set; }
@@ -19,9 +21,9 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
 
     #region Public Interface
     public string AssetName { get; protected set; }
-    virtual public string DisplayName { get; private set; }
-    virtual public Sprite Sprite => null;
-    virtual public string Author => "Crimson Tales";
+    public string DisplayName { get; protected set; }
+    public Sprite Thumbnail { get; protected set; }
+    public string Author { get; protected set; }
 
     public SourceDescriptor Descriptor { get; private set; }
 
@@ -34,7 +36,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
     List<OutfitEffect> Effects = [];
     public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = [];
 
-    public PelvisWatchdog prefabWatchdog { get; private set; }
+    PelvisWatchdog prefabWatchdog;
     public BoneData boneData => prefabWatchdog.BoneData;
     public CompData compData => prefabWatchdog.CompData;
     public MagiData magiData => prefabWatchdog.MagiData;
@@ -165,4 +167,28 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
 
     IInstantiable IAccessorySource.GetInstantiable(AccessoryDescriptor accessory) => GetAccessory(accessory);
     #endregion
+
+    string IListable.Header => this.DisplayName;
+    string IListable.Subheader => "";
+    Color IListable.BaseColor => Constants.DefaultColor;
+    Color IListable.HighlightColor => Constants.Highlight;
+    bool IListable.Filter<T>(Predicate<T> predicate)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual List<(string, UnityAction)> GetContextMenuItems()
+    {
+        var target = OutfitListUI.TargetOutfit;
+        var results = new List<(string, UnityAction)>()
+        {
+             ("Use Animator",     () => target.SetAnimator(this.Descriptor))
+            ,("Use Measurements", () => target.SetConfiguration(this.Descriptor))
+            ,("Use Colliders",    () => target.SetColliderSource(this.Descriptor))
+            ,("Activate Effects", () => target.SetEffect(this.Descriptor, true))
+            ,("Disable Effects",  () => target.SetEffect(this.Descriptor, false))
+        };
+        
+        return results;
+    }
 }
