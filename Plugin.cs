@@ -14,6 +14,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace CarolCustomizer;
 
@@ -64,6 +65,7 @@ public class CCPlugin : BaseUnityPlugin
             .Constructor(uiAssetLoader, recipesManager);
         HarmonyInstance = new Harmony("AccessoryModPatch");
         HarmonyInstance.PatchAll();
+        SceneManager.sceneLoaded += OnirismPatches.FixTentCutscene;
         Log.Info("CCPlugin.Awake() Success!");
     }
 
@@ -115,6 +117,7 @@ public class CCPlugin : BaseUnityPlugin
     void OnDisable()
     {
         Log.Info("Plugin OnDisable()");
+        SceneManager.sceneLoaded -= OnirismPatches.FixTentCutscene;
         uiAssetLoader.Dispose();
         Config.Save();
         HarmonyInstance?.UnpatchSelf();

@@ -7,11 +7,29 @@ using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Hooks.Watchdogs;
 using System.Linq;
 using Onirism.Ui;
+using UnityEngine.SceneManagement;
 
 namespace CarolCustomizer.Hooks;
 
 public static class OnirismPatches
 {
+    public static void FixTentCutscene(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name != "Popcicle_peaks_Polarsea") return;
+
+        Log.Info("Applying tent cutscene fix");
+        Resources.FindObjectsOfTypeAll<Transform>()
+            .Select(x => x.gameObject)
+            .Where(x => x.name == "InsideTent")
+            .ToList()
+            .ForEach(x => x.SetActive(false));
+    }
+
+    private static void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
+    {
+        throw new System.NotImplementedException();
+    }
+
     [HarmonyPatch(typeof(CostumeSwapUI), nameof(CostumeSwapUI.ChangeCostume))]
     public static class CostumeSwapPatch
     {
