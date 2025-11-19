@@ -30,6 +30,9 @@ public record SourceDescriptor : IEquatable<SourceDescriptor>, IComparable<Sourc
         string thisName = LocalizationIndex.GetLine(this.Name);
         string thatName = LocalizationIndex.GetLine(other.Name);
 
-        return thisName.CompareTo(thatName);
+        int comparison = thisName.CompareTo(thatName);
+        if (comparison != 0) return comparison;
+
+        return this.Name.CompareTo(other.Name);
     }
 }
