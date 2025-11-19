@@ -1,5 +1,4 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Events;
@@ -7,7 +6,6 @@ using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using Onirism.Gameplay;
@@ -100,6 +98,7 @@ public class OutfitListUI : MonoBehaviour
         hairstyles
             .Select(x => new Dropdown.OptionData() { text = x.Key})
             .ForEach(ModelSelector.options.Add);
+        ModelSelector.options.Add(new Dropdown.OptionData("None"));
         Log.Debug($"hair ui initialized, {ModelSelector.options.Count()} model options and {ColorSelector.options.Count()} color options.");
     }
 
@@ -185,9 +184,16 @@ public class OutfitListUI : MonoBehaviour
     void HandleHairChange(AccessoryChangedEvent e)
     {
         Log.Debug($"HandleHairChange({e})");
+        if (!e.Visible)
+        {
+            Log.Debug("Setting hair dropdown to None");
+            int index = ModelSelector.options.Count();
+            ModelSelector.SetValueWithoutNotify(index);
+            return;
+        }
         var style = e.Target;
         var match = hairstyles.Values
-            .FirstOrDefault(x => x.Equals(style));
+            .FirstOrDefault(stored => stored.Source.Name == style.Source.Name);
         if (match is null) { Log.Error($"No hairstyle matching {e.Target}"); return; }
 
         int styleIndex = hairstyles.Values.IndexOf(match);
@@ -238,12 +244,14 @@ public class OutfitListUI : MonoBehaviour
     {
         Log.Debug($"OnHairDropdownChanged(model:{modelIndex}, dye:{dyeIndex}");
         var dye = hairDyes.Values[dyeIndex];
-        var model = hairstyles.Values[modelIndex];
         var matDesc = new MaterialDescriptor(dye.material, new(Constants.HairDyeSourceName, SourceType.Hair));
 
         var existingHair = OutfitListUI.TargetOutfit.ActiveAccessories
             .Where(x => x.Source.Type == Models.SourceType.Hair)
             .ForEach(OutfitListUI.TargetOutfit.DisableAccessory);
+        if (modelIndex >= hairstyles.Count()) return;
+
+        var model = hairstyles.Values[modelIndex];
         OutfitListUI.TargetOutfit.EnableAccessory(model);
         OutfitListUI.TargetOutfit.PaintAccessory(model, matDesc, model.hairstyle.mainMaterialIndex);
     }
