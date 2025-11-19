@@ -52,6 +52,9 @@
 		<Reference Include="FuseBox.Lugh">
 			<HintPath>lib\FuseBox.Lugh.dll</HintPath>
 		</Reference>
+		<Reference Include="UnityEngine.Localization">
+			<HintPath>lib\Unity.Localization.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">

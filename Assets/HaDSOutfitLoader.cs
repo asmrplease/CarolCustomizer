@@ -8,6 +8,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Localization.Settings;
+using UnityEngine.Localization.Tables;
 
 namespace CarolCustomizer.Assets;
 internal class HaDSOutfitLoader : IDisposable
@@ -44,6 +46,9 @@ internal class HaDSOutfitLoader : IDisposable
 
     void LoadHair()
     {
+        var table = LocalizationSettings.StringDatabase.GetTable((TableReference)"Main", LocalizationSettings.SelectedLocale);
+        table.AddEntry("Haircut_Itsuki", "Itsuki");
+        table.AddEntry("Haircut_Powerhelmet", "Hood/Helmet");
         var hair = Resources.FindObjectsOfTypeAll<Hairstyle>()
             .Where(x => !x.gameObject.name.Contains("(Clone)"))
             .Select(x => new StoredHair(x))

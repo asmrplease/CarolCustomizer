@@ -29,6 +29,7 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
         base(hairstyle.name, new SourceDescriptor(hairstyle.name, SourceType.Hair))
     {
         this.hairstyle = hairstyle;
+        if (hairstyle.localizationName == "") hairstyle.localizationName = "Haircut_Powerhelmet";
         this.AssetName = hairstyle.name;
         this.DisplayName = LocalizationIndex.GetLine(hairstyle.localizationName);
         var smr = hairstyle.model as SkinnedMeshRenderer;
