@@ -13,51 +13,26 @@ using UnityEngine.Events;
 
 namespace CarolCustomizer.Models.Outfits;
 
-public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAccessorySource, IListable
+public partial class Outfit 
 {
-    #region Dependencies
     public Transform storedAsset { get; protected set; }
-    #endregion
 
-    #region Public Interface
     public string AssetName { get; protected set; }
     public string DisplayName { get; protected set; }
-    public Sprite Thumbnail { get; protected set; }
     public string Author { get; protected set; }
 
-    public SourceDescriptor Descriptor { get; private set; }
-
-    virtual public ModelData GetConfiguration() => null;
-
     protected Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = [];
-
-    public List<StoredAccessory> GetAccessories() => AccDict.Values.ToList();
-    public List<MaterialDescriptor> GetMaterials() => MaterialDescriptors.ToList();
-    List<OutfitEffect> Effects = [];
     public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = [];
+    List<OutfitEffect> Effects = [];
+
 
     PelvisWatchdog prefabWatchdog;
     public BoneData boneData => prefabWatchdog.BoneData;
     public CompData compData => prefabWatchdog.CompData;
     public MagiData magiData => prefabWatchdog.MagiData;
     virtual public Func<SkinnedMeshRenderer, bool> FaceDefinition => (x) => x.name == "tete";
+    public StoredAccessory GetAccessory(string name) => AccDict.Values.FirstOrDefault(x => x.Name == name);
 
-    public MaterialDescriptor GetMaterial(MaterialDescriptor descriptor)
-    {
-        MaterialDescriptors.TryGetValue(descriptor, out var result);
-        return result;
-    }
-
-    public List<Transform> GetBespokeBones()
-    {
-        return boneData.BespokeBones;
-    }
-
-    public List<MagicaCloth> GetBoneCloths() => magiData.BoneCloths;
-
-    #endregion
-
-    #region Lifecycle
     public Outfit(Transform storedAsset)
     {
         if (!storedAsset) { Log.Error("Outfit constructor was passed a null transform."); return; }
@@ -113,37 +88,21 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
 
         Log.Debug($"{DisplayName} constructed.");
     }
-
-    public StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
-    {
-        AccDict.TryGetValue(descriptor, out StoredAccessory result);
-        result ??= GetAccessory(descriptor.Name);
-        return result;
-    }
-
-    public StoredAccessory GetAccessory(string name) => AccDict.Values.FirstOrDefault(x => x.Name == name);
-
-    public virtual RuntimeAnimatorController GetAnimator() => null;
-
     public void Dispose()
     {
         Log.Debug("Outfit.Dispose()");
         if (prefabWatchdog) GameObject.Destroy(prefabWatchdog);
     }
-    #endregion
+}
 
-    #region Equality & Comparison
+public partial class Outfit : IComparable<Outfit>, IEquatable<Outfit>
+{
     public int CompareTo(Outfit other)
     {
         int displayNameComparison = DisplayName.CompareTo(other.DisplayName);
         if (displayNameComparison != 0) return displayNameComparison;
         return AssetName.CompareTo(other.AssetName);
     }
-    public bool Equals(Outfit other)
-    {
-        return this.AssetName == other.AssetName;
-    }
-
     public override bool Equals(object other)
     {
         if (ReferenceEquals(null, other)) return false;
@@ -152,22 +111,40 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
 
         return Equals((Outfit)other);
     }
-
+    public bool Equals(Outfit other) => this.AssetName == other.AssetName;
     public static bool operator ==(Outfit lhs, Outfit rhs) => Equals(rhs, lhs);
     public static bool operator !=(Outfit lhs, Outfit rhs) => !Equals(rhs, lhs);
+    public override int GetHashCode() => this.AssetName.GetHashCode();
+}
 
-    public override int GetHashCode()
+public partial class Outfit : IAccessorySource
+{
+    public SourceDescriptor Descriptor { get; private set; }
+    virtual public ModelData GetConfiguration() => null;
+    public List<MagicaCloth> GetBoneCloths() => magiData.BoneCloths;
+    public List<StoredAccessory> GetAccessories() => AccDict.Values.ToList();
+    public List<Transform> GetBespokeBones() => boneData.BespokeBones;
+    public MaterialDescriptor GetMaterial(MaterialDescriptor descriptor)
     {
-        return this.AssetName.GetHashCode();
+        MaterialDescriptors.TryGetValue(descriptor, out var result);
+        return result;
     }
-
+    public List<MaterialDescriptor> GetMaterials() => MaterialDescriptors.ToList();
+    public StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
+    {
+        AccDict.TryGetValue(descriptor, out StoredAccessory result);
+        result ??= GetAccessory(descriptor.Name);
+        return result;
+    }
+    public virtual RuntimeAnimatorController GetAnimator() => null;
     public List<OutfitEffect> GetEffects() => this.Effects;
-
     List<MagicaCapsuleCollider> IAccessorySource.GetColliders() => this.magiData.CapsuleColliders;
-
     IInstantiable IAccessorySource.GetInstantiable(AccessoryDescriptor accessory) => GetAccessory(accessory);
-    #endregion
+}
 
+public partial class Outfit : IListable
+{
+    public Sprite Thumbnail { get; protected set; }
     string IListable.Header => this.DisplayName;
     string IListable.Subheader => "";
     Color IListable.BaseColor => Constants.DefaultColor;
@@ -176,19 +153,16 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
     {
         throw new NotImplementedException();
     }
-
     public virtual List<(string, UnityAction)> GetContextMenuItems()
     {
         var target = OutfitListUI.TargetOutfit;
-        var results = new List<(string, UnityAction)>()
-        {
+        return
+        [
              ("Use Animator",     () => target.SetAnimator(this.Descriptor))
             ,("Use Measurements", () => target.SetConfiguration(this.Descriptor))
             ,("Use Colliders",    () => target.SetColliderSource(this.Descriptor))
             ,("Activate Effects", () => target.SetEffect(this.Descriptor, true))
             ,("Disable Effects",  () => target.SetEffect(this.Descriptor, false))
-        };
-        
-        return results;
+        ];
     }
 }
