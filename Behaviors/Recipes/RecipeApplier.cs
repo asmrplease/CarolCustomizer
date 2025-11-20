@@ -103,13 +103,13 @@ public static class RecipeApplier
     public static IEnumerable<SourceDescriptor> GetMissingSources(RecipeDescriptor recipe)
     {
         return GetSources(recipe)
-            .Where(x => OutfitAssetManager.GetAccessorySource(x) is null);
+            .Where(x => OutfitAssetManager.GetAccessorySource(x, false) is null);
     }
 
     public static IEnumerable<AccessoryDescriptor> GetRemovedAccessories(RecipeDescriptor recipe)
     {
         return recipe.ActiveAccessories
-            .Select(acc => (acc, source: OutfitAssetManager.GetAccessorySource(acc.Source)))
+            .Select(acc => (acc, source: OutfitAssetManager.GetAccessorySource(acc.Source, false)))
             .Where(tup => tup.source is not null)
             .Where(tup => tup.source.GetInstantiable(tup.acc) is null)
             .Select(tup => tup.acc);

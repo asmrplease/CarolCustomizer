@@ -49,7 +49,7 @@ public class OutfitAssetManager : IDisposable
             .result;
     }
 
-    public static IAccessorySource GetAccessorySource(SourceDescriptor descriptor)
+    public static IAccessorySource GetAccessorySource(SourceDescriptor descriptor, bool warnOnMissing = true)
     {
         var result =  descriptor.Type switch
         {
@@ -60,7 +60,7 @@ public class OutfitAssetManager : IDisposable
             _ => null,
         };
 
-        if (result is null) Log.Warning($"No source of type {descriptor.Type} named {descriptor.Name} was found.");
+        if (result is null && warnOnMissing) Log.Warning($"No source of type {descriptor.Type} named {descriptor.Name} was found");
         return result;
     }
 
