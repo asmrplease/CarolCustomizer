@@ -9,6 +9,7 @@ using BepInEx;
 using System.Linq;
 using CarolCustomizer.UI.Main;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 public class RecipeFileWatcher : IDisposable
@@ -43,7 +44,7 @@ public class RecipeFileWatcher : IDisposable
         watcher.EnableRaisingEvents = true;
         SceneManager.sceneUnloaded += (_) => RefreshSlow();
         MenuToggle.OnMenuToggle += MenuToggleHandle;
-        OutfitAssetManager.OnOutfitSetLoaded += ReloadAll;
+        OutfitAssetManager.OnOutfitSetLoaded += () => CCPlugin.CoroutineRunner.StartCoroutine(ReloadAll());
         Application.quitting += Dispose;
     }
 
@@ -61,10 +62,10 @@ public class RecipeFileWatcher : IDisposable
     void MenuToggleHandle(bool visible)
     {
         watcher.EnableRaisingEvents = visible;
-        if (visible) QuickRefresh();
+        if (visible) CCPlugin.CoroutineRunner.StartCoroutine(QuickRefresh());
     }
     
-    void QuickRefresh()
+    IEnumerator QuickRefresh()
     {
         var paths = RecipeLoader.GetRecipeFilePaths();
         var missing = paths.Where(x => !recipes.ContainsKey(x));
@@ -73,17 +74,28 @@ public class RecipeFileWatcher : IDisposable
             var ext = Path.GetExtension(path).ToLower();
             if (ext != Constants.JsonFileExtension && ext != Constants.PngFileExtension) continue;
             OnRecipeFileCreated(new Recipe(path));
+            yield return null;
         }
     }
 
-    public void ReloadAll()
+    public IEnumerator ReloadAll()
     {
         recipes.Values.ForEach(x => OnRecipeDeleted?.Invoke(x));
         recipes.Clear();
-
-        RecipeLoader
-            .GetRecipeFilePaths()
-            .ForEach(x => OnRecipeFileCreated(new Recipe(x)));
+        Log.Debug("sync load autosaves");
+        var autosaves = RecipeLoader.GetRecipeFilePaths()
+            .Where(x => x.Contains(Constants.AutoSave))
+            .Select(x => new Recipe(x))
+            .ForEach(OnRecipeFileCreated);
+        Log.Debug("yield load recipes");
+        var rest = RecipeLoader.GetRecipeFilePaths()
+            .Where(x => !x.Contains(Constants.AutoSave))
+            .ToList();
+        foreach (var path in rest)
+        {
+            OnRecipeFileCreated(new Recipe(path));
+            yield return null;
+        }
     }
 
     public void RefreshSlow()

@@ -55,7 +55,7 @@ public class CCPlugin : BaseUnityPlugin
         uiAssetLoader = new();
         outfitAssetManager = new(folder);
         recipesManager = new(Constants.RecipeFolderPath);
-        recipesManager.ReloadAll();
+        StartCoroutine(recipesManager.ReloadAll());
         PrioritySources.OnStart();
         outfitLoader = new();
         players = new(folder);
