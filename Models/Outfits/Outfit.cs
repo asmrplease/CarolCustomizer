@@ -80,7 +80,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
             int i = 0;
             grouping.ForEach(x => x.name += i++);
         }
-        if (pelvis.GetComponent<PelvisWatchdog>() is PelvisWatchdog existing) { Log.Debug("Disposing of existing watchdog"); GameObject.Destroy(existing); }
+
         prefabWatchdog = PelvisWatchdog.GetAddWatchdog(pelvis.gameObject);
         prefabWatchdog.Awake();
         if (!prefabWatchdog.CompData) Log.Warning("Failed to instantiate meshdata in time.");
