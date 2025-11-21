@@ -29,6 +29,10 @@ public class PrioritySources
         var all = Autosave.ActiveAccessories
             .Select(x => x.Source)
             .ToList();
+        var mats = Autosave.ActiveAccessories
+            .SelectMany(x => x.Materials)
+            .Select(x => x.Source);
+        all.AddRange(mats);
         all.AddRange(Autosave.ActiveEffects);
         all.Add(Autosave.ConfigurationSource);
         all.Add(Autosave.AnimatorSource);
