@@ -8,11 +8,11 @@ using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Recipes;
-internal class AutoSaver : IDisposable
+public class AutoSaver : IDisposable
 {
     OutfitCoordinator outfitManager;
     readonly int playerIndex;
-    readonly string path;
+    public readonly string path;
 
     public AutoSaver(PlayerCarolInstance player, int playerIndex = 0)
     {

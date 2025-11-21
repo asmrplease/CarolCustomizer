@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Hooks.Watchdogs;
+﻿using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
@@ -34,7 +35,13 @@ internal class HaDSOutfitLoader : IDisposable
             x.gameObject.name.StartsWith("carol_", StringComparison.InvariantCultureIgnoreCase)
             && !x.gameObject.name.Contains("(Clone)"));//this line is designed to filter for any outfits that might be active when plugin is loaded 
 
-        foreach (var outfit in vanillaOutfits)
+        var sorted = vanillaOutfits
+            .Select(x => (md: x, name: x.gameObject.name.Split('_')[1]))
+            .OrderBy(tup => PrioritySources.IsLowPriority(tup.name))
+            .ForEach(tup => Log.Debug(tup.name))
+            .Select(tup => tup.md);
+
+        foreach (var outfit in sorted)
         {
             LoadHaDSOutfit(outfit);
             yield return null;

@@ -54,8 +54,10 @@ public class CCPlugin : BaseUnityPlugin
         saveAdjuster = new();
         uiAssetLoader = new();
         outfitAssetManager = new(folder);
-        outfitLoader = new();
         recipesManager = new(Constants.RecipeFolderPath);
+        recipesManager.ReloadAll();
+        PrioritySources.OnStart();
+        outfitLoader = new();
         players = new(folder);
         NPCManager.Constructor(folder, recipesManager);
         npcInstances = new(folder);

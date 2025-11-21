@@ -42,10 +42,8 @@ public class RecipeFileWatcher : IDisposable
         watcher.Changed += HandleRecipeFileChanged;
         watcher.EnableRaisingEvents = true;
         SceneManager.sceneUnloaded += (_) => RefreshSlow();
-
         MenuToggle.OnMenuToggle += MenuToggleHandle;
-
-        OutfitAssetManager.OnOutfitSetLoaded += RefreshAll;
+        OutfitAssetManager.OnOutfitSetLoaded += ReloadAll;
         Application.quitting += Dispose;
     }
 
@@ -78,7 +76,7 @@ public class RecipeFileWatcher : IDisposable
         }
     }
 
-    public void RefreshAll()
+    public void ReloadAll()
     {
         recipes.Values.ForEach(x => OnRecipeDeleted?.Invoke(x));
         recipes.Clear();
