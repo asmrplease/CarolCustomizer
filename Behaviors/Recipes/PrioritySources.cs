@@ -20,10 +20,12 @@ public class PrioritySources
             Constants.AutoSave
             + 0
             + Constants.JsonFileExtension);
-        Autosave = CCPlugin
+        var autosaveRecipe = CCPlugin
             .recipesManager
-            .GetRecipeByFilename(path)
-            .Descriptor;
+            .GetRecipeByFilename(path);
+        if (autosaveRecipe is null) { Log.Info("No autosave recipe available during PrioritySources.OnStart()"); return; }
+
+        Autosave = autosaveRecipe.Descriptor;
         Log.Debug("Descriptor loaded");
         //build source list from recipedescriptor
         var all = Autosave.ActiveAccessories
