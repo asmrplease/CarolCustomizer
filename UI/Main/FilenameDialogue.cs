@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace CarolCustomizer.UI.Main;
@@ -61,10 +62,10 @@ public class FilenameDialogue : MonoBehaviour
     {
         this.recipe = recipe;
         this.onConfirm = onConfirm;
-        CCPlugin.CoroutineRunner.StartCoroutine(idk());
+        CCPlugin.CoroutineRunner.StartCoroutine(Lock());
     }
 
-    IEnumerator idk()
+    IEnumerator Lock()
     {
         if (OutfitListUI.TargetOutfit.pelvis.Behavior is PlayerArmature player)
         {
@@ -77,6 +78,10 @@ public class FilenameDialogue : MonoBehaviour
             carolEntity.inventory.HideHeldWeapon(false);
             carolEntity.enabled = false;
         }
+        else if (OutfitListUI.TargetOutfit.pelvis.Behavior is MenuArmature menuPlayer)
+        {
+
+        }
         else Log.Warning("Carol was not a player when showing filename dialogue.");
 
         gameObject.SetActive(true);
@@ -84,6 +89,8 @@ public class FilenameDialogue : MonoBehaviour
 
     void OnDropdownChanged(int index)
     {
+        //if (SceneManager.GetActiveScene().name == Constants.MenuSceneName) return;
+
         var animator = OutfitListUI.TargetOutfit.pelvis.AnimData.Animator;
         StartCoroutine(Dialogue.controller.SetExpressionValue(animator, "Expression", index));
     }

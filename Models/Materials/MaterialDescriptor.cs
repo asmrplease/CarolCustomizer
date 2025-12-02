@@ -10,8 +10,6 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>
 {
     public string Name;
     public SourceDescriptor Source;
-
-
     [JsonIgnore]
     public readonly Material referenceMaterial;
 

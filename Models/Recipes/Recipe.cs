@@ -1,7 +1,7 @@
 ﻿using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
-using System.Collections;
+using PngHelper;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,6 +16,7 @@ public record Recipe
     public readonly string Json;
     public readonly List<AccessoryDescriptor> MissingAccessories;
     public readonly List<SourceDescriptor> MissingSources;
+    public readonly RichPng Png;
 
     public Recipe(string path)
     {
@@ -28,6 +29,7 @@ public record Recipe
         Json = results.Json;
         MissingSources = results.MissingSources.ToList();
         MissingAccessories = results.MissingAccs.ToList();
+        Png = results.Png;
     }
 
     public enum Status

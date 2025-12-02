@@ -74,10 +74,14 @@ public static class RecipeApplier
 
     public static IEnumerable<MaterialDescriptor> GetWorldMats(RecipeDescriptor recipe)
     {
+        if (recipe is null) return [];
+        if (recipe.ActiveAccessories is null) return [];
+
         return recipe
             .ActiveAccessories
+            .Where(x => x is not null)
             .SelectMany(x => x.Materials)
-            .Where(x => x.Source.Type == SourceType.World)
+            .Where(x => x is not null && x.Source.Type == SourceType.World)
             .Distinct();
     }
 

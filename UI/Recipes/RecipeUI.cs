@@ -6,6 +6,7 @@ using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
+using PngHelper;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -52,8 +53,12 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         displayImage.sprite = loader.PirateIcon;
         displayImage.enabled = false;
 
-        if (recipe.Extension == Constants.PngFileExtension) 
-            CCPlugin.CoroutineRunner.StartCoroutine(LoadThumbnail());
+        if (recipe.Extension == Constants.PngFileExtension)
+        {
+            var (dimensions, compressedData) = recipe.Png.CompressedFrames[0];
+            displayImage.sprite = PngUtil.BuildSprite(dimensions, compressedData);
+            displayImage.enabled = true;
+        }
 
         displayName = transform.Find(outfitNameAddress)?.GetComponentInChildren<Text>();
         displayName.text = this.recipe.Name;
