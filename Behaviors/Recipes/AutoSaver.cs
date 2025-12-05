@@ -2,13 +2,12 @@
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
-using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Recipes;
-public class AutoSaver : IDisposable
+public class AutoSaver
 {
     OutfitCoordinator outfitManager;
     readonly int playerIndex;
@@ -17,17 +16,11 @@ public class AutoSaver : IDisposable
     public AutoSaver(PlayerCarolInstance player, int playerIndex = 0)
     {
         outfitManager = player.outfitManager;
-        OutfitAssetManager.OnOutfitSetLoaded += Load;
         this.playerIndex = playerIndex;
         this.path = RecipeSaver.RecipeFilenameToPath(
             Constants.AutoSave 
             + playerIndex 
             + Constants.JsonFileExtension);
-    }
-
-    public void Dispose()
-    {
-        OutfitAssetManager.OnOutfitSetLoaded -= Load;
     }
 
     public void Save()

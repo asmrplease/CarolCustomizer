@@ -38,6 +38,7 @@ public class CCPlugin : BaseUnityPlugin
     HaDSOutfitLoader outfitLoader;
     SaveDataAdjuster saveAdjuster;
     UIAssetLoader uiAssetLoader;
+    SourceAwaiter SourceAwaiter;
     PlayerInstances players;
     Transform folder;
     #endregion
@@ -50,6 +51,7 @@ public class CCPlugin : BaseUnityPlugin
         folder = new GameObject("CCPlugin").transform;
         folder.parent = this.transform;
         CoroutineRunner = this;
+        SourceAwaiter = new();
         Settings.Constructor(Config);
         saveAdjuster = new();
         uiAssetLoader = new();
@@ -129,6 +131,7 @@ public class CCPlugin : BaseUnityPlugin
         npcInstances.Dispose();
         outfitLoader.Dispose();
         AccessoryDissolver.Dispose();
+        SourceAwaiter.Dispose();
         OnPluginDestroy?.Invoke();
         Log.Info("Customizer unload completed successfully.");
     }

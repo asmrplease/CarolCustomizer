@@ -44,7 +44,7 @@ public class RecipeFileWatcher : IDisposable
         watcher.EnableRaisingEvents = true;
         SceneManager.sceneUnloaded += (_) => RefreshSlow();
         MenuToggle.OnMenuToggle += MenuToggleHandle;
-        OutfitAssetManager.OnOutfitSetLoaded += () => CCPlugin.CoroutineRunner.StartCoroutine(ReloadAll());
+        //OutfitAssetManager.OnOutfitSetLoaded += () => CCPlugin.CoroutineRunner.StartCoroutine(ReloadAll());
         Application.quitting += Dispose;
     }
 

@@ -70,7 +70,9 @@ public class ConfigUI : MonoBehaviour
             siblingIndex++;
             item.name = label;
             item.gameObject.SetActive(true);
-            var text = item.transform.Find("Text").GetComponentInChildren<Text>(true);
+            var text = item.transform
+                .Find("Text")
+                .GetComponentInChildren<Text>(true);
             text.text = label;
             SetupToggle(label + "/Toggle", Settings.Plugin.customNPCs[npc].enable);
             Settings.Plugin.customNPCs[npc].enable.SettingChanged += ShowLevelReloadPopup;

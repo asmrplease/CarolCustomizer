@@ -4,7 +4,7 @@ using CarolCustomizer.Utils;
 using CarolCustomizer.Models.Recipes;
 
 namespace CarolCustomizer.Behaviors.Recipes;
-internal static class RecipeSaver
+public static class RecipeSaver
 {
     /// <summary>
     /// Combines the application path, recipe folder path, and given filename.

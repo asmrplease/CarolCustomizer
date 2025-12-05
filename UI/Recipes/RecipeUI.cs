@@ -6,9 +6,7 @@ using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
-using PngHelper;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -44,6 +42,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         MessageDialogue messageDialogue)
     {
         this.recipe = recipe;
+        this.recipe.OnStatusChanged += OnRecipeChanged;
         this.contextMenu = contextMenu;
         this.filenameDialogue = filenameDialogue;
         this.messageDialogue = messageDialogue;
@@ -64,37 +63,16 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         displayName.text = this.recipe.Name;
 
         background = transform.GetChild(0).gameObject.GetComponent<Image>();
-        background.color = GetUIColor();
-
         pickupLocation = transform.Find(pickupLocationAddress)?.GetComponent<Text>();
+        OnRecipeChanged();
+    }
+
+    void OnRecipeChanged()
+    {
         pickupLocation.text = GetStatusMessage();
+        background.color = GetUIColor();
     }
 
-
-    IEnumerator LoadThumbnail()
-    {
-        yield return new WaitForEndOfFrame();
-
-        var bytes = File.ReadAllBytes(recipe.Path);
-        Texture2D thumbnail = new(512, 512, TextureFormat.RGBA32, false);
-        if (!ImageConversion.LoadImage(thumbnail, bytes)) { Log.Warning($"failed to load png for {recipe.Name}"); yield break; }
-
-        displayImage.sprite = Sprite
-            .Create(
-                thumbnail,
-                new Rect (0,0,thumbnail.width,thumbnail.height),
-                new Vector2(0.5f, 0.5f));
-        displayImage.sprite.name = recipe.Name ;
-        displayImage.enabled = true;
-        yield break;
-    }
-
-    void OnShezaraChanged(object sender, EventArgs e)
-    {
-        if (!displayImage) return; 
-        
-        displayImage.enabled = (e.AsConfigEntry<string>().Value == recipe.Name);
-    }
 
     string GetStatusMessage()
     {
@@ -128,8 +106,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     void Overwrite() => RecipeSaver.SavePNG(new RecipeDescriptor(PlayerInstances.DefaultPlayer.outfitManager), recipe.Path);
 
-    void OnContextMenuLoad(PlayerCarolInstance player) => 
-        RecipeApplier.ActivateRecipe(player.outfitManager, recipe.Descriptor);
+    void OnContextMenuLoad(PlayerCarolInstance player) => RecipeApplier.ActivateRecipe(player.outfitManager, recipe.Descriptor);
 
     void OnContextMenuWarningLoad()
     {
@@ -190,6 +167,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         {
             var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
             foreach (var source in missingSources) { message += source + Environment.NewLine; }
+            foreach (var acc in recipe.MissingAccessories) { message += acc + Environment.NewLine; }
         }
         if (recipe.Error == Recipe.Status.SlowSource)
         {

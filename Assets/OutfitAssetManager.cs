@@ -23,7 +23,7 @@ public class OutfitAssetManager : IDisposable
 
     public static Dictionary<string, Dictionary<SourceDescriptor, HaDSOutfit>> outfitSets = [];
     public static Dictionary<SourceDescriptor, StoredHair> Hairstyles = [];
-    static HairDyeSource hairDyes;
+    public static HairDyeSource HairDyes;
     public static Dictionary<string, HairDye> HairColors = [];
 
     public OutfitAssetManager(Transform parent)
@@ -53,9 +53,9 @@ public class OutfitAssetManager : IDisposable
     {
         var result =  descriptor.Type switch
         {
-            SourceType.Outfit => GetOutfitSource(descriptor),
-            SourceType.Hair => GetHairSource(descriptor),
-            SourceType.World => GetWorldSource(descriptor),
+            SourceType.Outfit    => GetOutfitSource(descriptor),
+            SourceType.Hair      => GetHairSource(descriptor),
+            SourceType.World     => GetWorldSource(descriptor),
             SourceType.Resources => GetWorldSource(descriptor),
             _ => null,
         };
@@ -79,9 +79,9 @@ public class OutfitAssetManager : IDisposable
     {
         if (descriptor.Name == Constants.HairDyeSourceName)
         {
-            if (hairDyes is null) { Log.Error("Requested a hairdye before the dyes were loaded!"); }
+            if (HairDyes is null) { Log.Error("Requested a hairdye before the dyes were loaded!"); }
 
-            return hairDyes;
+            return HairDyes;
         }
         Hairstyles.TryGetValue(descriptor, out var source); 
         return source;
@@ -115,7 +115,7 @@ public class OutfitAssetManager : IDisposable
         hair.Select(x => (Key: x.Source, Value: x))
             .ForEach(tup => Log.Debug($"Adding {tup.Key}, {tup.Value} to StoredHair dict"))
             .ForEach(x => Hairstyles.TryAdd(x.Key, x.Value));
-        hairDyes = new HairDyeSource(dye);
+        HairDyes = new HairDyeSource(dye);
         OnHairLoaded?.Invoke((hair, dye));
     }
 

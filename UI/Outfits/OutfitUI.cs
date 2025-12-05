@@ -169,17 +169,19 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             .ForEach(x=>x.SetFavorite(false));
     }
 
+
+
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         var hads = outfit as HaDSOutfit; //TODO: idk, but not this
         var target = OutfitListUI.TargetOutfit;
         var results = new List<(string, UnityAction)>()
         {
-             ("Use Animator",     () => target.SetAnimator(outfit.Descriptor))
-            ,("Use Measurements", () => target.SetConfiguration(outfit.Descriptor))
-            ,("Use Colliders",    () => target.SetColliderSource(outfit.Descriptor))
-            ,("Activate Effects", () => target.SetEffect(outfit.Descriptor, true))
-            ,("Disable Effects",  () => target.SetEffect(outfit.Descriptor, false))
+            ("Use Animator",     () => target.SetAnimator(outfit.Descriptor)),
+            ("Use Measurements", () => target.SetConfiguration(outfit.Descriptor)),
+            ("Use Colliders",    () => target.SetColliderSource(outfit.Descriptor)),
+            ("Activate Effects", () => target.SetEffect(outfit.Descriptor, true)),
+            ("Disable Effects",  () => target.SetEffect(outfit.Descriptor, false)),
         };
         hads.Variants
             .ForEach(tup =>

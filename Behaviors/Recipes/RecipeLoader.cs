@@ -116,7 +116,7 @@ public static class RecipeLoader
         }
         var json = idk.Item1 ??= "";
         if (idk.Item2 is not null) results.Png = idk.Item2;
-
+        json = json.Trim();
         var tup = Deserialize(json);
         if (tup.Item1) results.Recipe = tup.Item2;
         else {results.Status = Recipe.Status.InvalidJson; return results; }
