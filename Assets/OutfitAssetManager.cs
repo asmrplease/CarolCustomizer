@@ -49,7 +49,7 @@ public class OutfitAssetManager : IDisposable
             .result;
     }
 
-    public static IAccessorySource GetAccessorySource(SourceDescriptor descriptor, bool warnOnMissing = true)
+    public static IGenericSource GetSource(SourceDescriptor descriptor, bool warnOnMissing = true)
     {
         var result =  descriptor.Type switch
         {
@@ -64,7 +64,7 @@ public class OutfitAssetManager : IDisposable
         return result;
     }
 
-    static IAccessorySource GetOutfitSource(SourceDescriptor descriptor)
+    static IGenericSource GetOutfitSource(SourceDescriptor descriptor)
     {
         var idk = outfitSets.Values
             .Select(dict =>
@@ -75,7 +75,7 @@ public class OutfitAssetManager : IDisposable
         return idk;
     }
 
-    static IAccessorySource GetHairSource(SourceDescriptor descriptor)
+    static IGenericSource GetHairSource(SourceDescriptor descriptor)
     {
         if (descriptor.Name == Constants.HairDyeSourceName)
         {
@@ -87,13 +87,13 @@ public class OutfitAssetManager : IDisposable
         return source;
     }
 
-    static IAccessorySource GetWorldSource(SourceDescriptor descriptor)
+    static IGenericSource GetWorldSource(SourceDescriptor descriptor)
     {
         Log.Warning("GetWorldSource() not implemented");
         return null;
     }
 
-    static IAccessorySource GetResourcesSource(SourceDescriptor descriptor)
+    static IGenericSource GetResourcesSource(SourceDescriptor descriptor)
     {
         Log.Warning($"GetResourcesSource() not implemented");
         return null;
@@ -101,12 +101,12 @@ public class OutfitAssetManager : IDisposable
 
     public static IInstantiable GetInstantiable(AccessoryDescriptor descriptor)
     {
-        return GetAccessorySource(descriptor.Source)?.GetInstantiable(descriptor);
+        return GetSource(descriptor.Source)?.GetInstantiable(descriptor);
     }
 
     public static MaterialDescriptor GetMaterial(MaterialDescriptor descriptor)
     {
-        return GetAccessorySource(descriptor.Source)?.GetMaterial(descriptor);
+        return GetSource(descriptor.Source)?.GetMaterial(descriptor);
     }
 
     public static void NotifyHairReady(List<StoredHair> hair, List<HairDye> dye)

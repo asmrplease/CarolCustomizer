@@ -35,7 +35,7 @@ public class SkeletonManager
         Log.Debug($"AssignLiveBones({acc.Name})");
         if (acc is null) { Log.Error("Requested bones for null accessory"); return; }
 
-        var source = OutfitAssetManager.GetAccessorySource(acc.Source);
+        var source = OutfitAssetManager.GetSource(acc.Source);
         //var source = acc.Source == Constants.HairstyleSourceName ?
         //    acc.Name : acc.Source; //if this is a hairstyle, use the hairstyle name not the source
         //probbaly not a good system but i'm getting tired of this problem so we can fix it later if it matters

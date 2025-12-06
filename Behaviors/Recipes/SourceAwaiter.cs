@@ -20,9 +20,9 @@ public class SourceAwaiter : IDisposable
     static void HandleHairLoaded((List<Models.Accessories.StoredHair>, List<Onirism.Gameplay.HairDye>) obj)
     {
         obj.Item1
-            .Select(x => x as IAccessorySource)
+            .Select(x => x as ISourceDescriptor)
             .ForEach(x => HandleSourceLoaded(x.Descriptor));
-        var idk = OutfitAssetManager.HairDyes as IAccessorySource;
+        var idk = OutfitAssetManager.HairDyes as IMaterialProvider;
         HandleSourceLoaded(idk.Descriptor);
     }
 

@@ -8,11 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace CarolCustomizer.Models.Outfits;
 
-public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAccessorySource
+public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IGenericSource
 {
     #region Dependencies
     public Transform storedAsset { get; protected set; }
@@ -176,8 +175,8 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IAcc
 
     public List<OutfitEffect> GetEffects() => this.Effects;
 
-    List<MagicaCapsuleCollider> IAccessorySource.GetColliders() => this.magiData.CapsuleColliders;
+    List<MagicaCapsuleCollider> IMagicaSource.GetColliders() => this.magiData.CapsuleColliders;
 
-    IInstantiable IAccessorySource.GetInstantiable(AccessoryDescriptor accessory) => GetAccessory(accessory);
+    IInstantiable IModelProvider.GetInstantiable(AccessoryDescriptor accessory) => GetAccessory(accessory);
     #endregion
 }

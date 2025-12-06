@@ -50,7 +50,7 @@ public class MenuArmature : MonoBehaviour, ICarolType
     public void SetBaseOutfit(SourceDescriptor descriptor)
     {
         Log.Debug("SetBaseOutfit(MenuSwitchOutfit)");
-        var source = OutfitAssetManager.GetAccessorySource(descriptor);
+        var source = OutfitAssetManager.GetSource(descriptor);
         if (source is not HaDSOutfit outfit) { Log.Warning($"SetBaseOutfit({descriptor}) found a source that was not an outfit"); return; }
 
         if (menuSwitchOutfit.loadedModel) { Destroy(menuSwitchOutfit.loadedModel); }

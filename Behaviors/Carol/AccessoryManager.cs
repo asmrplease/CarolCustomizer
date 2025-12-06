@@ -24,7 +24,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
     HashSet<SourceDescriptor> InitializedSources = [];
 
     public event Action<AccessoryChangedEvent> AccessoryChanged;
-    public event Action<IAccessorySource> AccessorySourceAdded;
+    public event Action<IGenericSource> AccessorySourceAdded;
 
     public IEnumerable<AccessoryDescriptor> ActiveAccessories =>
         liveAccessories
@@ -73,7 +73,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
     {
         if (InitializedSources.Contains(acc.Source)) { return; }
        
-        var source = OutfitAssetManager.GetAccessorySource(acc.Source);
+        var source = OutfitAssetManager.GetSource(acc.Source);
         if (source is null) { Log.Warning($"Failed to find {source}"); return; }
 
         InitializedSources.Add(acc.Source);
@@ -131,7 +131,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
             .Where(x => x.isActive)
             .ForEach(x => x.SetVisible(visible));
 
-    void OnSourceUnloaded(IAccessorySource source)
+    void OnSourceUnloaded(IGenericSource source)
     {
         foreach (var storedAcc in source.GetAccessories())
         {

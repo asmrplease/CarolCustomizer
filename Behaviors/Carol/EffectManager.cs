@@ -16,8 +16,8 @@ public class EffectManager : IPelvisFollower
     SkeletonManager skeletonManager;
 
     HashSet<SourceDescriptor> outfitEffects = [];
-    IAccessorySource animatorSource;
-    IAccessorySource configurationSource;
+    IConfigProvider animatorSource;
+    IConfigProvider configurationSource;
 
     public SourceDescriptor AnimatorSource => animatorSource.Descriptor ?? Constants.PyjamaDescriptor;
     public SourceDescriptor ConfigurationSource => configurationSource.Descriptor ?? Constants.PyjamaDescriptor;
@@ -55,7 +55,7 @@ public class EffectManager : IPelvisFollower
 
     public void SetEffect(SourceDescriptor desc, bool enabled)
     {
-        var source = OutfitAssetManager.GetAccessorySource(desc);
+        var source = OutfitAssetManager.GetSource(desc);
         if (!pelvis || pelvis.Behavior is null || source is null) return;
         if (!source.GetEffects().Any()) return;
         
@@ -89,7 +89,7 @@ public class EffectManager : IPelvisFollower
         Log.Debug("SetConfiguration()");
         if (source is null) { Log.Warning("outfit is null"); return; }
 
-        if (source != configurationSource?.Descriptor) { configurationSource = OutfitAssetManager.GetAccessorySource(source); }
+        if (source != configurationSource?.Descriptor) { configurationSource = OutfitAssetManager.GetSource(source); }
         if (configurationSource.GetConfiguration() is not ModelData modelData) { Log.Warning("Configuration source does not have ModelData."); return; }
 
         pelvis.Behavior.SetHeightOffset(modelData.height);
@@ -106,7 +106,7 @@ public class EffectManager : IPelvisFollower
         if (desc == animatorSource?.Descriptor) { pelvis.Behavior.SetAnimator(animatorSource.GetAnimator()); return; }
 
         Log.Debug("input descriptor doesn't match existing, replacing");
-        if (OutfitAssetManager.GetAccessorySource(desc) is not IAccessorySource source) return;
+        if (OutfitAssetManager.GetSource(desc) is not IConfigProvider source) return;
         Log.Debug("iaccessorysource is valid");
         if (source.GetAnimator() is not RuntimeAnimatorController rac) { Log.Warning($"{desc} had a null RAC"); return; }
         Log.Debug("rac is valid");

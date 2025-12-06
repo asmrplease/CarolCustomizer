@@ -87,7 +87,7 @@ public static class RecipeConverter
             hairSourceDescriptor,
             []
         );
-        var request = OutfitAssetManager.GetAccessorySource(hairSourceDescriptor);
+        var request = OutfitAssetManager.GetSource(hairSourceDescriptor);
         if (request is StoredHair hairSource)
         {
             MaterialDescriptor[] mats = [];
