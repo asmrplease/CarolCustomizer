@@ -91,6 +91,8 @@ public class PlayerArmature : MonoBehaviour, ICarolType
         inventory.phone.SetActive(true);
         carolEntity.anim.speed = speed;
         SetAnimation("PhoneOut");
+        var phoneLight = watchdog.transform.RecursiveFindTransform(x => x.name == "eye (5)");
+        if (phoneLight) phoneLight.gameObject.SetActive(false);
         carolEntity.enabled = false;
         yield return new WaitForSeconds(Constants.PhoneHideTime / speed);
 
@@ -114,6 +116,8 @@ public class PlayerArmature : MonoBehaviour, ICarolType
         Log.Debug("Unlocking player");
         Busy = true;
         Locked = false;
+        var phoneLight = watchdog.transform.RecursiveFindTransform(x => x.name == "eye (5)");
+        if (phoneLight) phoneLight.gameObject.SetActive(true);
         SetAnimation("PhoneBack");
         carolEntity.anim.speed = speed;
         yield return new WaitForSeconds(Constants.PhoneHideTime / speed);

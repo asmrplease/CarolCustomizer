@@ -1,5 +1,4 @@
 ﻿using CarolCustomizer.Behaviors.Recipes;
-using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
@@ -17,6 +16,8 @@ internal class HaDSOutfitLoader : IDisposable
 {
     static string ListName = "HaDS Outfits";
     static Dictionary<SourceDescriptor, HaDSOutfit> HaDSOutfits = new();
+    static List<Accessory> Accessories = [];
+    static List<Accessory> SMRAccessory => Accessories.Where(x => x.mesh is SkinnedMeshRenderer).ToList();
 
     public HaDSOutfitLoader()
     {
@@ -49,6 +50,7 @@ internal class HaDSOutfitLoader : IDisposable
 
         OutfitAssetManager.OnOutfitSetLoaded?.Invoke();
         //CCPlugin.uiInstance.loadingIndicator.NotifyLoadingComplete(reference);
+        LoadAccessories();
     }
 
     void LoadHair()
@@ -74,6 +76,15 @@ internal class HaDSOutfitLoader : IDisposable
         if (!HaDSOutfits.TryAdd(hads.Descriptor, hads)) return;
 
         OutfitAssetManager.OnOutfitLoaded?.Invoke(hads);
+    }
+
+    void LoadAccessories()
+    {
+        Resources
+            .FindObjectsOfTypeAll<Accessory>()
+            //.Where(x => x.mesh is SkinnedMeshRenderer)
+            //.Select(x => new StoredAccessory())
+            .ForEach(Accessories.Add);
     }
 
     public void Dispose()

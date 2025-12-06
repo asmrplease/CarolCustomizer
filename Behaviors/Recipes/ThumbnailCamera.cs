@@ -65,29 +65,29 @@ public class ThumbnailCamera : MonoBehaviour
     public IEnumerator Save(string filePath)
     {
         yield return new WaitForEndOfFrame();
-        var rawImage = Capture();
+        var rawImage = Capture(Constants.ThumbnailSize);
         var descriptor = new RecipeDescriptor(PlayerInstances.DefaultPlayer.outfitManager);
         string json = JsonConvert.SerializeObject(descriptor, Formatting.None);
-        PngUtil.BuildPng(filePath, rawImage, [(Constants.PNGChunkKeyword, json)]);
+        PngUtil.BuildPng(filePath, Constants.ThumbnailSize, rawImage, [(Constants.PNGChunkKeyword, json)]);
         Log.Info("Save complete.");
     }
 
-    public byte[] Capture()
+    public byte[] Capture(int resolution)
     {
         this.transform.position = (cameraPostionDriver.position + 3 * cameraPostionDriver.transform.forward);
         this.transform.LookAt(cameraTarget);
-        var black = Capture(Color.black);
-        var white = Capture(Color.white);
+        var black = Capture(Color.black, resolution);
+        var white = Capture(Color.white, resolution);
         var alpha = CalculateTransparency(black, white);
         return alpha.GetPixelData<byte>(0).ToArray();
     }
 
-    Texture2D Capture(Color color)
+    Texture2D Capture(Color color, int resolution)
     {
         camera.enabled = true;
         RenderTexture.active = 
             camera.targetTexture 
-            ??= new(Constants.ThumbnailSize, Constants.ThumbnailSize, 32);
+            ??= new(resolution, resolution, 32);
         camera.backgroundColor = color;
         camera.Render();
         Log.Debug("Render Complete");

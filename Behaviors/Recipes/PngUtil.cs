@@ -7,15 +7,15 @@ using UnityEngine;
 namespace CarolCustomizer.Behaviors.Recipes;
 public class PngUtil
 {
-    public static void BuildPng(string file, byte[] imageBytes, List<(string, string)> kvps)
+    public static void BuildPng(string file, int resolution, byte[] imageBytes, List<(string, string)> kvps)
     {
         //open file
         Log.Debug("BuildPng()");
         using var stream = File.Open(file, FileMode.Create);
         var builder = new PngBuilder()
         {
-            width = Constants.ThumbnailSize,
-            height = Constants.ThumbnailSize,
+            width = (uint) resolution,
+            height = (uint) resolution,
             rawData = imageBytes,
         };
         builder.textKeys.AddRange(kvps);
