@@ -9,7 +9,7 @@ public class PlayerCarolInstance : CarolInstance
 {
     PlayerArmature player;
     static Type playerType = typeof(PlayerArmature);
-    readonly AutoSaver autoSaver;
+    public readonly AutoSaver autoSaver;
     public readonly int playerIndex;
 
     public bool Busy => player?.Busy ?? false;

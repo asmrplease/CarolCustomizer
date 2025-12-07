@@ -1,5 +1,4 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.UI.Main;
@@ -76,9 +75,10 @@ public class RecipeListUI : MonoBehaviour
         recipesManager.OnRecipeCreated -= OnRecipeCreated;
         recipesManager.OnRecipeDeleted -= OnRecipeDeleted;
     }
-
+    
     void OnSearchBoxChanged(string text)
     {
+        Log.Debug($"RecipeListUI.OnSearchBoxChanged({text});");
         string search = text.Trim();
         bool empty = search == string.Empty;
         recipeUIs.ToList()
@@ -91,6 +91,8 @@ public class RecipeListUI : MonoBehaviour
     public void OnRecipeCreated(Recipe newRecipe)
     {
         Log.Debug("RecipeListUI.OnRecipeCreated");
+        if (recipeUIs.ContainsKey(newRecipe.Path)) return;
+
         RecipeApplier.GetWorldMats(newRecipe.Descriptor)
             .ForEach(SceneResourceProvider.AddToLazyLoad);
 
@@ -99,8 +101,8 @@ public class RecipeListUI : MonoBehaviour
 
         var recipeUI = uiInstance.AddComponent<RecipeUI>();
         if (!recipeUI) { Log.Warning("failed to instantiate recipeUI component"); return; }
-        recipeUI.Constructor(newRecipe, loader, contextMenu, fileDialogue, messageDialogue);
 
+        recipeUI.Constructor(newRecipe, loader, contextMenu, fileDialogue, messageDialogue);
         recipeUIs.Add(newRecipe.Path, recipeUI);
         Log.Debug($"Sibling index: {recipeUIs.IndexOfKey(newRecipe.Path)}");
         recipeUI.transform.SetSiblingIndex(recipeUIs.IndexOfKey(newRecipe.Path));

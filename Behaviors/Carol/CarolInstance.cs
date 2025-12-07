@@ -1,6 +1,7 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Hooks;
 using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Hooks.Watchdogs.UnhandledArmatures;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;

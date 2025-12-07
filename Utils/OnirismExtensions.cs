@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using CarolCustomizer.Hooks.Watchdogs;
+using System.Collections;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -55,5 +57,19 @@ public static class OnirismExtensions
             .transform
             .RecursiveFindTransform(x => x.name == "CarolPelvis")
             .gameObject;
+    }
+
+    public static IEnumerator EnableSpacesuit(this PelvisWatchdog watchdog)
+    {
+        Log.Info("EnableSpacesuit()");
+        watchdog.CompData.allSMRs
+            .Where(x => x.name == "Spacehelmet")
+            .ForEach(x => x.gameObject.SetActive(true));
+        if (SceneManager.GetActiveScene().name != "Spacestation") yield break;
+
+        watchdog.CompData.allSMRs
+            .Where(x => x.name == "Spacesuitbackpack")
+            .ForEach(x => x.gameObject.SetActive(true));
+        yield break;
     }
 }

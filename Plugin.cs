@@ -14,6 +14,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace CarolCustomizer;
 
@@ -37,6 +38,7 @@ public class CCPlugin : BaseUnityPlugin
     HaDSOutfitLoader outfitLoader;
     SaveDataAdjuster saveAdjuster;
     UIAssetLoader uiAssetLoader;
+    SourceAwaiter SourceAwaiter;
     PlayerInstances players;
     Transform folder;
     #endregion
@@ -49,12 +51,15 @@ public class CCPlugin : BaseUnityPlugin
         folder = new GameObject("CCPlugin").transform;
         folder.parent = this.transform;
         CoroutineRunner = this;
+        SourceAwaiter = new();
         Settings.Constructor(Config);
         saveAdjuster = new();
         uiAssetLoader = new();
         outfitAssetManager = new(folder);
-        outfitLoader = new();
         recipesManager = new(Constants.RecipeFolderPath);
+        StartCoroutine(recipesManager.ReloadAll());
+        PrioritySources.OnStart();
+        outfitLoader = new();
         players = new(folder);
         NPCManager.Constructor(folder, recipesManager);
         npcInstances = new(folder);
@@ -64,6 +69,7 @@ public class CCPlugin : BaseUnityPlugin
             .Constructor(uiAssetLoader, recipesManager);
         HarmonyInstance = new Harmony("AccessoryModPatch");
         HarmonyInstance.PatchAll();
+        SceneManager.sceneLoaded += OnirismPatches.FixTentCutscene;
         Log.Info("CCPlugin.Awake() Success!");
     }
 
@@ -107,9 +113,15 @@ public class CCPlugin : BaseUnityPlugin
             .Select(PelvisWatchdog.GetAddWatchdog);
     }
 
+    static void Tests()
+    {
+        EqualityTests.SourceDescriptorTest();
+    }
+
     void OnDisable()
     {
         Log.Info("Plugin OnDisable()");
+        SceneManager.sceneLoaded -= OnirismPatches.FixTentCutscene;
         uiAssetLoader.Dispose();
         Config.Save();
         HarmonyInstance?.UnpatchSelf();
@@ -119,6 +131,7 @@ public class CCPlugin : BaseUnityPlugin
         npcInstances.Dispose();
         outfitLoader.Dispose();
         AccessoryDissolver.Dispose();
+        SourceAwaiter.Dispose();
         OnPluginDestroy?.Invoke();
         Log.Info("Customizer unload completed successfully.");
     }

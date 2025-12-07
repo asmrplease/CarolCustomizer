@@ -40,7 +40,10 @@ public partial class Outfit
 
         this.storedAsset = storedAsset;
         AssetName = storedAsset.name;
-        DisplayName = LocalizationIndex.GetLine(this.storedAsset.gameObject.name);
+        var localization = LocalizationIndex.GetLine(this.storedAsset.gameObject.name);
+        if (localization.StartsWith("NOKEY")) localization = AssetName.Replace("CAROL_", "").Trim();
+        if (localization == "") localization = "Bombsuit";
+        DisplayName = localization;
         Descriptor = new SourceDescriptor(AssetName, SourceType.Outfit);
         var pelvis = storedAsset.RecursiveFindTransform(x => x.name == "CarolPelvis");
         if (!pelvis) { Log.Error("failed to find pelvis during Outfit construction."); return; }
@@ -54,7 +57,7 @@ public partial class Outfit
             int i = 0;
             grouping.ForEach(x => x.name += i++);
         }
-        if (pelvis.GetComponent<PelvisWatchdog>() is PelvisWatchdog existing) { Log.Debug("Disposing of existing watchdog"); GameObject.Destroy(existing); }
+
         prefabWatchdog = PelvisWatchdog.GetAddWatchdog(pelvis.gameObject);
         prefabWatchdog.Awake();
         if (!prefabWatchdog.CompData) Log.Warning("Failed to instantiate meshdata in time.");
@@ -89,6 +92,29 @@ public partial class Outfit
 
         Log.Debug($"{DisplayName} constructed.");
     }
+
+    public StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
+    {
+        AccDict.TryGetValue(descriptor, out StoredAccessory result);
+        if (result == null)
+        {
+            Log.Warning($"failed to match {descriptor}, looking up accessory by name.");
+            result = GetAccessoryByName(descriptor.Name);
+            if (result == null) Log.Warning($"Accessory {descriptor.Name} is not in {descriptor.Source}.");
+        }
+        return result;
+    }
+
+    public StoredAccessory GetAccessoryByName(string name)
+    {
+        var result = AccDict.Values.FirstOrDefault(x => x.Name == name);
+        if (result is null) { Log.Warning($"failed to find {name} by name in {Descriptor}."); }
+        //else { Log.Debug($"found {name} in {Descriptor}"); }
+        return result;
+    }
+
+    public virtual RuntimeAnimatorController GetAnimator() => null;
+
     public void Dispose()
     {
         Log.Debug("Outfit.Dispose()");
@@ -178,4 +204,9 @@ public partial class Outfit : IListable
             ,("Disable Effects",  () => target.SetEffect(this.Descriptor, false))
         ];
     }
+}
+    List<MagicaCapsuleCollider> IMagicaSource.GetColliders() => this.magiData.CapsuleColliders;
+
+    IInstantiable IModelProvider.GetInstantiable(AccessoryDescriptor accessory) => GetAccessory(accessory);
+    #endregion
 }

@@ -24,7 +24,6 @@ public class ScenePelvisFinder : IDisposable
     {
         Log.Debug("FindAllPelvises");
         if (mode == LoadSceneMode.Additive) return;
-        if (scene.name == Constants.MenuSceneName) return;
         
         Resources
             .FindObjectsOfTypeAll<GameObject>()
@@ -37,8 +36,5 @@ public class ScenePelvisFinder : IDisposable
     {
         Log.Debug("ScenePelvisFinder.Dispose()");
         SceneManager.sceneLoaded -= FindAllPelvises;
-        //allWatchdogs
-        //    .Where(x => x)
-        //    .ForEach(GameObject.Destroy);
     }
 }

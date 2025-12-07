@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static CarolController;
 
 namespace CarolCustomizer.Behaviors.Carol;
 
@@ -23,7 +24,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
     HashSet<SourceDescriptor> InitializedSources = [];
 
     public event Action<AccessoryChangedEvent> AccessoryChanged;
-    public event Action<IAccessorySource> AccessorySourceAdded;
+    public event Action<IGenericSource> AccessorySourceAdded;
 
     public IEnumerable<AccessoryDescriptor> ActiveAccessories =>
         liveAccessories
@@ -59,14 +60,20 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         }
         live.Enable();
         if (!live.IsOnArmature(pelvis.transform)) skeletonManager.AssignLiveBones(live);
-        AccessoryChanged?.Invoke(new AccessoryChangedEvent(desc, live, true));
+        //desc.Materials
+        //    .Select((mat, index) => (mat, index))
+        //    .Where(tup => tup.mat.referenceMaterial)
+        //    .ForEach(tup => PaintAccessory(desc, tup.mat, tup.index));
+        var e = new AccessoryChangedEvent(desc, live, true);
+        AccessoryChanged?.Invoke(e);
+        Log.Debug(e.ToString());
     }
 
     void CheckExistingSources(AccessoryDescriptor acc)
     {
         if (InitializedSources.Contains(acc.Source)) { return; }
        
-        var source = OutfitAssetManager.GetAccessorySource(acc.Source);
+        var source = OutfitAssetManager.GetSource(acc.Source);
         if (source is null) { Log.Warning($"Failed to find {source}"); return; }
 
         InitializedSources.Add(acc.Source);
@@ -83,11 +90,13 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(target, liveAccessory, false));
     }
 
-    public void PaintAccessory(AccessoryDescriptor accessory, MaterialDescriptor material, int index)
+    public void PaintAccessory(AccessoryDescriptor target, MaterialDescriptor material, int index)
     {
-        liveAccessories[accessory].ApplyMaterial(material, index);
-        var liveAccessory = liveAccessories[accessory] as AccessoryDescriptor;
-        AccessoryChanged?.Invoke(new AccessoryChangedEvent(accessory, liveAccessory, true));
+        if (!liveAccessories.TryGetValue(target, out var live)) { Log.Warning($"PaintAccessory failed to find {target}."); return; }
+
+        live.ApplyMaterial(material, index);
+        var newState = liveAccessories[target] as AccessoryDescriptor;
+        AccessoryChanged?.Invoke(new AccessoryChangedEvent(target, newState, true));
     }
 
     public void PaintAccessoryShared(AccessoryDescriptor accessory, List<Material> materials)
@@ -122,7 +131,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
             .Where(x => x.isActive)
             .ForEach(x => x.SetVisible(visible));
 
-    void OnSourceUnloaded(IAccessorySource source)
+    void OnSourceUnloaded(IGenericSource source)
     {
         foreach (var storedAcc in source.GetAccessories())
         {

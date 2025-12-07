@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System;

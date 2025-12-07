@@ -19,9 +19,10 @@ internal class MagicaManager
     List<MagicaCloth> processing = [];
     Dictionary<AccessoryDescriptor, MagicaCloth> MeshCloths = [];
     Dictionary<int, MagicaCloth> BoneCloths = [];
-    IAccessorySource colliderSource;
+    IMagicaSource colliderSource;
 
-    public SourceDescriptor ColliderSourceName => colliderSource.Descriptor ?? Constants.PyjamaDescriptor;
+    public SourceDescriptor ColliderSourceName => 
+        colliderSource?.Descriptor ?? Constants.PyjamaDescriptor;
 
     public MagicaManager(SkeletonManager skeletonManager)
     {
@@ -50,7 +51,7 @@ internal class MagicaManager
     {
         if (descriptor is null) { Log.Warning("SetColliderSource was passed a null source descriptor"); return; }
 
-        if (OutfitAssetManager.GetAccessorySource(descriptor) is not IAccessorySource source) return;
+        if (OutfitAssetManager.GetSource(descriptor) is not IMagicaSource source) return;
         if (source.GetColliders() is null) { Log.Warning($"ColliderSource {descriptor} was valid but has no colliders"); return; }
         colliderSource = source;
 
@@ -75,14 +76,14 @@ internal class MagicaManager
             .ForEach(tup => tup.live.CopyFrom(tup.reference));
     }
 
-    public void HandleSourceSetup(IAccessorySource source)
+    public void HandleSourceSetup(IMagicaSource source)
     {
         Log.Info($"HandleSourceSetup({source.Descriptor})");
         source.GetBoneCloths()
             .ForEach(x => BoneClothSetup(x, source));
     }
 
-    void BoneClothSetup(MagicaCloth refMagica, IAccessorySource source)
+    void BoneClothSetup(MagicaCloth refMagica, IMagicaSource source)
     {
         if (BoneCloths.TryGetValue(refMagica.GetInstanceID(), out var existing) && existing) { GameObject.Destroy(existing); }
 

@@ -3,7 +3,7 @@ using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Models.Recipes;
+using CarolCustomizer.Utils;
 using System;
 using UnityEngine;
 
@@ -30,11 +30,11 @@ public class CampaignBotArmature : MonoBehaviour, ICarolType, ICarolBot
         return this;
     }
 
-    public void CustomizeBot(Recipe recipe, OutfitCoordinator outfitManager) 
+    public void CustomizeBot(RecipeDescriptor recipe, OutfitCoordinator outfitManager, string _) 
     {
         if (Settings.Plugin.customCampaignBots.Value is not true) return;
 
-        RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
+        RecipeApplier.ActivateRecipe(outfitManager, recipe);
     }
 
     public void SetBaseVisibility(bool visible)
@@ -42,6 +42,7 @@ public class CampaignBotArmature : MonoBehaviour, ICarolType, ICarolBot
         if (Settings.Plugin.customCampaignBots.Value is not true) return;
         
         watchdog.CompData.SetBaseVisibility(visible);
+        if (transform.parent.name == "Spacesuit") StartCoroutine(watchdog.EnableSpacesuit());
     }
 
     void OnDestroy() => NPCManager.OnBotDespawn(this);

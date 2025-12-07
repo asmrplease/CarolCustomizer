@@ -1,7 +1,8 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
+using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
@@ -14,7 +15,7 @@ public class ActressArmature : MonoBehaviour, ICarolType
         Log.Debug($"{this} OnEnable");
         watchdog = GetComponent<PelvisWatchdog>();
         this.watchdog.Behavior = this;
-        watchdog.Behavior.SetBaseVisibility(false);
+        this.SetBaseVisibility(false);
         PlayerInstances.DefaultPlayer.NotifySpawned(watchdog);
     }
 
@@ -37,7 +38,14 @@ public class ActressArmature : MonoBehaviour, ICarolType
 
     public void SetHeightOffset(float height) { }
 
-    public void SetBaseVisibility(bool visibility) => watchdog.CompData.SetBaseVisibility(visibility);
+    public void SetBaseVisibility(bool visibility)
+    {
+        watchdog.CompData.SetBaseVisibility(visibility);
+        watchdog.BoneData.StandardBones[Constants.HeadBone]
+            .GetComponentsInChildren<SkinnedMeshRenderer>()
+            .ToList()
+            .ForEach(x => x.gameObject.SetActive(visibility));
+    }
 
     public void Dispose() => Destroy(this);
 }

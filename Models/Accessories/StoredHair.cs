@@ -1,5 +1,4 @@
-﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks;
 using CarolCustomizer.Models.Materials;
@@ -11,7 +10,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Models.Accessories;
-public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
+public class StoredHair : AccessoryDescriptor, IGenericSource, IInstantiable
 {
     public readonly string AssetName;
     public readonly string DisplayName;
@@ -21,17 +20,24 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
     List<MagicaCloth> boneCloths = [];
     List<MagicaCloth> meshCloths = [];
 
-    SourceDescriptor IAccessorySource.Descriptor => this.Source;
+    SourceDescriptor ISourceDescriptor.Descriptor => this.Source;
     AccessoryDescriptor IInstantiable.Descriptor => this;
 
     public StoredHair(Hairstyle hairstyle) :
         base(hairstyle.name, new SourceDescriptor(hairstyle.name, SourceType.Hair))
     {
         this.hairstyle = hairstyle;
+        if (hairstyle.localizationName == "") hairstyle.localizationName = "Haircut_Powerhelmet";
         this.AssetName = hairstyle.name;
         this.DisplayName = LocalizationIndex.GetLine(hairstyle.localizationName);
         var smr = hairstyle.model as SkinnedMeshRenderer;
-        this.BespokeBones = [hairstyle.transform.root];
+        var boneCopy = GameObject.Instantiate(hairstyle.transform.root);
+        GameObject.DontDestroyOnLoad(boneCopy);
+        boneCopy.GetComponentsInChildren<Component>()
+            .Where(x => !x.GetType().IsAssignableFrom(typeof(Transform)))
+            .ToList().ForEach(GameObject.Destroy);
+        boneCopy.transform.ResetLocalPosRot();
+        this.BespokeBones = [boneCopy];
         this.BespokeBones.ForEach(x => x.transform.localScale = Vector3.one);
         this.smr = hairstyle.model as SkinnedMeshRenderer;
         var magicas = hairstyle.transform.root
@@ -43,19 +49,15 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
             .Where(x => x.SerializeData.clothType == ClothProcess.ClothType.BoneCloth)
             .ForEach(boneCloths.Add);
     }
-    
 
     public LiveAccessory MakeLive(SkeletonManager skeleton, Transform folder)
     {
         return new LiveAccessory(this, folder);
     }
 
-    List<StoredAccessory> IAccessorySource.GetAccessories()
-    {
-        return [];
-    }
+    List<StoredAccessory> IModelProvider.GetAccessories() => [];
 
-    StoredAccessory IAccessorySource.GetAccessory(AccessoryDescriptor accessory)
+    StoredAccessory IModelProvider.GetAccessory(AccessoryDescriptor accessory)
     {
         Log.Warning($"Requested a StoredAccessory from StoredHair but this isn't implmented");
         return null;
@@ -63,18 +65,12 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
 
     public List<Transform> GetBespokeBones() => BespokeBones;
 
-    List<MagicaCloth> IAccessorySource.GetBoneCloths() => this.boneCloths;
+    List<MagicaCloth> IMagicaSource.GetBoneCloths() => this.boneCloths;
     public List<MagicaCloth> GetMeshCloths() => this.meshCloths;
 
-    MaterialDescriptor IAccessorySource.GetMaterial(MaterialDescriptor material)
-    {
-        return null;
-    }
+    MaterialDescriptor IMaterialProvider.GetMaterial(MaterialDescriptor material) => null;
 
-    List<MaterialDescriptor> IAccessorySource.GetMaterials()
-    {
-        return [];
-    }
+    List<MaterialDescriptor> IMaterialProvider.GetMaterials() => [];
 
     public LiveAccessory MakeLive(SkeletonManager skeleton, FaceCopier faceCopier, Transform folder)
     {
@@ -83,15 +79,15 @@ public class StoredHair : AccessoryDescriptor, IAccessorySource, IInstantiable
 
     public RuntimeAnimatorController GetAnimator() => null;
 
-    List<OutfitEffect> IAccessorySource.GetEffects() => [];
+    List<OutfitEffect> IEffectProvider.GetEffects() => [];
 
-    ModelData IAccessorySource.GetConfiguration() => null;
+    ModelData IConfigProvider.GetConfiguration() => null;
 
-    List<MagicaCapsuleCollider> IAccessorySource.GetColliders() => [];
+    List<MagicaCapsuleCollider> IMagicaSource.GetColliders() => [];
 
-    IInstantiable IAccessorySource.GetInstantiable(AccessoryDescriptor accessory)
+    IInstantiable IModelProvider.GetInstantiable(AccessoryDescriptor accessory)
     {
-        //jif (accessory != this) return null;
+        //if (accessory != this) return null;
 
         return this;
     }

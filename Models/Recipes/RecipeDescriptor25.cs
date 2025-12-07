@@ -4,6 +4,7 @@ using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CarolCustomizer.Models.Recipes;
 public class RecipeDescriptor25
@@ -37,8 +38,8 @@ public class RecipeDescriptor25
         ConfigurationSource = manager.ConfigurationSource;
         AnimatorSource = manager.AnimatorSource;
         ColliderSource = manager.ColliderSource;
-        ActiveAccessories = manager.LiveAccessoryDescriptors;
-        ActiveEffects = manager.ActiveEffects;
+        ActiveAccessories = manager.LiveAccessoryDescriptors.ToList();
+        ActiveEffects = manager.ActiveEffects.ToList();
         Version = PluginInfo.PLUGIN_VERSION;
     }
 }

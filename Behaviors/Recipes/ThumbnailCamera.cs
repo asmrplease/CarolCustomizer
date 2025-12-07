@@ -1,14 +1,11 @@
-﻿using CarolCustomizer;
+﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Hooks.Watchdogs;
-using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using Newtonsoft.Json;
-using System.IO;
 using System.Collections;
-using UnityEngine;
 using System.Linq;
-using CarolCustomizer.Behaviors.Carol;
+using UnityEngine;
 
 namespace FaceCam.Behaviors;
 public class ThumbnailCamera : MonoBehaviour
@@ -18,7 +15,6 @@ public class ThumbnailCamera : MonoBehaviour
     CameraController cameraController;
     Transform cameraPostionDriver;
     Transform cameraTarget;
-    
 
     void Awake()
     {
@@ -69,26 +65,29 @@ public class ThumbnailCamera : MonoBehaviour
     public IEnumerator Save(string filePath)
     {
         yield return new WaitForEndOfFrame();
-
-        this.transform.position = (cameraPostionDriver.position + 3 * cameraPostionDriver.transform.forward);
-        this.transform.LookAt(cameraTarget);
-        var black = Capture(Color.black);
-        var white = Capture(Color.white);
-        var alpha = CalculateTransparency(black, white);
-        byte[] bytes = alpha.EncodeToPNG();
-        File.WriteAllBytes(filePath, bytes);
+        var rawImage = Capture(Constants.ThumbnailSize);
         var descriptor = new RecipeDescriptor(PlayerInstances.DefaultPlayer.outfitManager);
         string json = JsonConvert.SerializeObject(descriptor, Formatting.None);
-        PngMetadataUtil.AddMetadata(filePath, Constants.PNGChunkKeyword, json);
+        PngUtil.BuildPng(filePath, Constants.ThumbnailSize, rawImage, [(Constants.PNGChunkKeyword, json)]);
         Log.Info("Save complete.");
     }
 
-    Texture2D Capture(Color color)
+    public byte[] Capture(int resolution)
+    {
+        this.transform.position = (cameraPostionDriver.position + 3 * cameraPostionDriver.transform.forward);
+        this.transform.LookAt(cameraTarget);
+        var black = Capture(Color.black, resolution);
+        var white = Capture(Color.white, resolution);
+        var alpha = CalculateTransparency(black, white);
+        return alpha.GetPixelData<byte>(0).ToArray();
+    }
+
+    Texture2D Capture(Color color, int resolution)
     {
         camera.enabled = true;
         RenderTexture.active = 
             camera.targetTexture 
-            ??= new(Constants.ThumbnailSize, Constants.ThumbnailSize, 32);
+            ??= new(resolution, resolution, 32);
         camera.backgroundColor = color;
         camera.Render();
         Log.Debug("Render Complete");

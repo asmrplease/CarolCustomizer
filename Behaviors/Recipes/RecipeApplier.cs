@@ -74,10 +74,14 @@ public static class RecipeApplier
 
     public static IEnumerable<MaterialDescriptor> GetWorldMats(RecipeDescriptor recipe)
     {
+        if (recipe is null) return [];
+        if (recipe.ActiveAccessories is null) return [];
+
         return recipe
             .ActiveAccessories
+            .Where(x => x is not null)
             .SelectMany(x => x.Materials)
-            .Where(x => x.Source.Type == SourceType.World)
+            .Where(x => x is not null && x.Source.Type == SourceType.World)
             .Distinct();
     }
 
@@ -103,13 +107,13 @@ public static class RecipeApplier
     public static IEnumerable<SourceDescriptor> GetMissingSources(RecipeDescriptor recipe)
     {
         return GetSources(recipe)
-            .Where(x => OutfitAssetManager.GetAccessorySource(x) is null);
+            .Where(x => OutfitAssetManager.GetSource(x, false) is null);
     }
 
     public static IEnumerable<AccessoryDescriptor> GetRemovedAccessories(RecipeDescriptor recipe)
     {
         return recipe.ActiveAccessories
-            .Select(acc => (acc, source: OutfitAssetManager.GetAccessorySource(acc.Source)))
+            .Select(acc => (acc, source: OutfitAssetManager.GetSource(acc.Source, false)))
             .Where(tup => tup.source is not null)
             .Where(tup => tup.source.GetInstantiable(tup.acc) is null)
             .Select(tup => tup.acc);

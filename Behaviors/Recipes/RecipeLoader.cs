@@ -1,15 +1,20 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using CarolCustomizer.Assets;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using MonoMod.Utils;
-using static Newtonsoft.Json.JsonConvert;
+using PngHelper;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using static CarolCustomizer.Utils.Constants;
+using static MissionManager;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace CarolCustomizer.Behaviors.Recipes;
-internal static class RecipeLoader
+public static class RecipeLoader
 {
     public static string[] GetRecipeFilePaths()
     {
@@ -25,62 +30,46 @@ internal static class RecipeLoader
             .ToArray();
     }
 
-    public static string GetRecipeJson(string path)
+    public static (string, RichPng) GetRecipeJson(string path)
     {
         string results = "";
+        RichPng png = null;
 
         switch (Path.GetExtension(path))
         {
             case ".json":
                 var file = File.OpenText(path);
-                if (file is null) { Log.Warning("failed to open file"); return ""; }
+                if (file is null) { Log.Warning("failed to open file"); return ("", null); }
 
                 results = file.ReadToEnd();
                 file.Close();
                 break;
             case ".png":
-                results = PngMetadataUtil.GetMetadata(path, PNGChunkKeyword);
-                if (results == "") Log.Warning("empty json!");
+                png = new RichPng(path);
+                png.Keywords.TryGetValue(Constants.PNGChunkKeyword, out results);
                 break;
             default:
                 Log.Warning("tried to load a recipe with an unsupported extension");
                 break;
         }
 
-        return results;
+        return (results, png);
     }
 
     public struct ValidationResults 
     { 
         public Recipe.Status Status; 
         public RecipeDescriptor Recipe; 
-        public string Json; 
+        public string Json;
+        public IEnumerable<AccessoryDescriptor> MissingAccs;
+        public IEnumerable<SourceDescriptor> MissingSources;
+        public RichPng Png;
     }
 
-    public static ValidationResults ValidateRecipeFile(string filePath)
+    public static (bool, RecipeDescriptor) Deserialize(string json)
     {
-        string json;
-        var results = new ValidationResults { Status = Recipe.Status.NoError, Recipe = null };
-
-        try { json = GetRecipeJson(filePath); }
-        catch (Exception e)
-        {
-            Log.Error(e.StackTrace);
-            results.Status = Recipe.Status.FileError; return results;
-        }
-        return ValidateJson(json);
-    }
-
-    public static ValidationResults ValidateJson(string json)
-    {
-        var results = new ValidationResults 
-        { 
-            Status = Recipe.Status.NoError, 
-            Recipe = null,
-            Json = json,
-        };
         Version version;
-
+        RecipeDescriptor rd;
         try
         {
             version = DeserializeObject<VersionedObject>(json)?.version;
@@ -97,16 +86,40 @@ internal static class RecipeLoader
             var v22 = version == v220 ? DeserializeObject<RecipeDescriptor22>(json) : v21?.ToVersion220();
             var v23 = version == v230 ? DeserializeObject<RecipeDescriptor23>(json) : v22?.ToVersion230();
             var v24 = version == v240 ? DeserializeObject<RecipeDescriptor24>(json) : v23?.ToVersion240();
-            results.Recipe = v24?.ToVersion250() ?? DeserializeObject<RecipeDescriptor25>(json);
+            rd = v24?.ToVersion250() ?? DeserializeObject<RecipeDescriptor25>(json);
         }
         catch (Exception ex)
         {
             ex.LogDetailed();
-            results.Status = Recipe.Status.InvalidJson;
-            return results;
+            return (false, null);
         }
+        return (true, rd);
+    }
 
-        if (results.Recipe is null) { results.Status = Recipe.Status.InvalidJson; return results; }
+    public static ValidationResults ValidateRecipeFile(string filePath)
+    {
+        Log.Debug($"ValidateRecipeFile({filePath})");
+        (string, RichPng) idk;
+        var results = new ValidationResults 
+        { 
+            Status = Recipe.Status.NoError, 
+            Recipe = null, 
+            MissingAccs = [], 
+            MissingSources = [] 
+        };
+
+        try { idk = GetRecipeJson(filePath); }
+        catch (Exception e)
+        {
+            Log.Error(e.StackTrace);
+            results.Status = Recipe.Status.FileError; return results;
+        }
+        var json = idk.Item1 ??= "";
+        if (idk.Item2 is not null) results.Png = idk.Item2;
+        json = json.Trim();
+        var tup = Deserialize(json);
+        if (tup.Item1) results.Recipe = tup.Item2;
+        else {results.Status = Recipe.Status.InvalidJson; return results; }
 
         bool slow = SceneResourceProvider
             .CheckMaterialsReady(RecipeApplier.GetWorldMats(results.Recipe))
@@ -115,10 +128,15 @@ internal static class RecipeLoader
 
         try
         {
-            if (RecipeApplier.GetMissingSources(results.Recipe).Any())
-            { results.Status = Recipe.Status.MissingSource; }
+            results.MissingSources = RecipeApplier.GetMissingSources(results.Recipe);
+            if (results.MissingSources.Any())
+            { results.Status = Recipe.Status.Incomplete; }
+
+            results.MissingAccs = RecipeApplier.GetRemovedAccessories(results.Recipe);
+            if (results.MissingAccs.Any())
+            { results.Status |= Recipe.Status.Incomplete; }
         }
-        catch { results.Status = Recipe.Status.MissingSource; }
+        catch { results.Status = Recipe.Status.Incomplete; }
         return results;
     }
 }

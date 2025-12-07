@@ -40,12 +40,12 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
         return this;
     }
 
-    public void CustomizeBot(Recipe recipe, OutfitCoordinator outfitManager) 
+    public void CustomizeBot(RecipeDescriptor recipe, OutfitCoordinator outfitManager, string _) 
     {
         if (!custom) return;
 
         SetBaseVisibility(false);
-        RecipeApplier.ActivateRecipe(outfitManager, recipe.Descriptor);
+        RecipeApplier.ActivateRecipe(outfitManager, recipe);
         var swimsuit = this.transform.parent.Find("Slimeswimsuit");
         if (!swimsuit) { Log.Warning("Failed to find Slimeswimsuit during SummerSlime.CustomizeBot()"); return; }
 
@@ -62,7 +62,6 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
             var mat = (acc.Name.ToLower().Contains("eyes")) ? eyeMat : slimeMat;
             outfitManager.PaintAccessoryShared(acc, acc.Materials.Select(x => mat).ToList());
         }
-        //outfitManager.SetHairColor(smr.material);
     }
 
     public void SetBaseVisibility(bool visible)

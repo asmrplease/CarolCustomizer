@@ -14,8 +14,6 @@ public partial class MaterialDescriptor
 {
     public string Name;
     public SourceDescriptor Source;
-
-
     [JsonIgnore]
     public readonly Material referenceMaterial;
 
@@ -53,10 +51,8 @@ public partial class MaterialDescriptor : IEquatable<MaterialDescriptor>
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return this.GetHashCode() == other.GetHashCode();
-        //TODO: why did the below fail to return equals when the hashcode was equal?
-        //return Name.DeInstance() == other.Name.DeInstance() 
-        //    && Source == other.Source;
+        return this.Name.DeInstance().Equals(other.Name.DeInstance())
+            && this.Source.Equals(other.Source);
     }
 
     public static bool operator ==(MaterialDescriptor left, MaterialDescriptor right) => Equals(left, right);

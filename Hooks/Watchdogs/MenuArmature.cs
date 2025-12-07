@@ -3,7 +3,6 @@ using System.Linq;
 using UnityEngine;
 using CarolCustomizer.Utils;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
 using Onirism.Ui;
 using CarolCustomizer.Assets;
@@ -23,7 +22,7 @@ public class MenuArmature : MonoBehaviour, ICarolType
         return this;
     }
 
-    //void Start() => StartCoroutine(MainMenuFix());
+    void Start() => StartCoroutine(MainMenuFix());
 
     void OnEnable()
     {
@@ -40,11 +39,10 @@ public class MenuArmature : MonoBehaviour, ICarolType
         
         foreach(var i in Enumerable.Range(0,5))
         {
-            if (watchdog.CompData.allSMRs.Any(x => x.gameObject.activeSelf))
-            {
-                //Log.Debug("MainMenuFix RefreshBaseVisibility");
-                watchdog.CompData.SetBaseVisibility(false);
-            }
+            watchdog.GetComponentsInChildren<SkinnedMeshRenderer>(true)
+                .Where(x => x.gameObject.activeSelf)
+                .ForEach(x => x.gameObject.SetActive(false));
+
             yield return new WaitForSeconds(1);
         }
     }
@@ -52,7 +50,7 @@ public class MenuArmature : MonoBehaviour, ICarolType
     public void SetBaseOutfit(SourceDescriptor descriptor)
     {
         Log.Debug("SetBaseOutfit(MenuSwitchOutfit)");
-        var source = OutfitAssetManager.GetAccessorySource(descriptor);
+        var source = OutfitAssetManager.GetSource(descriptor);
         if (source is not HaDSOutfit outfit) { Log.Warning($"SetBaseOutfit({descriptor}) found a source that was not an outfit"); return; }
 
         if (menuSwitchOutfit.loadedModel) { Destroy(menuSwitchOutfit.loadedModel); }
@@ -70,6 +68,9 @@ public class MenuArmature : MonoBehaviour, ICarolType
     public void SetBaseVisibility(bool visibility)
     {
         watchdog?.CompData?.SetBaseVisibility(visibility);
+        GetComponentsInChildren<Hairstyle>()
+            .ToList()
+            .ForEach(x => GameObject.Destroy(x.gameObject));
     }
 
     public void Dispose()

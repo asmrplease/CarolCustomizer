@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace CarolCustomizer.Models.Recipes;
 
-internal static class RecipeConverter
+public static class RecipeConverter
 {
     internal static RecipeDescriptor21 ToVersion210(this RecipeDescriptor20 legacy)
     {
@@ -62,19 +62,23 @@ internal static class RecipeConverter
             .ToList();
         var effects = legacy.ActiveEffects
             .Select(x => (SourceDescriptor)x);
-        var hair = GetHairFromStrings(legacy.Hairstyle, legacy.HairMaterial);
+        if (legacy.Hairstyle != "Haircut_Powerhelmet")
+        {
+            var hair = GetHairFromStrings(legacy.Hairstyle, legacy.HairMaterial);
+            accessories.Add(hair);
+        }
         return new RecipeDescriptor25
         (
             (SourceDescriptor)legacy.AnimatorSource,
             (SourceDescriptor)legacy.BaseOutfitName,
             (SourceDescriptor)legacy.ColliderSource,
-            accessories.Append(hair),
+            accessories,
             effects,
             "2.5.0"
         );
     }
 
-    internal static AccessoryDescriptor GetHairFromStrings(string hairstyle, string dye)
+    public static AccessoryDescriptor GetHairFromStrings(string hairstyle, string dye)
     {
         var hairSourceDescriptor = new SourceDescriptor(hairstyle, SourceType.Hair);
         var hair = new AccessoryDescriptor
@@ -83,7 +87,7 @@ internal static class RecipeConverter
             hairSourceDescriptor,
             []
         );
-        var request = OutfitAssetManager.GetAccessorySource(hairSourceDescriptor);
+        var request = OutfitAssetManager.GetSource(hairSourceDescriptor);
         if (request is StoredHair hairSource)
         {
             MaterialDescriptor[] mats = [];

@@ -1,9 +1,10 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Events;
+using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
@@ -32,6 +33,8 @@ public class OutfitListUI : MonoBehaviour
     Dropdown ModelSelector;
 
     SortedList<SourceDescriptor, OutfitUI> outfitUIs = [];
+    SortedList<string, StoredHair> hairstyles = [];
+    SortedList<string, HairDye> hairDyes = [];
 
     public Main.ContextMenu ContextMenu { get; private set; }
     public static OutfitCoordinator TargetOutfit => targetCarol?.outfitManager;
@@ -58,7 +61,7 @@ public class OutfitListUI : MonoBehaviour
 
         OutfitAssetManager.OnOutfitLoaded += OnOutfitLoaded;
         OutfitAssetManager.OnOutfitUnloaded += OnOutfitUnloaded;
-        //OutfitAssetManager.OnHairLoaded += HandleHairLoaded;
+        OutfitAssetManager.OnHairLoaded += HandleHairLoaded;
         Settings.Favorites.OnFavoritesCleared += UnfavoriteAllAccessories;
         deselectAll.onClick.AddListener(HandleDisableAllAccessories);
         deselectAll.onClick.AddListener(HandleDisableAllEffects);
@@ -74,24 +77,28 @@ public class OutfitListUI : MonoBehaviour
         ColorSelector = transform
             .Find(colorDropdownAddress)
             .GetComponent<Dropdown>();
-        //ColorSelector
-        //    .onValueChanged
-        //    .AddListener(OnColorDropdownChanged);
+        ColorSelector
+            .onValueChanged
+            .AddListener(OnColorDropdownChanged);
         ModelSelector = transform
             .Find(styleDropdownAddress)
             .GetComponent<Dropdown>();
-        //ModelSelector
-        //    .onValueChanged
-        //    .AddListener(OnModelDropdownChanged);
+        ModelSelector
+            .onValueChanged
+            .AddListener(OnModelDropdownChanged);
         
         Log.Debug("Hair dropdown callbacks set up!");
 
-        hairData.colors
-            .Select(x => new Dropdown.OptionData() { text = LocalizationIndex.GetLine(x.localizationName) })
+        hairData.styles.ForEach(x => hairstyles.TryAdd(x.DisplayName, x));
+        hairData.colors.ForEach(x => hairDyes.TryAdd(LocalizationIndex.GetLine(x.localizationName), x));
+
+        hairDyes
+            .Select(x => new Dropdown.OptionData() { text = x.Key })
             .ForEach(ColorSelector.options.Add);
-        hairData.styles
-            .Select(x => new Dropdown.OptionData() { text =  x.DisplayName})
+        hairstyles
+            .Select(x => new Dropdown.OptionData() { text = x.Key})
             .ForEach(ModelSelector.options.Add);
+        ModelSelector.options.Add(new Dropdown.OptionData("None"));
         Log.Debug($"hair ui initialized, {ModelSelector.options.Count()} model options and {ColorSelector.options.Count()} color options.");
     }
 
@@ -104,7 +111,7 @@ public class OutfitListUI : MonoBehaviour
 
     void OnOutfitLoaded(Outfit outfit)
     {
-        if (outfitUIs.ContainsKey(outfit.Descriptor)) { Log.Error($"{outfit.AssetName} was already in the UI list during OnOutfitLoaded"); return; }
+        if (outfitUIs.TryGetValue(outfit.Descriptor, out var existing)) { Log.Error($"{outfit.Descriptor} matched {existing} in the UI list during OnOutfitLoaded"); return; }
 
         var outfitUI = Factory.BuildOutfitUI(outfit);
         if (!outfitUI) { Log.Error($"failed to instantiate {outfit.DisplayName}'s outfitUI"); return; }
@@ -167,28 +174,40 @@ public class OutfitListUI : MonoBehaviour
 
     void HandleAccessoryChanged(AccessoryChangedEvent e)
     {
-        //TODO: make a bulk version of this so we can update the filter after the recipe changes/this event
+        //TODO: make a bulk version of this so we can update the filter faster after the recipe changes/this event
+        if (e.Target.Source.Type == Models.SourceType.Hair) { HandleHairChange(e); return; }
         if (!outfitUIs.TryGetValue(e.Target.Source, out var outfitUI)) { Log.Warning($"{e.Target.Source} is not in UI foutfit list?"); return; }
         
         outfitUI.HandleAccessoryChanged(e);
     }
 
-    void HandleHairChange(HairChangeEvent e)
+    void HandleHairChange(AccessoryChangedEvent e)
     {
-        string style = e.Style;
-        string color = e.Color;
+        Log.Debug($"HandleHairChange({e})");
+        if (!e.Visible)
+        {
+            Log.Debug("Setting hair dropdown to None");
+            int index = ModelSelector.options.Count();
+            ModelSelector.SetValueWithoutNotify(index);
+            return;
+        }
+        var style = e.Target;
+        var match = hairstyles.Values
+            .FirstOrDefault(stored => stored.Source.Name == style.Source.Name);
+        if (match is null) { Log.Error($"No hairstyle matching {e.Target}"); return; }
 
-        var styleIndex = ModelSelector
-            .options
-            .Select(x => x.text)
-            .ToList()
-            .IndexOf(style);
-        var localized = LocalizationIndex.GetLine(e.Color);
-        var colorIndex = ColorSelector
-            .options
-            .Select(x => x.text)
-            .ToList()
-            .IndexOf(localized);
+        int styleIndex = hairstyles.Values.IndexOf(match);
+        if (styleIndex < 0) { Log.Error($"Failed to find index hairstyle {match}."); return; }
+
+        int matIndex = hairstyles.Values[styleIndex].hairstyle.mainMaterialIndex;
+        var colorDesc = e.State.Materials[matIndex];
+        Log.Debug($"colorDesc: {colorDesc}");
+        var localized = colorDesc.Name.DeInstance() == "CRLH_Default_Brown" ? "Carol" :
+            hairDyes.FirstOrDefault(x => x.Value.material.name == colorDesc.Name).Key;
+        if (localized is null) { Log.Error($"Failed to find ui index for {colorDesc.Name}"); return; }
+
+        var colorIndex = hairDyes.IndexOfKey(localized);
+        Log.Debug($"Localized:{localized}, index: {colorIndex}");
 
         ModelSelector.SetValueWithoutNotify(styleIndex);
         ColorSelector.SetValueWithoutNotify(colorIndex);
@@ -206,19 +225,36 @@ public class OutfitListUI : MonoBehaviour
             .ForEach(tup => tup.UI.ClearFavorites());
     }
 
-    //void OnColorDropdownChanged(int index)
-    //{
-    //    var dye = OutfitAssetManager.HairColors.ElementAt(index).Value;
-    //    //var dye = OutfitAssetManager.HairColors[assetName];
-    //    OutfitListUI.TargetOutfit.SetHairColor(dye.material);
-    //}
+    void OnColorDropdownChanged(int dyeIndex)
+    {
+        Log.Debug($"OnColorDropdownChanged({dyeIndex})");
+        var modelIndex = ModelSelector.value;
+        OnHairDropdownChanged(modelIndex, dyeIndex);
+        
+    }
 
-    //void OnModelDropdownChanged(int index)
-    //{
-    //    Log.Debug($"OnHairModelChanged[{index}]");
-    //    var style = OutfitAssetManager.Hairstyles[index];
-    //    OutfitListUI.TargetOutfit.SetHairstyle(style);
-    //}
+    void OnModelDropdownChanged(int modelIndex)
+    {
+        Log.Debug($"OnModelDropdownChanged({modelIndex})");
+        var dyeIndex = ColorSelector.value;
+        OnHairDropdownChanged(modelIndex, dyeIndex);
+    }
+
+    void OnHairDropdownChanged(int modelIndex, int dyeIndex)
+    {
+        Log.Debug($"OnHairDropdownChanged(model:{modelIndex}, dye:{dyeIndex}");
+        var dye = hairDyes.Values[dyeIndex];
+        var matDesc = new MaterialDescriptor(dye.material, new(Constants.HairDyeSourceName, SourceType.Hair));
+
+        var existingHair = OutfitListUI.TargetOutfit.ActiveAccessories
+            .Where(x => x.Source.Type == Models.SourceType.Hair)
+            .ForEach(OutfitListUI.TargetOutfit.DisableAccessory);
+        if (modelIndex >= hairstyles.Count()) return;
+
+        var model = hairstyles.Values[modelIndex];
+        OutfitListUI.TargetOutfit.EnableAccessory(model);
+        OutfitListUI.TargetOutfit.PaintAccessory(model, matDesc, model.hairstyle.mainMaterialIndex);
+    }
 
     void OnEnable()
     {

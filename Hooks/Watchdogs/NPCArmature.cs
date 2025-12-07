@@ -1,8 +1,8 @@
-﻿using CarolCustomizer.Behaviors.Carol
-;
+﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -26,7 +26,14 @@ public class NPCArmature : MonoBehaviour, ICarolType
         thisNPCEnabled = Settings.Plugin.customNPCs[npcType].enable.Value;
     }
 
-    public void SetBaseVisibility(bool visible) { }
+    public void SetBaseVisibility(bool visible) 
+    {
+        if (!thisNPCEnabled) return;
+
+        watchdog.CompData.SetBaseVisibility(false);
+        watchdog.CompData.EffectGameObjects
+            .ForEach(x => x.gameObject.SetActive(true));
+    }
 
     public void SetAnimator(RuntimeAnimatorController outfit) { }
 
@@ -37,7 +44,7 @@ public class NPCArmature : MonoBehaviour, ICarolType
         this.watchdog = PelvisWatchdog.GetAddWatchdog(this.gameObject);
         this.watchdog.Behavior = this;
         this.npcType = NPCManager.GetNPCType(this.transform.parent.name);
-        watchdog.CompData.SetBaseVisibility(false);
+        SetBaseVisibility(false);
         NPCManager.OnNPCAwake(this); 
     }
 

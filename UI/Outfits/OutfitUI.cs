@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Recipes;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Events;
@@ -93,8 +94,12 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
         if (!AccUIs.TryGetValue(descriptor, out var UI))
         {
-            Log.Warning($"Key {descriptor} wasn't in {outfit.DisplayName}.");
-            return null;
+            if (OutfitAssetManager.GetInstantiable(descriptor) is not StoredAccessory stored)
+            {
+                Log.Warning($"Key {descriptor} wasn't in {outfit.DisplayName}.");
+                return null;
+            }
+            if (!AccUIs.TryGetValue(stored, out UI)) { Log.Warning("failed twice to find accUI, good job."); return null; }
         }
 
         if (!UI) UI = AccUIs[descriptor] = ui.Factory.BuildAccUI(this, descriptor);
@@ -164,7 +169,23 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             .ForEach(x=>x.accessory.SetFavorite(false));
     }
 
-    public List<(string, UnityAction)> GetContextMenuItems() => outfit.GetContextMenuItems();
+    public List<(string, UnityAction)> GetContextMenuItems()
+    {
+        var hads = outfit as HaDSOutfit; //TODO: idk, but not this
+        var target = OutfitListUI.TargetOutfit;
+        var results = new List<(string, UnityAction)>()
+        {
+             ("Use Animator",     () => target.SetAnimator(outfit.Descriptor))
+            ,("Use Measurements", () => target.SetConfiguration(outfit.Descriptor))
+            ,("Use Colliders",    () => target.SetColliderSource(outfit.Descriptor))
+            ,("Activate Effects", () => target.SetEffect(outfit.Descriptor, true))
+            ,("Disable Effects",  () => target.SetEffect(outfit.Descriptor, false))
+        };
+        hads.Variants
+            .ForEach(tup =>
+                results.Add(($"Load: {tup.Key}", () => RecipeApplier.ActivateRecipe(target, tup.Value))));
+        return results;
+    }
     #endregion
 
     //void OnDestroy() => AccUIs.Values

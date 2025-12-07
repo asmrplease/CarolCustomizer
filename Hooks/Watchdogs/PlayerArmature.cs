@@ -3,8 +3,8 @@ using CarolCustomizer.Utils;
 using System.Collections;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Behaviors.Settings;
-using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
+using CarolCustomizer.Assets;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
 public class PlayerArmature : MonoBehaviour, ICarolType
@@ -24,6 +24,8 @@ public class PlayerArmature : MonoBehaviour, ICarolType
     public bool controllerDisabled => !carolController.enabled;
     public bool inDialogue => carolEntity.hud.dialogue.dialogue.activeSelf;
 
+    Vector3 lockPos = Vector3.zero;
+
     public ICarolType Constructor(PelvisWatchdog watchdog)
     {
         this.watchdog ??= watchdog;
@@ -40,7 +42,7 @@ public class PlayerArmature : MonoBehaviour, ICarolType
         this.watchdog = GetComponent<PelvisWatchdog>();
         this.watchdog.Behavior = this;
         carolController = this.gameObject.GetComponentInParent<CarolController>();
-        watchdog.CompData.SetBaseVisibility(false);
+        this.SetBaseVisibility(false);
         if (!carolEntity) carolEntity = GetComponentInParent<Entity>();
         if (!carolEntity)
         {
@@ -70,6 +72,7 @@ public class PlayerArmature : MonoBehaviour, ICarolType
 
     IEnumerator LockRoutine(float initialDelay = 0f)
     {
+        lockPos = carolEntity.transform.root.position;
         float speed = LockSpeed * Settings.Plugin.MenuSpeed;
         Log.Debug($"Locking player, speed: {speed}");
         Busy = true;
@@ -88,6 +91,8 @@ public class PlayerArmature : MonoBehaviour, ICarolType
         inventory.phone.SetActive(true);
         carolEntity.anim.speed = speed;
         SetAnimation("PhoneOut");
+        var phoneLight = watchdog.transform.RecursiveFindTransform(x => x.name == "eye (5)");
+        if (phoneLight) phoneLight.gameObject.SetActive(false);
         carolEntity.enabled = false;
         yield return new WaitForSeconds(Constants.PhoneHideTime / speed);
 
@@ -97,12 +102,22 @@ public class PlayerArmature : MonoBehaviour, ICarolType
         yield break;
     }
 
+    void LateUpdate()
+    {
+        if (!Locked) return;
+
+        //Probably bad practice to modify the transform of another object but whatever. 
+        carolEntity.transform.root.position = lockPos;
+    }
+
     internal IEnumerator UnlockRoutine()
     {
         float speed = UnlockSpeed * Settings.Plugin.MenuSpeed;
         Log.Debug("Unlocking player");
         Busy = true;
         Locked = false;
+        var phoneLight = watchdog.transform.RecursiveFindTransform(x => x.name == "eye (5)");
+        if (phoneLight) phoneLight.gameObject.SetActive(true);
         SetAnimation("PhoneBack");
         carolEntity.anim.speed = speed;
         yield return new WaitForSeconds(Constants.PhoneHideTime / speed);
@@ -158,12 +173,12 @@ public class PlayerArmature : MonoBehaviour, ICarolType
     public void SetBaseVisibility(bool visibility) 
     {
         watchdog.CompData.SetBaseVisibility(visibility);
+        if (transform.parent.name == "Carol_Hazmat") StartCoroutine(watchdog.EnableSpacesuit());
+        if (!playerModelData) return;
+
         playerModelData.hairIsVisible = visibility;
         var inventory = GetComponentInParent<Inventory>();
-        if (!inventory) return;
-
-        inventory.currentHairstyle.GetComponent<Hairstyle>().Hide(visibility);
-        //inventory.currentHairstyle.GetComponent<Hairstyle>().SetVisible(visibility);
+        if (inventory) inventory.currentHairstyle.GetComponent<Hairstyle>().SetVisible(visibility);  
     } 
 
     public void Dispose()

@@ -7,7 +7,6 @@ using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -43,6 +42,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         MessageDialogue messageDialogue)
     {
         this.recipe = recipe;
+        this.recipe.OnStatusChanged += OnRecipeChanged;
         this.contextMenu = contextMenu;
         this.filenameDialogue = filenameDialogue;
         this.messageDialogue = messageDialogue;
@@ -52,50 +52,33 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         displayImage.sprite = loader.PirateIcon;
         displayImage.enabled = false;
 
-        if (recipe.Extension == Constants.PngFileExtension) 
-            CCPlugin.CoroutineRunner.StartCoroutine(LoadThumbnail());
+        if (recipe.Extension == Constants.PngFileExtension)
+        {
+            var (dimensions, compressedData) = recipe.Png.CompressedFrames[0];
+            displayImage.sprite = PngUtil.BuildSprite(dimensions, compressedData);
+            displayImage.enabled = true;
+        }
 
         displayName = transform.Find(outfitNameAddress)?.GetComponentInChildren<Text>();
         displayName.text = this.recipe.Name;
 
         background = transform.GetChild(0).gameObject.GetComponent<Image>();
-        background.color = GetUIColor();
-
         pickupLocation = transform.Find(pickupLocationAddress)?.GetComponent<Text>();
+        OnRecipeChanged();
+    }
+
+    void OnRecipeChanged()
+    {
         pickupLocation.text = GetStatusMessage();
+        background.color = GetUIColor();
     }
 
-
-    IEnumerator LoadThumbnail()
-    {
-        yield return new WaitForEndOfFrame();
-
-        var bytes = File.ReadAllBytes(recipe.Path);
-        Texture2D thumbnail = new(512, 512, TextureFormat.RGBA32, false);
-        if (!ImageConversion.LoadImage(thumbnail, bytes)) { Log.Warning($"failed to load png for {recipe.Name}"); yield break; }
-
-        displayImage.sprite = Sprite
-            .Create(
-                thumbnail,
-                new Rect (0,0,thumbnail.width,thumbnail.height),
-                new Vector2(0.5f, 0.5f));
-        displayImage.sprite.name = recipe.Name ;
-        displayImage.enabled = true;
-        yield break;
-    }
-
-    void OnShezaraChanged(object sender, EventArgs e)
-    {
-        if (!displayImage) return; 
-        
-        displayImage.enabled = (e.AsConfigEntry<string>().Value == recipe.Name);
-    }
 
     string GetStatusMessage()
     {
         return recipe.Error switch
         {
-            Recipe.Status.MissingSource => $"Missing {RecipeApplier.GetMissingSources(recipe.Descriptor).Count()} sources",
+            Recipe.Status.Incomplete    => $"Missing {recipe.MissingSources.Count()} sources, {recipe.MissingAccessories.Count()} accs",
             Recipe.Status.SlowSource    => $"{SceneResourceProvider.CheckMaterialsReady(RecipeApplier.GetWorldMats(recipe.Descriptor)).Count()} scenes required.",
             Recipe.Status.InvalidJson   => "Recipe data invalid",
             Recipe.Status.FileError     => "Error loading file",
@@ -107,7 +90,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     {
         return recipe.Error switch
         {
-            Recipe.Status.MissingSource => Constants.DefaultColor,
+            Recipe.Status.Incomplete => Constants.DefaultColor,
             Recipe.Status.SlowSource    => Constants.DefaultColor.RGBMultiplied(0.5f),
             Recipe.Status.InvalidJson   => Color.gray,
             Recipe.Status.FileError     => Color.gray,
@@ -123,17 +106,24 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 
     void Overwrite() => RecipeSaver.SavePNG(new RecipeDescriptor(PlayerInstances.DefaultPlayer.outfitManager), recipe.Path);
 
-    void OnContextMenuLoad(PlayerCarolInstance player) => 
-        RecipeApplier.ActivateRecipe(player.outfitManager, recipe.Descriptor);
+    void OnContextMenuLoad(PlayerCarolInstance player) => RecipeApplier.ActivateRecipe(player.outfitManager, recipe.Descriptor);
 
     void OnContextMenuWarningLoad()
     {
         string message = string.Empty;
-        if (recipe.Error == Recipe.Status.MissingSource)
+        if (recipe.Error == Recipe.Status.Incomplete)
         {
-            message = "Some of the resources for this recipe aren't available: " + Environment.NewLine; ;
-            var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
-            foreach (var source in missingSources) { message += source + Environment.NewLine; }
+            if (recipe.MissingSources.Any())
+            {
+                message = "Some of the resources for this recipe aren't available: " + Environment.NewLine;
+                foreach (var source in recipe.MissingSources) { message += source + Environment.NewLine; }
+            }
+            if (recipe.MissingAccessories.Any())
+            {
+                message += "Some of the accessories for this recipe were not found: " + Environment.NewLine;
+                foreach (var acc in recipe.MissingAccessories) { message += acc + Environment.NewLine; }
+            }
+            
         }
         if (recipe.Error == Recipe.Status.SlowSource)
         {
@@ -173,10 +163,11 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     void OnContextMenuListMissing()
     {
         string message = string.Empty;
-        if (recipe.Error == Recipe.Status.MissingSource)
+        if (recipe.Error == Recipe.Status.Incomplete)
         {
             var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
             foreach (var source in missingSources) { message += source + Environment.NewLine; }
+            foreach (var acc in recipe.MissingAccessories) { message += acc + Environment.NewLine; }
         }
         if (recipe.Error == Recipe.Status.SlowSource)
         {
@@ -253,7 +244,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             output.Add(("Rename", OnContextMenuRename));
             NPCManager.ValidNPCs().ForEach(x => output.Add(($"Set as {x}", () => ApplyToNPC(x))));
         }
-        if (recipe.Error == Recipe.Status.MissingSource || recipe.Error == Recipe.Status.SlowSource)
+        if (recipe.Error == Recipe.Status.Incomplete || recipe.Error == Recipe.Status.SlowSource)
         {
             output.Add(("Load*", OnContextMenuWarningLoad));
             output.Add(("Show Missing", OnContextMenuListMissing));

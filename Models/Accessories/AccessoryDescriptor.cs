@@ -17,7 +17,7 @@ public partial class AccessoryDescriptor
 {
     public readonly string Name;
     public readonly SourceDescriptor Source;
-    public MaterialDescriptor[] Materials;
+    public MaterialDescriptor[] Materials = [];
 
     [JsonConstructor]
     public AccessoryDescriptor(string name, SourceDescriptor source, MaterialDescriptor[] materials)
@@ -70,7 +70,9 @@ public partial class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return this.GetHashCode() == other.GetHashCode();
+        return this.Name.DeInstance().Equals(other.Name.DeInstance())
+            && this.Source.Equals(other.Source);
+            //&& this.Materials.SequenceEqual(other.Materials);
     }
 
     public override bool Equals(object other)
@@ -89,7 +91,7 @@ public partial class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
     {
         var mats = Materials as IStructuralEquatable;
         var matsHash = mats.GetHashCode(EqualityComparer<MaterialDescriptor>.Default);
-        unchecked { return Name.DeInstance().GetHashCode() << 12 ^ Source.GetHashCode() << 8 ^ matsHash; }
+        unchecked { return Name.DeInstance().GetHashCode() << 12 ^ Source.GetHashCode() << 8; }// ^ matsHash; }
     }
 }
 
