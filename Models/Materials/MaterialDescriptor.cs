@@ -1,12 +1,16 @@
-﻿using CarolCustomizer.Models.Outfits;
+﻿using CarolCustomizer.Behaviors;
+using CarolCustomizer.Contracts;
+using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace CarolCustomizer.Models.Materials;
 [Serializable]
-public class MaterialDescriptor : IEquatable<MaterialDescriptor>
+public partial class MaterialDescriptor 
 {
     public string Name;
     public SourceDescriptor Source;
@@ -37,6 +41,13 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>
         Source = descriptor;
     }
 
+    public override string ToString() => $"MD:{Source}.{Name}";
+
+    public MaterialDescriptor SetClipboard() => MaterialManager.clipboard = this;
+}
+
+public partial class MaterialDescriptor : IEquatable<MaterialDescriptor>
+{
     public bool Equals(MaterialDescriptor other)
     {
         if (other is null) return false;
@@ -64,6 +75,34 @@ public class MaterialDescriptor : IEquatable<MaterialDescriptor>
     {
         return Name.DeInstance().GetHashCode() ^ Source.GetHashCode();
     }
+}
 
-    public override string ToString() => $"MD:{Source}.{Name}";
+public partial class MaterialDescriptor : IListable
+{
+    Sprite IListable.Thumbnail => throw new NotImplementedException();
+
+    string IListable.Header => throw new NotImplementedException();
+
+    string IListable.Subheader => throw new NotImplementedException();
+
+    Color IListable.BaseColor => throw new NotImplementedException();
+
+    Color IListable.HighlightColor => throw new NotImplementedException();
+
+    bool IListable.Filter<T>(Predicate<T> predicate)
+    {
+        throw new NotImplementedException();
+    }
+
+    public List<(string, UnityAction)> GetContextMenuItems()
+    {
+        return
+        [
+            ("Copy", () => this.SetClipboard()),
+            //("Copy Current Material", CopyCurrentMaterial),
+            //("Paste Material", PasteMaterial),
+            //("Reset Material", ResetMaterial)
+        ];
+        
+    }
 }

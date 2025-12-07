@@ -161,7 +161,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     {
         AccUIs.Values
             .Where(x=>x)
-            .ForEach(x=>x.SetFavorite(false));
+            .ForEach(x=>x.accessory.SetFavorite(false));
     }
 
     public List<(string, UnityAction)> GetContextMenuItems() => outfit.GetContextMenuItems();

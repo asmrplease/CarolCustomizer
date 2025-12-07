@@ -123,20 +123,6 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
         else OutfitListUI.TargetOutfit.DisableAccessory(accessory);
     }
 
-    public void SetFavorite(bool favorited)
-    {
-        if (favorited) Settings.Favorites.AddToFavorites(accessory); 
-        else Settings.Favorites.RemoveFromFavorites(accessory);
-        favoriteIcon.enabled = favorited;
-    }
-
-    public List<(string, UnityAction)> GetContextMenuItems()
-    {
-        bool currentlyFavorite = Settings.Favorites.IsInFavorites(accessory);
-        return new List<(string, UnityAction)> { 
-            (currentlyFavorite ? "Remove from Favorites" : "Add to favorites", 
-            () => SetFavorite(!currentlyFavorite)) 
-        };
-    }
+    public List<(string, UnityAction)> GetContextMenuItems() => accessory.GetContextMenuItems();
     #endregion
 }

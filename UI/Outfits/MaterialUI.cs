@@ -94,15 +94,5 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
 
     void OnContextClick() => ui.ContextMenu.Show(this);
 
-    public List<(string, UnityAction)> GetContextMenuItems()
-    {
-        List<(string, UnityAction)> menuItems = new()
-        {
-            ("Copy Default Material", CopyDefaultMaterial),
-            ("Copy Current Material", CopyCurrentMaterial),
-            ("Paste Material", PasteMaterial),
-            ("Reset Material", ResetMaterial)
-        };
-        return menuItems;
-    }
+    public List<(string, UnityAction)> GetContextMenuItems() => defaultMaterial.GetContextMenuItems();
 }

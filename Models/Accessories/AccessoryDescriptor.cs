@@ -1,28 +1,23 @@
-﻿using CarolCustomizer.Models.Materials;
+﻿using CarolCustomizer.Behaviors.Settings;
+using CarolCustomizer.Contracts;
+using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
+using static ModelData;
 
 namespace CarolCustomizer.Models.Accessories;
 [Serializable]
-public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
+public partial class AccessoryDescriptor 
 {
     public readonly string Name;
     public readonly SourceDescriptor Source;
     public MaterialDescriptor[] Materials;
-
-    //[JsonConstructor]
-    //public AccessoryDescriptor(string name, string source, MaterialDescriptor[] materials)
-    //{
-    //    Name = name;
-    //    Source = source;
-    //    Materials = materials;
-    //}
 
     [JsonConstructor]
     public AccessoryDescriptor(string name, SourceDescriptor source, MaterialDescriptor[] materials)
@@ -36,8 +31,6 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
     {
         Name = name;
         Source = source;
-        //does having an empty list of materials cause problems here?
-        //only thing that uses this is LiveAccessory
     }
 
     public AccessoryDescriptor(SkinnedMeshRenderer smr, SourceDescriptor source)
@@ -62,6 +55,16 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
         Materials = existing.Materials;
     }
 
+    public override string ToString() => $"AD:{Source}.{Name}";
+    public void SetFavorite(bool favorited)
+    {
+        if (favorited) Settings.Favorites.AddToFavorites(this);
+        else Settings.Favorites.RemoveFromFavorites(this);
+    }
+}
+
+public partial class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
+{
     public bool Equals(AccessoryDescriptor other)
     {
         if (other is null) return false;
@@ -88,7 +91,32 @@ public class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
         var matsHash = mats.GetHashCode(EqualityComparer<MaterialDescriptor>.Default);
         unchecked { return Name.DeInstance().GetHashCode() << 12 ^ Source.GetHashCode() << 8 ^ matsHash; }
     }
+}
 
-    public override string ToString() => $"AD:{Source}.{Name}";
+public partial class AccessoryDescriptor : IListable
+{
+    Sprite IListable.Thumbnail => null;
 
+    string IListable.Header => this.Name;
+
+    string IListable.Subheader => $"{this.Materials.Length} materials";
+
+    Color IListable.BaseColor => Constants.DefaultColor;
+
+    Color IListable.HighlightColor => Constants.Highlight;
+
+    bool IListable.Filter<T>(Predicate<T> predicate)
+    {
+        throw new NotImplementedException();
+    }
+
+    public List<(string, UnityAction)> GetContextMenuItems()
+    {
+        bool currentlyFavorite = Settings.Favorites.IsInFavorites(this);
+        return  
+        [
+            (currentlyFavorite ? "Remove from Favorites" : "Add to favorites",
+            () => SetFavorite(!currentlyFavorite))
+        ];
+    }
 }
