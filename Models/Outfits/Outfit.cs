@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
 
 namespace CarolCustomizer.Models.Outfits;
 
@@ -153,6 +154,18 @@ public partial class Outfit : IListable
     {
         throw new NotImplementedException();
     }
+
+    IEnumerable<IListable> IListable.Children 
+    { 
+        get
+        {
+            List<IListable> results = [];
+            results.AddRange(this.MaterialDescriptors);
+            results.AddRange(this.GetAccessories());
+            return results;
+        }
+    }
+    
     public virtual List<(string, UnityAction)> GetContextMenuItems()
     {
         var target = OutfitListUI.TargetOutfit;

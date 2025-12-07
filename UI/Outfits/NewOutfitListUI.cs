@@ -1,6 +1,4 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Contracts;
-using CarolCustomizer.Events;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;

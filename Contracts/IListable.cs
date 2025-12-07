@@ -16,5 +16,5 @@ internal interface IListable : IContextMenuActions
     Color HighlightColor { get; }
     //UnityAction OnClick();
     bool Filter<T>(Predicate<T> predicate);
-    //IEnumerable<IListable> Children { get; }
+    IEnumerable<IListable> Children { get; }
 }

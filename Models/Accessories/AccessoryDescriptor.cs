@@ -110,6 +110,8 @@ public partial class AccessoryDescriptor : IListable
         throw new NotImplementedException();
     }
 
+    IEnumerable<IListable> IListable.Children => this.Materials;
+
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         bool currentlyFavorite = Settings.Favorites.IsInFavorites(this);

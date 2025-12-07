@@ -94,6 +94,8 @@ public partial class MaterialDescriptor : IListable
         throw new NotImplementedException();
     }
 
+    IEnumerable<IListable> IListable.Children => [];
+
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         return
