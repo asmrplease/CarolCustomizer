@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using static MissionManager;
 
 namespace CarolCustomizer.Models.Recipes;
 public partial record Recipe : ISourceAwaiter
@@ -43,6 +42,19 @@ public partial record Recipe : ISourceAwaiter
             .ForEach(x => SourceAwaiter.Register(x, this));
     }
 
+    [Flags]
+    public enum Status
+    {
+        NoError = 0,
+        Incomplete = 1,
+        SlowSource = 2,
+        InvalidJson = 4,
+        FileError = 8,
+    }
+}
+
+public partial record Recipe : ISourceAwaiter
+{
     void ISourceAwaiter.HandleSourceLoaded(SourceDescriptor source)
     {
         MissingSources.Remove(source);
@@ -57,16 +69,6 @@ public partial record Recipe : ISourceAwaiter
         OnStatusChanged?.Invoke();
     }
 
-
-
-    public enum Status
-    {
-        NoError,
-        Incomplete,
-        SlowSource,
-        InvalidJson,
-        FileError,
-    }
 }
 
 public partial record Recipe : IListable
@@ -87,7 +89,13 @@ public partial record Recipe : IListable
     {
         throw new NotImplementedException();
     }
+}
 
+public partial record Recipe : IRecipe
+{
+    string IRecipe.Name => this.Name;
+    RecipeDescriptor IRecipe.RecipeData => this.Descriptor;
+    Sprite IRecipe.Thumbnail => throw new NotImplementedException();//convert png to sprite here?
 }
 
 public partial record Recipe : IContextMenuActions

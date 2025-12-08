@@ -65,7 +65,7 @@ public class StoredHair : AccessoryDescriptor, IGenericSource, IInstantiable
 
     public List<Transform> GetBespokeBones() => BespokeBones;
 
-    List<MagicaCloth> IMagicaSource.GetBoneCloths() => this.boneCloths;
+    List<MagicaCloth> IMagicaProvider.GetBoneCloths() => this.boneCloths;
     public List<MagicaCloth> GetMeshCloths() => this.meshCloths;
 
     MaterialDescriptor IMaterialProvider.GetMaterial(MaterialDescriptor material) => null;
@@ -83,7 +83,7 @@ public class StoredHair : AccessoryDescriptor, IGenericSource, IInstantiable
 
     ModelData IConfigProvider.GetConfiguration() => null;
 
-    List<MagicaCapsuleCollider> IMagicaSource.GetColliders() => [];
+    List<MagicaCapsuleCollider> IMagicaProvider.GetColliders() => [];
 
     IInstantiable IModelProvider.GetInstantiable(AccessoryDescriptor accessory)
     {

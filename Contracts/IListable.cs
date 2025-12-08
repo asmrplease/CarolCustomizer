@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace CarolCustomizer.Contracts;
 
-internal interface IListable : IContextMenuActions
+public interface IListable : IContextMenuActions
 {
     Sprite Thumbnail { get; }
     string Header { get; }

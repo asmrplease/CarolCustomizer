@@ -164,7 +164,7 @@ public partial class Outfit : IGenericSource
     }
     public virtual RuntimeAnimatorController GetAnimator() => null;
     public List<OutfitEffect> GetEffects() => this.Effects;
-    List<MagicaCapsuleCollider> IMagicaSource.GetColliders() => this.magiData.CapsuleColliders;
+    List<MagicaCapsuleCollider> IMagicaProvider.GetColliders() => this.magiData.CapsuleColliders;
     IInstantiable IModelProvider.GetInstantiable(AccessoryDescriptor accessory) => GetAccessory(accessory);
 }
 

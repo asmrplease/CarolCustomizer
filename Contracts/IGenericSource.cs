@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace CarolCustomizer.Contracts;
 
-public interface IMagicaSource : ISourceDescriptor, IBoneProvider
+public interface IMagicaProvider : ISourceDescriptor, IBoneProvider
 {
     List<MagicaCapsuleCollider> GetColliders();
     List<MagicaCloth> GetBoneCloths();
@@ -52,7 +52,7 @@ public interface IGenericSource :
     ISourceDescriptor, 
     IModelProvider,
     IMaterialProvider,
-    IMagicaSource,
+    IMagicaProvider,
     IBoneProvider,
     IConfigProvider,
     IEffectProvider

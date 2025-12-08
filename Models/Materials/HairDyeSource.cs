@@ -41,9 +41,9 @@ public class HairDyeSource : IGenericSource
 
     List<Transform> IBoneProvider.GetBespokeBones() => [];
 
-    List<MagicaCloth> IMagicaSource.GetBoneCloths() => [];
+    List<MagicaCloth> IMagicaProvider.GetBoneCloths() => [];
 
-    List<MagicaCapsuleCollider> IMagicaSource.GetColliders() => [];
+    List<MagicaCapsuleCollider> IMagicaProvider.GetColliders() => [];
 
     ModelData IConfigProvider.GetConfiguration() => null;
 
