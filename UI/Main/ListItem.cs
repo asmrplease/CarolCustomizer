@@ -1,5 +1,7 @@
 ﻿using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
+using CarolCustomizer.Events;
+using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,8 +10,7 @@ using UnityEngine.UI;
 
 namespace CarolCustomizer.UI.Main;
 
-internal class ListItem<T> : MonoBehaviour, IPointerClickHandler
-    where T : IListable
+internal class ListItem : MonoBehaviour, IPointerClickHandler
 {
     static readonly string thumbnailAddress = "Outfit Header/Icon";
     static readonly string headerAddress = "Outfit Header/Text/Outfit Name";
@@ -29,7 +30,7 @@ internal class ListItem<T> : MonoBehaviour, IPointerClickHandler
 
     void Awake()
     {
-        this.name = $"{typeof(T).Name}: ";
+        Log.Debug("ListItem.Awake()");
         this.background = transform.GetChild(0).gameObject.GetComponent<Image>();
         this.displayImage = transform.Find(thumbnailAddress)?.GetComponent<Image>();
         this.header = transform.Find(headerAddress)?.GetComponentInChildren<Text>();
@@ -37,10 +38,11 @@ internal class ListItem<T> : MonoBehaviour, IPointerClickHandler
     }
 
 
-    public ListItem<T> Constructor(IListable source, ContextMenu contextMenu)
+    public ListItem Constructor(IListable source, ContextMenu contextMenu)
     {
+        Log.Debug($"ListItem {source.Header}");
         this.source = source;
-        this.name += source.Header;
+        this.name = $"ListItem({source.GetType().Name}): {source.Header}";
         this.header.text = source.Header;
         this.subheader.text = source.Subheader;
         this.displayImage.sprite = source.Thumbnail;
@@ -62,9 +64,9 @@ internal class ListItem<T> : MonoBehaviour, IPointerClickHandler
         this.children.ForEach(x => x.SetActive(expanded)); 
     }
 
-    public void OnFilterEvent(Predicate<T> predicate)
+    public void OnFilterEvent(UIFilterChangedEvent predicate)
     {
-        this.gameObject.SetActive(source.Filter(predicate));
+        //this.gameObject.SetActive(source.Filter(predicate));
     }
 
     public void ParentTo(GameObject parent)

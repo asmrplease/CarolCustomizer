@@ -24,10 +24,11 @@ public partial class Outfit
 
     protected Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = [];
     public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = [];
+    public readonly List<RecipeDescriptor> recipes = [];
     List<OutfitEffect> Effects = [];
 
 
-    PelvisWatchdog prefabWatchdog;
+    public PelvisWatchdog prefabWatchdog { get; protected set; }
     public BoneData boneData => prefabWatchdog.BoneData;
     public CompData compData => prefabWatchdog.CompData;
     public MagiData magiData => prefabWatchdog.MagiData;
@@ -113,8 +114,6 @@ public partial class Outfit
         return result;
     }
 
-    public virtual RuntimeAnimatorController GetAnimator() => null;
-
     public void Dispose()
     {
         Log.Debug("Outfit.Dispose()");
@@ -144,7 +143,7 @@ public partial class Outfit : IComparable<Outfit>, IEquatable<Outfit>
     public override int GetHashCode() => this.AssetName.GetHashCode();
 }
 
-public partial class Outfit : IAccessorySource
+public partial class Outfit : IGenericSource
 {
     public SourceDescriptor Descriptor { get; private set; }
     virtual public ModelData GetConfiguration() => null;
@@ -157,7 +156,7 @@ public partial class Outfit : IAccessorySource
         return result;
     }
     public List<MaterialDescriptor> GetMaterials() => MaterialDescriptors.ToList();
-    public StoredAccessory GetAccessory(AccessoryDescriptor descriptor)
+    StoredAccessory IModelProvider.GetAccessory(AccessoryDescriptor descriptor)
     {
         AccDict.TryGetValue(descriptor, out StoredAccessory result);
         result ??= GetAccessory(descriptor.Name);
@@ -165,15 +164,15 @@ public partial class Outfit : IAccessorySource
     }
     public virtual RuntimeAnimatorController GetAnimator() => null;
     public List<OutfitEffect> GetEffects() => this.Effects;
-    List<MagicaCapsuleCollider> IAccessorySource.GetColliders() => this.magiData.CapsuleColliders;
-    IInstantiable IAccessorySource.GetInstantiable(AccessoryDescriptor accessory) => GetAccessory(accessory);
+    List<MagicaCapsuleCollider> IMagicaSource.GetColliders() => this.magiData.CapsuleColliders;
+    IInstantiable IModelProvider.GetInstantiable(AccessoryDescriptor accessory) => GetAccessory(accessory);
 }
 
 public partial class Outfit : IListable
 {
     public Sprite Thumbnail { get; protected set; }
     string IListable.Header => this.DisplayName;
-    string IListable.Subheader => "";
+    string IListable.Subheader => this.Author;
     Color IListable.BaseColor => Constants.DefaultColor;
     Color IListable.HighlightColor => Constants.Highlight;
     bool IListable.Filter<T>(Predicate<T> predicate)
@@ -188,6 +187,7 @@ public partial class Outfit : IListable
             List<IListable> results = [];
             results.AddRange(this.MaterialDescriptors);
             results.AddRange(this.GetAccessories());
+            //results.AddRange(this.recipes);
             return results;
         }
     }
@@ -204,9 +204,4 @@ public partial class Outfit : IListable
             ,("Disable Effects",  () => target.SetEffect(this.Descriptor, false))
         ];
     }
-}
-    List<MagicaCapsuleCollider> IMagicaSource.GetColliders() => this.magiData.CapsuleColliders;
-
-    IInstantiable IModelProvider.GetInstantiable(AccessoryDescriptor accessory) => GetAccessory(accessory);
-    #endregion
 }

@@ -51,6 +51,7 @@ public class UIInstance : MonoBehaviour
 
         canvas = mainTransform.GetComponent<Canvas>();
         canvas.enabled = true;
+        UIElementFactory factory = new(loader);
 
         var viewRoot = mainTransform.Find(viewRootAddress);
 
@@ -61,8 +62,8 @@ public class UIInstance : MonoBehaviour
             .AddComponent<MessageDialogue>()
             .Constructor();
         var outfitView = Instantiate(loader.OutfitView, viewRoot)
-            .AddComponent<OutfitListUI>()
-            .Constructor(loader, contextMenu);
+            .AddComponent<NewOutfitListUI>()
+            .Constructor(factory, contextMenu);
         var recipesView = Instantiate(loader.RecipesView, viewRoot)
             .AddComponent<RecipeListUI>()
             .Constructor(loader, recipeFileWatcher, contextMenu, messageDialogue);

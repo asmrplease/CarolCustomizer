@@ -1,16 +1,19 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Utils;
 using PngHelper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.Events;
 using static MissionManager;
 
 namespace CarolCustomizer.Models.Recipes;
-public partial record Recipe
-public record Recipe : ISourceAwaiter
+public partial record Recipe : ISourceAwaiter
 {
     public readonly string Name;
     public readonly string Path;

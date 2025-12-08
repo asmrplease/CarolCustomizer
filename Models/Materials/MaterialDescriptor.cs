@@ -75,15 +75,15 @@ public partial class MaterialDescriptor : IEquatable<MaterialDescriptor>
 
 public partial class MaterialDescriptor : IListable
 {
-    Sprite IListable.Thumbnail => throw new NotImplementedException();
+    Sprite IListable.Thumbnail => null;
 
-    string IListable.Header => throw new NotImplementedException();
+    string IListable.Header => this.Name;
 
-    string IListable.Subheader => throw new NotImplementedException();
+    string IListable.Subheader => "";
 
-    Color IListable.BaseColor => throw new NotImplementedException();
+    Color IListable.BaseColor => Constants.DefaultColor;
 
-    Color IListable.HighlightColor => throw new NotImplementedException();
+    Color IListable.HighlightColor => Constants.Highlight;
 
     bool IListable.Filter<T>(Predicate<T> predicate)
     {

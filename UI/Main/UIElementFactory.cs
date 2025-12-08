@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
@@ -15,6 +16,24 @@ public class UIElementFactory
     {
         this.assetLoader = assetLoader; 
         this.uiInstance = uiInstance;
+    }
+
+    public UIElementFactory(UIAssetLoader assetLoader)
+    {
+        this.assetLoader = assetLoader;
+        this.uiInstance = null;
+    }
+
+    internal ListItem BuildGeneric(IListable listable, Transform parent, ContextMenu menu)
+    {
+        var gameObject = GameObject.Instantiate(assetLoader.OutfitListElement, parent);
+        if (!gameObject) { Log.Error("Failed to instantiate outfit UI prefab."); return null; }
+
+        //listable.Children.ForEach(x => BuildGeneric(x, gameObject.transform, menu));
+
+        return gameObject
+            .AddComponent<ListItem>()
+            .Constructor(listable, menu);
     }
 
     public OutfitUI BuildOutfitUI(Outfit outfit)

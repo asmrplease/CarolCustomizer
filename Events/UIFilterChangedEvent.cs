@@ -35,7 +35,7 @@ public class UIFilterChangedEvent
             $"ShowActive: {ShowActive}.";
     }
 
-    public bool Filter(IAccessorySource source)
+    public bool Filter(IModelProvider source)
     {
         //if (this.ShowFavorites && Settings.Favorites.IsInFavorites(accessory)) return true;
         //if (this.ShowActive && OutfitListUI.TargetOutfit.ActiveAccessories.Contains(accessory)) return true;
