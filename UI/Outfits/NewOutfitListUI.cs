@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
@@ -16,6 +17,7 @@ internal class NewOutfitListUI : MonoBehaviour
     Transform listRoot;
     ////Dictionary<SourceDescriptor, ListItem<IAccessorySource>> accSources = [];
     Dictionary<SourceDescriptor, ListItem> outfits = [];
+    Dictionary<SourceDescriptor, IGenericSource> sources = [];
     //Dictionary<SourceDescriptor, ListItem<AccessoryDescriptor>> accessories = [];
     //Dictionary<SourceDescriptor, ListItem<MaterialDescriptor>> materials = [];
     //Dictionary<SourceDescriptor, ListItem<Recipe>> recipes = [];
@@ -39,6 +41,14 @@ internal class NewOutfitListUI : MonoBehaviour
     {
         //outfits.Values.ForEach(ui => ui.OnFilterEvent(outfit => filterEvent.Filter(outfit)));
         outfits.Values.ForEach(ui => ui.OnFilterEvent(filterEvent));
+    }
+
+    void HandleSourceLoaded(IGenericSource source)
+    {
+        //create a mutable root element for the source
+        //that generates any required child elements
+
+        //use reflection to check which interfaces the object implements, and generate any child objects based off of it
     }
 
     void HandleOutfitLoaded(Outfit outfit)
