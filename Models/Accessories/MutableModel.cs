@@ -38,6 +38,8 @@ internal partial class MutableModel : IListable
 
     public IEnumerable<IListable> Children => this.materials;
 
+    public UnityAction<bool> OnToggle => (idk) => Log.Debug($"Toggle to state:{idk}");
+
     public bool Filter<T>(Predicate<T> predicate)
     {
         throw new NotImplementedException();

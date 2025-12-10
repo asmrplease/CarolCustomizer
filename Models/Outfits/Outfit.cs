@@ -185,13 +185,24 @@ public partial class Outfit : IListable
         get
         {
             List<IListable> results = [];
-            results.AddRange(this.MaterialDescriptors);
-            results.AddRange(this.GetAccessories());
+            //this.MaterialDescriptors
+            //    .Select(x => new MutableMaterial(x))
+            //    .ForEach(results.Add);
+            this.GetAccessories()
+                .Select(x => new MutableModel(x))
+                .ForEach(results.Add);
+            //results.AddRange(this.MaterialDescriptors);
+            //results.AddRange(this.GetAccessories());
             //results.AddRange(this.recipes);
             return results;
         }
     }
-    
+
+    UnityAction<bool> IListable.OnToggle => null;
+}
+
+public partial class Outfit : IContextMenuActions
+{
     public virtual List<(string, UnityAction)> GetContextMenuItems()
     {
         var target = OutfitListUI.TargetOutfit;

@@ -58,6 +58,7 @@ internal class NewOutfitListUI : MonoBehaviour
         var element = factory.BuildGeneric(outfit, this.listRoot, this.contextMenu);
         if (!element) { Log.Error("UIElementFactory failed to provide a UI element."); return; }
 
+        element.gameObject.SetActive(true);
         outfits.Add(outfit.Descriptor, element);
     }
 }

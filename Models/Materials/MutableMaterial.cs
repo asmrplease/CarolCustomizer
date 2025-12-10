@@ -45,6 +45,8 @@ internal partial class MutableMaterial : IListable
 
     IEnumerable<IListable> IListable.Children => def.Children;
 
+    UnityAction<bool> IListable.OnToggle => def.OnToggle;
+
     bool IListable.Filter<T>(Predicate<T> predicate)
     {
         return def.Filter(predicate) || act.Filter(predicate);

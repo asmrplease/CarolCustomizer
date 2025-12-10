@@ -85,6 +85,8 @@ public partial record Recipe : IListable
 
     IEnumerable<IListable> IListable.Children => throw new NotImplementedException();//sources, accessories, materials
 
+    UnityAction<bool> IListable.OnToggle => null;
+
     bool IListable.Filter<T>(Predicate<T> predicate)
     {
         throw new NotImplementedException();

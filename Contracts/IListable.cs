@@ -17,4 +17,6 @@ public interface IListable : IContextMenuActions
     //UnityAction OnClick();
     bool Filter<T>(Predicate<T> predicate);
     IEnumerable<IListable> Children { get; }
+    UnityAction<bool> OnToggle { get; }
+
 }

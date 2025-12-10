@@ -114,6 +114,8 @@ public partial class AccessoryDescriptor : IListable
 
     IEnumerable<IListable> IListable.Children => this.Materials;
 
+    UnityAction<bool> IListable.OnToggle => null;
+
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         bool currentlyFavorite = Settings.Favorites.IsInFavorites(this);
@@ -122,5 +124,10 @@ public partial class AccessoryDescriptor : IListable
             (currentlyFavorite ? "Remove from Favorites" : "Add to favorites",
             () => SetFavorite(!currentlyFavorite))
         ];
+    }
+
+    List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
+    {
+        throw new NotImplementedException();
     }
 }

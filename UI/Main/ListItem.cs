@@ -12,56 +12,77 @@ namespace CarolCustomizer.UI.Main;
 
 internal class ListItem : MonoBehaviour, IPointerClickHandler
 {
-    static readonly string thumbnailAddress = "Outfit Header/Icon";
-    static readonly string headerAddress = "Outfit Header/Text/Outfit Name";
-    static readonly string subheaderAddress = "Outfit Header/Text/Pickup Location";
-
+    static readonly string thumbnailAddress = "ListItemUI/Icon";
+    static readonly string toggleAddress = "ListItemUI/Toggle";
+    static readonly string headerAddress = "ListItemUI/Text/Header";
+    static readonly string subheaderAddress = "ListItemUI/Text/Subheader";
     Image background;
     Image displayImage;
     Text header;
     Text subheader;
-
+    Toggle toggle;
     IListable source;
-
-    GameObject parent;
-    readonly List<GameObject> children = [];
-
+    ListItem parent;
+    readonly List<ListItem> children = [];
     ContextMenu contextMenu;
+    Action<Transform> uiInit;
+    bool initialized = false;
+    bool expanded = false;
 
-    void Awake()
+    public ListItem Constructor(IListable source, ContextMenu contextMenu, Action<Transform> uiInit)
     {
-        Log.Debug("ListItem.Awake()");
+        Log.Debug($"ListItem {source.Header}");
+        this.source = source;
+        this.contextMenu = contextMenu;
+        this.uiInit = uiInit;
+        this.name = $"ListItem({source.GetType().Name}): {source.Header}";
+
+        return this;
+    }
+
+    void OnEnable() => Setup();
+
+    void Setup()
+    {
+        if (this.initialized) return;
+
+        this.uiInit(this.transform);
         this.background = transform.GetChild(0).gameObject.GetComponent<Image>();
         this.displayImage = transform.Find(thumbnailAddress)?.GetComponent<Image>();
         this.header = transform.Find(headerAddress)?.GetComponentInChildren<Text>();
         this.subheader = transform.Find(subheaderAddress)?.GetComponent<Text>();
-    }
+        this.toggle = transform.Find(toggleAddress)?.GetComponent<Toggle>();
 
-
-    public ListItem Constructor(IListable source, ContextMenu contextMenu)
-    {
-        Log.Debug($"ListItem {source.Header}");
-        this.source = source;
-        this.name = $"ListItem({source.GetType().Name}): {source.Header}";
         this.header.text = source.Header;
         this.subheader.text = source.Subheader;
         this.displayImage.sprite = source.Thumbnail;
+        this.displayImage.color = new(1, 1, 1, 1);
         this.background.color = source.BaseColor;
-        this.contextMenu = contextMenu;
-        
-        return this;
+
+        if (source.OnToggle is not null)
+        {
+            this.toggle.onValueChanged.AddListener(source.OnToggle);
+            this.toggle.gameObject.SetActive(true);
+            this.displayImage.gameObject.SetActive(false);
+        }
+        else
+        {
+            this.toggle.gameObject.SetActive(false);
+            this.displayImage.gameObject.SetActive(true);
+        }
+        this.initialized = true;
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == Settings.HotKeys.ContextMenu) { contextMenu.Show(source); }
-        //if (eventData.button == PointerEventData.InputButton.Left) { source.OnClick()?.Invoke(); }
+        if (eventData.button == PointerEventData.InputButton.Left) { Expand(expanded.Flip()); }
     }
 
     void Expand(bool expanded) 
     {
-        if (expanded) { this.parent.SetActive(expanded); }
-        this.children.ForEach(x => x.SetActive(expanded)); 
+        if (expanded && this.parent) { this.parent.gameObject.SetActive(expanded); }
+        this.children.ForEach(x => x.gameObject.SetActive(expanded)); 
     }
 
     public void OnFilterEvent(UIFilterChangedEvent predicate)
@@ -69,12 +90,12 @@ internal class ListItem : MonoBehaviour, IPointerClickHandler
         //this.gameObject.SetActive(source.Filter(predicate));
     }
 
-    public void ParentTo(GameObject parent)
+    public void ParentTo(ListItem parent)
     {
         this.parent = parent;        
     }
 
-    public void AttachChild(GameObject child)
+    public void AttachChild(ListItem child)
     {
         if (!child) return;
 

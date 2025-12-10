@@ -92,6 +92,8 @@ public partial class MaterialDescriptor : IListable
 
     IEnumerable<IListable> IListable.Children => [];
 
+    UnityAction<bool> IListable.OnToggle => null;
+
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         return

@@ -49,7 +49,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         name = this.recipe.Name;
 
         displayImage = transform.Find(displayImageAddress)?.GetComponent<Image>();
-        displayImage.sprite = loader.PirateIcon;
+        //displayImage.sprite = loader.PirateIcon;
         displayImage.enabled = false;
 
         if (recipe.Extension == Constants.PngFileExtension)

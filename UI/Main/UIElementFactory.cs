@@ -5,6 +5,7 @@ using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
+using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.UI.Main;
@@ -24,16 +25,28 @@ public class UIElementFactory
         this.uiInstance = null;
     }
 
+    internal void AddListItemUI(Transform listItem)
+    {
+        var go = GameObject.Instantiate(assetLoader.ListItemUI, listItem);
+        go.name = go.name.DeClone();
+        go.transform.SetAsFirstSibling();
+        go.SetActive(true);
+    }
+
     internal ListItem BuildGeneric(IListable listable, Transform parent, ContextMenu menu)
     {
-        var gameObject = GameObject.Instantiate(assetLoader.OutfitListElement, parent);
+        var gameObject = GameObject.Instantiate(assetLoader.ListItem, parent);
         if (!gameObject) { Log.Error("Failed to instantiate outfit UI prefab."); return null; }
 
-        //listable.Children.ForEach(x => BuildGeneric(x, gameObject.transform, menu));
-
-        return gameObject
+        var result = gameObject
             .AddComponent<ListItem>()
-            .Constructor(listable, menu);
+            .Constructor(listable, menu, AddListItemUI);
+
+        listable.Children
+            .Select(x => BuildGeneric(x, gameObject.transform, menu))
+            .ForEach(result.AttachChild);
+
+        return result;
     }
 
     public OutfitUI BuildOutfitUI(Outfit outfit)

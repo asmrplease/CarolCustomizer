@@ -8,6 +8,8 @@ public class UIAssetLoader : IDisposable
     const string uiContainerAddress = "Assets/Mods/TabUI/Accessory Canvas.prefab";
     const string accessoryButtonAddress = "Assets/Mods/TabUI/Blank Accessory.prefab";
     const string outfitButtonAddress = "Assets/Mods/TabUI/Blank Outfit.prefab";
+    const string listItemAddress = "Assets/Mods/TabUI/ListItem.prefab";
+    const string listItemUIAddress = "Assets/Mods/TabUI/ListItemUI.prefab";
     const string contextMenuAddress = "Assets/Mods/TabUI/Context Menu.prefab";
     const string outfitViewAddress = "Assets/Mods/TabUI/OutfitView.prefab";
     const string materialsViewAddress = "Assets/Mods/TabUI/MaterialsView.prefab";
@@ -15,7 +17,6 @@ public class UIAssetLoader : IDisposable
     const string settingsViewAddress = "Assets/Mods/TabUI/SettingsView.prefab";
     const string filenameDialogueAddress = "Assets/Mods/TabUI/FilenameDialogue 1.prefab";
     const string messageDialogueAddress = "Assets/Mods/TabUI/MessageDialogue.prefab";
-    const string pirateIconAddress = "assets/mods/tabui/pirateicon.png";
     const string eyedropperCursorAddress = "Assets/Mods/TabUI/eyedropper32.png";
     const string customizeNPCAddress = "Assets/Mods/TabUI/Customize NPC.prefab";
 
@@ -35,8 +36,9 @@ public class UIAssetLoader : IDisposable
     public GameObject HairstyleView { get; private set; }
     public GameObject FilenameDialogue { get; private set; }
     public GameObject MessageDialogue { get; private set; }
-    public Sprite PirateIcon { get; private set; }
     public Texture2D CursorTexture { get; private set; }
+    public GameObject ListItem { get; private set; }
+    public GameObject ListItemUI { get; private set; }
 
 
     public UIAssetLoader()
@@ -66,6 +68,8 @@ public class UIAssetLoader : IDisposable
         UIContainer = assetBundle.LoadAsset<GameObject>(uiContainerAddress);
         AccessoryListElement = assetBundle.LoadAsset<GameObject>(accessoryButtonAddress);
         OutfitListElement = assetBundle.LoadAsset<GameObject>(outfitButtonAddress);
+        ListItem = assetBundle.LoadAsset<GameObject>(listItemAddress);
+        ListItemUI = assetBundle.LoadAsset<GameObject>(listItemUIAddress);
         ContextMenu = assetBundle.LoadAsset<GameObject>(contextMenuAddress);
         OutfitView = assetBundle.LoadAsset<GameObject>(outfitViewAddress);
         MaterialsView = assetBundle.LoadAsset<GameObject>(materialsViewAddress);
@@ -73,9 +77,10 @@ public class UIAssetLoader : IDisposable
         SettingsView = assetBundle.LoadAsset<GameObject>(settingsViewAddress);
         FilenameDialogue = assetBundle.LoadAsset<GameObject>(filenameDialogueAddress);
         MessageDialogue = assetBundle.LoadAsset<GameObject>(messageDialogueAddress);
-        PirateIcon = assetBundle.LoadAsset<Sprite>(pirateIconAddress);
         CursorTexture = assetBundle.LoadAsset<Texture2D>(eyedropperCursorAddress);
         CustomizeNPC = assetBundle.LoadAsset<GameObject>(customizeNPCAddress);
         ContextMenuButton = ContextMenu.transform.GetChild(0).gameObject;
+
+        ListItem.SetActive(false);
     }
 }
