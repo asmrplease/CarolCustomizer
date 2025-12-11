@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 namespace CarolCustomizer.Models.Recipes;
-public partial record Recipe : ISourceAwaiter
+public partial record Recipe
 {
     public readonly string Name;
     public readonly string Path;
@@ -106,4 +106,10 @@ public partial record Recipe : IContextMenuActions
     {
         throw new NotImplementedException();
     }
+}
+
+public partial record Recipe : IPath
+{
+    string IPath.Path => this.Path;
+    PathType IPath.Type => PathType.Filesystem;
 }

@@ -51,6 +51,11 @@ internal class NewOutfitListUI : MonoBehaviour
         //use reflection to check which interfaces the object implements, and generate any child objects based off of it
     }
 
+    void HandleDirectorySetup(string directoryPath)
+    {
+        //create listable for the directory
+    }
+
     void HandleOutfitLoaded(Outfit outfit)
     {
         if (outfits.ContainsKey(outfit.Descriptor)) { Log.Error($"OutfitListUI was asked to instantiate {outfit.Descriptor}, but a matching outfit is already in the list."); return; }

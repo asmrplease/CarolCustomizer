@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using CarolCustomizer.Utils;
-using CarolCustomizer.Assets;
 using CarolCustomizer.Models.Recipes;
 using UnityEngine;
 using BepInEx;
