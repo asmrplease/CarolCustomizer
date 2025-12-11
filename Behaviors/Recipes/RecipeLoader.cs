@@ -58,7 +58,7 @@ public static class RecipeLoader
 
     public struct ValidationResults 
     { 
-        public Recipe.Status Status; 
+        public RecipeFile.Status Status; 
         public RecipeDescriptor Recipe; 
         public string Json;
         public IEnumerable<AccessoryDescriptor> MissingAccs;
@@ -102,7 +102,7 @@ public static class RecipeLoader
         (string, RichPng) idk;
         var results = new ValidationResults 
         { 
-            Status = Recipe.Status.NoError, 
+            Status = RecipeFile.Status.NoError, 
             Recipe = null, 
             MissingAccs = [], 
             MissingSources = [] 
@@ -112,31 +112,31 @@ public static class RecipeLoader
         catch (Exception e)
         {
             Log.Error(e.StackTrace);
-            results.Status = Recipe.Status.FileError; return results;
+            results.Status = RecipeFile.Status.FileError; return results;
         }
         var json = idk.Item1 ??= "";
         if (idk.Item2 is not null) results.Png = idk.Item2;
         json = json.Trim();
         var tup = Deserialize(json);
         if (tup.Item1) results.Recipe = tup.Item2;
-        else {results.Status = Recipe.Status.InvalidJson; return results; }
+        else {results.Status = RecipeFile.Status.InvalidJson; return results; }
 
         bool slow = SceneResourceProvider
             .CheckMaterialsReady(RecipeApplier.GetWorldMats(results.Recipe))
             .Any();
-        if (slow) results.Status = Recipe.Status.SlowSource;
+        if (slow) results.Status = RecipeFile.Status.SlowSource;
 
         try
         {
             results.MissingSources = RecipeApplier.GetMissingSources(results.Recipe);
             if (results.MissingSources.Any())
-            { results.Status = Recipe.Status.Incomplete; }
+            { results.Status = RecipeFile.Status.Incomplete; }
 
             results.MissingAccs = RecipeApplier.GetRemovedAccessories(results.Recipe);
             if (results.MissingAccs.Any())
-            { results.Status |= Recipe.Status.Incomplete; }
+            { results.Status |= RecipeFile.Status.Incomplete; }
         }
-        catch { results.Status = Recipe.Status.Incomplete; }
+        catch { results.Status = RecipeFile.Status.Incomplete; }
         return results;
     }
 }

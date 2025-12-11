@@ -88,7 +88,7 @@ public class RecipeListUI : MonoBehaviour
                     kvp.Key.Contains(search, System.StringComparison.OrdinalIgnoreCase)));
     }
 
-    public void OnRecipeCreated(Recipe newRecipe)
+    public void OnRecipeCreated(RecipeFile newRecipe)
     {
         Log.Debug("RecipeListUI.OnRecipeCreated");
         if (recipeUIs.ContainsKey(newRecipe.Path)) return;
@@ -108,7 +108,7 @@ public class RecipeListUI : MonoBehaviour
         recipeUI.transform.SetSiblingIndex(recipeUIs.IndexOfKey(newRecipe.Path));
     }
 
-    public void OnRecipeDeleted(Recipe removedRecipe)
+    public void OnRecipeDeleted(RecipeFile removedRecipe)
     {
         if (!recipeUIs.TryGetValue(removedRecipe.Path, out var ui)) { Log.Warning("tried to remove non-existant recipe ui element."); return; }
 

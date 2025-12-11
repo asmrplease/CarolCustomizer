@@ -105,7 +105,7 @@ public class NPCManager
         var recipes = recipesManager
             .Recipes
             .Where(x => 
-                x.Error == Recipe.Status.NoError
+                x.Error == RecipeFile.Status.NoError
                 && x.Name != Constants.AutoSave)
             .Select(x => (x.Name, x.Descriptor));
         var outfits = OutfitAssetManager.GetAllRecipes();

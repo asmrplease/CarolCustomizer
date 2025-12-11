@@ -1,12 +1,23 @@
 ﻿namespace CarolCustomizer.Contracts;
 
-internal interface IPath
+public interface IPath
 {
+    PathDescriptor PathDescriptor { get; }
+}
+
+public record PathDescriptor
+{
+    public PathDescriptor(string path, PathType type)
+    {
+        Path = path;
+        Type = type;
+    }
+
     string Path { get; }
     PathType Type { get; }
 }
 
-internal enum PathType
+public enum PathType
 {
     Filesystem = 0,
     Scene = 1,

@@ -42,14 +42,14 @@ public class AutoSaver
         CCPlugin.CoroutineRunner.StartCoroutine(LoadRecipeRoutine(recipe));
     }
 
-    IEnumerator LoadRecipeRoutine(Recipe recipeFile)
+    IEnumerator LoadRecipeRoutine(RecipeFile recipeFile)
     {
         if (!outfitManager.pelvis) yield return new WaitUntil(() => outfitManager.pelvis);
         RecipeDescriptor recipe;
 
         if (recipeFile is null
-            || recipeFile.Error == Recipe.Status.FileError
-            || recipeFile.Error == Recipe.Status.InvalidJson
+            || recipeFile.Error == RecipeFile.Status.FileError
+            || recipeFile.Error == RecipeFile.Status.InvalidJson
             || !recipeFile.Descriptor.ActiveAccessories.Any())
         {
             Log.Warning("Loading pyjamas instead of autosave");

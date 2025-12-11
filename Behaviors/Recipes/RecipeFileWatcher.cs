@@ -14,19 +14,19 @@ namespace CarolCustomizer.Behaviors.Recipes;
 public class RecipeFileWatcher : IDisposable
 {
     readonly FileSystemWatcher watcher;
-    readonly Dictionary<string, Recipe> recipes = [];
-    public List<Recipe> AllRecipes => recipes.Values.ToList();
+    readonly Dictionary<string, RecipeFile> recipes = [];
+    public List<RecipeFile> AllRecipes => recipes.Values.ToList();
 
-    public event Action<Recipe> OnRecipeCreated;
-    public event Action<Recipe> OnRecipeDeleted;
+    public event Action<RecipeFile> OnRecipeCreated;
+    public event Action<RecipeFile> OnRecipeDeleted;
 
-    public IEnumerable<Recipe> Recipes => recipes.Values;
+    public IEnumerable<RecipeFile> Recipes => recipes.Values;
 
-    public Recipe GetRecipeByFilename(string name)
+    public RecipeFile GetRecipeByFilename(string name)
     {
         string address = RecipeSaver.RecipeFilenameToPath(name);
         Log.Debug($"address: {address}");
-        recipes.TryGetValue(address, out Recipe recipe); 
+        recipes.TryGetValue(address, out RecipeFile recipe); 
         return recipe;
     }
 
@@ -72,7 +72,7 @@ public class RecipeFileWatcher : IDisposable
         {
             var ext = Path.GetExtension(path).ToLower();
             if (ext != Constants.JsonFileExtension && ext != Constants.PngFileExtension) continue;
-            OnRecipeFileCreated(new Recipe(path));
+            OnRecipeFileCreated(new RecipeFile(path));
             yield return null;
         }
     }
@@ -84,7 +84,7 @@ public class RecipeFileWatcher : IDisposable
         Log.Debug("sync load autosaves");
         var autosaves = RecipeLoader.GetRecipeFilePaths()
             .Where(x => x.Contains(Constants.AutoSave))
-            .Select(x => new Recipe(x))
+            .Select(x => new RecipeFile(x))
             .ForEach(OnRecipeFileCreated);
         Log.Debug("yield load recipes");
         var rest = RecipeLoader.GetRecipeFilePaths()
@@ -92,7 +92,7 @@ public class RecipeFileWatcher : IDisposable
             .ToList();
         foreach (var path in rest)
         {
-            OnRecipeFileCreated(new Recipe(path));
+            OnRecipeFileCreated(new RecipeFile(path));
             yield return null;
         }
     }
@@ -100,17 +100,17 @@ public class RecipeFileWatcher : IDisposable
     public void RefreshSlow()
     {
         var slow = recipes
-            .Where(x => x.Value.Error == Recipe.Status.SlowSource)
+            .Where(x => x.Value.Error == RecipeFile.Status.SlowSource)
             .ToList();
         foreach (var entry in slow)
         {
             OnRecipeDeleted?.Invoke(entry.Value);
             recipes.Remove(entry.Key);
-            OnRecipeFileCreated(new Recipe(entry.Key));
+            OnRecipeFileCreated(new RecipeFile(entry.Key));
         }
     }
 
-    void OnRecipeFileCreated(Recipe newRecipe)
+    void OnRecipeFileCreated(RecipeFile newRecipe)
     {
         Log.Debug($"OnRecipeFileCreated({newRecipe.Name})");
         recipes[newRecipe.Path] = newRecipe;
@@ -121,7 +121,7 @@ public class RecipeFileWatcher : IDisposable
                 OnRecipeCreated?.Invoke(newRecipe));
     }
 
-    void OnRecipeFileRemoved(Recipe removedRecipe)
+    void OnRecipeFileRemoved(RecipeFile removedRecipe)
     {
         Log.Debug($"OnRecipeFileRemoved({removedRecipe.Name})");
         recipes.Remove(removedRecipe.Path);
@@ -136,7 +136,7 @@ public class RecipeFileWatcher : IDisposable
         var ext = Path.GetExtension(e.FullPath).ToLower();
         if (ext != Constants.JsonFileExtension && ext != Constants.PngFileExtension) return;
         Log.Debug("HandleRecipeFileCreated");
-        var newRecipe = new Recipe(e.FullPath);
+        var newRecipe = new RecipeFile(e.FullPath);
         OnRecipeFileCreated(newRecipe);
     }
 
@@ -148,7 +148,7 @@ public class RecipeFileWatcher : IDisposable
         OnRecipeFileRemoved(recipes[e.FullPath]);
         if (!File.Exists(e.FullPath)) return;
 
-        OnRecipeFileCreated(new Recipe(e.FullPath));
+        OnRecipeFileCreated(new RecipeFile(e.FullPath));
     }
     void HandleRecipeFileRemoved(object source, FileSystemEventArgs e)
     {

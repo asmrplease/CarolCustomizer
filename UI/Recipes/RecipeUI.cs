@@ -24,7 +24,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     static readonly string outfitNameAddress = "Outfit Header/Text/Outfit Name";
     static readonly string pickupLocationAddress = "Outfit Header/Text/Pickup Location";
 
-    Recipe recipe;
+    RecipeFile recipe;
     Main.ContextMenu contextMenu;
     FilenameDialogue filenameDialogue;
     MessageDialogue messageDialogue;
@@ -35,7 +35,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     Text pickupLocation;
 
     public void Constructor(
-        Recipe recipe,
+        RecipeFile recipe,
         UIAssetLoader loader,
         Main.ContextMenu contextMenu,
         FilenameDialogue filenameDialogue,
@@ -78,10 +78,10 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     {
         return recipe.Error switch
         {
-            Recipe.Status.Incomplete    => $"Missing {recipe.MissingSources.Count()} sources, {recipe.MissingAccessories.Count()} accs",
-            Recipe.Status.SlowSource    => $"{SceneResourceProvider.CheckMaterialsReady(RecipeApplier.GetWorldMats(recipe.Descriptor)).Count()} scenes required.",
-            Recipe.Status.InvalidJson   => "Recipe data invalid",
-            Recipe.Status.FileError     => "Error loading file",
+            RecipeFile.Status.Incomplete    => $"Missing {recipe.MissingSources.Count()} sources, {recipe.MissingAccessories.Count()} accs",
+            RecipeFile.Status.SlowSource    => $"{SceneResourceProvider.CheckMaterialsReady(RecipeApplier.GetWorldMats(recipe.Descriptor)).Count()} scenes required.",
+            RecipeFile.Status.InvalidJson   => "Recipe data invalid",
+            RecipeFile.Status.FileError     => "Error loading file",
             _ => "",
         };
     }
@@ -90,10 +90,10 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     {
         return recipe.Error switch
         {
-            Recipe.Status.Incomplete => Constants.DefaultColor,
-            Recipe.Status.SlowSource    => Constants.DefaultColor.RGBMultiplied(0.5f),
-            Recipe.Status.InvalidJson   => Color.gray,
-            Recipe.Status.FileError     => Color.gray,
+            RecipeFile.Status.Incomplete => Constants.DefaultColor,
+            RecipeFile.Status.SlowSource    => Constants.DefaultColor.RGBMultiplied(0.5f),
+            RecipeFile.Status.InvalidJson   => Color.gray,
+            RecipeFile.Status.FileError     => Color.gray,
             _ => Constants.DefaultColor,
         };
     }
@@ -111,7 +111,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     void OnContextMenuWarningLoad()
     {
         string message = string.Empty;
-        if (recipe.Error == Recipe.Status.Incomplete)
+        if (recipe.Error == RecipeFile.Status.Incomplete)
         {
             if (recipe.MissingSources.Any())
             {
@@ -125,7 +125,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             }
             
         }
-        if (recipe.Error == Recipe.Status.SlowSource)
+        if (recipe.Error == RecipeFile.Status.SlowSource)
         {
             message = "The following scenes will be loaded in the background to provide materials:" + Environment.NewLine; ;
             var mats = RecipeApplier.GetWorldMats(recipe.Descriptor);
@@ -163,13 +163,13 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     void OnContextMenuListMissing()
     {
         string message = string.Empty;
-        if (recipe.Error == Recipe.Status.Incomplete)
+        if (recipe.Error == RecipeFile.Status.Incomplete)
         {
             var missingSources = RecipeApplier.GetMissingSources(recipe.Descriptor);
             foreach (var source in missingSources) { message += source + Environment.NewLine; }
             foreach (var acc in recipe.MissingAccessories) { message += acc + Environment.NewLine; }
         }
-        if (recipe.Error == Recipe.Status.SlowSource)
+        if (recipe.Error == RecipeFile.Status.SlowSource)
         {
             var mats = RecipeApplier.GetWorldMats(recipe.Descriptor);
             var unloadedScenes = SceneResourceProvider.CheckMaterialsReady(mats);
@@ -223,7 +223,7 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     public List<(string, UnityAction)> GetContextMenuItems()
     {
         var output = new List<(string, UnityAction)>();
-        if (recipe.Error == Recipe.Status.NoError)
+        if (recipe.Error == RecipeFile.Status.NoError)
         {
             PlayerInstances.ValidPlayers
                 .ForEach(player =>
@@ -237,29 +237,29 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             if (recipe.Name.Contains(Constants.AutoSave, StringComparison.CurrentCultureIgnoreCase))
                 return output;
         }
-        if (recipe.Error != Recipe.Status.FileError)
+        if (recipe.Error != RecipeFile.Status.FileError)
         {
             output.Add(("Overwrite", OnContextMenuOverwrite));
             output.Add(("Delete", OnContextMenuDelete));
             output.Add(("Rename", OnContextMenuRename));
             NPCManager.ValidNPCs().ForEach(x => output.Add(($"Set as {x}", () => ApplyToNPC(x))));
         }
-        if (recipe.Error == Recipe.Status.Incomplete || recipe.Error == Recipe.Status.SlowSource)
+        if (recipe.Error == RecipeFile.Status.Incomplete || recipe.Error == RecipeFile.Status.SlowSource)
         {
             output.Add(("Load*", OnContextMenuWarningLoad));
             output.Add(("Show Missing", OnContextMenuListMissing));
         }
         if (recipe.Extension == Constants.JsonFileExtension
-            && recipe.Error == Recipe.Status.NoError)
+            && recipe.Error == RecipeFile.Status.NoError)
         {
             output.Add(("Update to .png", ConvertToPNG));
         }
         if (recipe.Extension == Constants.PngFileExtension
-            && recipe.Error != Recipe.Status.FileError)
+            && recipe.Error != RecipeFile.Status.FileError)
         {
             output.Add(("Show in Explorer", ShowInExplorer));
         }
-        if (recipe.Error == Recipe.Status.FileError)
+        if (recipe.Error == RecipeFile.Status.FileError)
         {
             output.Add(("Ignore", () => Destroy(this.gameObject)));
         }

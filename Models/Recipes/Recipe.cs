@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 namespace CarolCustomizer.Models.Recipes;
-public partial record Recipe
+public partial record RecipeFile
 {
     public readonly string Name;
     public readonly string Path;
@@ -25,7 +25,7 @@ public partial record Recipe
     public readonly RichPng Png;
     public event Action OnStatusChanged;
 
-    public Recipe(string path)
+    public RecipeFile(string path)
     {
         Path = path;
         Name = System.IO.Path.GetFileNameWithoutExtension(Path);
@@ -53,7 +53,7 @@ public partial record Recipe
     }
 }
 
-public partial record Recipe : ISourceAwaiter
+public partial record RecipeFile : ISourceAwaiter
 {
     void ISourceAwaiter.HandleSourceLoaded(SourceDescriptor source)
     {
@@ -71,7 +71,7 @@ public partial record Recipe : ISourceAwaiter
 
 }
 
-public partial record Recipe : IListable
+public partial record RecipeFile : IListable
 {
     Sprite IListable.Thumbnail => throw new NotImplementedException();
 
@@ -93,14 +93,14 @@ public partial record Recipe : IListable
     }
 }
 
-public partial record Recipe : IRecipe
+public partial record RecipeFile : IRecipe
 {
     string IRecipe.Name => this.Name;
     RecipeDescriptor IRecipe.RecipeData => this.Descriptor;
     Sprite IRecipe.Thumbnail => throw new NotImplementedException();//convert png to sprite here?
 }
 
-public partial record Recipe : IContextMenuActions
+public partial record RecipeFile : IContextMenuActions
 {
     List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
     {
@@ -108,8 +108,7 @@ public partial record Recipe : IContextMenuActions
     }
 }
 
-public partial record Recipe : IPath
+public partial record RecipeFile : IPath
 {
-    string IPath.Path => this.Path;
-    PathType IPath.Type => PathType.Filesystem;
+    PathDescriptor IPath.PathDescriptor => new(this.Path, PathType.Filesystem);
 }
