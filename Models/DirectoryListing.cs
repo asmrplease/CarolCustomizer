@@ -9,16 +9,16 @@ using UnityEngine.Events;
 
 namespace CarolCustomizer.Models;
 
-internal partial class DirectoryListing
+internal partial class DirectoryListing 
 {
-    public readonly string DirectoryPath;
+    public readonly PathDescriptor DirectoryPath;
     public readonly Sprite Thumbnail;
     public readonly string DisplayName;
-    public DirectoryListing(string directoryPath)
+    public DirectoryListing(PathDescriptor pathDescriptor)
     {
-        this.DirectoryPath = directoryPath;
+        this.DirectoryPath = pathDescriptor;
         this.Thumbnail = FindSprite();
-        this.DisplayName = directoryPath.Split(Path.PathSeparator).Last();
+        this.DisplayName = this.DirectoryPath.Path.Split(Path.PathSeparator).Last();
         
     }
 
@@ -30,13 +30,18 @@ internal partial class DirectoryListing
     }
 }
 
+internal partial class DirectoryListing : IPath
+{
+    PathDescriptor IPath.PathDescriptor => this.DirectoryPath;
+}
+
 internal partial class DirectoryListing : IListable
 {
     Sprite IListable.Thumbnail => this.Thumbnail;
 
     string IListable.Header => this.DisplayName;
 
-    string IListable.Subheader => this.DirectoryPath;
+    string IListable.Subheader => this.DirectoryPath.Path;
 
     Color IListable.BaseColor => Constants.DefaultColor;
 

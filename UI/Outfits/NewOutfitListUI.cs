@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Contracts;
+using CarolCustomizer.Models;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
@@ -18,6 +19,7 @@ internal class NewOutfitListUI : MonoBehaviour
     ////Dictionary<SourceDescriptor, ListItem<IAccessorySource>> accSources = [];
     Dictionary<SourceDescriptor, ListItem> outfits = [];
     Dictionary<SourceDescriptor, IGenericSource> sources = [];
+    Dictionary<PathDescriptor, ListItem> directories = [];
     //Dictionary<SourceDescriptor, ListItem<AccessoryDescriptor>> accessories = [];
     //Dictionary<SourceDescriptor, ListItem<MaterialDescriptor>> materials = [];
     //Dictionary<SourceDescriptor, ListItem<Recipe>> recipes = [];
@@ -51,9 +53,15 @@ internal class NewOutfitListUI : MonoBehaviour
         //use reflection to check which interfaces the object implements, and generate any child objects based off of it
     }
 
-    void HandleDirectorySetup(string directoryPath)
+    ListItem HandleDirectorySetup(PathDescriptor path)
     {
+        if (directories.TryGetValue(path, out var existing)) { return existing; }
         //create listable for the directory
+        var directory = new DirectoryListing(path);
+        var listItem = factory.BuildGeneric(directory, this.listRoot, this.contextMenu);
+        directories[path] = listItem;
+        return listItem;
+        
     }
 
     void HandleOutfitLoaded(Outfit outfit)
@@ -65,5 +73,9 @@ internal class NewOutfitListUI : MonoBehaviour
 
         element.gameObject.SetActive(true);
         outfits.Add(outfit.Descriptor, element);
+        if (outfit is not IPath path) { return; }
+
+        var parent = HandleDirectorySetup(path.PathDescriptor);
+        element.ParentTo(parent);
     }
 }

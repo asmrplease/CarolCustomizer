@@ -92,7 +92,9 @@ internal class ListItem : MonoBehaviour, IPointerClickHandler
 
     public void ParentTo(ListItem parent)
     {
-        this.parent = parent;        
+        this.parent = parent;
+        parent.AttachChild(this);
+        this.transform.parent = parent.transform;
     }
 
     public void AttachChild(ListItem child)

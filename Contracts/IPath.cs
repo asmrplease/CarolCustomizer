@@ -13,8 +13,8 @@ public record PathDescriptor
         Type = type;
     }
 
-    string Path { get; }
-    PathType Type { get; }
+    public string Path { get; }
+    public PathType Type { get; }
 }
 
 public enum PathType
