@@ -5,23 +5,24 @@ using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace CarolCustomizer.Models.Accessories;
-public class StoredHair : AccessoryDescriptor, IGenericSource, IInstantiable
+public partial class StoredHair : AccessoryDescriptor
 {
     public readonly string AssetName;
     public readonly string DisplayName;
     public readonly Hairstyle hairstyle;
     public readonly SkinnedMeshRenderer smr;
     readonly List<Transform> BespokeBones;
-    List<MagicaCloth> boneCloths = [];
-    List<MagicaCloth> meshCloths = [];
+    readonly List<MagicaCloth> boneCloths = [];
+    readonly List<MagicaCloth> meshCloths = [];
 
     SourceDescriptor ISourceDescriptor.Descriptor => this.Source;
-    AccessoryDescriptor IInstantiable.Descriptor => this;
 
     public StoredHair(Hairstyle hairstyle) :
         base(hairstyle.name, new SourceDescriptor(hairstyle.name, SourceType.Hair))
@@ -49,12 +50,10 @@ public class StoredHair : AccessoryDescriptor, IGenericSource, IInstantiable
             .Where(x => x.SerializeData.clothType == ClothProcess.ClothType.BoneCloth)
             .ForEach(boneCloths.Add);
     }
+}
 
-    public LiveAccessory MakeLive(SkeletonManager skeleton, Transform folder)
-    {
-        return new LiveAccessory(this, folder);
-    }
-
+public partial class StoredHair : IGenericSource
+{
     List<StoredAccessory> IModelProvider.GetAccessories() => [];
 
     StoredAccessory IModelProvider.GetAccessory(AccessoryDescriptor accessory)
@@ -84,11 +83,46 @@ public class StoredHair : AccessoryDescriptor, IGenericSource, IInstantiable
     ModelData IConfigProvider.GetConfiguration() => null;
 
     List<MagicaCapsuleCollider> IMagicaProvider.GetColliders() => [];
-
     IInstantiable IModelProvider.GetInstantiable(AccessoryDescriptor accessory)
     {
         //if (accessory != this) return null;
 
         return this;
+    }
+}
+
+public partial class StoredHair : IInstantiable
+{
+    AccessoryDescriptor IInstantiable.Descriptor => this;
+    public LiveAccessory MakeLive(SkeletonManager skeleton, Transform folder)
+    {
+        return new LiveAccessory(this, folder);
+    }
+}
+
+public partial class StoredHair : IListable
+{
+    Sprite IListable.Thumbnail => this.hairstyle.visual;
+
+    string IListable.Header => this.DisplayName;
+
+    string IListable.Subheader => "Hairstyle";
+
+    Color IListable.BaseColor => Constants.DefaultColor;
+
+    Color IListable.HighlightColor => Constants.Highlight;
+
+    IEnumerable<IListable> IListable.Children => [];
+
+    UnityAction<bool> IListable.OnToggle => null;
+
+    bool IListable.Filter<T>(Predicate<T> predicate)
+    {
+        throw new NotImplementedException();
+    }
+
+    List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
+    {
+        throw new NotImplementedException();
     }
 }
