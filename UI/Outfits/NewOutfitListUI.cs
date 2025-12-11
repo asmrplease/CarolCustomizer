@@ -55,10 +55,12 @@ internal class NewOutfitListUI : MonoBehaviour
 
     ListItem HandleDirectorySetup(PathDescriptor path)
     {
+        Log.Debug($"DirectorySetup({path.Path})");
         if (directories.TryGetValue(path, out var existing)) { return existing; }
         //create listable for the directory
         var directory = new DirectoryListing(path);
         var listItem = factory.BuildGeneric(directory, this.listRoot, this.contextMenu);
+        listItem.gameObject.SetActive(true);
         directories[path] = listItem;
         return listItem;
         
@@ -71,7 +73,7 @@ internal class NewOutfitListUI : MonoBehaviour
         var element = factory.BuildGeneric(outfit, this.listRoot, this.contextMenu);
         if (!element) { Log.Error("UIElementFactory failed to provide a UI element."); return; }
 
-        element.gameObject.SetActive(true);
+        //element.gameObject.SetActive(true);
         outfits.Add(outfit.Descriptor, element);
         if (outfit is not IPath path) { return; }
 

@@ -18,8 +18,9 @@ internal partial class DirectoryListing
     {
         this.DirectoryPath = pathDescriptor;
         this.Thumbnail = FindSprite();
-        this.DisplayName = this.DirectoryPath.Path.Split(Path.PathSeparator).Last();
-        
+        this.DisplayName = this.DirectoryPath.Path
+            .Split("Onirism")
+            .Last();
     }
 
     Sprite FindSprite()
@@ -41,7 +42,7 @@ internal partial class DirectoryListing : IListable
 
     string IListable.Header => this.DisplayName;
 
-    string IListable.Subheader => this.DirectoryPath.Path;
+    string IListable.Subheader => "Folder";
 
     Color IListable.BaseColor => Constants.DefaultColor;
 
@@ -64,14 +65,3 @@ internal partial class DirectoryListing : IListable
         //delete
     }
 }
-
-//how do we connect this to the files that have been loaded?
-//if each object we're adding to the UI has a path element, we could match or lookup the path
-//game assets could have mock paths, such as their source descriptor, asset type, scene, etc
-//dividing game sources
-    //hair
-    //outfits
-    //accessories
-    //scenes
-//while making the top level separation by scene might eb simple and make sense from a programming perspective
-//sorting by type would make more sense for the player, especially beginners

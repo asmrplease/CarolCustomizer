@@ -1,13 +1,15 @@
-﻿using CarolCustomizer.Models.Accessories;
+﻿using CarolCustomizer.Contracts;
+using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using static System.Linq.Enumerable;
 
 namespace CarolCustomizer.Models.Outfits;
-public class HaDSOutfit : Outfit
+public partial class HaDSOutfit : Outfit
 {
     #region ModelData Handling 
     //public override Sprite Thumbnail => modelData.portraitShop;
@@ -109,4 +111,9 @@ public class HaDSOutfit : Outfit
         return results.Where(x=>x.Value).Select(x=>x.Key).ToList();
     }
     #endregion
+}
+
+public partial class HaDSOutfit : IPath
+{
+    PathDescriptor IPath.PathDescriptor => new("Outfits", PathType.Convenience);
 }
