@@ -5,6 +5,7 @@ using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
+using Slate.ActionClips;
 using System.Linq;
 using UnityEngine;
 
@@ -33,7 +34,7 @@ public class UIElementFactory
         go.SetActive(true);
     }
 
-    internal ListItem BuildGeneric(IListable listable, Transform parent, ContextMenu menu)
+    internal ListItem BuildGeneric(IListable listable, Transform parent, ContextMenu menu, bool visible = true)
     {
         var gameObject = GameObject.Instantiate(assetLoader.ListItem, parent);
         if (!gameObject) { Log.Error("Failed to instantiate outfit UI prefab."); return null; }
@@ -41,11 +42,10 @@ public class UIElementFactory
         var result = gameObject
             .AddComponent<ListItem>()
             .Constructor(listable, menu, AddListItemUI);
-
+        result.gameObject.SetActive(visible);
         listable.Children
-            .Select(x => BuildGeneric(x, gameObject.transform, menu))
-            .ForEach(result.AttachChild);
-
+            .Select(x => BuildGeneric(x, gameObject.transform, menu, false))
+            .ForEach(x => x.ParentTo(result));
         return result;
     }
 

@@ -79,7 +79,7 @@ public partial class MaterialDescriptor : IListable
 
     string IListable.Header => this.Name;
 
-    string IListable.Subheader => "";
+    string IListable.Subheader => this.referenceMaterial is null? "" : this.referenceMaterial.shader.GetName();
 
     Color IListable.BaseColor => Constants.DefaultColor;
 

@@ -63,7 +63,7 @@ public class UIInstance : MonoBehaviour
             .Constructor();
         var outfitView = Instantiate(loader.OutfitView, viewRoot)
             .AddComponent<NewOutfitListUI>()
-            .Constructor(factory, contextMenu);
+            .Constructor(factory, recipeFileWatcher, contextMenu);
         var recipesView = Instantiate(loader.RecipesView, viewRoot)
             .AddComponent<RecipeListUI>()
             .Constructor(loader, recipeFileWatcher, contextMenu, messageDialogue);

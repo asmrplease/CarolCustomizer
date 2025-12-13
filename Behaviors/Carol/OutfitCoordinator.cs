@@ -40,8 +40,12 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
     public void DisableAllEffects() => effectManager.DisableAllEffects();
     public void SetConfiguration(SourceDescriptor source) => effectManager.SetConfiguration(source);
     public void SetColliderSource(SourceDescriptor source) => magicaManager.SetColliderSource(source);
-    public void EnableAccessory(AccessoryDescriptor accessory) => accessoryManager.EnableAccessory(accessory);
-    public void DisableAccessory(AccessoryDescriptor accessory) => accessoryManager.DisableAccessory(accessory);
+    public void SetAccessory(AccessoryDescriptor accessory, bool state)
+    {
+        if (state) accessoryManager.EnableAccessory(accessory);
+        if (!state) accessoryManager.DisableAccessory(accessory);
+    }
+    
     public MaterialDescriptor[] GetLiveMaterials(AccessoryDescriptor accessory) => accessoryManager?.GetLiveMaterials(accessory);
     public void HandleNewPelvis(PelvisWatchdog watchdog) => this.pelvis = watchdog;
 

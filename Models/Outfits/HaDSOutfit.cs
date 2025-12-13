@@ -4,7 +4,6 @@ using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using static System.Linq.Enumerable;
 
@@ -17,8 +16,6 @@ public partial class HaDSOutfit : Outfit
     public override ModelData GetConfiguration() => modelData;
     public ModelData modelData { get; protected set; }
     public HairData hairData { get; protected set; }
-
-    public Dictionary<string, RecipeDescriptor> Variants { get; private set; } = new();
 
     public HaDSOutfit(Transform storedAsset) : base(storedAsset)
     {
@@ -45,13 +42,14 @@ public partial class HaDSOutfit : Outfit
         {
             if (compData.coopToggles.Count() == 0)
             {
-                Variants[modelData.accessories[i].name] = BuildRecipe(i, -1);
+                string idk = modelData.accessories[i].name;
+                this.Variants[idk] = new Recipe(idk, BuildRecipe(i, -1), this.Thumbnail);
                 continue;
             }
             foreach (int j in Range(0, compData.coopMeshes.Count()))
             {
                 string variantName = $"P({j + 1}) {modelData.accessories[i].name}";
-                Variants[variantName] = BuildRecipe(i, j);
+                this.Variants[variantName] = new Recipe(variantName, BuildRecipe(i, j), this.Thumbnail);
             }
         }
     }

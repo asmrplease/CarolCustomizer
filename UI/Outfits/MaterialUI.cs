@@ -76,7 +76,7 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
     void SetMaterial(MaterialDescriptor material)
     {
         Log.Debug("MatUI SetMaterial!");
-        OutfitListUI.TargetOutfit.EnableAccessory(accessoryUI.accessory);
+        OutfitListUI.TargetOutfit.SetAccessory(accessoryUI.accessory, true);
         OutfitListUI.TargetOutfit.PaintAccessory(accessoryUI.accessory, material, index);
     }
 

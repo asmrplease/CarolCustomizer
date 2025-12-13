@@ -57,7 +57,7 @@ public class AutoSaver
             recipe = outfit
                 .Variants
                 .ElementAt(playerIndex)
-                .Value;
+                .Value.Descriptor;
         }
         else 
         { 

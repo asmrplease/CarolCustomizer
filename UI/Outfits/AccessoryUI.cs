@@ -119,8 +119,7 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
     {
         outfitUI.OnAccessoryToggled();
 
-        if (state) OutfitListUI.TargetOutfit.EnableAccessory(accessory);
-        else OutfitListUI.TargetOutfit.DisableAccessory(accessory);
+        OutfitListUI.TargetOutfit.SetAccessory(accessory, state);
     }
 
     public List<(string, UnityAction)> GetContextMenuItems() => accessory.GetContextMenuItems();

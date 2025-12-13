@@ -248,11 +248,11 @@ public class OutfitListUI : MonoBehaviour
 
         var existingHair = OutfitListUI.TargetOutfit.ActiveAccessories
             .Where(x => x.Source.Type == Models.SourceType.Hair)
-            .ForEach(OutfitListUI.TargetOutfit.DisableAccessory);
+            .ForEach(x => OutfitListUI.TargetOutfit.SetAccessory(x, false));
         if (modelIndex >= hairstyles.Count()) return;
 
         var model = hairstyles.Values[modelIndex];
-        OutfitListUI.TargetOutfit.EnableAccessory(model);
+        OutfitListUI.TargetOutfit.SetAccessory(model, true);
         OutfitListUI.TargetOutfit.PaintAccessory(model, matDesc, model.hairstyle.mainMaterialIndex);
     }
 

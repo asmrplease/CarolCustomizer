@@ -2,6 +2,7 @@
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
+using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.UI.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
@@ -10,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Rendering;
 
 namespace CarolCustomizer.Models.Outfits;
 
@@ -24,9 +24,8 @@ public partial class Outfit
 
     protected Dictionary<AccessoryDescriptor, StoredAccessory> AccDict = [];
     public HashSet<MaterialDescriptor> MaterialDescriptors { get; private set; } = [];
-    public readonly List<RecipeDescriptor> recipes = [];
     List<OutfitEffect> Effects = [];
-
+    public Dictionary<string, Recipe> Variants { get; private set; } = [];
 
     public PelvisWatchdog prefabWatchdog { get; protected set; }
     public BoneData boneData => prefabWatchdog.BoneData;
@@ -185,15 +184,12 @@ public partial class Outfit : IListable
         get
         {
             List<IListable> results = [];
-            //this.MaterialDescriptors
-            //    .Select(x => new MutableMaterial(x))
-            //    .ForEach(results.Add);
             this.GetAccessories()
                 .Select(x => new MutableModel(x))
                 .ForEach(results.Add);
-            //results.AddRange(this.MaterialDescriptors);
-            //results.AddRange(this.GetAccessories());
-            //results.AddRange(this.recipes);
+            results.AddRange(this.Variants.Values);
+            this.MaterialDescriptors
+                .ForEach(results.Add);
             return results;
         }
     }

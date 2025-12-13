@@ -123,7 +123,7 @@ public class OutfitAssetManager : IDisposable
     {
         return outfitSets.Values
             .SelectMany(sourceDict => sourceDict.Values)
-            .SelectMany(outfit => outfit.Variants.Select(kvp => (outfit.DisplayName, kvp.Value)));
+            .SelectMany(outfit => outfit.Variants.Select(kvp => (outfit.DisplayName, kvp.Value.Descriptor)));
     }
 
     public void Dispose() { if (liveFolder.gameObject) GameObject.Destroy(liveFolder.gameObject); }

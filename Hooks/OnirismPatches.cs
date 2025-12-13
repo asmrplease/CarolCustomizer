@@ -49,7 +49,7 @@ public static class OnirismPatches
             if (recipe is null) { Log.Error($"Failed to find any recipes in outfit {modelData.name}"); return false; }
             RecipeApplier.ActivateRecipe(
                 player.outfitManager,
-                recipe);
+                recipe.Descriptor);
             return false;
         }
     }

@@ -183,7 +183,7 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         };
         hads.Variants
             .ForEach(tup =>
-                results.Add(($"Load: {tup.Key}", () => RecipeApplier.ActivateRecipe(target, tup.Value))));
+                results.Add(($"Load: {tup.Key}", () => RecipeApplier.ActivateRecipe(target, tup.Value.Descriptor))));
         return results;
     }
     #endregion

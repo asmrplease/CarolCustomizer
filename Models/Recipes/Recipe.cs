@@ -1,10 +1,7 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Contracts;
-using CarolCustomizer.Models.Accessories;
-using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
-using PngHelper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,78 +9,40 @@ using UnityEngine;
 using UnityEngine.Events;
 
 namespace CarolCustomizer.Models.Recipes;
-public partial record RecipeFile
+public partial record Recipe
 {
     public readonly string Name;
-    public readonly string Path;
-    public readonly string Extension;
-    public Status Error;
     public readonly RecipeDescriptor Descriptor;
-    public readonly string Json;
-    public readonly List<AccessoryDescriptor> MissingAccessories;
-    public readonly HashSet<SourceDescriptor> MissingSources;
-    public readonly RichPng Png;
-    public event Action OnStatusChanged;
-
-    public RecipeFile(string path)
+    public readonly Sprite Thumbnail;
+    public Recipe(string name, RecipeDescriptor recipe, Sprite thumbnail)
     {
-        Path = path;
-        Name = System.IO.Path.GetFileNameWithoutExtension(Path);
-        Extension = System.IO.Path.GetExtension(Path);
-        var results = RecipeLoader.ValidateRecipeFile(Path);
-        Error = results.Status;
-        Descriptor = results.Recipe;
-        Json = results.Json;
-        MissingSources = results.MissingSources.ToHashSet();
-        MissingAccessories = results.MissingAccs.ToList();
-        Png = results.Png;
-        results.MissingSources
-            .ToList()
-            .ForEach(x => SourceAwaiter.Register(x, this));
-    }
-
-    [Flags]
-    public enum Status
-    {
-        NoError = 0,
-        Incomplete = 1,
-        SlowSource = 2,
-        InvalidJson = 4,
-        FileError = 8,
+        this.Name = name;
+        this.Descriptor = recipe;
+        this.Thumbnail = thumbnail;
     }
 }
 
-public partial record RecipeFile : ISourceAwaiter
+public partial record Recipe : IRecipe
 {
-    void ISourceAwaiter.HandleSourceLoaded(SourceDescriptor source)
-    {
-        MissingSources.Remove(source);
-        if (MissingSources.Any()) return;
-
-        bool slow = SceneResourceProvider
-            .CheckMaterialsReady(RecipeApplier.GetWorldMats(this.Descriptor))
-            .Any();
-        if (this.Error == Status.Incomplete) this.Error = Status.NoError;
-        if (this.Error == Status.NoError && slow) this.Error = Status.SlowSource;
-
-        OnStatusChanged?.Invoke();
-    }
+    string IRecipe.Name => this.Name;
+    RecipeDescriptor IRecipe.RecipeData => this.Descriptor;
+    Sprite IRecipe.Thumbnail => this.Thumbnail;
 
 }
 
-public partial record RecipeFile : IListable
+public partial record Recipe : IListable
 {
-    Sprite IListable.Thumbnail => throw new NotImplementedException();
+    Sprite IListable.Thumbnail => this.Thumbnail;
 
     string IListable.Header => this.Name;
 
-    string IListable.Subheader => this.Error.ToString();
+    string IListable.Subheader => "";
 
     Color IListable.BaseColor => Constants.DefaultColor;
 
     Color IListable.HighlightColor => Constants.Highlight;
 
-    IEnumerable<IListable> IListable.Children => throw new NotImplementedException();//sources, accessories, materials
+    IEnumerable<IListable> IListable.Children => [];//sources, accessories, materials?
 
     UnityAction<bool> IListable.OnToggle => null;
 
@@ -91,24 +50,20 @@ public partial record RecipeFile : IListable
     {
         throw new NotImplementedException();
     }
-}
 
-public partial record RecipeFile : IRecipe
-{
-    string IRecipe.Name => this.Name;
-    RecipeDescriptor IRecipe.RecipeData => this.Descriptor;
-    Sprite IRecipe.Thumbnail => throw new NotImplementedException();//convert png to sprite here?
-}
-
-public partial record RecipeFile : IContextMenuActions
-{
     List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
     {
-        throw new NotImplementedException();
+        var output = new List<(string, UnityAction)>();
+        PlayerInstances.ValidPlayers
+                .ForEach(player =>
+                    output.Add(
+                        ($"Load on P{player.playerIndex + 1}"
+                        , () => RecipeApplier.ActivateRecipe(player.outfitManager, this.Descriptor))));
+        if (PlayerInstances.ValidPlayers.Count() == 0)
+        {
+            output.Add(("Load", () => RecipeApplier.ActivateRecipe(PlayerInstances.DefaultPlayer.outfitManager, this.Descriptor)));
+        }
+        //if (this.Name.Contains(Constants.AutoSave, StringComparison.CurrentCultureIgnoreCase))
+        return output;
     }
-}
-
-public partial record RecipeFile : IPath
-{
-    PathDescriptor IPath.PathDescriptor => new(this.Path, PathType.Filesystem);
 }

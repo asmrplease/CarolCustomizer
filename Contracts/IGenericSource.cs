@@ -27,7 +27,7 @@ public interface IMaterialProvider : ISourceDescriptor
     List<MaterialDescriptor> GetMaterials();
 }
 
-public interface IEffectProvider : ISourceDescriptor
+public interface IEffectProvider : ISourceDescriptor, IBoneProvider
 {
     List<OutfitEffect> GetEffects();
 }

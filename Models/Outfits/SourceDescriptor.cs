@@ -1,10 +1,9 @@
-﻿using JetBrains.Annotations;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 
 namespace CarolCustomizer.Models.Outfits;
 
-public record SourceDescriptor : IEquatable<SourceDescriptor>, IComparable<SourceDescriptor>
+public record SourceDescriptor 
 {
     public string Name;
     public SourceType Type;
@@ -22,17 +21,5 @@ public record SourceDescriptor : IEquatable<SourceDescriptor>, IComparable<Sourc
     public override string ToString()
     {
         return $"SD:{Type}-{Name}";
-    }
-
-    public int CompareTo(SourceDescriptor other)
-    {
-        //TODO: this comparison doesn't use the DisplayName of the outfits. 
-        string thisName = LocalizationIndex.GetLine(this.Name);
-        string thatName = LocalizationIndex.GetLine(other.Name);
-
-        int comparison = thisName.CompareTo(thatName);
-        if (comparison != 0) return comparison;
-
-        return this.Name.CompareTo(other.Name);
     }
 }

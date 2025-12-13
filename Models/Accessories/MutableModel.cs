@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Contracts;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
 using System;
@@ -18,7 +19,7 @@ internal partial class MutableModel
     {
         this.target = target;
         this.materials = target.Materials
-            .Select(x => new MutableMaterial(x))
+            .Select((x, i) => new MutableMaterial(x, target, i))
             .ToList();
     }
 }
@@ -38,7 +39,7 @@ internal partial class MutableModel : IListable
 
     public IEnumerable<IListable> Children => this.materials;
 
-    public UnityAction<bool> OnToggle => (idk) => Log.Debug($"Toggle to state:{idk}");
+    public UnityAction<bool> OnToggle => (visible) => PlayerInstances.DefaultPlayer.outfitManager.SetAccessory(this.target, visible);
 
     public bool Filter<T>(Predicate<T> predicate)
     {

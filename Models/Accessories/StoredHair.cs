@@ -41,6 +41,9 @@ public partial class StoredHair : AccessoryDescriptor
         this.BespokeBones = [boneCopy];
         this.BespokeBones.ForEach(x => x.transform.localScale = Vector3.one);
         this.smr = hairstyle.model as SkinnedMeshRenderer;
+        this.Materials = this.smr.materials
+            .Select(x => new MaterialDescriptor(x, this.Source))
+            .ToArray();
         var magicas = hairstyle.transform.root
             .GetComponentsInChildren<MagicaCloth>();
         magicas
@@ -100,6 +103,11 @@ public partial class StoredHair : IInstantiable
     }
 }
 
+public partial class StoredHair : IPath
+{
+    PathDescriptor IPath.PathDescriptor => new("Hairstyles", PathType.Convenience);
+} 
+
 public partial class StoredHair : IListable
 {
     Sprite IListable.Thumbnail => this.hairstyle.visual;
@@ -112,7 +120,7 @@ public partial class StoredHair : IListable
 
     Color IListable.HighlightColor => Constants.Highlight;
 
-    IEnumerable<IListable> IListable.Children => [];
+    IEnumerable<IListable> IListable.Children => [new MutableModel(this)];
 
     UnityAction<bool> IListable.OnToggle => null;
 

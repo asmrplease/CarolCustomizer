@@ -32,7 +32,7 @@ public static class RecipeApplier
     static void SetAccessory(OutfitCoordinator target, AccessoryDescriptor acc)
     {
         Log.Debug($"Setting accessory {acc.Source}:{acc.Name}");
-        target.EnableAccessory(acc);
+        target.SetAccessory(acc, true);
         acc
             .Materials
             .Select((mat, index) => (mat, index))

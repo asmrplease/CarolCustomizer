@@ -19,7 +19,7 @@ internal partial class DirectoryListing
         this.DirectoryPath = pathDescriptor;
         this.Thumbnail = FindSprite();
         this.DisplayName = this.DirectoryPath.Path
-            .Split("Onirism")
+            .Split("Onirism\\")
             .Last();
     }
 

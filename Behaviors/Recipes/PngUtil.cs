@@ -1,7 +1,10 @@
-﻿using CarolCustomizer.Utils;
+﻿using CarolCustomizer.Contracts;
+using CarolCustomizer.Models.Recipes;
+using CarolCustomizer.Utils;
 using PngHelper;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Behaviors.Recipes;
@@ -42,6 +45,12 @@ public class PngUtil
         return array;   
     }
 
+    public static Sprite BuildSprite(RichPng png)
+    {
+        var (dimensions, compressedData) = png.CompressedFrames[0];
+        return PngUtil.BuildSprite(dimensions, compressedData);
+    }
+
     public static Sprite BuildSprite(IDimension dimensions, byte[] compressedData)
     {
         var width = (int)dimensions.Width;
@@ -59,6 +68,18 @@ public class PngUtil
             new Rect(0, 0, thumbnail.width, thumbnail.height),
             new Vector2(0.5f, 0.5f)
         );
+    }
+
+    public static List<Recipe> ReadRecipes(RichPng png)
+    {
+        var frames = png.CompressedFrames
+            .Select(tup => BuildSprite(tup.Item1, tup.Item2));
+        var results = png.Keywords
+            .Where(kvp => kvp.Key.Contains("RecipeData"))
+            .Select(kvp => (name: kvp.Key.Replace("Data", ""), recipe: RecipeLoader.Deserialize(kvp.Value).Item2))
+            .Zip(frames, (tup, frame) => new Recipe(tup.name, tup.recipe, frame))
+            .ToList();
+        return results;
     }
 
     //public static void AddMetadata(string origFilename, string key, string value)

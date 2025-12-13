@@ -1,4 +1,7 @@
-﻿using CarolCustomizer.Contracts;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors;
+using CarolCustomizer.Contracts;
+using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
@@ -10,23 +13,33 @@ namespace CarolCustomizer.Models.Materials;
 internal partial class MutableMaterial
 {
     public readonly MaterialDescriptor DefaultMaterial;
+    public readonly (AccessoryDescriptor, int) Model;
     public MaterialDescriptor ActiveMaterial { get; private set; }
 
-    public MutableMaterial(MaterialDescriptor target)
+    public MutableMaterial(MaterialDescriptor target, AccessoryDescriptor model, int index)
     {
         this.DefaultMaterial = target;
         this.ActiveMaterial = target;
+        this.Model = (model, index);
     }
 
     public void SetMaterial(MaterialDescriptor newMaterial)
     {
         this.ActiveMaterial = newMaterial;
+        PlayerInstances.DefaultPlayer.outfitManager
+            .PaintAccessory(this.Model.Item1, this.ActiveMaterial, this.Model.Item2);
+        OnChange?.Invoke();
     }
 
     public void ResetMaterial()
     {
-        this.ActiveMaterial = DefaultMaterial;
+        SetMaterial(this.DefaultMaterial);
     }
+}
+
+internal partial class MutableMaterial : IUpdateable
+{
+    public Action OnChange {  get; set; }
 }
 
 internal partial class MutableMaterial : IListable
@@ -56,8 +69,8 @@ internal partial class MutableMaterial : IListable
     {
         var results = def.GetContextMenuItems();
         results.AddRange(act.GetContextMenuItems());
-        results.Add(("Paste Material", () => { }));
-        results.Add(("Reset Material", () => { }));
+        results.Add(("Paste Material", () => this.SetMaterial(MaterialManager.clipboard)));
+        results.Add(("Reset Material", () => this.ResetMaterial()));
         return results;
     }
 }
