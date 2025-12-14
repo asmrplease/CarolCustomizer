@@ -85,14 +85,7 @@ public partial class MaterialDescriptor : IListable
 
     Color IListable.HighlightColor => Constants.Highlight;
 
-    bool IListable.Filter<T>(Predicate<T> predicate)
-    {
-        throw new NotImplementedException();
-    }
-
     IEnumerable<IListable> IListable.Children => [];
-
-    UnityAction<bool> IListable.OnToggle => null;
 
     public List<(string, UnityAction)> GetContextMenuItems()
     {

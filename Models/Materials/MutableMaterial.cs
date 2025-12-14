@@ -25,6 +25,8 @@ internal partial class MutableMaterial
 
     public void SetMaterial(MaterialDescriptor newMaterial)
     {
+        if (newMaterial == ActiveMaterial) return;
+
         this.ActiveMaterial = newMaterial;
         PlayerInstances.DefaultPlayer.outfitManager
             .PaintAccessory(this.Model.Item1, this.ActiveMaterial, this.Model.Item2);
@@ -57,13 +59,6 @@ internal partial class MutableMaterial : IListable
     Color IListable.HighlightColor => Constants.Highlight;
 
     IEnumerable<IListable> IListable.Children => def.Children;
-
-    UnityAction<bool> IListable.OnToggle => def.OnToggle;
-
-    bool IListable.Filter<T>(Predicate<T> predicate)
-    {
-        return def.Filter(predicate) || act.Filter(predicate);
-    }
 
     List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
     {

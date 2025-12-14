@@ -48,11 +48,6 @@ public partial record CCHairDye : IListable
     Color IListable.BaseColor => Constants.DefaultColor;
     Color IListable.HighlightColor => Constants.Highlight;
     IEnumerable<IListable> IListable.Children => [];
-    UnityAction<bool> IListable.OnToggle => null;
-    bool IListable.Filter<T>(Predicate<T> predicate)
-    {
-        throw new NotImplementedException();
-    }
 
     List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
     {

@@ -44,13 +44,6 @@ public partial record Recipe : IListable
 
     IEnumerable<IListable> IListable.Children => [];//sources, accessories, materials?
 
-    UnityAction<bool> IListable.OnToggle => null;
-
-    bool IListable.Filter<T>(Predicate<T> predicate)
-    {
-        throw new NotImplementedException();
-    }
-
     List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
     {
         var output = new List<(string, UnityAction)>();

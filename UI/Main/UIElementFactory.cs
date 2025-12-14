@@ -34,7 +34,7 @@ public class UIElementFactory
         go.SetActive(true);
     }
 
-    internal ListItem BuildGeneric(IListable listable, Transform parent, ContextMenu menu, bool visible = true)
+    internal ListItem BuildGeneric(IListable listable, Transform parent, ContextMenu menu, bool visible)
     {
         var gameObject = GameObject.Instantiate(assetLoader.ListItem, parent);
         if (!gameObject) { Log.Error("Failed to instantiate outfit UI prefab."); return null; }
@@ -43,9 +43,6 @@ public class UIElementFactory
             .AddComponent<ListItem>()
             .Constructor(listable, menu, AddListItemUI);
         result.gameObject.SetActive(visible);
-        listable.Children
-            .Select(x => BuildGeneric(x, gameObject.transform, menu, false))
-            .ForEach(x => x.ParentTo(result));
         return result;
     }
 

@@ -1,9 +1,8 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Contracts;
+using CarolCustomizer.Events;
 using CarolCustomizer.Models;
-using CarolCustomizer.Models.Materials;
-using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
@@ -22,8 +21,12 @@ internal class NewOutfitListUI : MonoBehaviour
     Transform listRoot;
     Dictionary<PathDescriptor, ListItem> directories = [];
     Dictionary<IListable, ListItem> listList = [];
+    List<ListItem> topList = [];
 
-    public NewOutfitListUI Constructor(UIElementFactory factory, RecipeFileWatcher recipeWatcher, Main.ContextMenu contextMenu)
+    public NewOutfitListUI Constructor(
+        UIElementFactory factory, 
+        RecipeFileWatcher recipeWatcher, 
+        Main.ContextMenu contextMenu)
     {
         this.factory = factory;
         this.contextMenu = contextMenu;
@@ -33,9 +36,9 @@ internal class NewOutfitListUI : MonoBehaviour
             .AddComponent<FilterUI>()
             .Constructor();
 
-        OutfitAssetManager.OnOutfitLoaded += this.HandleListable;
+        OutfitAssetManager.OnOutfitLoaded += this.HandleTopList;
         OutfitAssetManager.OnHairLoaded += HandleHairLoaded;
-        recipeWatcher.OnRecipeCreated += HandleListable;
+        recipeWatcher.OnRecipeCreated += HandleTopList;
         filter.FilterChanged += HandleFilterChanged;
 
         return this;
@@ -43,42 +46,62 @@ internal class NewOutfitListUI : MonoBehaviour
 
     void HandleHairLoaded((List<Models.Accessories.StoredHair>, List<Onirism.Gameplay.HairDye>) obj)
     {
-        obj.Item1.ForEach(HandleListable);
-        if (OutfitAssetManager.HairDyes is not HairDyeSource dyeSource) { return; }
-        
-        HandleListable(dyeSource);
+        obj.Item1.ForEach(HandleTopList);
+        HandleTopList(OutfitAssetManager.HairDyes);
     }
 
-    void HandleFilterChanged(Events.UIFilterChangedEvent filterEvent)
+    void HandleFilterChanged(UIFilterChangedEvent e)
     {
-        //outfits.Values.ForEach(ui => ui.OnFilterEvent(outfit => filterEvent.Filter(outfit)));
-        //outfits.Values.ForEach(ui => ui.OnFilterEvent(filterEvent));
+        Log.Debug($"NewOutfitListUI.HandleFilterChanged({e.AnyFilters})");
+        if (e.AnyFilters)
+        {
+            listList.Values
+            .Select(x => (ui: x, filter: x as IFilterable<UIFilterChangedEvent>))
+            .ForEach(tup => tup.ui.gameObject.SetActive(tup.filter.MatchesFilter(e)));
+        }
+        else
+        {
+            listList.Values.ForEach(x => x.gameObject.SetActive(false));
+            topList.ForEach(x => x.gameObject.SetActive(true));
+        }
     }
 
-    void HandleListable(IListable listable)
-    {
-        if (listList.TryGetValue(listable, out var existing)) { Log.Warning($"IListable {listable.Header} has already been instantiated"); return; }
+    void HandleTopList(IListable listable) => HandleSubList(listable, true);
 
-        var element = factory.BuildGeneric(listable, this.listRoot, this.contextMenu);
-        if (!element) { Log.Error("UIElementFactory failed to provide a UI element."); return; }
+    ListItem HandleSubList(IListable listable, bool top = false)
+    {
+        if (listList.TryGetValue(listable, out var existing)) { Log.Warning($"IListable {listable.Header} has already been instantiated"); return null; }
+
+        var element = factory.BuildGeneric(listable, this.listRoot, this.contextMenu, top);
+        if (!element) { Log.Error("UIElementFactory failed to provide a UI element."); return null; }
 
         listList[listable] = element;
-        if (listable is not IPath path) return;
+        listable.Children
+            .Select(x => HandleSubList(x))
+            .Where(x => x is not null)
+            .ForEach(x => ListItem.Parent(element, x));
+        if (listable is not IPath path)
+        {
+            if (top) this.topList.Add(element);
+            return element;
+        }
 
-        var parent = HandleDirectorySetup(path.PathDescriptor);
-        element.ParentTo(parent);
+        var parent = HandleDirectorySetup(path);
+        ListItem.Parent(parent, element);
         element.gameObject.SetActive(false);
-        return;
+        return element;
     }
 
-    ListItem HandleDirectorySetup(PathDescriptor path)
+    ListItem HandleDirectorySetup(IPath path) 
     {
-        Log.Debug($"DirectorySetup({path.Path})");
-        if (directories.TryGetValue(path, out var existing)) { return existing; }
-        //create listable for the directory
-        var directory = new DirectoryListing(path);
-        var listItem = factory.BuildGeneric(directory, this.listRoot, this.contextMenu);
-        directories[path] = listItem;
+        Log.Debug($"DirectorySetup({path.PathDescriptor.Path})");
+        if (directories.TryGetValue(path.PathDescriptor, out var existing)) { return existing; }
+
+        var directory = new DirectoryListing(path.PathDescriptor);
+        var listItem = factory.BuildGeneric(directory, this.listRoot, this.contextMenu, true);
+        topList.Add(listItem);
+        directories[path.PathDescriptor] = listItem;
+        listList[directory] = listItem;
         return listItem;
     }
 }

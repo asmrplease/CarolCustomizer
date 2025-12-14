@@ -174,10 +174,6 @@ public partial class Outfit : IListable
     string IListable.Subheader => this.Author;
     Color IListable.BaseColor => Constants.DefaultColor;
     Color IListable.HighlightColor => Constants.Highlight;
-    bool IListable.Filter<T>(Predicate<T> predicate)
-    {
-        throw new NotImplementedException();
-    }
 
     IEnumerable<IListable> IListable.Children 
     { 
@@ -193,8 +189,6 @@ public partial class Outfit : IListable
             return results;
         }
     }
-
-    UnityAction<bool> IListable.OnToggle => null;
 }
 
 public partial class Outfit : IContextMenuActions

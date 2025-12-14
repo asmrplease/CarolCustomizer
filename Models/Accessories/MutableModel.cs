@@ -1,5 +1,7 @@
 ﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
+using CarolCustomizer.Events;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
 using System;
@@ -12,21 +14,65 @@ namespace CarolCustomizer.Models.Accessories;
 
 internal partial class MutableModel
 {
-    AccessoryDescriptor target;
+    AccessoryDescriptor model;
+    bool targetActive = false;
     List<MutableMaterial> materials;
+    OutfitCoordinator targetOutfit;
 
-    public MutableModel(AccessoryDescriptor target)
+    public MutableModel(AccessoryDescriptor model)
     {
-        this.target = target;
-        this.materials = target.Materials
-            .Select((x, i) => new MutableMaterial(x, target, i))
+        this.model = model;
+        this.materials = model.Materials
+            .Select((x, i) => new MutableMaterial(x, model, i))
             .ToList();
+        //hook coordinator change to ui target outfit change
+        HandleCoordinatorChange(PlayerInstances.DefaultPlayer.outfitManager);
+        
+        //how do we connect this object to the target armature?
+        //also how do the materials get handled?
+        //we need a connection to the outfitmanager
+        //when the outfit manager changes state,
+            //reset this object to default
+            //update any objects that are in the current outfit to match the new state
     }
+
+    void HandleCoordinatorChange(OutfitCoordinator coordinator)
+    {
+        if (this.targetOutfit is not null)
+        {
+            this.targetOutfit.AccessoryChanged -= HandleAccChange;
+        }
+        this.targetOutfit = coordinator;
+        this.targetOutfit.AccessoryChanged += HandleAccChange;
+    }
+
+    void HandleAccChange(AccessoryChangedEvent e)
+    {
+        if (e.Target != this.model) return;
+
+        this.targetActive = e.Visible;
+        e.State.Materials
+            .Zip(this.materials, (desc, mut) => (desc, mut))
+            .ForEach(tup => tup.mut.SetMaterial(tup.desc));
+        this.OnChange?.Invoke();
+    }
+
+    void Reset()
+    {
+        this.targetActive = false;
+        this.materials.ForEach(x => x.ResetMaterial());
+    }
+
+}
+
+internal partial class MutableModel : IUpdateable
+{
+    public Action OnChange { get; set; }
 }
 
 internal partial class MutableModel : IListable
 {
-    IListable idk => target as IListable;
+    IListable idk => model as IListable;
     public Sprite Thumbnail => idk.Thumbnail;
 
     public string Header => idk.Header;
@@ -39,8 +85,6 @@ internal partial class MutableModel : IListable
 
     public IEnumerable<IListable> Children => this.materials;
 
-    public UnityAction<bool> OnToggle => (visible) => PlayerInstances.DefaultPlayer.outfitManager.SetAccessory(this.target, visible);
-
     public bool Filter<T>(Predicate<T> predicate)
     {
         throw new NotImplementedException();
@@ -52,5 +96,11 @@ internal partial class MutableModel : IListable
         //add any mutable-only operations here.
         return results;
     }
+}
+
+internal partial class MutableModel : IToggleable
+{
+    public UnityAction<bool> OnToggle => (visible) => PlayerInstances.DefaultPlayer.outfitManager.SetAccessory(this.model, visible);
+    bool IToggleable.ToggleState => this.targetActive;
 }
 

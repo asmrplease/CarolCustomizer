@@ -122,15 +122,5 @@ public partial class StoredHair : IListable
 
     IEnumerable<IListable> IListable.Children => [new MutableModel(this)];
 
-    UnityAction<bool> IListable.OnToggle => null;
-
-    bool IListable.Filter<T>(Predicate<T> predicate)
-    {
-        throw new NotImplementedException();
-    }
-
-    List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
-    {
-        throw new NotImplementedException();
-    }
+    List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems() => [];
 }

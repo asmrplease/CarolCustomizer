@@ -107,14 +107,7 @@ public partial class AccessoryDescriptor : IListable
 
     Color IListable.HighlightColor => Constants.Highlight;
 
-    bool IListable.Filter<T>(Predicate<T> predicate)
-    {
-        throw new NotImplementedException();
-    }
-
     IEnumerable<IListable> IListable.Children => this.Materials;
-
-    UnityAction<bool> IListable.OnToggle => null;
 
     public List<(string, UnityAction)> GetContextMenuItems()
     {

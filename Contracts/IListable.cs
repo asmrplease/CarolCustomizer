@@ -12,12 +12,22 @@ public interface IListable : IContextMenuActions
     string Subheader { get; }
     Color BaseColor { get; }
     Color HighlightColor { get; }
-    bool Filter<T>(Predicate<T> predicate);
     IEnumerable<IListable> Children { get; }
+}
+
+public interface IFilterable<T>
+{
+    bool MatchesFilter(T filterEvent);
+}
+
+public interface IToggleable
+{
     UnityAction<bool> OnToggle { get; }
+    bool ToggleState { get; }
 }
 
 public interface IUpdateable
 {
     Action OnChange { get; set; }
 }
+

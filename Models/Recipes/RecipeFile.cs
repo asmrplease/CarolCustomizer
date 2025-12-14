@@ -98,13 +98,6 @@ public partial record RecipeFile : IListable
     Color IListable.HighlightColor => Constants.Highlight;
 
     IEnumerable<IListable> IListable.Children => this.recipes;//sources, accessories, materials
-
-    UnityAction<bool> IListable.OnToggle => null;
-
-    bool IListable.Filter<T>(Predicate<T> predicate)
-    {
-        throw new NotImplementedException();
-    }
 }
 
 public partial record RecipeFile : IRecipe

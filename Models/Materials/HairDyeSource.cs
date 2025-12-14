@@ -44,13 +44,6 @@ public partial class HairDyeSource : IListable
 
     IEnumerable<IListable> IListable.Children => this.hairDyes.Values;
 
-    UnityAction<bool> IListable.OnToggle => null;
-
-    bool IListable.Filter<T>(Predicate<T> predicate)
-    {
-        throw new NotImplementedException();
-    }
-
     List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
     {
         return [];

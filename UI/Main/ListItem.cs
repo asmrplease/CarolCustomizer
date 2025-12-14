@@ -22,7 +22,7 @@ internal partial class ListItem : MonoBehaviour
     Text subheader;
     Toggle toggle;
     IListable source;
-    ListItem parent;
+    public ListItem parent { get; private set; }
     public int Width { get; private set; } = 240;
     readonly List<ListItem> children = [];
     ContextMenu contextMenu;
@@ -38,7 +38,6 @@ internal partial class ListItem : MonoBehaviour
         this.uiInit = uiInit;
         this.name = $"ListItem({source.GetType().Name}): {source.Header}";
         if (source is IUpdateable dynamic) { dynamic.OnChange += Refresh; }
-
         return this;
     }
 
@@ -62,9 +61,12 @@ internal partial class ListItem : MonoBehaviour
 
     void Refresh() 
     {
+        if (!this.initialized) return;
+
         this.header.text = source.Header;
         this.subheader.text = source.Subheader;
         this.background.color = source.BaseColor;
+
         if (source.Thumbnail is not null)
         {
             this.displayImage.sprite = source.Thumbnail;
@@ -74,11 +76,15 @@ internal partial class ListItem : MonoBehaviour
         {
             this.displayImage.color = new(0,0,0,0);
         }
-        if (source.OnToggle is not null)
+        if (source is IToggleable toggle)
         {
-            this.toggle.onValueChanged.AddListener(source.OnToggle);
+            //Log.Debug($"ListItem({this.header.text}).Refresh() is IToggleable");
+            this.toggle.onValueChanged.RemoveAllListeners();
+            this.toggle.onValueChanged.AddListener(toggle.OnToggle);
+            this.toggle.SetIsOnWithoutNotify(toggle.ToggleState);
             this.toggle.gameObject.SetActive(true);
             this.displayImage.gameObject.SetActive(false);
+            //Log.Debug("toggle setup complete");
         }
         else
         {
@@ -93,24 +99,12 @@ internal partial class ListItem : MonoBehaviour
         this.children.ForEach(x => x.gameObject.SetActive(expanded)); 
     }
 
-    public void OnFilterEvent(UIFilterChangedEvent predicate)
+    public static void Parent(ListItem parent, ListItem child)
     {
-        //this.gameObject.SetActive(source.Filter(predicate));
-    }
-
-    public void ParentTo(ListItem parent)
-    {
-        this.parent = parent;
-        parent.AttachChild(this);
-        this.transform.SetParent(parent.transform);
-        this.Width = parent.Width - 10;
-    }
-
-    public void AttachChild(ListItem child)
-    {
-        if (!child) return;
-
-        this.children.Add(child);
+        child.parent = parent;
+        child.transform.SetParent(parent.transform);
+        child.Width = parent.Width - 10;
+        parent.children.Add(child);
     }
 }
 
@@ -133,3 +127,28 @@ internal partial class ListItem : IPointerClickHandler
         if (eventData.button == PointerEventData.InputButton.Left) { Expand(expanded.Flip()); }
     }
 }
+
+internal partial class ListItem : IFilterable<UIFilterChangedEvent>
+{
+    bool IFilterable<UIFilterChangedEvent>.MatchesFilter(UIFilterChangedEvent e)
+    {
+        if (this.source is null) return false;
+
+        if (this.source is IToggleable toggle)
+        {
+            var state = toggle.ToggleState;
+            if (state) Log.Debug($"Toggle {this.source.Header} is {state}.");
+            if (state) return true;
+        }
+        if (e.HasText)
+        {
+            if (source.Header    is not null && source.Header.Contains(e.Text, StringComparison.InvariantCultureIgnoreCase)) return true;
+            if (source.Subheader is not null && source.Subheader.Contains(e.Text, StringComparison.InvariantCultureIgnoreCase)) return true;
+        } 
+        return false;
+    }
+}
+
+//listitem visibility and relationships
+//setting relationships and having predictable behavior for when a listitem will be displayed is crucial
+//all listitems 
