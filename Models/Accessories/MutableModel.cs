@@ -7,6 +7,7 @@ using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -62,7 +63,32 @@ internal partial class MutableModel
         this.targetActive = false;
         this.materials.ForEach(x => x.ResetMaterial());
     }
+}
 
+
+//the idea here is that if this is the only ui element for an accessory,
+//we would want to be able to look up the ui element for an accessory
+//via a dictionary index with linear time. 
+internal partial class MutableModel : IEquatable<AccessoryDescriptor>
+{
+    public bool Equals(AccessoryDescriptor other)
+    {
+        return ((IEquatable<AccessoryDescriptor>)model).Equals(other);
+    }
+
+    public override bool Equals(object other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        if (other.GetType() == typeof(AccessoryDescriptor)) return Equals((AccessoryDescriptor)other);
+        if (other.GetType() == typeof(MutableModel)) return this.model.Equals(other);
+        return false;
+    }
+
+    public static bool operator ==(MutableModel left, AccessoryDescriptor right) => Equals(left, right);
+    public static bool operator !=(MutableModel left, AccessoryDescriptor right) => !Equals(left, right);
+
+    public override int GetHashCode() => model.GetHashCode();
 }
 
 internal partial class MutableModel : IUpdateable

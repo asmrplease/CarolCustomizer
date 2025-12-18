@@ -89,8 +89,8 @@ public partial class AccessoryDescriptor : IEquatable<AccessoryDescriptor>
 
     public override int GetHashCode()
     {
-        var mats = Materials as IStructuralEquatable;
-        var matsHash = mats.GetHashCode(EqualityComparer<MaterialDescriptor>.Default);
+        //var mats = Materials as IStructuralEquatable;
+        //var matsHash = mats.GetHashCode(EqualityComparer<MaterialDescriptor>.Default);
         unchecked { return Name.DeInstance().GetHashCode() << 12 ^ Source.GetHashCode() << 8; }// ^ matsHash; }
     }
 }

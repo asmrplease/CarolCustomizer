@@ -40,8 +40,15 @@ internal class NewOutfitListUI : MonoBehaviour
         OutfitAssetManager.OnHairLoaded += HandleHairLoaded;
         recipeWatcher.OnRecipeCreated += HandleTopList;
         filter.FilterChanged += HandleFilterChanged;
+        TargetSelectUI.OnCarolSelectionChanged += HandleTargetChanged; ;
+        HandleTargetChanged(PlayerInstances.DefaultPlayer);
 
         return this;
+    }
+
+    private void HandleTargetChanged(Behaviors.Carol.CarolInstance obj)
+    {
+        throw new System.NotImplementedException();
     }
 
     void HandleHairLoaded((List<Models.Accessories.StoredHair>, List<Onirism.Gameplay.HairDye>) obj)
