@@ -1,5 +1,4 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Hooks;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Hooks.Watchdogs.UnhandledArmatures;
 using CarolCustomizer.Utils;

@@ -2,6 +2,7 @@
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 
@@ -16,6 +17,17 @@ public class ActressArmature : MonoBehaviour, ICarolType
         watchdog = GetComponent<PelvisWatchdog>();
         this.watchdog.Behavior = this;
         this.SetBaseVisibility(false);
+        StartCoroutine(DelayedSpawn());
+    }
+
+    IEnumerator DelayedSpawn()
+    {
+        //wait for the end of this frame
+        yield return new WaitForEndOfFrame();
+        //wait for the end of the next frame 
+        yield return new WaitForEndOfFrame();
+        //if the coroutine hasn't been canceled due to object deactivation,
+        //call setup for the actress
         PlayerInstances.DefaultPlayer.NotifySpawned(watchdog);
     }
 
@@ -47,5 +59,5 @@ public class ActressArmature : MonoBehaviour, ICarolType
             .ForEach(x => x.gameObject.SetActive(visibility));
     }
 
-    public void Dispose() => Destroy(this);
+    public void Dispose() { } // => Destroy(this);
 }

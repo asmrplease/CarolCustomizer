@@ -6,7 +6,7 @@ using UnityEngine;
 namespace CarolCustomizer.Hooks.Watchdogs.UnhandledArmatures;
 internal class UnhandledArmature : MonoBehaviour, ICarolType
 {
-    PelvisWatchdog watchdog;
+    protected PelvisWatchdog watchdog;
     public ICarolType Constructor(PelvisWatchdog watchdog)
     {
         Log.Info($"{gameObject.name} has an unhandled behavior type {this.GetType().Name}");
