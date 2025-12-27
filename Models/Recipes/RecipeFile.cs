@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Accessories;
@@ -9,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace CarolCustomizer.Models.Recipes;
 public partial record RecipeFile
@@ -87,7 +87,7 @@ public partial record RecipeFile : ISourceAwaiter
 
 public partial record RecipeFile : IListable
 {
-    Sprite IListable.Thumbnail => ((IRecipe)this.recipes.First()).Thumbnail;
+    Sprite IListable.Thumbnail => ((IRecipe)this.recipes.FirstOrDefault())?.Thumbnail;
 
     string IListable.Header => this.Name;
 
@@ -109,9 +109,16 @@ public partial record RecipeFile : IRecipe
 
 public partial record RecipeFile : IContextMenuActions
 {
-    List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
+    [MenuItem("Load")] void Load() => RecipeApplier.ActivateRecipe(PlayerInstances.DefaultPlayer.outfitManager, this.Descriptor);
+    [MenuItem("Show Dependencies")] void ContextMenuDependencies() { }
+    [MenuItem("Show In Explorer")] void Show() => MiscExtensions.ShowInExplorer(this.Path);
+    [MenuItem("Overwrite")] void ContextMenuOverwrite() { }
+    [MenuItem("Rename")] void ContextMenuRename() { }
+    [MenuItem("Delete")] void ContextMenuDelete() { }
+
+    List<ContextButton> IContextMenuActions.GetContextMenuItems()
     {
-        var output = new List<(string, UnityAction)>();
+        var output = this.AutoMenuItems();
         if (this.Error == RecipeFile.Status.NoError)
         {
             PlayerInstances.ValidPlayers
@@ -119,39 +126,13 @@ public partial record RecipeFile : IContextMenuActions
                     output.Add(
                         ($"Load on P{player.playerIndex + 1}"
                         , () => RecipeApplier.ActivateRecipe(player.outfitManager, this.Descriptor))));
-            if (PlayerInstances.ValidPlayers.Count() == 0)
-            {
-                output.Add(("Load", () => RecipeApplier.ActivateRecipe(PlayerInstances.DefaultPlayer.outfitManager, this.Descriptor)));
-            }
             if (this.Name.Contains(Constants.AutoSave, StringComparison.CurrentCultureIgnoreCase))
                 return output;
         }
-        //if (this.Error != RecipeFile.Status.FileError)
-        //{
-        //    output.Add(("Overwrite", OnContextMenuOverwrite));
-        //    output.Add(("Delete", OnContextMenuDelete));
-        //    output.Add(("Rename", OnContextMenuRename));
-        //    NPCManager.ValidNPCs().ForEach(x => output.Add(($"Set as {x}", () => ApplyToNPC(x))));
-        //}
-        //if (this.Error == RecipeFile.Status.Incomplete || recipe.Error == RecipeFile.Status.SlowSource)
-        //{
-        //    output.Add(("Load*", OnContextMenuWarningLoad));
-        //    output.Add(("Show Missing", OnContextMenuListMissing));
-        //}
-        //if (this.Extension == Constants.JsonFileExtension
-        //    && this.Error == RecipeFile.Status.NoError)
-        //{
-        //    output.Add(("Update to .png", ConvertToPNG));
-        //}
-        //if (this.Extension == Constants.PngFileExtension
-        //    && this.Error != RecipeFile.Status.FileError)
-        //{
-        //    output.Add(("Show in Explorer", ShowInExplorer));
-        //}
-        //if (this.Error == RecipeFile.Status.FileError)
-        //{
-        //    output.Add(("Ignore", () => Destroy(this.gameObject)));
-        //}
+        if (this.Error != RecipeFile.Status.FileError)
+        {
+            //NPCManager.ValidNPCs().ForEach(x => output.Add(($"Set as {x}", () => ApplyToNPC(x))));
+        }
         return output;
     }
 }

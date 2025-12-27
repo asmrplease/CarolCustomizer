@@ -1,14 +1,14 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Models.Recipes;
-using CarolCustomizer.UI.Main;
+using CarolCustomizer.UI.Legacy.Main;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Recipes;
+namespace CarolCustomizer.UI.Legacy.Recipes;
 public class RecipeListUI : MonoBehaviour
 {
     static readonly string listRootAddress = "Scroll View/Viewport/Content";
@@ -51,8 +51,8 @@ public class RecipeListUI : MonoBehaviour
         newRecipeButton = newRecipeButtonGO.GetComponent<Button>();
         newRecipeButton.onClick.AddListener(OnNewSave);
 
-        this.recipesManager.OnRecipeCreated += OnRecipeCreated;
-        this.recipesManager.OnRecipeDeleted += OnRecipeDeleted;
+        RecipeFileWatcher.OnRecipeCreated += OnRecipeCreated;
+        RecipeFileWatcher.OnRecipeDeleted += OnRecipeDeleted;
 
         searchBox = transform
             .Find(searchBoxAddress)
@@ -72,8 +72,8 @@ public class RecipeListUI : MonoBehaviour
     void OnDestroy()
     {
         Log.Debug("ReceiptListUI.OnDestroy()");
-        recipesManager.OnRecipeCreated -= OnRecipeCreated;
-        recipesManager.OnRecipeDeleted -= OnRecipeDeleted;
+        RecipeFileWatcher.OnRecipeCreated -= OnRecipeCreated;
+        RecipeFileWatcher.OnRecipeDeleted -= OnRecipeDeleted;
     }
     
     void OnSearchBoxChanged(string text)
@@ -112,7 +112,7 @@ public class RecipeListUI : MonoBehaviour
     {
         if (!recipeUIs.TryGetValue(removedRecipe.Path, out var ui)) { Log.Warning("tried to remove non-existant recipe ui element."); return; }
 
-        GameObject.Destroy(ui.gameObject);
+        Destroy(ui.gameObject);
         recipeUIs.Remove(removedRecipe.Path);
     }
 

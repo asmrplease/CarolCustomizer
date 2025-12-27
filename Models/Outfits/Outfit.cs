@@ -1,9 +1,10 @@
-﻿using CarolCustomizer.Contracts;
+﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Recipes;
-using CarolCustomizer.UI.Outfits;
+using CarolCustomizer.UI.Legacy.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
 using System;
@@ -193,16 +194,17 @@ public partial class Outfit : IListable
 
 public partial class Outfit : IContextMenuActions
 {
-    public virtual List<(string, UnityAction)> GetContextMenuItems()
+    [MenuItem("Use Animator")] void ApplyAnimator() => OutfitListUI.TargetOutfit.SetAnimator(this.Descriptor);
+    [MenuItem("Use Measurements")] void ApplyMeasurements() => OutfitListUI.TargetOutfit.SetConfiguration(this.Descriptor);
+    [MenuItem("Use Colliders")] void UseColliders() => OutfitListUI.TargetOutfit.SetColliderSource(this.Descriptor);
+
+    public virtual List<ContextButton> GetContextMenuItems()
     {
-        var target = OutfitListUI.TargetOutfit;
-        return
-        [
-             ("Use Animator",     () => target.SetAnimator(this.Descriptor))
-            ,("Use Measurements", () => target.SetConfiguration(this.Descriptor))
-            ,("Use Colliders",    () => target.SetColliderSource(this.Descriptor))
-            ,("Activate Effects", () => target.SetEffect(this.Descriptor, true))
-            ,("Disable Effects",  () => target.SetEffect(this.Descriptor, false))
-        ];
+        var results = this.AutoMenuItems();
+        var target = PlayerInstances.DefaultPlayer.outfitManager;
+        bool effectEnabled = target.ActiveEffects.Contains(this.Descriptor);
+        var message = effectEnabled ? "Disable Effects" : "Enable Effects";
+        results.Add((message, () => target.SetEffect(this.Descriptor, !effectEnabled)));
+        return results;
     }
 }

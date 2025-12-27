@@ -1,5 +1,5 @@
 ﻿using CarolCustomizer.Hooks.Watchdogs;
-using CarolCustomizer.UI.Outfits;
+using CarolCustomizer.UI.Legacy.Outfits;
 using CarolCustomizer.Utils;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Main;
+namespace CarolCustomizer.UI.Legacy.Main;
 public class FilenameDialogue : MonoBehaviour
 {
     static readonly string confirmAddress = "Buttons/Confirm";

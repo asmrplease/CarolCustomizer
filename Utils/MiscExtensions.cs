@@ -3,6 +3,8 @@ using MagicaCloth2;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -14,6 +16,16 @@ namespace CarolCustomizer.Utils;
 /// </summary>
 public static class MiscExtensions
 {
+    public static void ShowInExplorer(string path)
+    {
+        try
+        {
+            string argument = "/select, \"" + path + "\"";
+            Process.Start("explorer.exe", argument);
+        }
+        catch (Win32Exception e) { Log.Error(e.Message); }
+    }
+
     public static string DeClone(this string name)
     {
         return name.Replace("(Clone)", "");

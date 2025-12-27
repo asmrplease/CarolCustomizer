@@ -3,13 +3,14 @@ using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.UI.Outfits;
+using CarolCustomizer.UI.Legacy.Outfits;
+using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using Slate.ActionClips;
 using System.Linq;
 using UnityEngine;
 
-namespace CarolCustomizer.UI.Main;
+namespace CarolCustomizer.UI.Legacy.Main;
 public class UIElementFactory
 {
     UIAssetLoader assetLoader;
@@ -23,12 +24,12 @@ public class UIElementFactory
     public UIElementFactory(UIAssetLoader assetLoader)
     {
         this.assetLoader = assetLoader;
-        this.uiInstance = null;
+        uiInstance = null;
     }
 
     internal void AddListItemUI(Transform listItem)
     {
-        var go = GameObject.Instantiate(assetLoader.ListItemUI, listItem);
+        var go = Object.Instantiate(assetLoader.ListItemUI, listItem);
         go.name = go.name.DeClone();
         go.transform.SetAsFirstSibling();
         go.SetActive(true);
@@ -36,7 +37,7 @@ public class UIElementFactory
 
     internal ListItem BuildGeneric(IListable listable, Transform parent, ContextMenu menu, bool visible)
     {
-        var gameObject = GameObject.Instantiate(assetLoader.ListItem, parent);
+        var gameObject = Object.Instantiate(assetLoader.ListItem, parent);
         if (!gameObject) { Log.Error("Failed to instantiate outfit UI prefab."); return null; }
 
         var result = gameObject
@@ -48,7 +49,7 @@ public class UIElementFactory
 
     public OutfitUI BuildOutfitUI(Outfit outfit)
     {
-        var outfitUIGO = GameObject.Instantiate(assetLoader.OutfitListElement, uiInstance.ListRoot);
+        var outfitUIGO = Object.Instantiate(assetLoader.OutfitListElement, uiInstance.ListRoot);
         if (!outfitUIGO) { Log.Error("Failed to instantiate outfit UI prefab."); return null; }
 
         var outfitUI = outfitUIGO.AddComponent<OutfitUI>();
@@ -62,7 +63,7 @@ public class UIElementFactory
     {
         Outfit outfit = parent.outfit;
         StoredAccessory accessory = outfit.GetAccessory(accessoryDescriptor);
-        var accInstance = GameObject.Instantiate(assetLoader.AccessoryListElement, parent.transform);
+        var accInstance = Object.Instantiate(assetLoader.AccessoryListElement, parent.transform);
         if (!accInstance) { Log.Error("Failed to instantiate accessory UI prefab."); return null; }
 
         var accUI = accInstance.AddComponent<AccessoryUI>();
@@ -74,7 +75,7 @@ public class UIElementFactory
 
     public MaterialUI BuildMatUI(AccessoryUI parent, int matIndex, MaterialDescriptor material)
     {
-        var matInstance = GameObject.Instantiate(assetLoader.AccessoryListElement, parent.transform.parent);
+        var matInstance = Object.Instantiate(assetLoader.AccessoryListElement, parent.transform.parent);
         if (!matInstance) { Log.Error("Failed to instantiate material UI prefab."); return null; }
 
         var matUI = matInstance.AddComponent<MaterialUI>();

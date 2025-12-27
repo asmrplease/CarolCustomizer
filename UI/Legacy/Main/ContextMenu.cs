@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Main;
+namespace CarolCustomizer.UI.Legacy.Main;
 public class ContextMenu : MonoBehaviour
 {
     #region Dependencies
@@ -28,7 +28,7 @@ public class ContextMenu : MonoBehaviour
     {
         this.buttonPrefab = buttonPrefab;
         buttonContainer = transform;
-        this.gameObject.SetActive(false);
+        gameObject.SetActive(false);
         return this;
     }
     #endregion
@@ -39,7 +39,7 @@ public class ContextMenu : MonoBehaviour
         if (menuItems is null) return;
         if (gameObject.activeSelf) { Hide(); }
 
-        foreach ((string name, UnityAction action) in menuItems.GetContextMenuItems())
+        foreach ((string name, System.Action action) in menuItems.GetContextMenuItems())
         {
             GameObject buttonGO = Instantiate(buttonPrefab, buttonContainer);
             if (!buttonGO) { Log.Error("failed to instantiate button prefab."); return; }
@@ -47,7 +47,7 @@ public class ContextMenu : MonoBehaviour
             if (!buttonComponent) { Log.Error("failed to find button component."); return; }
 
             buttonComponent.GetComponentInChildren<Text>(true).text = name;
-            buttonComponent.onClick.AddListener(action);
+            buttonComponent.onClick.AddListener(action.Invoke);
             buttonComponent.onClick.AddListener(Hide);
             buttonList.Add(buttonComponent);
         }

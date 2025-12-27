@@ -1,13 +1,13 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Models.Materials;
-using CarolCustomizer.UI.Main;
+using CarolCustomizer.UI.Legacy.Main;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace CarolCustomizer.UI.Materials;
+namespace CarolCustomizer.UI.Legacy.Materials;
 internal class MaterialsListUI : MonoBehaviour
 {
     private static readonly string listRootAddress = "Scroll View/Viewport/Content";
@@ -25,8 +25,8 @@ internal class MaterialsListUI : MonoBehaviour
     {
         this.loader = loader;
         this.contextMenu = contextMenu;
-        this.eyedropper = this.gameObject.AddComponent<Eyedropper>().Constructor(loader);
-        this.eyedropper.OnMaterialsFound += OnEyedropperChanged;
+        eyedropper = gameObject.AddComponent<Eyedropper>().Constructor(loader);
+        eyedropper.OnMaterialsFound += OnEyedropperChanged;
         SceneResourceProvider.SetCallback();
         SceneResourceProvider.OnMaterialLoaded += OnMaterialBookmarked;
         MenuToggle.OnMenuToggle += HandleMenuToggle;
@@ -36,14 +36,14 @@ internal class MaterialsListUI : MonoBehaviour
 
     void HandleMenuToggle(bool visible)
     {
-        this.eyedropper.enabled = visible;
+        eyedropper.enabled = visible;
     }
 
     void OnEnable()
     {
-        if (!this.eyedropper) return;
+        if (!eyedropper) return;
 
-        this.eyedropper.enabled = true;
+        eyedropper.enabled = true;
     }
 
     private void OnMaterialBookmarked(MaterialDescriptor mat)
@@ -64,7 +64,7 @@ internal class MaterialsListUI : MonoBehaviour
     private void OnEyedropperChanged(List<MaterialDescriptor> materials)
     {
         if (materials is null) return;
-        if (!this.eyedropper.enabled) return;
+        if (!eyedropper.enabled) return;
 
         eyedropperMaterialUIs
             .Where(x => x)
@@ -83,12 +83,12 @@ internal class MaterialsListUI : MonoBehaviour
     void Update()
     {
         if (!Input.GetMouseButtonDown(0)) return;
-        if (this.contextMenu.isActiveAndEnabled) return;
+        if (contextMenu.isActiveAndEnabled) return;
         if (!MenuToggle.IsVisible) return;
         if (EventSystem.current.IsPointerOverGameObject()) return;
 
         Log.Debug("Toggling Eyedropper");
-        this.eyedropper.enabled = !this.eyedropper.enabled;
+        eyedropper.enabled = !eyedropper.enabled;
     }
 
 }

@@ -9,7 +9,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace CarolCustomizer.UI.Main;
+namespace CarolCustomizer.UI.Legacy.Main;
 public class MenuToggle : MonoBehaviour
 {
     #region Dependencies
@@ -148,7 +148,7 @@ public class MenuToggle : MonoBehaviour
         //if we're in any invalid states for opening the menu
         if (!CheckInput()) return;
         if (GameManager.manager.isInCutscene) return;
-        if (Onirism.Ui.UiManager.I.panelStacker.depth > 0) return;
+        if (UiManager.I.panelStacker.depth > 0) return;
 
         GameplaySetMenuState(true);
     }
@@ -172,8 +172,8 @@ public class MenuToggle : MonoBehaviour
         //var cursorState = visible ? CursorLockMode.Confined : CursorLockMode.Locked;
         //Log.Debug($"Set lockstate to {cursorState}");
 
-        if (visible) Onirism.Ui.UiManager.I.panelStacker.Stack(uiInstance.lughPanel, true);
-        if (!visible) Onirism.Ui.UiManager.I.panelStacker.DestackTopmost(true);
+        if (visible) UiManager.I.panelStacker.Stack(uiInstance.lughPanel, true);
+        if (!visible) UiManager.I.panelStacker.DestackTopmost(true);
 
         foreach (GameObject camera in CameraController.cameras)
             camera.GetComponent<CameraController>().enabled = !visible;

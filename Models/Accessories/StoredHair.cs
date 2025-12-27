@@ -5,7 +5,6 @@ using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -121,6 +120,20 @@ public partial class StoredHair : IListable
     Color IListable.HighlightColor => Constants.Highlight;
 
     IEnumerable<IListable> IListable.Children => [new MutableModel(this)];
+}
 
-    List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems() => [];
+public partial class StoredHair : IContextMenuActions
+{
+    [MenuItem("Swap to this Hairstyle")]
+    public void Swap()
+    {
+        //TODO
+        //get current hairstyles
+        //get first hair dye if any
+        //disable all current hairstyles
+        //enable this hairstyle
+        //set hairdye
+    }
+
+    List<ContextButton> IContextMenuActions.GetContextMenuItems() => this.AutoMenuItems();
 }

@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Main;
+namespace CarolCustomizer.UI.Legacy.Main;
 internal class LoadingIndicator : MonoBehaviour
 {
     GameObject indicatorObject;
@@ -30,7 +30,7 @@ internal class LoadingIndicator : MonoBehaviour
         indicatorObject = Instantiate(source.gameObject, uiRoot.parent);
         var outline = indicatorObject.AddComponent<UnityEngine.UI.Outline>();
         var shadow = indicatorObject.GetComponent<Shadow>();
-        this.rect = indicatorObject.GetComponent<RectTransform>();
+        rect = indicatorObject.GetComponent<RectTransform>();
         var image = indicatorObject.GetComponent<Image>();
         Destroy(shadow);
         outline.effectColor = Color.white;

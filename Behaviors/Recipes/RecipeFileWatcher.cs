@@ -6,9 +6,9 @@ using CarolCustomizer.Models.Recipes;
 using UnityEngine;
 using BepInEx;
 using System.Linq;
-using CarolCustomizer.UI.Main;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using CarolCustomizer.UI.Legacy.Main;
 
 namespace CarolCustomizer.Behaviors.Recipes;
 public class RecipeFileWatcher : IDisposable
@@ -17,8 +17,8 @@ public class RecipeFileWatcher : IDisposable
     readonly Dictionary<string, RecipeFile> recipes = [];
     public List<RecipeFile> AllRecipes => recipes.Values.ToList();
 
-    public event Action<RecipeFile> OnRecipeCreated;
-    public event Action<RecipeFile> OnRecipeDeleted;
+    public static event Action<RecipeFile> OnRecipeCreated;
+    public static event Action<RecipeFile> OnRecipeDeleted;
 
     public IEnumerable<RecipeFile> Recipes => recipes.Values;
 

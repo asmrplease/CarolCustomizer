@@ -43,20 +43,20 @@ public partial record Recipe : IListable
     Color IListable.HighlightColor => Constants.Highlight;
 
     IEnumerable<IListable> IListable.Children => [];//sources, accessories, materials?
+}
 
-    List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
+public partial record Recipe : IContextMenuActions
+{
+    [MenuItem("Load")] void Load() => RecipeApplier.ActivateRecipe(PlayerInstances.DefaultPlayer.outfitManager, this.Descriptor);
+
+    List<ContextButton> IContextMenuActions.GetContextMenuItems()
     {
-        var output = new List<(string, UnityAction)>();
+        var output = this.AutoMenuItems();
         PlayerInstances.ValidPlayers
                 .ForEach(player =>
                     output.Add(
                         ($"Load on P{player.playerIndex + 1}"
                         , () => RecipeApplier.ActivateRecipe(player.outfitManager, this.Descriptor))));
-        if (PlayerInstances.ValidPlayers.Count() == 0)
-        {
-            output.Add(("Load", () => RecipeApplier.ActivateRecipe(PlayerInstances.DefaultPlayer.outfitManager, this.Descriptor)));
-        }
-        //if (this.Name.Contains(Constants.AutoSave, StringComparison.CurrentCultureIgnoreCase))
         return output;
     }
 }

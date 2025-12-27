@@ -32,11 +32,6 @@ internal partial class MutableMaterial
             .PaintAccessory(this.Model.Item1, this.ActiveMaterial, this.Model.Item2);
         OnChange?.Invoke();
     }
-
-    public void ResetMaterial()
-    {
-        SetMaterial(this.DefaultMaterial);
-    }
 }
 
 internal partial class MutableMaterial : IUpdateable
@@ -59,13 +54,21 @@ internal partial class MutableMaterial : IListable
     Color IListable.HighlightColor => Constants.Highlight;
 
     IEnumerable<IListable> IListable.Children => def.Children;
+}
 
-    List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
+internal partial class MutableMaterial : IContextMenuActions
+{
+    [MenuItem("Paste Material")]
+    void Paste() => this.SetMaterial(MaterialManager.clipboard);
+
+    [MenuItem("Reset Material")]
+    public void ResetMaterial() => SetMaterial(this.DefaultMaterial);
+
+    List<ContextButton> IContextMenuActions.GetContextMenuItems()
     {
-        var results = def.GetContextMenuItems();
-        results.AddRange(act.GetContextMenuItems());
-        results.Add(("Paste Material", () => this.SetMaterial(MaterialManager.clipboard)));
-        results.Add(("Reset Material", () => this.ResetMaterial()));
+        var results = (def as IContextMenuActions).GetContextMenuItems();
+        results.AddRange((act as IContextMenuActions).GetContextMenuItems());
+        results.AddRange(this.AutoMenuItems());
         return results;
     }
 }

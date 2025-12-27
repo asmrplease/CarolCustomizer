@@ -78,6 +78,7 @@ public static class Constants
     public const string BepInExFolder = "BepInEx";
     public const string PluginsFolder = "plugins";
     public const string UIAssetName = "tabui.ui";
+    public const string UITKAssetName = "uitk.ui";
     public const string LogFileName = "LogOutput.log";
     public const string AssetFolderName = "CarolCustomizer";
     public const string Preferences = "Preferences";
@@ -92,6 +93,7 @@ public static class Constants
     public static readonly string PluginsFolderPath = Path.Combine(BepInExFolderPath, PluginsFolder);
     public static readonly string AssetFolderPath = Path.Combine(PluginsFolderPath, AssetFolderName);
     public static readonly string UIAssetPath = Path.Combine(AssetFolderPath, UIAssetName);
+    public static readonly string UITKAssetPath = Path.Combine(AssetFolderPath, UITKAssetName);
     public static readonly string LogFilePath = Path.Combine(BepInExFolderPath, LogFileName);
     
     public static readonly Vector3 OutOfTheWay = new(-10000, -10000, -10000);

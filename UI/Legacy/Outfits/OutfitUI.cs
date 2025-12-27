@@ -14,7 +14,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Outfits;
+namespace CarolCustomizer.UI.Legacy.Outfits;
 public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
     #region Addresses
@@ -71,10 +71,10 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
     public void Hide()
     {
         Collapse();
-        this.gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 
-    public void Show() => this.gameObject.SetActive(true);
+    public void Show() => gameObject.SetActive(true);
 
     public void Expand() => expanded = ShowAccessoriesWhere(_ => true);
 
@@ -169,11 +169,11 @@ public class OutfitUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             .ForEach(x=>x.accessory.SetFavorite(false));
     }
 
-    public List<(string, UnityAction)> GetContextMenuItems()
+    public List<ContextButton> GetContextMenuItems()
     {
         var hads = outfit as HaDSOutfit; //TODO: idk, but not this
         var target = OutfitListUI.TargetOutfit;
-        var results = new List<(string, UnityAction)>()
+        var results = new List<ContextButton>()
         {
              ("Use Animator",     () => target.SetAnimator(outfit.Descriptor))
             ,("Use Measurements", () => target.SetConfiguration(outfit.Descriptor))

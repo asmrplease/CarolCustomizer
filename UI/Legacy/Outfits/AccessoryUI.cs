@@ -11,7 +11,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Outfits;
+namespace CarolCustomizer.UI.Legacy.Outfits;
 /// <summary>
 /// Represents one Accessory in the UI. 
 /// </summary>
@@ -107,7 +107,7 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
     public void HandleAccessoryChanged(AccessoryChangedEvent eventData)
     {
         Log.Debug("AccUI.HandleAccessoryChanged");
-        this.activationToggle.SetIsOnWithoutNotify(eventData.Visible);
+        activationToggle.SetIsOnWithoutNotify(eventData.Visible);
         eventData.State.Materials
             .Zip(matUIs, (x, y) => (des: x, ui: y))
             .ForEach(tup => tup.ui.UpdateActiveMaterial(tup.des));    
@@ -122,6 +122,6 @@ public class AccessoryUI : MonoBehaviour, IPointerClickHandler, IContextMenuActi
         OutfitListUI.TargetOutfit.SetAccessory(accessory, state);
     }
 
-    public List<(string, UnityAction)> GetContextMenuItems() => accessory.GetContextMenuItems();
+    public List<ContextButton> GetContextMenuItems() => (accessory as IContextMenuActions).GetContextMenuItems();
     #endregion
 }

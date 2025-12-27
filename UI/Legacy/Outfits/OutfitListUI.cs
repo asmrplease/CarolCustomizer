@@ -6,7 +6,7 @@ using CarolCustomizer.Models;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.UI.Main;
+using CarolCustomizer.UI.Legacy.Main;
 using CarolCustomizer.Utils;
 using Onirism.Gameplay;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Outfits;
+namespace CarolCustomizer.UI.Legacy.Outfits;
 public class OutfitListUI : MonoBehaviour
 {
     #region Static Constants
@@ -47,11 +47,11 @@ public class OutfitListUI : MonoBehaviour
     {
         Log.Debug("OutfitListUI.Constructor()");
         this.loader = loader;
-        this.ContextMenu = contextMenu;
-        filter = this.gameObject
+        ContextMenu = contextMenu;
+        filter = gameObject
             .AddComponent<FilterUI>()
             .Constructor();
-        targetSelect = this.gameObject
+        targetSelect = gameObject
             .AddComponent<TargetSelectUI>();
         deselectAll = transform
             .Find(uncheckAllAddress)
@@ -175,7 +175,7 @@ public class OutfitListUI : MonoBehaviour
     void HandleAccessoryChanged(AccessoryChangedEvent e)
     {
         //TODO: make a bulk version of this so we can update the filter faster after the recipe changes/this event
-        if (e.Target.Source.Type == Models.SourceType.Hair) { HandleHairChange(e); return; }
+        if (e.Target.Source.Type == SourceType.Hair) { HandleHairChange(e); return; }
         if (!outfitUIs.TryGetValue(e.Target.Source, out var outfitUI)) { Log.Warning($"{e.Target.Source} is not in UI foutfit list?"); return; }
         
         outfitUI.HandleAccessoryChanged(e);
@@ -246,14 +246,14 @@ public class OutfitListUI : MonoBehaviour
         var dye = hairDyes.Values[dyeIndex];
         var matDesc = new MaterialDescriptor(dye.material, new(Constants.HairDyeSourceName, SourceType.Hair));
 
-        var existingHair = OutfitListUI.TargetOutfit.ActiveAccessories
-            .Where(x => x.Source.Type == Models.SourceType.Hair)
-            .ForEach(x => OutfitListUI.TargetOutfit.SetAccessory(x, false));
+        var existingHair = TargetOutfit.ActiveAccessories
+            .Where(x => x.Source.Type == SourceType.Hair)
+            .ForEach(x => TargetOutfit.SetAccessory(x, false));
         if (modelIndex >= hairstyles.Count()) return;
 
         var model = hairstyles.Values[modelIndex];
-        OutfitListUI.TargetOutfit.SetAccessory(model, true);
-        OutfitListUI.TargetOutfit.PaintAccessory(model, matDesc, model.hairstyle.mainMaterialIndex);
+        TargetOutfit.SetAccessory(model, true);
+        TargetOutfit.PaintAccessory(model, matDesc, model.hairstyle.mainMaterialIndex);
     }
 
     void OnEnable()

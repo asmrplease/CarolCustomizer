@@ -25,19 +25,6 @@ public partial record CCHairDye
         this.MaterialDescriptor = new MaterialDescriptor(source.material, this.SourceDescriptor);
         this.DisplayName = LocalizationIndex.GetLine(source.localizationName);
     }
-
-    void ApplyToOutfit(OutfitCoordinator outfit)
-    {
-        Log.Debug($"CCHairDye({this.DisplayName}).ApplyToOutfit");
-        //foreach hairstyles in current outfit
-        var hair = outfit.ActiveAccessories.Where(x => x.Source.Type == SourceType.Hair);
-        hair
-            .Select(x => OutfitAssetManager.Hairstyles[x.Source])
-            .Select(x => x.hairstyle.mainMaterialIndex)
-            .Zip(hair, (index, hair) => (index, hair))
-            .ForEach(tup => PlayerInstances.DefaultPlayer.outfitManager
-                .PaintAccessory(tup.hair, MaterialDescriptor, tup.index));
-    }
 }
 
 public partial record CCHairDye : IListable
@@ -48,11 +35,28 @@ public partial record CCHairDye : IListable
     Color IListable.BaseColor => Constants.DefaultColor;
     Color IListable.HighlightColor => Constants.Highlight;
     IEnumerable<IListable> IListable.Children => [];
+}
 
-    List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
+public partial record CCHairDye : IContextMenuActions
+{
+    [MenuItem("Apply to Hair")]
+    void ApplyToOutfit()
     {
-        var results = ((IListable)this.MaterialDescriptor).GetContextMenuItems();
-        results.Add(("Apply to Hair", () => this.ApplyToOutfit(PlayerInstances.DefaultPlayer.outfitManager)));
+        Log.Debug($"CCHairDye({this.DisplayName}).ApplyToOutfit");
+        var outfit = PlayerInstances.DefaultPlayer.outfitManager;
+        var hair = outfit.ActiveAccessories.Where(x => x.Source.Type == SourceType.Hair);
+        hair
+            .Select(x => OutfitAssetManager.Hairstyles[x.Source])
+            .Select(x => x.hairstyle.mainMaterialIndex)
+            .Zip(hair, (index, hair) => (index, hair))
+            .ForEach(tup => PlayerInstances.DefaultPlayer.outfitManager
+                .PaintAccessory(tup.hair, MaterialDescriptor, tup.index));
+    }
+
+    List<ContextButton> IContextMenuActions.GetContextMenuItems()
+    {
+        var results = this.MaterialDescriptor.GetContextMenuItems();
+        results.AddRange(this.AutoMenuItems());
         return results;
     }
 }

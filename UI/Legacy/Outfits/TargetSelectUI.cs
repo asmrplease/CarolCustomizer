@@ -1,13 +1,13 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.UI.Main;
+using CarolCustomizer.UI.Legacy.Main;
 using CarolCustomizer.Utils;
 using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Outfits;
+namespace CarolCustomizer.UI.Legacy.Outfits;
 internal class TargetSelectUI : MonoBehaviour
 {
     const string targetSelectAddress = "Target Select";

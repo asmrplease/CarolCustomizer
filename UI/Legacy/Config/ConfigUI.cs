@@ -1,7 +1,7 @@
 ﻿using BepInEx.Configuration;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Settings;
-using CarolCustomizer.UI.Main;
+using CarolCustomizer.UI.Legacy.Main;
 using CarolCustomizer.Utils;
 using System;
 using System.ComponentModel;
@@ -11,7 +11,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Config;
+namespace CarolCustomizer.UI.Legacy.Config;
 public class ConfigUI : MonoBehaviour
 {
     #region Transform Addresses
@@ -44,7 +44,7 @@ public class ConfigUI : MonoBehaviour
     public ConfigUI Constructor(MessageDialogue dialogue)
     {
         Log.Debug("ConfigUI.Constructor()");
-        this.dialoge = dialogue;
+        dialoge = dialogue;
 
         transform.SetupButton(LogFolderButtonAddress, OpenLogFolder);
         transform.SetupButton(ClearFavoritesButtonAddress, ConfirmClearFavorites);
@@ -63,7 +63,7 @@ public class ConfigUI : MonoBehaviour
         {
             string name = Enum.GetName(typeof(NPC), npc);
             var label = $"Customize {name}";
-            var item = GameObject.Instantiate(reference.gameObject, this.transform);
+            var item = Instantiate(reference.gameObject, transform);
             if (!item) { Log.Error($"Failed to instantiate {name}'s config menu entry"); continue; }
 
             item.transform.SetSiblingIndex(siblingIndex);
@@ -145,7 +145,7 @@ public class ConfigUI : MonoBehaviour
         Settings.Plugin.customSummerSlimes.Value = slider;
     }
 
-    private void ShowLevelReloadPopup(object sender, System.EventArgs e)
+    private void ShowLevelReloadPopup(object sender, EventArgs e)
     {
         if (SceneManager.GetActiveScene().name == Constants.MenuSceneName) return;
 

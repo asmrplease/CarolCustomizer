@@ -9,7 +9,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Outfits;
+namespace CarolCustomizer.UI.Legacy.Outfits;
 public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
     #region Static Addresses
@@ -46,8 +46,8 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
         this.ui = ui;
         this.index = index;
         var toggle = transform.Find(toggleAddress).gameObject;
-        GameObject.Destroy(toggle.GetComponent<Toggle>());//TODO: do we need this line???
-        GameObject.Destroy(toggle);
+        Destroy(toggle.GetComponent<Toggle>());//TODO: do we need this line???
+        Destroy(toggle);
         rect = GetComponent<RectTransform>();
         rect.Translate(new Vector3(16, 0, 0));
         rect.sizeDelta = new Vector2(208, 32);
@@ -94,5 +94,5 @@ public class MaterialUI : MonoBehaviour, IPointerClickHandler, IContextMenuActio
 
     void OnContextClick() => ui.ContextMenu.Show(this);
 
-    public List<(string, UnityAction)> GetContextMenuItems() => defaultMaterial.GetContextMenuItems();
+    public List<ContextButton> GetContextMenuItems() => defaultMaterial.GetContextMenuItems();
 }

@@ -6,7 +6,8 @@ using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Hooks;
 using CarolCustomizer.Hooks.Watchdogs;
-using CarolCustomizer.UI.Main;
+using CarolCustomizer.UI.Legacy.Main;
+using CarolCustomizer.UI.UITK;
 using CarolCustomizer.Utils;
 using FaceCam.Behaviors;
 using HarmonyLib;
@@ -38,6 +39,7 @@ public class CCPlugin : BaseUnityPlugin
     HaDSOutfitLoader outfitLoader;
     SaveDataAdjuster saveAdjuster;
     UIAssetLoader uiAssetLoader;
+    UITKAssetLoader uitk;
     SourceAwaiter SourceAwaiter;
     PlayerInstances players;
     Transform folder;
@@ -54,7 +56,14 @@ public class CCPlugin : BaseUnityPlugin
         SourceAwaiter = new();
         Settings.Constructor(Config);
         saveAdjuster = new();
-        uiAssetLoader = new();
+        //uiAssetLoader = new();
+        uitk = new();
+        var ui = new GameObject();
+        ui.transform.SetParent(this.transform);
+        ui.AddComponent<TreeViewManager>()
+            .Constructor(uitk);
+        var context = UITKContextMenu.Constructor(uitk);
+        context.transform.SetParent(this.transform);
         outfitAssetManager = new(folder);
         recipesManager = new(Constants.RecipeFolderPath);
         StartCoroutine(recipesManager.ReloadAll());
@@ -63,10 +72,10 @@ public class CCPlugin : BaseUnityPlugin
         players = new(folder);
         NPCManager.Constructor(folder, recipesManager);
         npcInstances = new(folder);
-        uiInstance = folder
-            .gameObject
-            .AddComponent<UIInstance>()
-            .Constructor(uiAssetLoader, recipesManager);
+        //uiInstance = folder
+        //    .gameObject
+        //    .AddComponent<UIInstance>()
+        //    .Constructor(uiAssetLoader, recipesManager);
         HarmonyInstance = new Harmony("AccessoryModPatch");
         HarmonyInstance.PatchAll();
         SceneManager.sceneLoaded += OnirismPatches.FixTentCutscene;
@@ -122,7 +131,8 @@ public class CCPlugin : BaseUnityPlugin
     {
         Log.Info("Plugin OnDisable()");
         SceneManager.sceneLoaded -= OnirismPatches.FixTentCutscene;
-        uiAssetLoader.Dispose();
+        //uiAssetLoader.Dispose();
+        uitk.Dispose();
         Config.Save();
         HarmonyInstance?.UnpatchSelf();
         Settings.Dispose();

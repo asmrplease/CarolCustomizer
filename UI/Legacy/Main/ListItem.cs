@@ -1,12 +1,14 @@
 ﻿using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Events;
+using CarolCustomizer.UI.Legacy.Main;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using ContextMenu = CarolCustomizer.UI.Legacy.Main.ContextMenu;
 
 namespace CarolCustomizer.UI.Main;
 
@@ -123,7 +125,7 @@ internal partial class ListItem : IPointerClickHandler
 {
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == Settings.HotKeys.ContextMenu) { contextMenu.Show(source); }
+        //if (eventData.button == Settings.HotKeys.ContextMenu) { contextMenu.Show(source); }
         if (eventData.button == PointerEventData.InputButton.Left) { Expand(expanded.Flip()); }
     }
 }

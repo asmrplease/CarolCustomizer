@@ -115,18 +115,21 @@ internal partial class MutableModel : IListable
     {
         throw new NotImplementedException();
     }
-
-    public List<(string, UnityAction)> GetContextMenuItems()
-    {
-        var results = idk.GetContextMenuItems();
-        //add any mutable-only operations here.
-        return results;
-    }
 }
 
 internal partial class MutableModel : IToggleable
 {
     public UnityAction<bool> OnToggle => (visible) => PlayerInstances.DefaultPlayer.outfitManager.SetAccessory(this.model, visible);
     bool IToggleable.ToggleState => this.targetActive;
+}
+
+internal partial class MutableModel : IContextMenuActions
+{
+    public List<ContextButton> GetContextMenuItems()
+    {
+        var results = (model as IContextMenuActions).GetContextMenuItems();
+        //add any mutable-only operations here.
+        return results;
+    }
 }
 

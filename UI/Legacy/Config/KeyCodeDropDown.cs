@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Config;
+namespace CarolCustomizer.UI.Legacy.Config;
 
 public class KeyCodeDropDown : MonoBehaviour
 {

@@ -3,13 +3,14 @@ using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Events;
 using CarolCustomizer.Models;
+using CarolCustomizer.UI.Legacy.Main;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace CarolCustomizer.UI.Outfits;
+namespace CarolCustomizer.UI.Legacy.Outfits;
 
 internal class NewOutfitListUI : MonoBehaviour
 {
@@ -25,20 +26,20 @@ internal class NewOutfitListUI : MonoBehaviour
 
     public NewOutfitListUI Constructor(
         UIElementFactory factory, 
-        RecipeFileWatcher recipeWatcher, 
+        RecipeFileWatcher recipeWatcher,
         Main.ContextMenu contextMenu)
     {
         this.factory = factory;
         this.contextMenu = contextMenu;
         this.recipeWatcher = recipeWatcher;
         listRoot = transform.Find(listRootAddress);
-        this.filter = this.gameObject
+        filter = gameObject
             .AddComponent<FilterUI>()
             .Constructor();
 
-        OutfitAssetManager.OnOutfitLoaded += this.HandleTopList;
+        OutfitAssetManager.OnOutfitLoaded += HandleTopList;
         OutfitAssetManager.OnHairLoaded += HandleHairLoaded;
-        recipeWatcher.OnRecipeCreated += HandleTopList;
+        RecipeFileWatcher.OnRecipeCreated += HandleTopList;
         filter.FilterChanged += HandleFilterChanged;
         TargetSelectUI.OnCarolSelectionChanged += HandleTargetChanged; ;
         HandleTargetChanged(PlayerInstances.DefaultPlayer);
@@ -79,7 +80,7 @@ internal class NewOutfitListUI : MonoBehaviour
     {
         if (listList.TryGetValue(listable, out var existing)) { Log.Warning($"IListable {listable.Header} has already been instantiated"); return null; }
 
-        var element = factory.BuildGeneric(listable, this.listRoot, this.contextMenu, top);
+        var element = factory.BuildGeneric(listable, listRoot, contextMenu, top);
         if (!element) { Log.Error("UIElementFactory failed to provide a UI element."); return null; }
 
         listList[listable] = element;
@@ -89,7 +90,7 @@ internal class NewOutfitListUI : MonoBehaviour
             .ForEach(x => ListItem.Parent(element, x));
         if (listable is not IPath path)
         {
-            if (top) this.topList.Add(element);
+            if (top) topList.Add(element);
             return element;
         }
 
@@ -105,7 +106,7 @@ internal class NewOutfitListUI : MonoBehaviour
         if (directories.TryGetValue(path.PathDescriptor, out var existing)) { return existing; }
 
         var directory = new DirectoryListing(path.PathDescriptor);
-        var listItem = factory.BuildGeneric(directory, this.listRoot, this.contextMenu, true);
+        var listItem = factory.BuildGeneric(directory, listRoot, contextMenu, true);
         topList.Add(listItem);
         directories[path.PathDescriptor] = listItem;
         listList[directory] = listItem;

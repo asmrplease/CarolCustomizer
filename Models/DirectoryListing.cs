@@ -1,8 +1,6 @@
 ﻿using CarolCustomizer.Contracts;
 using CarolCustomizer.Utils;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -49,12 +47,11 @@ internal partial class DirectoryListing : IListable
     Color IListable.HighlightColor => Constants.Highlight;
 
     IEnumerable<IListable> IListable.Children => [];
+}
 
-    List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
-    {
-        throw new NotImplementedException();
-        //rename
-        //overwrite
-        //delete
-    }
+internal partial class DirectoryListing : IContextMenuActions
+{
+    [MenuItem("Show in explorer")] void ShowInExplorer() => MiscExtensions.ShowInExplorer(this.DirectoryPath.Path);
+
+    List<ContextButton> IContextMenuActions.GetContextMenuItems() => this.AutoMenuItems();
 }

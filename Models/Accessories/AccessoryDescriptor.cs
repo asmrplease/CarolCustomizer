@@ -108,19 +108,19 @@ public partial class AccessoryDescriptor : IListable
     Color IListable.HighlightColor => Constants.Highlight;
 
     IEnumerable<IListable> IListable.Children => this.Materials;
+}
 
-    public List<(string, UnityAction)> GetContextMenuItems()
+public partial class AccessoryDescriptor : IContextMenuActions
+{
+    List<ContextButton> IContextMenuActions.GetContextMenuItems()
     {
+        var results = this.AutoMenuItems();
         bool currentlyFavorite = Settings.Favorites.IsInFavorites(this);
-        return  
+        results.AddRange(
         [
             (currentlyFavorite ? "Remove from Favorites" : "Add to favorites",
             () => SetFavorite(!currentlyFavorite))
-        ];
-    }
-
-    List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
-    {
-        throw new NotImplementedException();
+        ]);
+        return results;
     }
 }

@@ -1,10 +1,10 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors;
 using CarolCustomizer.Behaviors.Recipes;
-using CarolCustomizer.UI.Config;
-using CarolCustomizer.UI.Materials;
-using CarolCustomizer.UI.Outfits;
-using CarolCustomizer.UI.Recipes;
+using CarolCustomizer.UI.Legacy.Config;
+using CarolCustomizer.UI.Legacy.Materials;
+using CarolCustomizer.UI.Legacy.Outfits;
+using CarolCustomizer.UI.Legacy.Recipes;
 using CarolCustomizer.Utils;
 using FuseBox.Lugh;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Main;
+namespace CarolCustomizer.UI.Legacy.Main;
 
 public class UIInstance : MonoBehaviour
 {

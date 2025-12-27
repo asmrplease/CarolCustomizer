@@ -4,12 +4,10 @@ using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Recipes;
-using CarolCustomizer.UI.Main;
+using CarolCustomizer.UI.Legacy.Main;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -17,7 +15,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Recipes;
+namespace CarolCustomizer.UI.Legacy.Recipes;
 public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
     static readonly string displayImageAddress = "Outfit Header/Icon";
@@ -49,7 +47,6 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         name = this.recipe.Name;
 
         displayImage = transform.Find(displayImageAddress)?.GetComponent<Image>();
-        //displayImage.sprite = loader.PirateIcon;
         displayImage.enabled = false;
 
         if (recipe.Extension == Constants.PngFileExtension)
@@ -72,7 +69,6 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         pickupLocation.text = GetStatusMessage();
         background.color = GetUIColor();
     }
-
 
     string GetStatusMessage()
     {
@@ -210,19 +206,9 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         if (eventData.button == Settings.HotKeys.ContextMenu) contextMenu.Show(this);
     }
 
-    void ShowInExplorer()
+    public List<ContextButton> GetContextMenuItems()
     {
-        try
-        {
-            string argument = "/select, \"" + recipe.Path + "\"";
-            Process.Start("explorer.exe", argument);
-        }
-        catch (Win32Exception e) { Log.Error(e.Message); }
-    }
-
-    public List<(string, UnityAction)> GetContextMenuItems()
-    {
-        var output = new List<(string, UnityAction)>();
+        var output = this.AutoMenuItems();
         if (recipe.Error == RecipeFile.Status.NoError)
         {
             PlayerInstances.ValidPlayers
@@ -253,15 +239,6 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
             && recipe.Error == RecipeFile.Status.NoError)
         {
             output.Add(("Update to .png", ConvertToPNG));
-        }
-        if (recipe.Extension == Constants.PngFileExtension
-            && recipe.Error != RecipeFile.Status.FileError)
-        {
-            output.Add(("Show in Explorer", ShowInExplorer));
-        }
-        if (recipe.Error == RecipeFile.Status.FileError)
-        {
-            output.Add(("Ignore", () => Destroy(this.gameObject)));
         }
         return output;
     }

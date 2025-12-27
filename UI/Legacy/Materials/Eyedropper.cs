@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
-namespace CarolCustomizer.UI.Materials;
+namespace CarolCustomizer.UI.Legacy.Materials;
 internal class Eyedropper : MonoBehaviour
 {
     GameObject lastHit;
@@ -22,13 +22,13 @@ internal class Eyedropper : MonoBehaviour
 
     internal Eyedropper Constructor(UIAssetLoader uiAssets)
     {
-        this.cursor = uiAssets.CursorTexture;
+        cursor = uiAssets.CursorTexture;
         return this;
     }
 
     void OnEnable()
     {
-        Cursor.SetCursor(this.cursor, hotspot, CursorMode.Auto);
+        Cursor.SetCursor(cursor, hotspot, CursorMode.Auto);
     }
 
     void OnDisable()

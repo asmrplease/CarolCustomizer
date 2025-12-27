@@ -10,7 +10,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Materials;
+namespace CarolCustomizer.UI.Legacy.Materials;
 internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
 {
     const string displayNameAddress = "Text/Accessory Name";
@@ -38,8 +38,8 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
         sceneName.text = material.Source.Name;
 
         var toggle = transform.Find(toggleAddress).gameObject;
-        GameObject.Destroy(toggle.GetComponent<Toggle>());
-        GameObject.Destroy(toggle);
+        Destroy(toggle.GetComponent<Toggle>());
+        Destroy(toggle);
 
         background = GetComponent<Image>();
         background.color = material.referenceMaterial ? 
@@ -61,9 +61,9 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
 
     void LoadMaterial()
     {
-        string scene = this.material.Source.Name;
+        string scene = material.Source.Name;
         CCPlugin.CoroutineRunner.StartCoroutine(SceneResourceProvider.BatchQueueAndThen(
-            this.material,
+            material,
             (_) => { }));
         CCPlugin.CoroutineRunner.StartCoroutine(
             SceneResourceProvider.BatchLoad());
@@ -79,10 +79,10 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
         contextMenu.Show(this);
     }
 
-    public List<(string, UnityAction)> GetContextMenuItems()
+    public List<ContextButton> GetContextMenuItems()
     {
-        List<(string, UnityAction)> menuItems = [];
-        if (this.material.referenceMaterial) menuItems.Add(("Copy Material", CopyMaterial));
+        List<ContextButton> menuItems = [];
+        if (material.referenceMaterial) menuItems.Add(("Copy Material", CopyMaterial));
         else menuItems.Add(("Load Material", LoadMaterial));
         return menuItems;
     }

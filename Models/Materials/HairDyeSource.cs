@@ -4,11 +4,9 @@ using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
 using Onirism.Gameplay;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace CarolCustomizer.Models.Materials;
 public partial class HairDyeSource 
@@ -43,11 +41,6 @@ public partial class HairDyeSource : IListable
     Color IListable.HighlightColor => Constants.Highlight;
 
     IEnumerable<IListable> IListable.Children => this.hairDyes.Values;
-
-    List<(string, UnityAction)> IContextMenuActions.GetContextMenuItems()
-    {
-        return [];
-    }
 }
 
 public partial class HairDyeSource : IGenericSource
@@ -60,7 +53,6 @@ public partial class HairDyeSource : IGenericSource
     }
     List<MaterialDescriptor> IMaterialProvider.GetMaterials()
     {
-        Log.Warning("Someone asked for ALL of the hairdyes for some reason.");
         return hairDyes.Keys.ToList();
     }
     List<StoredAccessory> IModelProvider.GetAccessories() => [];

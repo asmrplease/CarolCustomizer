@@ -40,8 +40,6 @@ public partial class MaterialDescriptor
     }
 
     public override string ToString() => $"MD:{Source}.{Name}";
-
-    public MaterialDescriptor SetClipboard() => MaterialManager.clipboard = this;
 }
 
 public partial class MaterialDescriptor : IEquatable<MaterialDescriptor>
@@ -86,16 +84,15 @@ public partial class MaterialDescriptor : IListable
     Color IListable.HighlightColor => Constants.Highlight;
 
     IEnumerable<IListable> IListable.Children => [];
+}
 
-    public List<(string, UnityAction)> GetContextMenuItems()
-    {
-        return
-        [
-            ("Copy", () => this.SetClipboard()),
-            //("Copy Current Material", CopyCurrentMaterial),
-            //("Paste Material", PasteMaterial),
-            //("Reset Material", ResetMaterial)
-        ];
-        
-    }
+public partial class MaterialDescriptor : IContextMenuActions
+{
+    [MenuItem("Copy")]
+    void SetClipboard() => MaterialManager.clipboard = this;
+
+    [MenuItem("Debug")]
+    void Debug() => Log.Debug($"MenuActions:{this.Name}");
+
+    public List<ContextButton> GetContextMenuItems() => this.AutoMenuItems();
 }

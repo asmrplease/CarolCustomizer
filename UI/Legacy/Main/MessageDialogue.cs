@@ -2,7 +2,7 @@
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace CarolCustomizer.UI.Main;
+namespace CarolCustomizer.UI.Legacy.Main;
 public class MessageDialogue : MonoBehaviour
 {
     const string defaultCancelMessage = "Cancel";
@@ -31,7 +31,7 @@ public class MessageDialogue : MonoBehaviour
 
         confirmButton.onClick.AddListener(Close);
         cancelButton.onClick.AddListener(Close);
-        this.gameObject.SetActive(false);
+        gameObject.SetActive(false);
         return this;
     }
 

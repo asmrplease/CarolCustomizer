@@ -2,7 +2,7 @@
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
-using CarolCustomizer.UI.Outfits;
+using CarolCustomizer.UI.Legacy.Outfits;
 using System.Linq;
 
 namespace CarolCustomizer.Events;
