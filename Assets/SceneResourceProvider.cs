@@ -37,7 +37,7 @@ internal class SceneResourceProvider
     {
         if (mode == LoadSceneMode.Additive) return;
 
-        GetResourcesFromScene(scene.name);
+        //GetResourcesFromScene(scene.name);
     }
 
     internal static IEnumerator BatchQueueAndThen(MaterialDescriptor request, Action<MaterialDescriptor> closure)

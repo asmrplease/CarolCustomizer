@@ -62,6 +62,8 @@ public class CCPlugin : BaseUnityPlugin
         ui.transform.SetParent(this.transform);
         ui.AddComponent<TreeViewManager>()
             .Constructor(uitk);
+        ui.AddComponent<MenuToggle>()
+            .Constructor();
         var context = UITKContextMenu.Constructor(uitk);
         context.transform.SetParent(this.transform);
         outfitAssetManager = new(folder);

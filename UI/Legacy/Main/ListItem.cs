@@ -1,7 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Settings;
-using CarolCustomizer.Contracts;
+﻿using CarolCustomizer.Contracts;
 using CarolCustomizer.Events;
-using CarolCustomizer.UI.Legacy.Main;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;

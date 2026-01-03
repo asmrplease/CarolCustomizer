@@ -1,33 +1,26 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Utils;
+using FuseBox.Lugh;
 using Onirism.Ui;
 using System;
 using System.Collections;
-using System.ComponentModel;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace CarolCustomizer.UI.Legacy.Main;
 public class MenuToggle : MonoBehaviour
 {
-    #region Dependencies
-    UIInstance uiInstance;
-    #endregion
-
-    #region State Variables
+    //GameObject uiInstance;
     public static bool IsVisible { get; private set; } = false;
     Scene currentScene;
     GameObject mainMenuPages;
-    #endregion
 
     public static event Action<bool> OnMenuToggle;
 
-    public void Constructor(UIInstance uiInstance)
+    public void Constructor()
     {
-        this.uiInstance = uiInstance;
-
+        //this.uiInstance = uiInstance;
         SceneManager.sceneLoaded += OnSceneChange;
     }
     void OnDestroy()
@@ -38,7 +31,7 @@ public class MenuToggle : MonoBehaviour
     }
     void Start()
     {
-        OnMenuToggle?.Invoke(false);//uiInstance.Hide();
+        //OnMenuToggle?.Invoke(false);//uiInstance.Hide();
         currentScene = SceneManager.GetActiveScene();
         if (currentScene.name != Constants.MenuSceneName) return;
         StartCoroutine(OnMainMenuLoaded());
@@ -60,7 +53,7 @@ public class MenuToggle : MonoBehaviour
 
     void Update()
     {
-        if (!uiInstance) return; 
+        //if (!uiInstance) return; 
 
         if (currentScene.name == Constants.MenuSceneName) { MainMenuUpdate(); return; }
         GameplayUpdate();
@@ -105,17 +98,9 @@ public class MenuToggle : MonoBehaviour
             return;
         }
 
-        //if we are not currently visible and asked to become visible
-        //var activePage = mainMenuPages.transform.Cast<Transform>().FirstOrDefault(x => x.gameObject.activeSelf);
-        //if (!activePage) { Log.Warning("tried to hide menu screen but no active page was found."); return; }
-        //if (activePage.GetSiblingIndex() != 0) { Log.Debug("tried to open accUI but we weren't on the main page"); return; }
-
         OnMenuToggle?.Invoke(true);
-        //activePage.gameObject.SetActive(false);
         SetGameMainMenuVisibility(false);
         Log.Debug("hid menu");
-
-        //store the visibility state
         IsVisible = newVisibility;
     }
 
@@ -124,7 +109,10 @@ public class MenuToggle : MonoBehaviour
         MainMenuTopPanel.I.gameObject.SetActive(visible);
         if (!visible) return;
 
-        var animator = MainMenuTopPanel.I.transform.Find("Screens Container")?.GetChild(0)?.GetComponent<Animator>();
+        var animator = MainMenuTopPanel.I.transform
+            .Find("Screens Container")?
+            .GetChild(0)?
+            .GetComponent<Animator>();
         if (!animator) return;
 
         animator.SetBool("opened", true);
@@ -152,37 +140,23 @@ public class MenuToggle : MonoBehaviour
 
         GameplaySetMenuState(true);
     }
-
-    //void LateUpdate()
-    //{
-    //    if (!IsVisible) return;
-    //    Cursor.visible = true;
-    //    Cursor.lockState = CursorLockMode.Confined;
-    //}
-
     void GameplaySetMenuState(bool visible)
     {
         Log.Debug($"GameplaySetMenuState({visible})");
-        if (!uiInstance) { Log.Warning("Tried to set ui state on missing uiInstance."); return; }
-
-        //PauseDiary.manager.isPaused = visible;
-        //Onirism.Ui.PauseMenu.
-        //Onirism.Ui.UiManager.I.isInPauseMenu = visible;
-        //GameManager.manager.ToggleCursorState(visible ? CursorLockMode.Confined : CursorLockMode.Locked);
-        //var cursorState = visible ? CursorLockMode.Confined : CursorLockMode.Locked;
-        //Log.Debug($"Set lockstate to {cursorState}");
-
-        if (visible) UiManager.I.panelStacker.Stack(uiInstance.lughPanel, true);
+        //if (!uiInstance) { Log.Warning("Tried to set ui state on missing uiInstance."); return; }
+        
+        var go = new GameObject();
+        var lughPanel = go.AddComponent<LughPanel>();
+        if (visible) UiManager.I.panelStacker.Stack(lughPanel, true);
         if (!visible) UiManager.I.panelStacker.DestackTopmost(true);
+        Log.Debug($"Toggled LughPanel to {visible}");
 
         foreach (GameObject camera in CameraController.cameras)
             camera.GetComponent<CameraController>().enabled = !visible;
-
-        Log.Debug($"Toggled LughPanel to {visible}");
-        OnMenuToggle?.Invoke(visible);
         if (visible) PlayerInstances.DefaultPlayer.LockPlayer();
         else PlayerInstances.DefaultPlayer.UnlockPlayer();
         IsVisible = visible;
+        OnMenuToggle?.Invoke(visible);
         Log.Debug("GameplaySetMenuState Completed successfully");
     }
 }

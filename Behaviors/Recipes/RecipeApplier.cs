@@ -20,7 +20,7 @@ public static class RecipeApplier
         recipe
             .ActiveAccessories
             .ForEach(x => SetAccessory(target, x));
-        CCPlugin.CoroutineRunner.StartCoroutine(SceneResourceProvider.BatchLoad());
+        //CCPlugin.CoroutineRunner.StartCoroutine(SceneResourceProvider.BatchLoad());
         recipe
             .ActiveEffects
             .ForEach(x => target.SetEffect(x, true));

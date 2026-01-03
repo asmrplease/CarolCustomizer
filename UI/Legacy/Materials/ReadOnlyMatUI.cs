@@ -6,7 +6,6 @@ using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -66,7 +65,7 @@ internal class ReadOnlyMatUI : MonoBehaviour, IPointerClickHandler, IContextMenu
             material,
             (_) => { }));
         CCPlugin.CoroutineRunner.StartCoroutine(
-            SceneResourceProvider.BatchLoad());
+            SceneResourceProvider. BatchLoad());
     }
 
     public void OnPointerClick(PointerEventData eventData)

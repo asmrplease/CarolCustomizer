@@ -2,8 +2,10 @@ using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
+using CarolCustomizer.UI.Legacy.Main;
 using CarolCustomizer.UI.UITK;
 using CarolCustomizer.Utils;
+using Onirism.Ui;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -19,6 +21,7 @@ public class TreeViewManager : MonoBehaviour
     Dictionary<int, IListable> elements = new();
 
     UITKAssetLoader assetLoader;
+    UIDocument uiDoc;
     TreeView treeView;
 
     public TreeViewManager Constructor(UITKAssetLoader assetLoader)
@@ -26,24 +29,15 @@ public class TreeViewManager : MonoBehaviour
         this.assetLoader = assetLoader;
         this.elementTemplate = assetLoader.ListItem;
 
-        var uiDoc = this.gameObject.AddComponent<UIDocument>();
-        uiDoc.visualTreeAsset = assetLoader.TreeView;
+        uiDoc = this.gameObject.AddComponent<UIDocument>();
+        uiDoc.visualTreeAsset = new();//assetLoader.TreeView;
         uiDoc.sourceAsset = assetLoader.TreeView;
         uiDoc.panelSettings = assetLoader.PanelSettings;
         var root = uiDoc.rootVisualElement;
+        root.Add(new TreeView());
         treeView = root.Q<TreeView>();
         treeView.fixedItemHeight = 100;
-
-        OutfitAssetManager.OnOutfitLoaded += AddListable;
-        RecipeFileWatcher.OnRecipeCreated += AddListable;
-
-        return this;
-    }
-
-    void Start()
-    {
-        //instantiate/reference the element template
-        if (this.elementTemplate is null) return;
+        treeView.style.width = 800;
 
         //set up closures for element instantiation and binding
         treeView.makeItem = () => elementTemplate.CloneTree();
@@ -56,9 +50,23 @@ public class TreeViewManager : MonoBehaviour
             element.Q<Label>("Subheader").text = listable.Subheader;
             element.Q("Thumbnail").style.backgroundImage = new StyleBackground(listable.Thumbnail);
             element.RegisterCallback<PointerDownEvent, IListable>(Click, listable);
+
         };
         var initializer = new List<TreeViewItemData<IListable>>();
         treeView.SetRootItems(initializer);
+
+        OutfitAssetManager.OnOutfitLoaded += AddListable;
+        RecipeFileWatcher.OnRecipeCreated += AddListable;
+        MenuToggle.OnMenuToggle += OnMenuToggle;
+
+        return this;
+    }
+
+    void OnMenuToggle(bool visible)
+    {
+        Log.Debug($"TreeViewManager.OnMenuToggle({visible})");
+        uiDoc.rootVisualElement.SetVisible(visible);
+        if (visible) { treeView.Rebuild(); }
     }
 
     void Click(PointerDownEvent e, IListable element)

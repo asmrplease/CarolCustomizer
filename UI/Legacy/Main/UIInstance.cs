@@ -90,9 +90,9 @@ public class UIInstance : MonoBehaviour
         Buttons = [outfitsButton, recipesButton, materialsButton, configButton ];
         
         ChangeTab(outfitsButton, outfitView.gameObject);
-        gameObject
-            .AddComponent<MenuToggle>()
-            .Constructor(this);
+        //gameObject
+        //    .AddComponent<MenuToggle>()
+        //    .Constructor(this);
         MenuToggle.OnMenuToggle += HandleMenuToggle;
         return this;
     }

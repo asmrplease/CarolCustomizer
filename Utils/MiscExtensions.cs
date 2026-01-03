@@ -5,9 +5,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
 
 namespace CarolCustomizer.Utils;
@@ -34,6 +36,24 @@ public static class MiscExtensions
     public static string DeInstance(this string name)
     {
         return name.Replace("(Instance)", "").Trim();
+    }
+
+    public static void SetVisible(this VisualElement element, bool isVisible)
+    {
+        element.style.visibility = isVisible ? StyleKeyword.Null : Visibility.Hidden;
+        //element.Children().ForEach(x => x.SetVisible(isVisible));
+    }
+
+    public static bool DirectoryHidden(string path)
+    {
+        //Log.Debug($"DirectoryHidden({path})");
+        var directories = path.Split(Path.DirectorySeparatorChar).ToList();
+        var index = directories.IndexOf("Onirism");
+        return
+            directories
+            .Skip(index)
+            //.ForEach(Log.Debug)
+            .Any(str => str.StartsWith("."));
     }
 
     /// <summary>
