@@ -36,6 +36,7 @@ public class ThumbnailCamera : MonoBehaviour
         camera.enabled = false;
 
         PlayerInstances.DefaultPlayer.SpawnEvent += HandleNewPelvis;
+        if (PlayerInstances.DefaultPlayer.outfitManager.pelvis is PelvisWatchdog existing) HandleNewPelvis(existing);
         Slate.Cutscene.OnCutsceneStopped += HandleCutsceneEnd;
 
         if (GetComponent<HxVolumetricCamera>() is HxVolumetricCamera hxvc) { Destroy(hxvc); }

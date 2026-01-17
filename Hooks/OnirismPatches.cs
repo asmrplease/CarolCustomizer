@@ -79,21 +79,21 @@ public static class OnirismPatches
         public static void Postfix() => SaveDataAdjuster.SetPyjamas();
     }
 
-    [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.LoadSave))]
-    public static class SetPyjamasInVersus
-    {
-        [HarmonyPostfix]
-        public static void Postfix(MainMenuManager __instance)
-        {
-            if (__instance.mapSelectType != "Versus") return;
-            if (!Settings.Plugin.customMPBots.Value) return;
+    //[HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.LoadSave))]
+    //public static class SetPyjamasInVersus
+    //{
+    //    [HarmonyPostfix]
+    //    public static void Postfix(MainMenuManager __instance)
+    //    {
+    //        if (__instance.mapSelectType != "Versus") return;
+    //        if (!Settings.Plugin.customMPBots.Value) return;
 
-            MultiplayerSelection
-                .selected
-                .ForEach(x => 
-                    x.skinPlaceholder = GameManager.manager.carolModel);
-        }
-    }
+    //        MultiplayerSelection
+    //            .selected
+    //            .ForEach(x => 
+    //                x.skinPlaceholder = GameManager.manager.carolModel);
+    //    }
+    //}
 
     [HarmonyPatch(typeof(ZombieRandomizer), "Start")]
     public static class SlimeCustomizationPatch

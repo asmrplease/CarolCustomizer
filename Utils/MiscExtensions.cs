@@ -3,6 +3,7 @@ using MagicaCloth2;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -42,6 +43,18 @@ public static class MiscExtensions
         }
 
         return output;
+    }
+
+    public static bool DirectoryHidden(string path)
+    {
+        //Log.Debug($"DirectoryHidden({path})");
+        var directories = path.Split(Path.DirectorySeparatorChar).ToList();
+        var index = directories.IndexOf("Onirism");
+        return
+            directories
+            .Skip(index)
+            //.ForEach(Log.Debug)
+            .Any(str => str.StartsWith("."));
     }
 
     /// <summary>
