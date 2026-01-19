@@ -50,7 +50,7 @@ public class StoredHair : AccessoryDescriptor, IGenericSource, IInstantiable
             .ForEach(boneCloths.Add);
     }
 
-    public LiveAccessory MakeLive(SkeletonManager skeleton, Transform folder)
+    public ILiveModel MakeLive(SkeletonManager skeleton, Transform folder)
     {
         return new LiveAccessory(this, folder);
     }
@@ -72,7 +72,7 @@ public class StoredHair : AccessoryDescriptor, IGenericSource, IInstantiable
 
     List<MaterialDescriptor> IMaterialProvider.GetMaterials() => [];
 
-    public LiveAccessory MakeLive(SkeletonManager skeleton, FaceCopier faceCopier, Transform folder)
+    public ILiveModel MakeLive(SkeletonManager skeleton, FaceCopier faceCopier, Transform folder)
     {
         return new LiveAccessory(this, folder);
     }

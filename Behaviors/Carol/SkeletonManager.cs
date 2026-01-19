@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Outfits;
@@ -14,7 +15,7 @@ public class SkeletonManager
 {
     Dictionary<SourceDescriptor, Dictionary<string, Transform>> outfitBoneDicts = [];
     PelvisWatchdog pelvis;
-    public event Action<LiveAccessory> OnLiveBonesAssigned;
+    public event Action<ISkinned> OnLiveBonesAssigned;
 
     public void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
@@ -30,22 +31,23 @@ public class SkeletonManager
         pelvis = newPelvis;
     }
 
-    public void AssignLiveBones(LiveAccessory acc, bool notify = true)
+    public void AssignLiveBones(ISkinned acc, bool notify = true)
     {
-        Log.Debug($"AssignLiveBones({acc.Name})");
+        Log.Debug($"AssignLiveBones({acc.Descriptor.Name})");
         if (acc is null) { Log.Error("Requested bones for null accessory"); return; }
 
-        var source = OutfitAssetManager.GetSource(acc.Source);
+        var source = OutfitAssetManager.GetSource(acc.Descriptor.Source);
+        var bespokeBones = acc.BespokeBones;
         //var source = acc.Source == Constants.HairstyleSourceName ?
         //    acc.Name : acc.Source; //if this is a hairstyle, use the hairstyle name not the source
         //probbaly not a good system but i'm getting tired of this problem so we can fix it later if it matters
 
-        var bespokeDict = GetAddBoneSet(acc.Source, acc.BespokeBones);
-        Transform[] liveBones = new Transform[acc.bones.Length];
-        foreach (int i in Enumerable.Range(0, acc.bones.Length))
+        var bespokeDict = GetAddBoneSet(acc.Descriptor.Source, acc.BespokeBones);
+        Transform[] liveBones = new Transform[acc.ReferenceBones.Length];
+        foreach (int i in Enumerable.Range(0, acc.ReferenceBones.Length))
         {
-            if (!acc.bones[i]) continue;
-            bespokeDict.TryGetValue(acc.bones[i].name, out liveBones[i]);
+            if (!acc.ReferenceBones[i]) continue;
+            bespokeDict.TryGetValue(acc.ReferenceBones[i].name, out liveBones[i]);
         }
         bespokeDict.TryGetValue(acc.RootBoneName, out var rootBone);
         rootBone ??= pelvis.BoneData.StandardBones["CarolPelvis"];

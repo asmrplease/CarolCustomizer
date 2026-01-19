@@ -17,7 +17,7 @@ namespace CarolCustomizer.Behaviors.Carol;
 
 public class AccessoryManager : IDisposable, IPelvisFollower
 {
-    Dictionary<AccessoryDescriptor, LiveAccessory> liveAccessories = [];
+    Dictionary<AccessoryDescriptor, ILiveModel> liveAccessories = [];
     PelvisWatchdog pelvis;
     SkeletonManager skeletonManager;
     FaceCopier faceCopier;
@@ -35,7 +35,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         liveAccessories
         .Values
         .Where(x => x.isActive)
-        .Select(x => new AccessoryDescriptor(x));
+        .Select(x => new AccessoryDescriptor(x.Descriptor));//TODO: sometimes this goes like two 'new's deep
 
     public AccessoryManager(SkeletonManager skeletonManager, FaceCopier faceCopier)
     {
@@ -59,12 +59,12 @@ public class AccessoryManager : IDisposable, IPelvisFollower
             liveAccessories.Add(desc, live);
         }
         live.Enable();
-        if (!live.IsOnArmature(pelvis.transform)) skeletonManager.AssignLiveBones(live);
+        if (!live.IsOnArmature(pelvis.transform) && live is ISkinned skinned) skeletonManager.AssignLiveBones(skinned);
         //desc.Materials
         //    .Select((mat, index) => (mat, index))
         //    .Where(tup => tup.mat.referenceMaterial)
         //    .ForEach(tup => PaintAccessory(desc, tup.mat, tup.index));
-        var e = new AccessoryChangedEvent(desc, live, true);
+        var e = new AccessoryChangedEvent(desc, live.Descriptor, true);
         AccessoryChanged?.Invoke(e);
         Log.Debug(e.ToString());
     }
@@ -109,7 +109,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
     public MaterialDescriptor[] GetLiveMaterials(AccessoryDescriptor accessory)
     {
         if (!liveAccessories.ContainsKey(accessory)) { return null; }
-        return liveAccessories[accessory].Materials;
+        return liveAccessories[accessory].Descriptor.Materials;
     }
 
     public void DisableAllAccessories() => ActiveAccessories.ForEach(DisableAccessory);
@@ -122,6 +122,7 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         liveAccessories
             .Values
             .Where(x => x.isActive)
+            .OfType<ISkinned>()
             .ForEach(x => skeletonManager.AssignLiveBones(x, true));
         
     }

@@ -1,6 +1,5 @@
-﻿using CarolCustomizer.Behaviors.Carol;
+﻿using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Materials;
-using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
 using System;
@@ -9,11 +8,11 @@ using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Models.Accessories;
-public class LiveAccessory : AccessoryDescriptor, IDisposable
+public partial class LiveAccessory : AccessoryDescriptor, IDisposable
 {
     #region Dependencies
     Transform folder;
-    readonly SkinnedMeshRenderer referenceSMR;
+    SkinnedMeshRenderer referenceSMR;
     #endregion
 
     #region Common Components
@@ -21,24 +20,20 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
     #endregion
 
     #region Public Interface
-    public Transform[] bones => referenceSMR.bones;
-    public string RootBoneName => referenceSMR.rootBone?.name ?? "CarolPelvis";
+    //public Transform[] referenceBones => referenceSMR.bones;
 
-    public readonly Outfit outfit;
+    //public readonly Outfit outfit;
 
-    public readonly List<Transform> BespokeBones;
-
-    public readonly MagicaCloth meshCloth;
-
-    public bool isActive { get; private set; } = false;
+    //public readonly List<Transform> BespokeBones;
 
     public LiveAccessory(StoredAccessory acc, Transform folder, MagicaCloth magica = null)
         : base(acc.referenceSMR, acc.Source)
     {
         this.folder = folder;
         this.referenceSMR = acc.referenceSMR;
-        this.outfit = acc.outfit;
-        this.BespokeBones = outfit.boneData.BespokeBones;
+        //this.outfit = acc.outfit;
+        //this.BespokeBones = acc.outfit.boneData.BespokeBones;
+        this.boneProvider = acc.outfit;
         this.Materials = new MaterialDescriptor[acc.Materials.Length];
         this.meshCloth = magica;
         acc.Materials
@@ -52,8 +47,9 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
     {
         this.folder = folder;
         this.referenceSMR = hair.smr;
-        this.outfit = null;
-        this.BespokeBones = hair.GetBespokeBones();
+        //this.outfit = null;
+        //this.BespokeBones = hair.GetBespokeBones();
+        this.boneProvider = hair;
         this.referenceSMR = hair.smr;
         this.Materials = new MaterialDescriptor[hair.smr.sharedMaterials.Length];
         this.meshCloth = hair.GetMeshCloths().FirstOrDefault();
@@ -83,59 +79,12 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         liveSMR.gameObject.SetActive(isActive);
     }
 
-    public bool IsOnArmature(Transform pelvis)
-    {
-        if (!pelvis) return false;
-        if (!liveSMR.rootBone) return false;
-        return liveSMR.rootBone.IsChildOf(pelvis);
-    }
-
     public void SetLiveBones(Transform[] liveBones, Transform rootBone)
     {
         if (!liveSMR) Log.Warning($"{this.Name} had a null SMR during SetLiveBones()");
 
         liveSMR.bones = liveBones;
         liveSMR.rootBone = rootBone;
-    }
-
-    virtual public void Enable()
-    {
-        isActive = true;
-        liveSMR.gameObject.SetActive(true);
-    }
-
-    virtual public void Disable() 
-    {
-        isActive = false;
-        liveSMR.gameObject.SetActive(false); 
-    }
-
-    public void SetVisible(bool visible)
-    {
-        if (!liveSMR) return;
-        if (!liveSMR.gameObject) return;
-
-        liveSMR.enabled = visible;
-    }
-
-    public void AddToMagica(MagicaCloth magica)
-    {
-        Reinstantiate();
-        magica.SerializeData.sourceRenderers.Add(liveSMR);
-        magica.SerializeData.rootBones.Add(liveSMR.transform);
-    }
-
-    internal void ApplyMaterial(MaterialDescriptor material, int index)
-    {
-        Log.Debug($"ApplyMaterial({material.Name}, {index});");
-        Materials[index] = material;
-        liveSMR.ReplaceMaterialAtIndex(material.referenceMaterial, index);
-        Log.Debug($"The material is now {liveSMR.materials[index]}.");
-    }
-
-    internal void ApplySharedMaterials(List<Material> materials)
-    {
-        liveSMR.SetSharedMaterials(materials);
     }
 
     public AccessoryDescriptor AsDescriptor()
@@ -148,4 +97,74 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         if (liveSMR) GameObject.Destroy(liveSMR.gameObject);
     }
     #endregion
+}
+
+public partial class LiveAccessory : ILiveModel
+{
+    public bool isActive { get; private set; } = false;
+    public AccessoryDescriptor Descriptor => new AccessoryDescriptor(this);
+    public string RootBoneName => referenceSMR.rootBone?.name ?? "CarolPelvis";
+    virtual public void Enable()
+    {
+        isActive = true;
+        liveSMR.gameObject.SetActive(true);
+    }
+
+    virtual public void Disable()
+    {
+        isActive = false;
+        liveSMR.gameObject.SetActive(false);
+    }
+
+    public void SetVisible(bool visible)
+    {
+        if (!liveSMR) return;
+        if (!liveSMR.gameObject) return;
+
+        liveSMR.enabled = visible;
+    }
+
+    public void ApplyMaterial(MaterialDescriptor material, int index)
+    {
+        Log.Debug($"ApplyMaterial({material.Name}, {index});");
+        Materials[index] = material;
+        liveSMR.ReplaceMaterialAtIndex(material.referenceMaterial, index);
+        Log.Debug($"The material is now {liveSMR.materials[index]}.");
+    }
+
+    public void ApplySharedMaterials(List<Material> materials)
+    {
+        liveSMR.SetSharedMaterials(materials);
+    }
+
+    public bool IsOnArmature(Transform pelvis)
+    {
+        if (!pelvis) return false;
+        if (!liveSMR.rootBone) return false;
+        return liveSMR.rootBone.IsChildOf(pelvis);
+    }
+}
+
+public partial class LiveAccessory : ISkinned
+{
+    List<Transform> ISkinned.BespokeBones => boneProvider.GetBespokeBones();
+
+    Transform[] ISkinned.ReferenceBones => referenceSMR.bones;
+
+    string ISkinned.RootBoneName => referenceSMR.rootBone?.name ?? "CarolPelvis";
+}
+
+public partial class LiveAccessory : ILiveMagica
+{
+    public IBoneProvider boneProvider { get; private set; }
+
+    public MagicaCloth meshCloth { get; private set; }
+
+    public void AddToMagica(MagicaCloth magica)
+    {
+        Reinstantiate();
+        magica.SerializeData.sourceRenderers.Add(liveSMR);
+        magica.SerializeData.rootBones.Add(liveSMR.transform);
+    }
+
 }

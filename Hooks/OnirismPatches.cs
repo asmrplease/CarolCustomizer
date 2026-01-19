@@ -79,6 +79,8 @@ public static class OnirismPatches
         public static void Postfix() => SaveDataAdjuster.SetPyjamas();
     }
 
+    //removed due to MainMenuManager being removed and patch failing,
+    //i don't remeber what this patch did so hopefully nothign broke lmao
     //[HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.LoadSave))]
     //public static class SetPyjamasInVersus
     //{

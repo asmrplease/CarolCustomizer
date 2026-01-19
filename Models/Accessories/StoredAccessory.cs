@@ -26,7 +26,7 @@ public class StoredAccessory : AccessoryDescriptor, IInstantiable
 
     AccessoryDescriptor IInstantiable.Descriptor => this;
 
-    public LiveAccessory MakeLive(SkeletonManager skeleton, FaceCopier faceCopier, Transform folder)
+    public ILiveModel MakeLive(SkeletonManager skeleton, FaceCopier faceCopier, Transform folder)
     {
         return outfit.FaceDefinition.Invoke(this.referenceSMR) ?
             new LiveFace(this, skeleton,faceCopier, folder) :

@@ -17,7 +17,7 @@ internal class MagicaManager
     PelvisWatchdog targetPelvis;
 
     List<MagicaCloth> processing = [];
-    Dictionary<AccessoryDescriptor, MagicaCloth> MeshCloths = [];
+    Dictionary<ILiveMagica, MagicaCloth> MeshCloths = [];
     Dictionary<int, MagicaCloth> BoneCloths = [];
     IMagicaSource colliderSource;
 
@@ -27,7 +27,7 @@ internal class MagicaManager
     public MagicaManager(SkeletonManager skeletonManager)
     {
         this.skeleton = skeletonManager;
-        this.skeleton.OnLiveBonesAssigned += AccMeshClothSetup;
+        this.skeleton.OnLiveBonesAssigned += (acc) => AccMeshClothSetup(acc as ILiveMagica);//TODO: this will fail
     }
 
     public void HandleNewPelvis(PelvisWatchdog newPelvis)
@@ -93,11 +93,11 @@ internal class MagicaManager
         BoneCloths[refMagica.GetInstanceID()] = liveMagica;
     }
 
-    public void AccMeshClothSetup(LiveAccessory acc)
+    public void AccMeshClothSetup(ILiveMagica acc)
     {
         if (!acc.meshCloth) return;
 
-        Log.Info($"MagicaManager.HandleNewLiveAcc({acc.Name})");
+        Log.Info($"MagicaManager.HandleNewLiveAcc({acc.Descriptor.Name})");
         if (MeshCloths.TryGetValue(acc, out var existing) && existing) GameObject.Destroy(existing);
         if (!acc.isActive) return;
 
@@ -107,9 +107,9 @@ internal class MagicaManager
         liveMagica.SerializeData.sourceRenderers.Clear();
         liveMagica.SerializeData.rootBones.Clear();
         acc.AddToMagica(liveMagica);
-        skeleton.AssignLiveBones(acc, false);
-        CommonSetup(liveMagica, acc.Source, acc.BespokeBones);
-        liveMagica.name = acc.Name + " MeshCloth";
+        if (acc is ISkinned skinned) skeleton.AssignLiveBones(skinned, false);
+        CommonSetup(liveMagica, acc.Descriptor.Source, acc.boneProvider.GetBespokeBones());
+        liveMagica.name = acc.Descriptor.Name + " MeshCloth";
         referenceMagica.gameObject.SetActive(true);
         MeshCloths[acc] = liveMagica;
     }
