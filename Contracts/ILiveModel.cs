@@ -1,4 +1,5 @@
-﻿using CarolCustomizer.Models.Accessories;
+﻿using CarolCustomizer.Hooks.Watchdogs;
+using CarolCustomizer.Models.Accessories;
 using CarolCustomizer.Models.Materials;
 using MagicaCloth2;
 using System;
@@ -12,6 +13,7 @@ public interface ILiveModel : IDisposable
     AccessoryDescriptor Descriptor { get; }
     void Enable();
     void Disable();
+    void HandleNewArmature(PelvisWatchdog watchdog);
     void SetVisible(bool visible);
     void ApplyMaterial(MaterialDescriptor material, int index);
     void ApplySharedMaterials(List<Material> materials);
@@ -20,7 +22,6 @@ public interface ILiveModel : IDisposable
 
 public interface ISkinned : ILiveModel
 {
-    
     List<Transform> BespokeBones { get; }
     Transform[] ReferenceBones { get; }
     string RootBoneName { get; }

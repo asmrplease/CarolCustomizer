@@ -1,7 +1,10 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks;
+using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Materials;
+using CarolCustomizer.Models.Outfits;
+using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,74 +12,98 @@ using UnityEngine;
 namespace CarolCustomizer.Models.Accessories;
 public partial class GameAccessory
 {
-    readonly Accessory gameAcc;
-    bool isSkinned => gameAcc.attachType == Accessory.AccessoryChildTypes.SkinnedToCharacter;
+    public readonly Accessory gameAcc;
+    public static SourceDescriptor Source = new(Constants.GameAccessorySourceName, SourceType.GameAcc);
+    public bool isSkinned => gameAcc.attachType == Accessory.AccessoryChildTypes.SkinnedToCharacter;
 
     public GameAccessory(Accessory gameAcc)
     {
         this.gameAcc = gameAcc;
     }
+
+    public string GetParentBoneName() => gameAcc.GetParentBoneName();
 }
 
 public partial class GameAccessory : IInstantiable
 {
-    public AccessoryDescriptor Descriptor => throw new NotImplementedException();
+    public AccessoryDescriptor Descriptor => new(this.gameAcc.name, GameAccessory.Source);
 
     public ILiveModel MakeLive(SkeletonManager skeleton, FaceCopier faceCopier, Transform folder)
     {
-        return new LiveGameAccessory(this, skeleton);
-
+        //if (reference.isSkinned) return new LiveAccessory(gameAcc.skinnedMesh);
+        return new LiveGameAccessory(this);
     }
 }
 
 public partial class LiveGameAccessory
 {
-    readonly MeshRenderer liveMesh;
-
-    public LiveGameAccessory(GameAccessory acc, SkeletonManager skeleton)
+    readonly GameAccessory reference;
+    GameObject instance;
+    PelvisWatchdog watchdog;
+    public LiveGameAccessory(GameAccessory acc)
     {
-        
+        this.reference = acc;
     }
+    
 }
 
 public partial class LiveGameAccessory : ILiveModel
 {
     public bool isActive { get; private set; } = false;
 
-    AccessoryDescriptor ILiveModel.Descriptor => throw new NotImplementedException();
+    AccessoryDescriptor ILiveModel.Descriptor => reference.Descriptor;
+
+    void ILiveModel.HandleNewArmature(PelvisWatchdog watchdog)
+    {
+        if (instance) GameObject.Destroy(instance);
+        string parentName = this.reference.GetParentBoneName();
+        Transform parent = watchdog.BoneData.StandardBones[parentName];
+        instance = GameObject.Instantiate(this.reference.gameAcc.gameObject, parent);
+    }
 
     void ILiveModel.ApplyMaterial(MaterialDescriptor material, int index)
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
+        Log.Warning("GameAccessory.ApplyMaterial Not Implemented.");
     }
 
     void ILiveModel.ApplySharedMaterials(List<Material> materials)
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
     }
 
     void ILiveModel.Disable()
     {
-        throw new NotImplementedException();
+        if (!instance) return;
+        
+        isActive = true;
+        instance.SetActive(false);
     }
 
     void IDisposable.Dispose()
     {
-        throw new NotImplementedException();
+        if (instance) GameObject.Destroy(instance);
     }
 
     void ILiveModel.Enable()
     {
-        throw new NotImplementedException();
+        if (!instance) return;
+        
+        isActive = true;
+        instance.SetActive(false);
     }
 
     bool ILiveModel.IsOnArmature(Transform root)
     {
-        throw new NotImplementedException();
+        if (!instance || !root) return false;
+
+        return instance.transform.parent.IsChildOf(root);
     }
 
     void ILiveModel.SetVisible(bool visible)
     {
-        throw new NotImplementedException();
+        if (!instance) return;
+
+        instance.SetActive(visible);
     }
 }

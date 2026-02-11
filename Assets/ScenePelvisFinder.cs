@@ -27,7 +27,7 @@ public class ScenePelvisFinder : IDisposable
         
         Resources
             .FindObjectsOfTypeAll<GameObject>()
-            .Where(x => x.name == "CarolPelvis")
+            .Where(x => x.name == Constants.PelvisBone)
             .Select(PelvisWatchdog.GetAddWatchdog)
             .ForEach(x => allWatchdogs.Add(x));
     }

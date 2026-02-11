@@ -108,7 +108,7 @@ public class CCPlugin : BaseUnityPlugin
         Entity.players
             .Select(x => 
                 x.transform
-                .RecursiveFindTransform(x => x.name == "CarolPevis")
+                .RecursiveFindTransform(x => x.name == Constants.PelvisBone)
                 .gameObject)
             .Select(PelvisWatchdog.GetAddWatchdog);
     }

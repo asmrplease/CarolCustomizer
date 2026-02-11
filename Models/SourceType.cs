@@ -6,4 +6,5 @@ public enum SourceType
     World = 1,
     Resources = 2,
     Hair = 3,
+    GameAcc = 4,
 }

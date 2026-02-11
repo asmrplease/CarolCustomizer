@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static Onirism.Ui.ElixirDispenserPanel;
 
 namespace CarolCustomizer.Utils;
 public static class OnirismExtensions
@@ -28,18 +29,6 @@ public static class OnirismExtensions
         return name.Replace("CAROLMOD_", "").Replace("CAROL_", "").Replace("(Clone)", "").Replace("_", " ").Trim();
     }
 
-    /// <summary>
-    /// Updates dynbone components to support adding arbitrary bones, requires reflection calls. 
-    /// </summary>
-    /// <param name="dBone">Dynamic Bone to restart.</param>
-    public static void RestartDynamicBone(this DynamicBone dBone)
-    {
-        //TODO: can we cache these MethodInfo objects to make this faster?
-        if (dBone == null) { Log.Warning("Couldn't find hair DynamicBone!"); return; }//TODO: try to instantiate if null? for now just don't NRE on the next line
-        typeof(DynamicBone).GetMethod("InitTransforms", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(dBone, null);
-        typeof(DynamicBone).GetMethod("SetupParticles", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(dBone, null);
-    }
-
     public static MultiplayerManager.PlayerStats GetPlayerStats(this VirtualCarol virtualCarol)
     {
         if (MultiplayerManager.manager?.players is null) return null;
@@ -55,7 +44,7 @@ public static class OnirismExtensions
             .GetRootGameObjects()
             .First(x => x.name == "MenuCarolLoader")
             .transform
-            .RecursiveFindTransform(x => x.name == "CarolPelvis")
+            .RecursiveFindTransform(x => x.name == Constants.PelvisBone)
             .gameObject;
     }
 
@@ -71,5 +60,30 @@ public static class OnirismExtensions
             .Where(x => x.name == "Spacesuitbackpack")
             .ForEach(x => x.gameObject.SetActive(true));
         yield break;
+    }
+
+    public static string GetParentBoneName(this Accessory acc)
+    {
+        return acc.slot switch
+        {
+            Accessory.AccessorySlot.Head => Constants.HeadBone,
+            Accessory.AccessorySlot.Eyes => Constants.HeadBone,
+            Accessory.AccessorySlot.Mouth => Constants.HeadBone,
+            Accessory.AccessorySlot.HairClipLeft => Constants.HeadBone,
+            Accessory.AccessorySlot.HairClipRight => Constants.HeadBone,
+            Accessory.AccessorySlot.AnimalEars => Constants.HeadBone,
+            Accessory.AccessorySlot.Ears => Constants.HeadBone,
+            Accessory.AccessorySlot.Back => Constants.BackBone,
+            Accessory.AccessorySlot.Chest => Constants.ChestBone,
+            Accessory.AccessorySlot.BackPelvis => Constants.PelvisBone,
+            Accessory.AccessorySlot.FrontPelvis => Constants.PelvisBone,
+            Accessory.AccessorySlot.HipLeft => Constants.PelvisBone,
+            Accessory.AccessorySlot.HipRight => Constants.PelvisBone,
+            Accessory.AccessorySlot.LeftArm => Constants.LeftArmBone,
+            Accessory.AccessorySlot.RightArm => Constants.RightArmBone,
+            Accessory.AccessorySlot.LeftLeg => Constants.LeftLegBone,
+            Accessory.AccessorySlot.RightLeg => Constants.RightLegBone,
+            _ => Constants.PelvisBone,
+        };
     }
 }

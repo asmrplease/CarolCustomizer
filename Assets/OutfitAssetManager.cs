@@ -57,12 +57,14 @@ public class OutfitAssetManager : IDisposable
             SourceType.Hair      => GetHairSource(descriptor),
             SourceType.World     => GetWorldSource(descriptor),
             SourceType.Resources => GetWorldSource(descriptor),
+            //SourceType.GameAcc   => GetGameAccSource(descriptor),
             _ => null,
         };
 
         if (result is null && warnOnMissing) Log.Warning($"No source of type {descriptor.Type} named {descriptor.Name} was found");
         return result;
     }
+
 
     static IGenericSource GetOutfitSource(SourceDescriptor descriptor)
     {
@@ -101,6 +103,11 @@ public class OutfitAssetManager : IDisposable
 
     public static IInstantiable GetInstantiable(AccessoryDescriptor descriptor)
     {
+        if (descriptor.Source.Type == SourceType.GameAcc)
+        {
+            Log.Debug("GetInstantiable GameAcc");
+            return HaDSOutfitLoader.Accessories[descriptor];
+        }
         return GetSource(descriptor.Source)?.GetInstantiable(descriptor);
     }
 

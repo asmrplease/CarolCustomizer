@@ -1,8 +1,7 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks.Watchdogs;
-using CarolCustomizer.Models.Accessories;
-using CarolCustomizer.Models.Outfits;
+    using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using System;
 using System.Collections.Generic;
@@ -13,21 +12,21 @@ namespace CarolCustomizer.Behaviors.Carol;
 
 public class SkeletonManager
 {
-    Dictionary<SourceDescriptor, Dictionary<string, Transform>> outfitBoneDicts = [];
+    Dictionary<SourceDescriptor, Dictionary<string, Transform>> boneDicts = [];
     PelvisWatchdog pelvis;
     public event Action<ISkinned> OnLiveBonesAssigned;
 
     public void HandleNewPelvis(PelvisWatchdog newPelvis)
     {
         Log.Debug("SkeletonManager.HandleNewPelvis()");
-        outfitBoneDicts
+        boneDicts
             .Values
             .SelectMany(dict => dict.Values)
             .Where(trans => trans && !CommonBones.IsCommon(trans.name))
             .Select(x => x.gameObject)
             .ToList()
             .ForEach(GameObject.Destroy);
-        outfitBoneDicts.Clear();
+        boneDicts.Clear();
         pelvis = newPelvis;
     }
 
@@ -38,10 +37,6 @@ public class SkeletonManager
 
         var source = OutfitAssetManager.GetSource(acc.Descriptor.Source);
         var bespokeBones = acc.BespokeBones;
-        //var source = acc.Source == Constants.HairstyleSourceName ?
-        //    acc.Name : acc.Source; //if this is a hairstyle, use the hairstyle name not the source
-        //probbaly not a good system but i'm getting tired of this problem so we can fix it later if it matters
-
         var bespokeDict = GetAddBoneSet(acc.Descriptor.Source, acc.BespokeBones);
         Transform[] liveBones = new Transform[acc.ReferenceBones.Length];
         foreach (int i in Enumerable.Range(0, acc.ReferenceBones.Length))
@@ -50,7 +45,7 @@ public class SkeletonManager
             bespokeDict.TryGetValue(acc.ReferenceBones[i].name, out liveBones[i]);
         }
         bespokeDict.TryGetValue(acc.RootBoneName, out var rootBone);
-        rootBone ??= pelvis.BoneData.StandardBones["CarolPelvis"];
+        rootBone ??= pelvis.BoneData.StandardBones[Constants.PelvisBone];
         acc.SetLiveBones(liveBones, rootBone);
         if (notify) OnLiveBonesAssigned?.Invoke(acc);
     }
@@ -61,7 +56,7 @@ public class SkeletonManager
         if (bespokeBones is null) { Log.Error("GetAddBoneSet was given a null list of bones"); return null; }
 
         Log.Debug($"GetAddBoneSet({source})");
-        if (outfitBoneDicts.TryGetValue(source, out var dict)) { Log.Debug("Returning cached bone dict"); return dict; }
+        if (boneDicts.TryGetValue(source, out var dict)) { Log.Debug("Returning cached bone dict"); return dict; }
 
         Log.Debug($"Adding bone set for {source}");
         Dictionary<string, Transform> boneDict = new(pelvis.BoneData.StandardBones);
@@ -79,7 +74,7 @@ public class SkeletonManager
                 .AllChildTransforms()
                 .ForEach(x => boneDict[x.name] = x);
         }
-        outfitBoneDicts[source] = boneDict;
+        boneDicts[source] = boneDict;
         return boneDict;
     }
 }

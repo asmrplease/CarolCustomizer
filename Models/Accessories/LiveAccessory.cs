@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Contracts;
+using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
 using MagicaCloth2;
@@ -103,7 +104,7 @@ public partial class LiveAccessory : ILiveModel
 {
     public bool isActive { get; private set; } = false;
     public AccessoryDescriptor Descriptor => new AccessoryDescriptor(this);
-    public string RootBoneName => referenceSMR.rootBone?.name ?? "CarolPelvis";
+    public string RootBoneName => referenceSMR.rootBone?.name ?? Constants.PelvisBone;
     virtual public void Enable()
     {
         isActive = true;
@@ -115,6 +116,8 @@ public partial class LiveAccessory : ILiveModel
         isActive = false;
         liveSMR.gameObject.SetActive(false);
     }
+
+    void ILiveModel.HandleNewArmature(PelvisWatchdog watchdog) { }
 
     public void SetVisible(bool visible)
     {
@@ -151,7 +154,7 @@ public partial class LiveAccessory : ISkinned
 
     Transform[] ISkinned.ReferenceBones => referenceSMR.bones;
 
-    string ISkinned.RootBoneName => referenceSMR.rootBone?.name ?? "CarolPelvis";
+    string ISkinned.RootBoneName => referenceSMR.rootBone?.name ?? Constants.PelvisBone;
 }
 
 public partial class LiveAccessory : ILiveMagica

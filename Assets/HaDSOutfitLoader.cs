@@ -16,8 +16,8 @@ internal class HaDSOutfitLoader : IDisposable
 {
     static string ListName = "HaDS Outfits";
     static Dictionary<SourceDescriptor, HaDSOutfit> HaDSOutfits = new();
-    static List<Accessory> Accessories = [];
-    static List<Accessory> SMRAccessory => Accessories.Where(x => x.mesh is SkinnedMeshRenderer).ToList();
+    internal static Dictionary<AccessoryDescriptor, GameAccessory> Accessories = [];
+    
 
     public HaDSOutfitLoader()
     {
@@ -82,9 +82,8 @@ internal class HaDSOutfitLoader : IDisposable
     {
         Resources
             .FindObjectsOfTypeAll<Accessory>()
-            //.Where(x => x.mesh is SkinnedMeshRenderer)
-            //.Select(x => new StoredAccessory())
-            .ForEach(Accessories.Add);
+            .Select(x => new GameAccessory(x))
+            .ForEach(x => Accessories.Add(x.Descriptor, x));
     }
 
     public void Dispose()
