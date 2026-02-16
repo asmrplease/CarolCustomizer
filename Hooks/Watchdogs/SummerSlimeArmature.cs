@@ -60,7 +60,7 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
         foreach (var acc in outfitManager.ActiveAccessories)
         {
             var mat = (acc.Name.ToLower().Contains("eyes")) ? eyeMat : slimeMat;
-            outfitManager.PaintAccessoryShared(acc, acc.Materials.Select(x => mat).ToList());
+            outfitManager.PaintShared(acc, acc.Materials.Select(x => mat).ToList());
         }
     }
 

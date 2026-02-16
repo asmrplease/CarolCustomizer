@@ -90,19 +90,30 @@ public class AccessoryManager : IDisposable, IPelvisFollower
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(target, liveAccessory, false));
     }
 
-    public void PaintAccessory(AccessoryDescriptor target, MaterialDescriptor material, int index)
+    public void PaintAtIndex(AccessoryDescriptor target, MaterialDescriptor material, int index)
     {
-        if (!liveAccessories.TryGetValue(target, out var live)) { Log.Warning($"PaintAccessory failed to find {target}."); return; }
+        if (!liveAccessories.TryGetValue(target, out var live)) { Log.Warning($"PaintAtIndex failed to find {target}."); return; }
 
         live.ApplyMaterial(material, index);
         var newState = liveAccessories[target] as AccessoryDescriptor;
         AccessoryChanged?.Invoke(new AccessoryChangedEvent(target, newState, true));
     }
 
-    public void PaintAccessoryShared(AccessoryDescriptor accessory, List<Material> materials)
+    public void PaintArray(AccessoryDescriptor target, MaterialDescriptor[] materials)
+    {
+        if (!liveAccessories.TryGetValue(target, out var live)) { Log.Warning($"PaintByList failed to find {target}."); return; }
+
+        live.Materials = materials;
+        var arr = materials.Select(x => x.referenceMaterial).ToArray();
+        live.ApplyMaterialArray(arr);
+        var newState = live as AccessoryDescriptor;
+        AccessoryChanged?.Invoke(new AccessoryChangedEvent(target, newState, true));   
+    }
+
+    public void PaintShared(AccessoryDescriptor accessory, List<Material> materials)
     {
         EnableAccessory(accessory);
-        if (!liveAccessories.ContainsKey(accessory)) { Log.Warning("asked to paint disabled accessory"); return; }
+        if (!liveAccessories.ContainsKey(accessory)) { Log.Warning("PaintShared asked to paint disabled accessory"); return; }
         liveAccessories[accessory].ApplySharedMaterials(materials);
     }
 

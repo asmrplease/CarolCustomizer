@@ -133,10 +133,9 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
         Log.Debug($"The material is now {liveSMR.materials[index]}.");
     }
 
-    internal void ApplySharedMaterials(List<Material> materials)
-    {
-        liveSMR.SetSharedMaterials(materials);
-    }
+    internal void ApplySharedMaterials(List<Material> materials) => liveSMR.SetSharedMaterials(materials);
+
+    public void ApplyMaterialArray(Material[] materials) => liveSMR.materials = materials;
 
     public AccessoryDescriptor AsDescriptor()
     {

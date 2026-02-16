@@ -51,7 +51,7 @@ public static class RecipeApplier
                 (
                     SceneResourceProvider.BatchQueueAndThen(
                         materialDescription, 
-                        (x) => target.PaintAccessory(accessory, x, index))
+                        (x) => target.PaintAtIndex(accessory, x, index))
                 );
             return;
         }
@@ -59,7 +59,7 @@ public static class RecipeApplier
         var mat = OutfitAssetManager.GetMaterial(materialDescription);
         if (mat is null) { Log.Warning($"Failed to find material {materialDescription}"); return; }
 
-        target.PaintAccessory(accessory, mat, index);
+        target.PaintAtIndex(accessory, mat, index);
     }
 
     public static IEnumerable<SourceDescriptor> GetMatSources(RecipeDescriptor recipe)

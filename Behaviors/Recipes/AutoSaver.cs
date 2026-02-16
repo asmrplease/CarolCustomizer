@@ -1,6 +1,7 @@
 ﻿using CarolCustomizer.Assets;
 using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Models.Recipes;
+using CarolCustomizer.UI.Recipes;
 using CarolCustomizer.Utils;
 using System.Collections;
 using System.Linq;
@@ -34,37 +35,29 @@ public class AutoSaver
         Log.Info("Autosave Complete.");
     }
 
-    public void Load()
+    public void Load() => CCPlugin.CoroutineRunner.StartCoroutine(LoadRecipeRoutine());
+
+    IEnumerator LoadRecipeRoutine()
     {
         var recipe = CCPlugin
             .recipesManager
             .GetRecipeByFilename(this.path);
-        CCPlugin.CoroutineRunner.StartCoroutine(LoadRecipeRoutine(recipe));
-    }
-
-    IEnumerator LoadRecipeRoutine(Recipe recipeFile)
-    {
         if (!outfitManager.pelvis) yield return new WaitUntil(() => outfitManager.pelvis);
-        RecipeDescriptor recipe;
 
-        if (recipeFile is null
-            || recipeFile.Error == Recipe.Status.FileError
-            || recipeFile.Error == Recipe.Status.InvalidJson
-            || !recipeFile.Descriptor.ActiveAccessories.Any())
+        RecipeDescriptor descriptor;
+        if (recipe is null
+            || recipe.Error == Recipe.Status.FileError
+            || recipe.Error == Recipe.Status.InvalidJson
+            || !recipe.Descriptor.ActiveAccessories.Any())
         {
             Log.Warning("Loading pyjamas instead of autosave");
-            var outfit = OutfitAssetManager.GetPyjamas();
-            recipe = outfit
+            descriptor = OutfitAssetManager.GetPyjamas()
                 .Variants
                 .ElementAt(playerIndex)
                 .Value;
         }
-        else 
-        { 
-            Log.Info("Loading autosave recipe");
-            recipe = recipeFile.Descriptor;
-        }
-        RecipeApplier.ActivateRecipe(outfitManager, recipe);
+        else { descriptor = recipe.Descriptor; }
+        RecipeApplier.ActivateRecipe(outfitManager, descriptor);
         Log.Debug("Load completed succesfully");
         yield break;
     }

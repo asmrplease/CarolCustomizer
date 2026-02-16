@@ -1,5 +1,4 @@
-﻿using System;
-namespace CarolCustomizer.Models;
+﻿namespace CarolCustomizer.Models;
 public enum SourceType
 {
     Outfit = 0,

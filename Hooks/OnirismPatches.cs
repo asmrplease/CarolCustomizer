@@ -25,11 +25,6 @@ public static class OnirismPatches
             .ForEach(x => x.SetActive(false));
     }
 
-    private static void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
-    {
-        throw new System.NotImplementedException();
-    }
-
     [HarmonyPatch(typeof(CostumeSwapUI), nameof(CostumeSwapUI.ChangeCostume))]
     public static class CostumeSwapPatch
     {

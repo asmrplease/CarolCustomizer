@@ -19,8 +19,8 @@ public class EffectManager : IPelvisFollower
     IConfigProvider animatorSource;
     IConfigProvider configurationSource;
 
-    public SourceDescriptor AnimatorSource => animatorSource.Descriptor ?? Constants.PyjamaDescriptor;
-    public SourceDescriptor ConfigurationSource => configurationSource.Descriptor ?? Constants.PyjamaDescriptor;
+    public SourceDescriptor AnimatorSource => animatorSource?.Descriptor ?? Constants.PyjamaDescriptor;
+    public SourceDescriptor ConfigurationSource => configurationSource?.Descriptor ?? Constants.PyjamaDescriptor;
     public IEnumerable<SourceDescriptor> ActiveEffects => outfitEffects;
 
     public EffectManager(SkeletonManager skeletonManager)

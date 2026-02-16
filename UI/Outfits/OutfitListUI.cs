@@ -253,7 +253,7 @@ public class OutfitListUI : MonoBehaviour
 
         var model = hairstyles.Values[modelIndex];
         OutfitListUI.TargetOutfit.EnableAccessory(model);
-        OutfitListUI.TargetOutfit.PaintAccessory(model, matDesc, model.hairstyle.mainMaterialIndex);
+        OutfitListUI.TargetOutfit.PaintAtIndex(model, matDesc, model.hairstyle.mainMaterialIndex);
     }
 
     void OnEnable()

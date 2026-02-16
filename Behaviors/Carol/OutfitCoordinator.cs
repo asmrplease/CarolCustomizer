@@ -34,8 +34,9 @@ public class OutfitCoordinator : IDisposable, IPelvisFollower
     public IEnumerable<SourceDescriptor> ActiveEffects => effectManager.ActiveEffects;
     public void SetEffect(SourceDescriptor source, bool state) => effectManager.SetEffect(source, state);
     public void SetAnimator(SourceDescriptor source) => effectManager.SetAnimator(source);
-    public void PaintAccessory(AccessoryDescriptor accessory, MaterialDescriptor material, int index) => accessoryManager.PaintAccessory(accessory, material, index);
-    public void PaintAccessoryShared(AccessoryDescriptor accessory, List<Material> materials) => accessoryManager.PaintAccessoryShared(accessory, materials);
+    public void PaintAtIndex(AccessoryDescriptor accessory, MaterialDescriptor material, int index) => accessoryManager.PaintAtIndex(accessory, material, index);
+    public void PaintShared(AccessoryDescriptor accessory, List<Material> materials) => accessoryManager.PaintShared(accessory, materials);
+    public void PaintArray(AccessoryDescriptor accessory, MaterialDescriptor[] materials) => accessoryManager.PaintArray(accessory, materials);
     public void DisableAllAccessories() => accessoryManager.DisableAllAccessories();
     public void DisableAllEffects() => effectManager.DisableAllEffects();
     public void SetConfiguration(SourceDescriptor source) => effectManager.SetConfiguration(source);
