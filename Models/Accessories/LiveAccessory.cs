@@ -1,5 +1,4 @@
-﻿using CarolCustomizer.Behaviors.Carol;
-using CarolCustomizer.Models.Materials;
+﻿using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
 using MagicaCloth2;

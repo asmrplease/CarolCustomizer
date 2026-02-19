@@ -68,8 +68,7 @@ public class OutfitAssetManager : IDisposable
     {
         var idk = outfitSets.Values
             .Select(dict =>
-                (found: dict.TryGetValue(descriptor, out var result)
-                , result))
+                (found: dict.TryGetValue(descriptor, out var result), result))
             .FirstOrDefault(tup => tup.found)
             .result;
         return idk;
