@@ -16,7 +16,7 @@ internal class ArmatureIdentifier
     static readonly List<(Func<PelvisWatchdog, Predicate<PelvisWatchdog>, Result> func, Predicate<PelvisWatchdog> pred)> checks;
     static ArmatureIdentifier() => checks =
     [
-        ///Check<SearchType,      ArmatureType>,        (watchdog) => additional detection condition),            //Purpose
+        ///Check<SearchType,    ResultType>,          (watchdog) => additional detection condition),             //Purpose
         (Check<Transform,       SpoilerArmature>,     (x) => x.parentName.Contains("Carol_Adult")),              //Adult Carol
         (Check<MenuSwitchOutfit,MenuArmature>,        (x) => true),                                              //Menu
         (Check<VirtualCarol,    MPBotArmature>,       (x) => true),                                              //Multiplayer Bots
@@ -33,9 +33,9 @@ internal class ArmatureIdentifier
         (Check<Character,       ActressArmature>,     (x) => true),                                              //Carol Actress
         (Check<Transform,       NPCArmature>,         (x) => NPCManager.GetNPCType(x.parentName) != NPC.Error),  //NPCs 
         (Check<Transform,       OutfitArmature>,      (x) => x.gameObject.scene.buildIndex == -1),               //Outfit references
-        (Check<Transform,       ToySoldierArmature>,  (x) => x.parentName.Contains("Carol_Toysoldier")),            //ChristmasArenaDecoration
+        (Check<Transform,       ToySoldierArmature>,  (x) => x.parentName.Contains("Carol_Toysoldier")),         //ChristmasArenaDecoration
         (Check<Transform,       RobonickelArmature>,  (x) => x.parentName == "Carol_Bionicle"),                  //ChristmasArenaDecoration
-        (Check<Transform,       ActressArmature>,     (x) => NPCManager.GetNPCType(x.parentName) == NPC.Error),  //Carol Actress?
+        (Check<Transform,       ActressArmature>,     (x) => NPCManager.GetNPCType(x.parentName) == NPC.Error),  //Carol Actress? Seems to be causing trouble
         (Check<Transform,       MenuDummyArmature>,   (x) => x.rootName   == "MenuDummySvc"),                    //Menu Dummy
         (Check<Transform,       UnknownArmature>,     (x) => true),                                              //Catch-All
     ];
@@ -44,7 +44,8 @@ internal class ArmatureIdentifier
     {
         if (!watchdog) { Log.Warning("DetectChanges() called on a destroyed Watchdog"); return; }
 
-        checks.Select(tup => tup.func.Invoke(watchdog, tup.pred))
+        checks
+            .Select(tup => tup.func.Invoke(watchdog, tup.pred))
             .Where(x => x is Result.Detected)
             .First();
     }

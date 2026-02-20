@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CarolCustomizer.Hooks.Watchdogs.UnhandledArmatures;
+﻿namespace CarolCustomizer.Hooks.Watchdogs.UnhandledArmatures;
 internal class ShopArmature : UnhandledArmature
 {
 }

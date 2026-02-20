@@ -1,13 +1,11 @@
 ﻿using CarolCustomizer.Assets;
-using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.Utils;
 using Newtonsoft.Json;
 using System.Collections;
-using System.Linq;
 using UnityEngine;
 
-namespace FaceCam.Behaviors;
+namespace CarolCustomizer.Behaviors.Recipes;
 public class ThumbnailCamera : MonoBehaviour
 {
     readonly Vector3 cameraRotationAxis = new(0, 1, 0);
@@ -27,7 +25,7 @@ public class ThumbnailCamera : MonoBehaviour
         if (collider) GameObject.Destroy(collider);
 
         camera.cullingMask = 1 << Constants.SMRLayer;
-        camera.clearFlags = CameraClearFlags.Color; //CameraClearFlags.Depth;//
+        camera.clearFlags = CameraClearFlags.Color;
         camera.backgroundColor = Constants.DefaultColor;
         camera.depth = Camera.main.depth + 1;
         camera.fieldOfView = 18;
@@ -39,6 +37,7 @@ public class ThumbnailCamera : MonoBehaviour
         if (PlayerInstances.DefaultPlayer.outfitManager.pelvis is PelvisWatchdog existing) HandleNewPelvis(existing);
         Slate.Cutscene.OnCutsceneStopped += HandleCutsceneEnd;
 
+        //remove camera effects that interfere with transparency
         if (GetComponent<HxVolumetricCamera>() is HxVolumetricCamera hxvc) { Destroy(hxvc); }
         if (GetComponent<HxVolumetricImageEffect>() is HxVolumetricImageEffect hxvie) { Destroy(hxvie); }
 
@@ -66,65 +65,16 @@ public class ThumbnailCamera : MonoBehaviour
     public IEnumerator Save(string filePath)
     {
         yield return new WaitForEndOfFrame();
-        var rawImage = Capture(Constants.ThumbnailSize);
-        var descriptor = new RecipeDescriptor(PlayerInstances.DefaultPlayer.outfitManager);
-        string json = JsonConvert.SerializeObject(descriptor, Formatting.None);
-        PngUtil.BuildPng(filePath, Constants.ThumbnailSize, rawImage, [(Constants.PNGChunkKeyword, json)]);
-        Log.Info("Save complete.");
-    }
 
-    public byte[] Capture(int resolution)
-    {
+        var res = Constants.ThumbnailSize;
         this.transform.position = (cameraPostionDriver.position + 3 * cameraPostionDriver.transform.forward);
         this.transform.LookAt(cameraTarget);
-        var black = Capture(Color.black, resolution);
-        var white = Capture(Color.white, resolution);
-        var alpha = CalculateTransparency(black, white);
-        return alpha.GetPixelData<byte>(0).ToArray();
-    }
-
-    Texture2D Capture(Color color, int resolution)
-    {
-        camera.enabled = true;
-        RenderTexture.active = 
-            camera.targetTexture 
-            ??= new(resolution, resolution, 32);
-        camera.backgroundColor = color;
-        camera.Render();
-        Log.Debug("Render Complete");
-        Texture2D result = new Texture2D(
-            camera.targetTexture.width,
-            camera.targetTexture.height,
-            TextureFormat.RGBA32, false);
-        if (result) Log.Info("created texture2d");
-
-        result.ReadPixels(
-            new Rect(
-                0, 0,   
-                camera.targetTexture.width,
-                camera.targetTexture.height),
-            0, 0);
-
-        result.Apply();
-        Log.Debug("ReadPixels complete");
-        camera.enabled = false;
-        return result;
-    }
-
-    Texture2D CalculateTransparency(Texture2D blackTexture, Texture2D whiteTexture)
-    {
-        const int mipmap = 0;
-        var alphaTex = new Texture2D(
-            camera.targetTexture.width,
-            camera.targetTexture.height,
-            TextureFormat.RGBA32, false);
-        var black = blackTexture.GetPixelData<Color32>(mipmap);
-        var white = whiteTexture.GetPixelData<Color32>(mipmap);
-        var alpha = black
-            .Zip(white, (black, white) => white.DifferenceToAlpha(black))
-            .ToArray();
-        alphaTex.SetPixelData(alpha, mipmap);
-        return alphaTex;
+        var texture = camera.CaptureAlpha(res);
+        var bytes = texture.GetPixelData<byte>(0).ToArray();
+        var descriptor = new RecipeDescriptor(PlayerInstances.DefaultPlayer.outfitManager);
+        string json = JsonConvert.SerializeObject(descriptor, Formatting.None);
+        PngUtil.BuildPng(filePath, res, bytes, [(Constants.PNGChunkKeyword, json)]);
+        Log.Info("Save complete.");
     }
 
     void OnDestroy() => Slate.Cutscene.OnCutsceneStopped -= HandleCutsceneEnd;

@@ -8,7 +8,6 @@ using CarolCustomizer.Hooks;
 using CarolCustomizer.Hooks.Watchdogs;
 using CarolCustomizer.UI.Main;
 using CarolCustomizer.Utils;
-using FaceCam.Behaviors;
 using HarmonyLib;
 using System;
 using System.Collections;

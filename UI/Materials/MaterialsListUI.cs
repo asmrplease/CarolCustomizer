@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace CarolCustomizer.UI.Materials;
-internal class MaterialsListUI : MonoBehaviour
+public class MaterialsListUI : MonoBehaviour
 {
     private static readonly string listRootAddress = "Scroll View/Viewport/Content";
 
@@ -19,7 +19,7 @@ internal class MaterialsListUI : MonoBehaviour
     Transform listRoot;
 
     readonly List<ReadOnlyMatUI> eyedropperMaterialUIs = [];
-    readonly Dictionary<MaterialDescriptor, ReadOnlyMatUI> bookmarkedMaterialUIs = [];
+    readonly Dictionary<MaterialDescriptor, ReadOnlyMatUI> permanentUIElements = [];
 
     public MaterialsListUI Constructor(UIAssetLoader loader, Main.ContextMenu contextMenu)
     {
@@ -28,7 +28,7 @@ internal class MaterialsListUI : MonoBehaviour
         this.eyedropper = this.gameObject.AddComponent<Eyedropper>().Constructor(loader);
         this.eyedropper.OnMaterialsFound += OnEyedropperChanged;
         SceneResourceProvider.SetCallback();
-        SceneResourceProvider.OnMaterialLoaded += OnMaterialBookmarked;
+        SceneResourceProvider.OnMaterialLoaded += OnMaterialLoaded;
         MenuToggle.OnMenuToggle += HandleMenuToggle;
         listRoot = transform.Find(listRootAddress);
         return this;
@@ -46,19 +46,18 @@ internal class MaterialsListUI : MonoBehaviour
         this.eyedropper.enabled = true;
     }
 
-    private void OnMaterialBookmarked(MaterialDescriptor mat)
+    public void OnMaterialLoaded(MaterialDescriptor mat)
     {
         Log.Debug($"Creating materialUI for {mat.Name}");
-        if (bookmarkedMaterialUIs.TryGetValue(mat, out var existing))
+        if (permanentUIElements.TryGetValue(mat, out var existing))
         {
             Destroy(existing.gameObject);
-            bookmarkedMaterialUIs.Remove(mat);
+            permanentUIElements.Remove(mat);
         }
         var ui = Instantiate(loader.AccessoryListElement, listRoot)
             .AddComponent<ReadOnlyMatUI>()
             .Constructor(mat, contextMenu);
-        bookmarkedMaterialUIs.Add(mat, ui);
-        //ui.transform.SetSiblingIndex(bookmarkedMaterialUIs.IndexOfKey(mat));
+        permanentUIElements.Add(mat, ui);
     }
 
     private void OnEyedropperChanged(List<MaterialDescriptor> materials)
@@ -90,5 +89,4 @@ internal class MaterialsListUI : MonoBehaviour
         Log.Debug("Toggling Eyedropper");
         this.eyedropper.enabled = !this.eyedropper.enabled;
     }
-
 }
