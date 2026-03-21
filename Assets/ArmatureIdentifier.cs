@@ -13,6 +13,14 @@ using UnityEngine;
 namespace CarolCustomizer.Assets;
 internal class ArmatureIdentifier
 {
+    /// <summary>
+    /// An ordered list of functions to evaluate to determine armature type.
+    /// The function evaluates a PelvisWatchdog, a Component type to search for, an armature behavior to instantiate on success, and an additional predicate, then returns a Result (yes, no, error).
+    /// The list items are tuples, bundling the reference to the typed function with their corresponding predicate.
+    /// Each line acts like: if (watchdog.GetComponentInParent<SearchType>()) && predicate.Invoke(watchdog)) {watchdog.AddComponent<ResultType>();}
+    /// Check<Transform>() and "(x) => true" always evaluate to true.
+    /// This convoluted setup is meant to make the checking process safe to call, and easy to adjust. 
+    /// </summary>
     static readonly List<(Func<PelvisWatchdog, Predicate<PelvisWatchdog>, Result> func, Predicate<PelvisWatchdog> pred)> checks;
     static ArmatureIdentifier() => checks =
     [

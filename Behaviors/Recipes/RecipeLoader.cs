@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using static CarolCustomizer.Utils.Constants;
-using static MissionManager;
 using static Newtonsoft.Json.JsonConvert;
 
 namespace CarolCustomizer.Behaviors.Recipes;

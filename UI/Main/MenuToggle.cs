@@ -5,7 +5,6 @@ using Onirism.Ui;
 using System;
 using System.Collections;
 using System.ComponentModel;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -19,7 +18,8 @@ public class MenuToggle : MonoBehaviour
     #region State Variables
     public static bool IsVisible { get; private set; } = false;
     Scene currentScene;
-    GameObject mainMenuPages;
+    GameObject screensContainer;
+    Animator idk;
     #endregion
 
     public static event Action<bool> OnMenuToggle;
@@ -69,22 +69,23 @@ public class MenuToggle : MonoBehaviour
     bool CheckInput()
     {
         return Input.GetKeyDown(Settings.HotKeys.MenuToggleMouse)
-             || Input.GetKeyDown(Settings.HotKeys.MenuToggleKeyboard);
+            || Input.GetKeyDown(Settings.HotKeys.MenuToggleKeyboard);
     }
 
     IEnumerator OnMainMenuLoaded()
     {
-        yield return new WaitUntil(() => MainMenuManager.manager);
+        yield return new WaitUntil(() => MainMenuTopPanel.I);
         Log.Debug("MenuToggle.OnMainMenuLoaded()");
 
-        var pagesFolder = MainMenuManager.manager.transform.Find("PAGES");
-        if (!pagesFolder) { Log.Error("didn't find main menu page."); yield return null; }
-        if (pagesFolder) { mainMenuPages = pagesFolder.gameObject; }
+        var container = MainMenuTopPanel.I.transform.Find("Screens Container");
+        if (!container) { Log.Warning("failed to find Screens Container."); yield return null; }
+
+        screensContainer = container.gameObject;
     }
 
     void MainMenuUpdate()
     {
-        if (!mainMenuPages) return;
+        if (!screensContainer) return;
 
         if (CheckInput()) { MainMenuSetMenuState(!IsVisible); return; }
         if (IsVisible && Input.GetKeyDown(KeyCode.Escape)) { MainMenuSetMenuState(false); return; }
@@ -96,41 +97,22 @@ public class MenuToggle : MonoBehaviour
         if (newVisibility == IsVisible) { return; }
 
         //if we are currently visible and asked to go back to regular menu
-        if (IsVisible && !newVisibility)
-        {
-            OnMenuToggle?.Invoke(false);// uiInstance.Hide();
-            SetGameMainMenuVisibility(true);
-            //mainMenuPages.transform.GetChild(0).gameObject.SetActive(true);
-            IsVisible = newVisibility;
-            return;
-        }
-
-        //if we are not currently visible and asked to become visible
-        //var activePage = mainMenuPages.transform.Cast<Transform>().FirstOrDefault(x => x.gameObject.activeSelf);
-        //if (!activePage) { Log.Warning("tried to hide menu screen but no active page was found."); return; }
-        //if (activePage.GetSiblingIndex() != 0) { Log.Debug("tried to open accUI but we weren't on the main page"); return; }
-
-        OnMenuToggle?.Invoke(true);
-        //activePage.gameObject.SetActive(false);
-        SetGameMainMenuVisibility(false);
-        Log.Debug("hid menu");
-
-        //store the visibility state
+        SetGameMainMenuVisibility(!newVisibility);
         IsVisible = newVisibility;
+        OnMenuToggle?.Invoke(newVisibility);
     }
 
     void SetGameMainMenuVisibility(bool visible)
     {
-        MainMenuTopPanel.I.gameObject.SetActive(visible);
+        Log.Debug($"SetGameMainMenuVisibility({visible}");
+        if (!screensContainer) { Log.Warning("Main menu pages null when trying to set visibility"); return; }
+        screensContainer.SetActive(visible);
         if (!visible) return;
+        if (screensContainer.transform.GetChild(0)?.GetComponent<Animator>() is not Animator animator) { Log.Warning("main menu animator was null when trying to set visibility"); return; }
 
-        var animator = MainMenuTopPanel.I.transform.Find("Screens Container")?.GetChild(0)?.GetComponent<Animator>();
-        if (!animator) return;
-
-        animator.SetBool("opened", true);
-        animator.Update(0.0f);
-        animator.Play("Opened", -1, 1f);
-        animator.Update(0.0f);
+        Log.Debug($"{animator.gameObject.name}");
+        idk = animator;
+        idk.SetBool("opened", true);
     }
 
     void GameplayUpdate()
@@ -153,24 +135,11 @@ public class MenuToggle : MonoBehaviour
         GameplaySetMenuState(true);
     }
 
-    //void LateUpdate()
-    //{
-    //    if (!IsVisible) return;
-    //    Cursor.visible = true;
-    //    Cursor.lockState = CursorLockMode.Confined;
-    //}
 
     void GameplaySetMenuState(bool visible)
     {
         Log.Debug($"GameplaySetMenuState({visible})");
         if (!uiInstance) { Log.Warning("Tried to set ui state on missing uiInstance."); return; }
-
-        //PauseDiary.manager.isPaused = visible;
-        //Onirism.Ui.PauseMenu.
-        //Onirism.Ui.UiManager.I.isInPauseMenu = visible;
-        //GameManager.manager.ToggleCursorState(visible ? CursorLockMode.Confined : CursorLockMode.Locked);
-        //var cursorState = visible ? CursorLockMode.Confined : CursorLockMode.Locked;
-        //Log.Debug($"Set lockstate to {cursorState}");
 
         if (visible) Onirism.Ui.UiManager.I.panelStacker.Stack(uiInstance.lughPanel, true);
         if (!visible) Onirism.Ui.UiManager.I.panelStacker.DestackTopmost(true);

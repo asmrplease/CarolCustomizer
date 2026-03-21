@@ -9,7 +9,7 @@ namespace CarolCustomizer.Behaviors.Recipes;
 public class ThumbnailCamera : MonoBehaviour
 {
     readonly Vector3 cameraRotationAxis = new(0, 1, 0);
-    Camera camera;
+    public Camera camera;
     CameraController cameraController;
     Transform cameraPostionDriver;
     Transform cameraTarget;
@@ -38,8 +38,8 @@ public class ThumbnailCamera : MonoBehaviour
         Slate.Cutscene.OnCutsceneStopped += HandleCutsceneEnd;
 
         //remove camera effects that interfere with transparency
-        if (GetComponent<HxVolumetricCamera>() is HxVolumetricCamera hxvc) { Destroy(hxvc); }
-        if (GetComponent<HxVolumetricImageEffect>() is HxVolumetricImageEffect hxvie) { Destroy(hxvie); }
+        if (GetComponent<HxVolumetricCamera>()      is HxVolumetricCamera hxvc)         { Destroy(hxvc); }
+        if (GetComponent<HxVolumetricImageEffect>() is HxVolumetricImageEffect hxvie)   { Destroy(hxvie); }
 
         cameraController = this.GetComponent<CameraController>();
         if (!cameraController) { Log.Warning("didn't find cameracontroller component"); return; }

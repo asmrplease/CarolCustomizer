@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Utils;
+using Onirism;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,9 +23,9 @@ internal class CutsceneTest
 
     static List<string> GetCampaignSceneNames()
     {
-        return GameManager.manager
-            .scenes
-            .Where(x => x.isStory)
+        return SceneLoaderSvc.I
+            .allScenes
+            .Where(x => x.sceneType == SceneTypes.ADVENTURE)
             .Select(x => x.sceneName)
             .ToList();
     }
