@@ -33,7 +33,7 @@ public class MagiData : MonoBehaviour
     public MagiData Constructor()
     {
         MagicaCloths = transform
-            .parent
+            .root
             .GetComponentsInChildren<MagicaCloth>(true)
             .ToList();
 
