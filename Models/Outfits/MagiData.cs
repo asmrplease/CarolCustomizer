@@ -28,7 +28,7 @@ public class MagiData : MonoBehaviour
     [SerializeField]
     public MagicaClothCompanion ClothCompanion;
 
-    public Dictionary<SkinnedMeshRenderer, MagicaCloth> smrMeshClothDict = [];
+    public Dictionary<SkinnedMeshRenderer, List<MagicaCloth>> smrMeshClothDict = [];
 
     public MagiData Constructor()
     {
@@ -52,7 +52,11 @@ public class MagiData : MonoBehaviour
                 tup.renderers
                     .Where(renderer => renderer.GetType() == typeof(SkinnedMeshRenderer))
                     .Select(renderer => renderer as SkinnedMeshRenderer)
-                    .ForEach(smr => smrMeshClothDict.Add(smr, tup.meshCloth));
+                    .ForEach(smr =>
+                    {
+                        if  (smrMeshClothDict.TryGetValue(smr, out var list)) list.Add(tup.meshCloth);
+                        else smrMeshClothDict.Add(smr, [tup.meshCloth]);
+                    });
             });
         Log.Debug($"Found {smrMeshClothDict.Count()} smrs with meshcloths");
 

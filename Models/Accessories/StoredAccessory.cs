@@ -3,6 +3,7 @@ using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks;
 using CarolCustomizer.Models.Outfits;
 using MagicaCloth2;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ public class StoredAccessory : AccessoryDescriptor, IInstantiable
 {
     public readonly Outfit outfit;
     public readonly SkinnedMeshRenderer referenceSMR;
-    public readonly MagicaCloth magica;
+    public readonly List<MagicaCloth> magica;
     public string DisplayName;
 
     public StoredAccessory(Outfit outfit, SkinnedMeshRenderer smr)

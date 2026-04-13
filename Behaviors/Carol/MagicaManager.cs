@@ -17,7 +17,7 @@ internal class MagicaManager
     PelvisWatchdog targetPelvis;
 
     List<MagicaCloth> processing = [];
-    Dictionary<AccessoryDescriptor, MagicaCloth> MeshCloths = [];
+    Dictionary<MagicaCloth, MagicaCloth> MeshCloths = [];
     Dictionary<int, MagicaCloth> BoneCloths = [];
     IMagicaSource colliderSource;
 
@@ -95,23 +95,25 @@ internal class MagicaManager
 
     public void AccMeshClothSetup(LiveAccessory acc)
     {
-        if (!acc.meshCloth) return;
-
-        Log.Info($"MagicaManager.HandleNewLiveAcc({acc.Name})");
-        if (MeshCloths.TryGetValue(acc, out var existing) && existing) GameObject.Destroy(existing);
+        if (acc.meshCloths is null) return;
         if (!acc.isActive) return;
 
-        var referenceMagica = acc.meshCloth;
-        referenceMagica.gameObject.SetActive(false);
-        var liveMagica = GameObject.Instantiate(referenceMagica, targetPelvis.transform.parent);
-        liveMagica.SerializeData.sourceRenderers.Clear();
-        liveMagica.SerializeData.rootBones.Clear();
-        acc.AddToMagica(liveMagica);
-        skeleton.AssignLiveBones(acc, false);
-        CommonSetup(liveMagica, acc.Source, acc.BespokeBones);
-        liveMagica.name = acc.Name + " MeshCloth";
-        referenceMagica.gameObject.SetActive(true);
-        MeshCloths[acc] = liveMagica;
+        Log.Info($"MagicaManager.HandleNewLiveAcc({acc.Name})");
+        int i = 1;
+        foreach (var referenceMagica in acc.meshCloths)
+        {
+            if (MeshCloths.TryGetValue(referenceMagica, out var existing) && existing) GameObject.Destroy(existing);
+            referenceMagica.gameObject.SetActive(false);
+            var liveMagica = GameObject.Instantiate(referenceMagica, targetPelvis.transform.parent);
+            liveMagica.SerializeData.sourceRenderers.Clear();
+            liveMagica.SerializeData.rootBones.Clear();
+            acc.AddToMagica(liveMagica);
+            skeleton.AssignLiveBones(acc, false);
+            CommonSetup(liveMagica, acc.Source, acc.BespokeBones);
+            liveMagica.name = acc.Name + " MeshCloth " + i++;
+            referenceMagica.gameObject.SetActive(true);
+            MeshCloths[referenceMagica] = liveMagica;
+        }
     }
 
     void CommonSetup(MagicaCloth liveMagica, SourceDescriptor source, List<Transform> bespokeBones)
