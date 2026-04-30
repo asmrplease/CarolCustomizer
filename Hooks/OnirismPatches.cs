@@ -25,36 +25,36 @@ public static class OnirismPatches
             .ForEach(x => x.SetActive(false));
     }
 
-    [HarmonyPatch(typeof(CostumeSwapUI), nameof(CostumeSwapUI.ChangeCostume))]
-    public static class CostumeSwapPatch
-    {
-        [HarmonyPrefix]
-        public static bool Prefix(CostumeSwapUI __instance)
-        {
-            __instance.cardSlotToItem.TryGetValue(
-                __instance.selection.transform.parent.gameObject,
-                out var modelData);
-            if (!modelData) return false;
+    //[HarmonyPatch(typeof(CostumeSwapUI), nameof(CostumeSwapUI.ChangeCostume))]
+    //public static class CostumeSwapPatch
+    //{
+    //    [HarmonyPrefix]
+    //    public static bool Prefix(CostumeSwapUI __instance)
+    //    {
+    //        __instance.cardSlotToItem.TryGetValue(
+    //            __instance.selection.transform.parent.gameObject,
+    //            out var modelData);
+    //        if (!modelData) return false;
 
-            var player = PlayerInstances.Find(__instance.player);
-            if (player is null) return false;
+    //        var player = PlayerInstances.Find(__instance.player);
+    //        if (player is null) return false;
 
-            Log.Debug($"CostumeSwapUI: {modelData.name}");
-            var recipe = OutfitAssetManager.GetOutfitByAssetName(modelData.name)?.Variants.FirstOrDefault().Value;
-            if (recipe is null) { Log.Error($"Failed to find any recipes in outfit {modelData.name}"); return false; }
-            RecipeApplier.ActivateRecipe(
-                player.outfitManager,
-                recipe);
-            return false;
-        }
-    }
+    //        Log.Debug($"CostumeSwapUI: {modelData.name}");
+    //        var recipe = OutfitAssetManager.GetOutfitByAssetName(modelData.name)?.Variants.FirstOrDefault().Value;
+    //        if (recipe is null) { Log.Error($"Failed to find any recipes in outfit {modelData.name}"); return false; }
+    //        RecipeApplier.ActivateRecipe(
+    //            player.outfitManager,
+    //            recipe);
+    //        return false;
+    //    }
+    //}
 
-    [HarmonyPatch(typeof(CostumeSwapUI), nameof(CostumeSwapUI.ToggleAccessory))]
-    public class AccessoryTogglePatch
-    {
-        [HarmonyPrefix]
-        public static bool Prefix() => false;
-    }
+    //[HarmonyPatch(typeof(CostumeSwapUI), nameof(CostumeSwapUI.ToggleAccessory))]
+    //public class AccessoryTogglePatch
+    //{
+    //    [HarmonyPrefix]
+    //    public static bool Prefix() => false;
+    //}
 
     [HarmonyPatch(typeof(SwapCostumeTrigger), "OnTriggerEnter")]
     public class DisableSwapCostumeTrigger
