@@ -19,6 +19,7 @@ internal class ArmatureIdentifier
     /// The list items are tuples, bundling the reference to the typed function with their corresponding predicate.
     /// Each line acts like: if (watchdog.GetComponentInParent<SearchType>()) && predicate.Invoke(watchdog)) {watchdog.AddComponent<ResultType>();}
     /// Check<Transform>() and "(x) => true" always evaluate to true.
+    /// The list is checked in order, so in the event an armature would pass more than one test, it is assigned based on the first matching rule.
     /// This convoluted setup is meant to make the checking process safe to call, and easy to adjust. 
     /// </summary>
     static readonly List<(Func<PelvisWatchdog, Predicate<PelvisWatchdog>, Result> func, Predicate<PelvisWatchdog> pred)> checks;
@@ -43,6 +44,7 @@ internal class ArmatureIdentifier
         (Check<Transform,       OutfitArmature>,      (x) => x.gameObject.scene.buildIndex == -1),               //Outfit references
         (Check<Transform,       ToySoldierArmature>,  (x) => x.parentName.Contains("Carol_Toysoldier")),         //ChristmasArenaDecoration
         (Check<Transform,       RobonickelArmature>,  (x) => x.parentName == "Carol_Bionicle"),                  //ChristmasArenaDecoration
+        (Check<Transform,       ResortNPCArmature>,   (x) => x.rootName   == "CHARACTERS"),                      //Resort NPCs
         (Check<Transform,       ActressArmature>,     (x) => NPCManager.GetNPCType(x.parentName) == NPC.Error),  //Carol Actress? Seems to be causing trouble
         (Check<Transform,       MenuDummyArmature>,   (x) => x.rootName   == "MenuDummySvc"),                    //Menu Dummy
         (Check<Transform,       UnknownArmature>,     (x) => true),                                              //Catch-All
@@ -53,9 +55,8 @@ internal class ArmatureIdentifier
         if (!watchdog) { Log.Warning("DetectChanges() called on a destroyed Watchdog"); return; }
 
         checks
-            .Select(tup => tup.func.Invoke(watchdog, tup.pred))
-            .Where(x => x is Result.Detected)
-            .First();
+            .Select(check => check.func.Invoke(watchdog, check.pred))
+            .First(x => x is Result.Detected);
     }
 
     enum Result { Detected, NotDetected, Error }

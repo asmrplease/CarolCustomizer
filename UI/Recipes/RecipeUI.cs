@@ -240,8 +240,8 @@ public class RecipeUI : MonoBehaviour, IPointerClickHandler, IContextMenuActions
         if (recipe.Error != Recipe.Status.FileError)
         {
             output.Add(("Overwrite", OnContextMenuOverwrite));
-            output.Add(("Delete", OnContextMenuDelete));
-            output.Add(("Rename", OnContextMenuRename));
+            output.Add(("Delete",    OnContextMenuDelete));
+            output.Add(("Rename",    OnContextMenuRename));
             NPCManager.ValidNPCs().ForEach(x => output.Add(($"Set as {x}", () => ApplyToNPC(x))));
         }
         if (recipe.Error == Recipe.Status.Incomplete || recipe.Error == Recipe.Status.SlowSource)

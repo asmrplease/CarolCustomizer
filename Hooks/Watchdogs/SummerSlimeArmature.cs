@@ -3,9 +3,7 @@ using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
-using System;
 using System.Linq;
 using UnityEngine;
 
