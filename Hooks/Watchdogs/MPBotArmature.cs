@@ -43,10 +43,11 @@ public class MPBotArmature : MonoBehaviour, ICarolType, ICarolBot
         virtualCarol ??= GetComponentInParent<VirtualCarol>(true);
         if (!virtualCarol) { Log.Warning("VirtualCarol null during SetBotName"); return; }
 
-        MultiplayerManager.PlayerStats stats = virtualCarol?.GetPlayerStats();
-        if (stats is null) { Log.Error("didn't find stats from virtualCarol"); return; }
+        //MultiplayerManager.PlayerStats stats = virtualCarol?.GetPlayerStats();
+        //if (stats is null) { Log.Error("didn't find stats from virtualCarol"); return; }
 
-        stats.name = name;
+        //stats.name = name;
+        Log.Warning("SetMPName was commented out due to a programming change and never restored.");
     }
 
     public ICarolType Constructor(PelvisWatchdog watchdog)

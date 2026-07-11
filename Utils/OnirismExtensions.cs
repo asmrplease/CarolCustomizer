@@ -40,13 +40,13 @@ public static class OnirismExtensions
         typeof(DynamicBone).GetMethod("SetupParticles", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(dBone, null);
     }
 
-    public static MultiplayerManager.PlayerStats GetPlayerStats(this VirtualCarol virtualCarol)
-    {
-        if (MultiplayerManager.manager?.players is null) return null;
-        if (!virtualCarol) return null;
-        return MultiplayerManager.manager.players
-            .FirstOrDefault(x => x.player == virtualCarol.entity);
-    }
+    //public static MultiplayerManager.PlayerStats GetPlayerStats(this VirtualCarol virtualCarol)
+    //{
+    //    if (MultiplayerManager.manager?.players is null) return null;
+    //    if (!virtualCarol) return null;
+    //    return MultiplayerManager.manager.players
+    //        .FirstOrDefault(x => x.player == virtualCarol.entity);
+    //}
 
     public static GameObject GetMenuCarolPelvis()
     {
