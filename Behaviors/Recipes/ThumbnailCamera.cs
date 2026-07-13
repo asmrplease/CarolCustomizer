@@ -21,8 +21,8 @@ public class ThumbnailCamera : MonoBehaviour
         if (!camera) { Log.Error("ThumbnailCamera instantiated on an object without a camera component!"); return; }
 
         this.name = "Thumbnail Camera";
-        var collider = GetComponent<SphereCollider>();
-        if (collider) GameObject.Destroy(collider);
+        if (GetComponent<SphereCollider>() is SphereCollider c) GameObject.Destroy(c);
+        if (GetComponent<AudioListener>()  is AudioListener a)  GameObject.Destroy(a);
 
         camera.cullingMask = 1 << Constants.SMRLayer;
         camera.clearFlags = CameraClearFlags.Color;
