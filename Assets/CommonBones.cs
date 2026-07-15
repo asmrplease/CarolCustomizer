@@ -8,8 +8,8 @@ public static class CommonBones
 {
     static HashSet<string> Bones;
     public static bool Ready => Bones is not null;
-    static List<string> HairBones = new() 
-    { 
+    static List<string> HairBones =
+    [
         "Carol_TAIL_TOP", 
         "Carol_TAIL_HIGH_MID", 
         "Carol_TAIL_LOW_MID", 
@@ -19,7 +19,7 @@ public static class CommonBones
         "Carol_ENDBone001Bone001Bone001", 
         "Carol_ENDBone001Bone001Bone001Bone001", 
         "Carol_ENDBone001Bone001Bone001Bone001Bone001" 
-    };
+    ];
     public static void SetCommonBones()
     {
         if (Ready) { Log.Error("tried to replace standard bone names"); return; }
@@ -27,7 +27,7 @@ public static class CommonBones
         Bones = GameManager.manager
             .GetOutfit(Constants.Pyjamas)
             .transform
-            .RecursiveFindTransform(x => x.name == "CarolPelvis")
+            .RecursiveFindTransform(x => x.name == Constants.Pelvis)
             .GetComponentsInChildren<Transform>()
             .Select(x => x.name)
             .ToHashSet();

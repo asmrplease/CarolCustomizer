@@ -21,7 +21,7 @@ public class LiveAccessory : AccessoryDescriptor, IDisposable
 
     #region Public Interface
     public Transform[] bones => referenceSMR.bones;
-    public string RootBoneName => referenceSMR.rootBone?.name ?? "CarolPelvis";
+    public string RootBoneName => referenceSMR.rootBone?.name ?? Constants.Pelvis;
 
     public readonly Outfit outfit;
 

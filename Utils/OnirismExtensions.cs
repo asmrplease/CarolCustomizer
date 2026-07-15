@@ -55,7 +55,7 @@ public static class OnirismExtensions
             .GetRootGameObjects()
             .First(x => x.name == "MenuCarolLoader")
             .transform
-            .RecursiveFindTransform(x => x.name == "CarolPelvis")
+            .RecursiveFindTransform(x => x.name == Constants.Pelvis)
             .gameObject;
     }
 

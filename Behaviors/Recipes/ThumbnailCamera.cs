@@ -21,9 +21,6 @@ public class ThumbnailCamera : MonoBehaviour
         if (!camera) { Log.Error("ThumbnailCamera instantiated on an object without a camera component!"); return; }
 
         this.name = "Thumbnail Camera";
-        if (GetComponent<SphereCollider>() is SphereCollider c) GameObject.Destroy(c);
-        if (GetComponent<AudioListener>()  is AudioListener a)  GameObject.Destroy(a);
-
         camera.cullingMask = 1 << Constants.SMRLayer;
         camera.clearFlags = CameraClearFlags.Color;
         camera.backgroundColor = Constants.DefaultColor;
@@ -37,13 +34,12 @@ public class ThumbnailCamera : MonoBehaviour
         if (PlayerInstances.DefaultPlayer.outfitManager.pelvis is PelvisWatchdog existing) HandleNewPelvis(existing);
         Slate.Cutscene.OnCutsceneStopped += HandleCutsceneEnd;
 
-        //remove camera effects that interfere with transparency
         if (GetComponent<HxVolumetricCamera>()      is HxVolumetricCamera hxvc)         { Destroy(hxvc); }
         if (GetComponent<HxVolumetricImageEffect>() is HxVolumetricImageEffect hxvie)   { Destroy(hxvie); }
+        if (GetComponent<SphereCollider>()   is SphereCollider c)                       { Destroy(c); }
+        if (GetComponent<AudioListener>()    is AudioListener a)                        { Destroy(a); }
+        if (GetComponent<CameraController>() is CameraController cc)                    { Destroy(cc); }
 
-        cameraController = this.GetComponent<CameraController>();
-        if (!cameraController) { Log.Warning("didn't find cameracontroller component"); return; }
-        GameObject.Destroy(cameraController);
         HandleNewPelvis(PlayerInstances.DefaultPlayer.outfitManager.pelvis);
     }
 

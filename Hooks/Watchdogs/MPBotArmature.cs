@@ -9,7 +9,7 @@ using System;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class MPBotArmature : MonoBehaviour, ICarolType, ICarolBot
+public class MPBotArmature : MonoBehaviour, ICarolType, ICustomizable
 {
     VirtualCarol virtualCarol;
     public PelvisWatchdog watchdog { get; private set; }
@@ -28,7 +28,7 @@ public class MPBotArmature : MonoBehaviour, ICarolType, ICarolBot
         watchdog.CompData.SetBaseVisibility(visible);
     }
 
-    public void CustomizeBot(RecipeDescriptor recipe, OutfitCoordinator outfit, string name)
+    public void Customize(RecipeDescriptor recipe, OutfitCoordinator outfit, string name)
     {
         if (Settings.Plugin.customMPBots.Value is not true) return;
 

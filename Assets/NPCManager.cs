@@ -56,7 +56,7 @@ public class NPCManager
             .Cast<NPC>()
             .Except([NPC.Error]);
 
-    public static void OnBotSpawn(ICarolBot bot)
+    public static void OnBotSpawn(ICustomizable bot)
     {
         Log.Debug("OnBotSpawn()");
         if (!bot.Watchdog()) { Log.Error("Tried to spawn bot will null watchdog!"); return; }
@@ -67,10 +67,10 @@ public class NPCManager
         liveBots.Add(bot.Watchdog(), botInstance);
         liveBots[bot.Watchdog()].NotifySpawned(bot.Watchdog());
         var recipe = GetRandomRecipe();
-        bot.CustomizeBot(recipe.Item2, botInstance.outfitManager, recipe.Item1);
+        bot.Customize(recipe.Item2, botInstance.outfitManager, recipe.Item1);
     }
 
-    public static void OnBotDespawn(ICarolBot bot)
+    public static void OnBotDespawn(ICustomizable bot)
     {
         Log.Debug("OnBotDespawn()");
         if (!liveBots.ContainsKey(bot.Watchdog())) { Log.Warning("tried to despawn a bot not in the list"); return; }

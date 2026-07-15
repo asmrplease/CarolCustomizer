@@ -8,7 +8,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
+public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICustomizable
 {
     static int spawnCount = 0;
     static Material eyeMat = null;
@@ -38,7 +38,7 @@ public class SummerSlimeArmature : MonoBehaviour, ICarolType, ICarolBot
         return this;
     }
 
-    public void CustomizeBot(RecipeDescriptor recipe, OutfitCoordinator outfitManager, string _) 
+    public void Customize(RecipeDescriptor recipe, OutfitCoordinator outfitManager, string _) 
     {
         if (!custom) return;
 

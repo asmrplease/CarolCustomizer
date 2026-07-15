@@ -8,7 +8,7 @@ using System;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs;
-public class CampaignBotArmature : MonoBehaviour, ICarolType, ICarolBot
+public class CampaignBotArmature : MonoBehaviour, ICarolType, ICustomizable
 {
     public PelvisWatchdog watchdog { get; private set; }
     public PelvisWatchdog Watchdog() => watchdog;
@@ -30,7 +30,7 @@ public class CampaignBotArmature : MonoBehaviour, ICarolType, ICarolBot
         return this;
     }
 
-    public void CustomizeBot(RecipeDescriptor recipe, OutfitCoordinator outfitManager, string _) 
+    public void Customize(RecipeDescriptor recipe, OutfitCoordinator outfitManager, string _) 
     {
         if (Settings.Plugin.customCampaignBots.Value is not true) return;
 

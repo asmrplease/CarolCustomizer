@@ -7,8 +7,8 @@ using UnityEngine;
 namespace CarolCustomizer.Utils;
 public static class Constants
 {
-    public static readonly List<string> freeOutfits = new List<string>
-    {
+    public static readonly List<string> freeOutfits =
+    [
         "CAROL_Bombsuit",
         "CAROL_Bionicle1",
         "CAROL_BombsuitShark",
@@ -41,7 +41,7 @@ public static class Constants
         "CAROL_2021Halloween",
         "CAROL_Vampirehunter",
         "CAROL_Zombie"
-    };
+    ];
     public static readonly Color DefaultColor = new(0.1882353f, 0.0f, 0.3647059f, 1.0f);
     public static readonly Color Highlight = new(0.6f, 0.2039f, 0.7373f, 0.728f);
     public static readonly Color Vanilla = new(0, 0.1294f, 0.3647f, 1f);
@@ -85,6 +85,7 @@ public static class Constants
     public const string PNGChunkKeyword = "RecipeData";
     public const string HairstyleSourceName = "Hairstyles";
     public const string HairDyeSourceName = "HairDye";
+    public const string Pelvis = "CarolPelvis";
 
     public static readonly string ApplicationPath = Directory.GetParent(Application.dataPath).FullName;
     public static readonly string RecipeFolderPath = Path.Combine(ApplicationPath, RecipeFolderName);

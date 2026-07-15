@@ -67,7 +67,7 @@ public class Outfit : IDisposable, IComparable<Outfit>, IEquatable<Outfit>, IGen
         if (localization == "") localization = "Bombsuit";
         DisplayName = localization;
         Descriptor = new SourceDescriptor(AssetName, SourceType.Outfit);
-        var pelvis = storedAsset.RecursiveFindTransform(x => x.name == "CarolPelvis");
+        var pelvis = storedAsset.RecursiveFindTransform(x => x.name == Constants.Pelvis);
         if (!pelvis) { Log.Error("failed to find pelvis during Outfit construction."); return; }
 
         var duplicates = pelvis

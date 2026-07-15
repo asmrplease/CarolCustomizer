@@ -48,7 +48,7 @@ public class SkeletonManager
             bespokeDict.TryGetValue(acc.bones[i].name, out liveBones[i]);
         }
         bespokeDict.TryGetValue(acc.RootBoneName, out var rootBone);
-        rootBone ??= pelvis.BoneData.StandardBones["CarolPelvis"];
+        rootBone ??= pelvis.BoneData.StandardBones[Constants.Pelvis];
         acc.SetLiveBones(liveBones, rootBone);
         if (notify) OnLiveBonesAssigned?.Invoke(acc);
     }

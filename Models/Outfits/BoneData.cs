@@ -3,7 +3,6 @@ using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace CarolCustomizer.Models.Outfits;
 public class BoneData : MonoBehaviour
@@ -11,10 +10,7 @@ public class BoneData : MonoBehaviour
     [SerializeField]
     public List<Transform> allTransforms;
 
-    [SerializeField]
-    List<Transform> standardBones;
-
-    public Dictionary<string, Transform> StandardBones => standardBones.ToDictionaryOverwrite(x => x.name);
+    public Dictionary<string, Transform> StandardBones;
     public List<Transform> BespokeBones { get; private set; } = new();
 
     public BoneData Constructor()
@@ -24,9 +20,11 @@ public class BoneData : MonoBehaviour
         List<Transform> filteringList = new(allTransforms);
         if (!CommonBones.Ready) { CommonBones.SetCommonBones(); }
 
-        standardBones = filteringList
+        var standardBones = filteringList
             .Where(x => CommonBones.IsCommon(x.name))
             .ToList();
+
+        StandardBones = standardBones.ToDictionaryOverwrite(x => x.name);
 
         BespokeBones = filteringList
             .Except(standardBones)
