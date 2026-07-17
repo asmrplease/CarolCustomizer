@@ -1,4 +1,5 @@
 ﻿using CarolCustomizer.Assets;
+using CarolCustomizer.Behaviors;
 using CarolCustomizer.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,12 @@ public class BoneData : MonoBehaviour
     [SerializeField]
     public List<Transform> allTransforms;
 
-    public Dictionary<string, Transform> StandardBones;
+    [SerializeField]
+    List<Transform> standardBones;
+
+    public Dictionary<string, Transform> StandardBones => standardBones.ToDictionaryOverwrite(x => x.name);
+    //TODO: This feels really dumb, but for some reason things break when the values are cached
+
     public List<Transform> BespokeBones { get; private set; } = new();
 
     public BoneData Constructor()
@@ -20,18 +26,26 @@ public class BoneData : MonoBehaviour
         List<Transform> filteringList = new(allTransforms);
         if (!CommonBones.Ready) { CommonBones.SetCommonBones(); }
 
-        var standardBones = filteringList
+        standardBones = filteringList
             .Where(x => CommonBones.IsCommon(x.name))
             .ToList();
 
-        StandardBones = standardBones.ToDictionaryOverwrite(x => x.name);
+        //if (CommonBones.CommonBoneCount > standardBones.Count())
+        //{
+        //    var pelvis = standardBones.FirstOrDefault(x => x.name == Constants.Pelvis);
+        //    var boneNames = standardBones
+        //        .Select(x => x.name);
+        //    CommonBones.Bones
+        //        .Except(boneNames)
+        //        .ForEach(name => ArmatureNormalizer.FindAndRename(pelvis, name));
+        //}
 
         BespokeBones = filteringList
-            .Except(standardBones)
-            .Where(x=> 
-                x.transform.parent
-                && CommonBones.IsCommon(x.transform.parent.name))
-            .ToList();
+        .Except(standardBones)
+        .Where(x=> 
+            x.transform.parent
+            && CommonBones.IsCommon(x.transform.parent.name))
+        .ToList();
 
         return this;
     }

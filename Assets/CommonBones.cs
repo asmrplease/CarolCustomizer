@@ -6,7 +6,9 @@ using UnityEngine;
 namespace CarolCustomizer.Assets;
 public static class CommonBones
 {
-    static HashSet<string> Bones;
+    public static HashSet<string> Bones;
+    public static int CommonBoneCount => Bones.Count;
+
     public static bool Ready => Bones is not null;
     static List<string> HairBones =
     [

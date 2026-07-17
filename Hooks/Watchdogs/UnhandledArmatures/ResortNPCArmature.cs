@@ -30,32 +30,33 @@ internal class ResortNPCArmature : MonoBehaviour, ICarolType, ICustomizable
 
     public ICarolType Constructor(PelvisWatchdog watchdog)
     {
-        throw new System.NotImplementedException();
+        //throw new System.NotImplementedException();
+        return this;
     }
 
     public void SetBaseOutfit(SourceDescriptor outfit)
     {
-        throw new System.NotImplementedException();
+        //throw new System.NotImplementedException();
     }
 
     public void SetAnimator(RuntimeAnimatorController rac)
     {
-        throw new System.NotImplementedException();
+        //throw new System.NotImplementedException();
     }
 
     public void SetHeightOffset(float height)
     {
-        throw new System.NotImplementedException();
+        //throw new System.NotImplementedException();
     }
 
     public void SetBaseVisibility(bool visibility)
     {
-        throw new System.NotImplementedException();
+        //throw new System.NotImplementedException();
     }
 
     public void Dispose()
     {
-        throw new System.NotImplementedException();
+        //throw new System.NotImplementedException();
     }
 }
 

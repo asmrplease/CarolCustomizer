@@ -53,13 +53,14 @@ public static class Constants
         {"Fast", 2.0f}
     };
 
-    public const string MenuSceneName = "Main_menu_new";
-    public const string LoadingSceneName = "Loading_Startup";
-    public const string IntroCutsceneName = "INTRO_CUTSCENES";
+    public const string MenuSceneName = "SYS - Main Menu";
+    public const string LoadingSceneName = "SYS - Loading Zone";
+    public const string IntroCutsceneName = "ADV - Intro Cutscene";
     public const string Pyjamas = "CAROL_PyjamaBasic";
     public const string RobotHead = "Robocarolhead";
     public const string Shezara = "Shezara";
     public const string HeadBone = "Bn_CarolHead";
+    public const string Pelvis = "CarolPelvis";
     public const float CarolDefaultMass = 0.01f;
     public const KeyCode DefaultReload = KeyCode.F8;
     public const int SMRLayer = 8;
@@ -85,7 +86,7 @@ public static class Constants
     public const string PNGChunkKeyword = "RecipeData";
     public const string HairstyleSourceName = "Hairstyles";
     public const string HairDyeSourceName = "HairDye";
-    public const string Pelvis = "CarolPelvis";
+    
 
     public static readonly string ApplicationPath = Directory.GetParent(Application.dataPath).FullName;
     public static readonly string RecipeFolderPath = Path.Combine(ApplicationPath, RecipeFolderName);

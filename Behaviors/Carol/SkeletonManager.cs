@@ -66,7 +66,7 @@ public class SkeletonManager
         foreach (var bespokeBone in bespokeBones)
         {
             Transform parentBone;
-            if (!bespokeBone.parent){ parentBone = boneDict["Bn_CarolHead"]; }
+            if (!bespokeBone.parent){ parentBone = boneDict[Constants.HeadBone]; }
             else if (!pelvis.BoneData.StandardBones.TryGetValue(bespokeBone.parent.name, out parentBone))
             if (!parentBone) { Log.Error($"Could not find {bespokeBone.name}'s parent, {bespokeBone.parent.name}."); continue; }
 

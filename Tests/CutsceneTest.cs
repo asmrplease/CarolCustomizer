@@ -26,7 +26,7 @@ internal class CutsceneTest
         return SceneLoaderSvc.I
             .allScenes
             .Where(x => x.sceneType == SceneTypes.ADVENTURE)
-            .Select(x => x.sceneName)
+            .Select(x => x.sceneKey)
             .ToList();
     }
 

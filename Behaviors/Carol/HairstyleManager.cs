@@ -102,7 +102,7 @@ internal class HairstyleManager : IDisposable
         if (hairstyle is null) { Log.Warning("no valid hairstyle during HairstyleManager.InstantiateHairstyle"); return; }
         if (!targetPelvis) { Log.Error("No valid pelvis during HairstyleManager.InstantiateHairstyle()"); return; }
 
-        var head = targetPelvis.BoneData.StandardBones["Bn_CarolHead"];
+        var head = targetPelvis.BoneData.StandardBones[Constants.HeadBone];
         if (!head) { Log.Error("No valid headbone when instantiating hairstyle"); return; }
 
         var onModelHairstyles = head.GetComponentsInChildren<Hairstyle>(true);
