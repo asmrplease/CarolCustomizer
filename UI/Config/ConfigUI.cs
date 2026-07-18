@@ -6,6 +6,7 @@ using CarolCustomizer.Utils;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Net;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -49,7 +50,11 @@ public class ConfigUI : MonoBehaviour
         transform.SetupButton(LogFolderButtonAddress, OpenLogFolder);
         transform.SetupButton(ClearFavoritesButtonAddress, ConfirmClearFavorites);
 
-        SetupToggle(RunInBackgroundToggleAddress, Settings.Game.RunInBackgroundCE);
+        //SetupToggle(RunInBackgroundToggleAddress, Settings.Game.RunInBackgroundCE);
+        transform
+            .Find(RunInBackgroundToggleAddress)
+            .parent
+            .gameObject.SetActive(false);
         SetupToggle(CampaignBotToggleAddress, Settings.Plugin.customCampaignBots);
         SetupToggle(MultiplayerBotToggleAddress, Settings.Plugin.customMPBots);
         var reference = transform.Find(CustomNpcUiAddress);

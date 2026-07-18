@@ -8,17 +8,17 @@ using System.Collections;
 using System.Linq;
 using UnityEngine;
 
-namespace CarolCustomizer.Hooks.Watchdogs.UnhandledArmatures;
+namespace CarolCustomizer.Hooks.Watchdogs;
 internal class ResortNPCArmature : MonoBehaviour, ICarolType, ICustomizable
 {
     PelvisWatchdog watchdog;
 
     void Awake()
     {
-        this.watchdog = PelvisWatchdog.GetAddWatchdog(this.gameObject);
-        if (!watchdog) { Log.Error("Failed to get watchdog during WitchArmature.Awake()"); return; }
+        watchdog = PelvisWatchdog.GetAddWatchdog(gameObject);
+        if (!watchdog) { Log.Error("Failed to get watchdog during ResortNPCArmature.Awake()"); return; }
 
-        this.watchdog.Behavior = this;
+        watchdog.Behavior = this;
 
         NPCManager.OnBotSpawn(this);
     }

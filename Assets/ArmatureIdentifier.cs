@@ -31,7 +31,7 @@ internal class ArmatureIdentifier
         (Check<VirtualCarol,    MPBotArmature>,       (x) => true),                                              //Multiplayer Bots
         (Check<Transform,       ShopArmature>,        (x) => x.rootName   == "GameManager"),                     //Shop Dummy
         (Check<Entity,          PCBBArmature>,        (x) => x.parentName == "BlueberryPlayerRig"),              //Playable Blueberry
-        (Check<Entity,          PlayerArmature>,      (x) => x.rootName.StartsWith("Carol - Player")),            //Standard Player
+        (Check<Entity,          PlayerArmature>,      (x) => x.rootName.StartsWith("Carol - Player")),           //Standard Player
         (Check<Entity,          NPCArmature>,         (x) => NPCManager.GetNPCType(x.parentName) != NPC.Error),  //NPC Entities
         (Check<Entity,          SummerSlimeArmature>, (x) => x.parentName == "SummerSlimegirl2019"),             //Summer Slimes
         (Check<Entity,          SpaceCorpArmature>,   (x) => x.rootName   == "Corp_space(Clone)"),               //Space station enemies
