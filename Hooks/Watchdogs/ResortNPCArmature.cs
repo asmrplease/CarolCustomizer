@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
@@ -17,9 +18,9 @@ internal class ResortNPCArmature : MonoBehaviour, ICarolType, ICustomizable
     {
         watchdog = PelvisWatchdog.GetAddWatchdog(gameObject);
         if (!watchdog) { Log.Error("Failed to get watchdog during ResortNPCArmature.Awake()"); return; }
-
         watchdog.Behavior = this;
 
+        if (!Settings.Plugin.customCampaignBots.Value) return;
         NPCManager.OnBotSpawn(this);
     }
 
@@ -33,7 +34,6 @@ internal class ResortNPCArmature : MonoBehaviour, ICarolType, ICustomizable
 
     public ICarolType Constructor(PelvisWatchdog watchdog)
     {
-        //throw new System.NotImplementedException();
         return this;
     }
 
@@ -56,14 +56,17 @@ internal class ResortNPCArmature : MonoBehaviour, ICarolType, ICustomizable
 
     IEnumerator BaseVisibility(bool visibility)
     {
-        yield return new WaitForSeconds(3);
+        //yield return new WaitForSeconds(3);
 
-        watchdog
+        var randomizers = watchdog
             .transform
             .parent
-            .GetComponents<ChildRandomizer>()
+            .GetComponents<ChildRandomizer>();
+        randomizers
             .SelectMany(rand => rand.children)
             .ForEach(t => t.gameObject.SetActive(visibility));
+        if (!visibility) randomizers.ToList().ForEach(GameObject.Destroy);
+        yield break;
     }
 
     public void Dispose()

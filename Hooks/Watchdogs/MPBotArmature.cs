@@ -3,7 +3,6 @@ using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
-using CarolCustomizer.Models.Recipes;
 using CarolCustomizer.Utils;
 using System;
 using UnityEngine;
@@ -26,6 +25,11 @@ public class MPBotArmature : MonoBehaviour, ICarolType, ICustomizable
 
         Log.Debug($"MPBotBehavior.SetBaseVisibility({visible})");
         watchdog.CompData.SetBaseVisibility(visible);
+        watchdog
+            .GetComponentInChildren<Hairstyle>(true)?
+            .model
+            .gameObject
+            .SetActive(visible);
     }
 
     public void Customize(RecipeDescriptor recipe, OutfitCoordinator outfit, string name)

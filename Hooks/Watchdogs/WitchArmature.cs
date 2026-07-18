@@ -1,5 +1,6 @@
 ﻿using CarolCustomizer.Behaviors.Carol;
 using CarolCustomizer.Behaviors.Recipes;
+using CarolCustomizer.Behaviors.Settings;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Hooks.Watchdogs.UnhandledArmatures;
 using CarolCustomizer.Models.Outfits;
@@ -19,6 +20,7 @@ internal class WitchArmature : MonoBehaviour, ICarolType, ICustomizable
         if (!watchdog) { Log.Error("Failed to get watchdog during WitchArmature.Awake()"); return; }
 
         watchdog.Behavior = this;
+        if (!Settings.Plugin.customCampaignBots.Value) return;
 
         NPCManager.OnBotSpawn(this);
     }
@@ -33,7 +35,6 @@ internal class WitchArmature : MonoBehaviour, ICarolType, ICustomizable
 
     public ICarolType Constructor(PelvisWatchdog watchdog)
     {
-        //throw new System.NotImplementedException();
         return this;
     }
 
@@ -56,13 +57,17 @@ internal class WitchArmature : MonoBehaviour, ICarolType, ICustomizable
 
     IEnumerator BaseVisibility(bool visibility)
     {
-        yield return new WaitForSeconds(1);
 
+       // yield return new WaitForSeconds(10);
         watchdog
             .transform
             .parent
             .GetComponentsInChildren<SkinnedMeshRenderer>(true)
             .ForEach(smr => smr.gameObject.SetActive(visibility));
+        if (visibility) yield break;
+
+        if (GetComponentInParent<ZombieRandomizer>() is Component rando) GameObject.Destroy(rando);
+        yield break;
     }
 
     public void Dispose()

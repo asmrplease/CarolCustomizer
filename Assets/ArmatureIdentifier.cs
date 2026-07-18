@@ -26,16 +26,16 @@ internal class ArmatureIdentifier
     static ArmatureIdentifier() => checks =
     [
         ///Check<SearchType,    ResultType>,          (watchdog) => additional detection condition),             //Purpose
+        (Check<Entity,          PlayerArmature>,      (x) => x.rootName.StartsWith("Carol - Player")),           //Standard Player
         (Check<Transform,       SpoilerArmature>,     (x) => x.parentName.Contains("Carol_Adult")),              //Adult Carol
         (Check<MenuSwitchOutfit,MenuArmature>,        (x) => true),                                              //Menu
         (Check<VirtualCarol,    MPBotArmature>,       (x) => true),                                              //Multiplayer Bots
         (Check<Transform,       ShopArmature>,        (x) => x.rootName   == "GameManager"),                     //Shop Dummy
         (Check<Entity,          PCBBArmature>,        (x) => x.parentName == "BlueberryPlayerRig"),              //Playable Blueberry
-        (Check<Entity,          PlayerArmature>,      (x) => x.rootName.StartsWith("Carol - Player")),           //Standard Player
         (Check<Entity,          NPCArmature>,         (x) => NPCManager.GetNPCType(x.parentName) != NPC.Error),  //NPC Entities
         (Check<Entity,          SummerSlimeArmature>, (x) => x.parentName == "SummerSlimegirl2019"),             //Summer Slimes
         (Check<Entity,          SpaceCorpArmature>,   (x) => x.rootName   == "Corp_space(Clone)"),               //Space station enemies
-        (Check<Entity,          WitchArmature>,       (x) => x.parentName == "witchStudent"),                    //Cursed Forest enemies
+        (Check<Transform,       WitchArmature>,       (x) => x.parentName.Contains("witchStudent")),             //Cursed Forest enemies
         (Check<Entity,          CampaignBotArmature>, (x) => x.parentName == "Carol_Robot"),                     //Campaign bots
         (Check<CutsceneActor,   ActressArmature>,     (x) => true),                                              //Carol Actress
         (Check<Character,       NPCArmature>,         (x) => NPCManager.GetNPCType(x.parentName) != NPC.Error),  //NPC Actresses
@@ -45,7 +45,7 @@ internal class ArmatureIdentifier
         (Check<Transform,       ToySoldierArmature>,  (x) => x.parentName.Contains("Carol_Toysoldier")),         //ChristmasArenaDecoration
         (Check<Transform,       RobonickelArmature>,  (x) => x.parentName == "Carol_Bionicle"),                  //ChristmasArenaDecoration
         (Check<Transform,       ResortNPCArmature>,   (x) => x.rootName   == "CHARACTERS"),                      //Resort NPCs
-        (Check<Transform,       ActressArmature>,     (x) => NPCManager.GetNPCType(x.parentName) == NPC.Error),  //Carol Actress? Seems to be causing trouble
+        //(Check<Transform,       ActressArmature>,     (x) => NPCManager.GetNPCType(x.parentName) == NPC.Error),  //Carol Actress? Seems to be causing trouble
         (Check<Transform,       MenuDummyArmature>,   (x) => x.rootName   == "MenuDummySvc"),                    //Menu Dummy
         (Check<Transform,       UnknownArmature>,     (x) => true),                                              //Catch-All
     ];
