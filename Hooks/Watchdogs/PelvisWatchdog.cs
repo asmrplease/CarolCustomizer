@@ -60,16 +60,8 @@ public class PelvisWatchdog : MonoBehaviour
         VisibilityChanged?.Invoke(this.Visible);
     }
     void OnEnable() => OnChange();
-
     void OnDisable() => OnChange();
-    void OnTransformParentChanged() 
-    {
-        //This check prevents issues with situations where the player becomes parented to a vehicle or other object
-        if (Behavior.GetType() == typeof(PlayerArmature)) return;
-
-        OnChange();
-    }
-
+    void OnTransformParentChanged() => OnChange();
     void OnDestroy()
     {
         Log.Debug($"{parentName} PelvisWatchdog.Dispose()");

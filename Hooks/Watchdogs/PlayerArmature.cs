@@ -168,6 +168,7 @@ public class PlayerArmature : MonoBehaviour, ICarolType
     void OnDisable()
     {
         Log.Debug($"{this}.OnDisable()");
+        PlayerInstances.DefaultPlayer.RestorePrevious(this.watchdog);
     }
 
     public void SetBaseVisibility(bool visibility) 

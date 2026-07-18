@@ -26,7 +26,7 @@ internal class ArmatureIdentifier
     static ArmatureIdentifier() => checks =
     [
         ///Check<SearchType,    ResultType>,          (watchdog) => additional detection condition),             //Purpose
-        (Check<Entity,          PlayerArmature>,      (x) => x.rootName.StartsWith("Carol - Player")),           //Standard Player
+        (Check<Entity,          PlayerArmature>,      (x) => x.transform.GetPath().Contains("Carol - Player")),   //Standard Player
         (Check<Transform,       SpoilerArmature>,     (x) => x.parentName.Contains("Carol_Adult")),              //Adult Carol
         (Check<MenuSwitchOutfit,MenuArmature>,        (x) => true),                                              //Menu
         (Check<VirtualCarol,    MPBotArmature>,       (x) => true),                                              //Multiplayer Bots
@@ -73,7 +73,11 @@ internal class ArmatureIdentifier
         if (armature.Behavior.GetType() == typeof(ResultType)) return Result.Detected;
 
         Log.Debug($"Type detected as {typeof(SearchType)}, instantiating {typeof(ResultType)}.");
-        armature.GetComponents<ICarolType>().ForEach(x => x.Dispose());
+        armature
+            .GetComponents<ICarolType>()
+            .Select(x => x as MonoBehaviour)
+            .ToList()
+            .ForEach(GameObject.Destroy);
         armature.Behavior = armature.gameObject
             .AddComponent<ResultType>()
             .Constructor(armature);
