@@ -4,7 +4,6 @@ using CarolCustomizer.Utils;
 using Onirism.Ui;
 using System;
 using System.Collections;
-using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,7 +16,7 @@ public class MenuToggle : MonoBehaviour
 
     #region State Variables
     public static bool IsVisible { get; private set; } = false;
-    Scene currentScene;
+    string currentScene;
     GameObject screensContainer;
     Animator idk;
     #endregion
@@ -33,28 +32,31 @@ public class MenuToggle : MonoBehaviour
     void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneChange;
-        if (currentScene.name != Constants.MenuSceneName) return;
+        if (currentScene != Constants.MenuSceneName) return;
         MainMenuSetMenuState(false);
     }
     void Start()
     {
         OnMenuToggle?.Invoke(false);//uiInstance.Hide();
-        currentScene = SceneManager.GetActiveScene();
-        if (currentScene.name != Constants.MenuSceneName) return;
+        currentScene = SceneManager.GetActiveScene().name;
+        if (currentScene == Constants.NetworkSceneName) { currentScene = Constants.MenuSceneName; }
+        if (currentScene != Constants.MenuSceneName) return;
         StartCoroutine(OnMainMenuLoaded());
     }
 
     void OnSceneChange(Scene newScene, LoadSceneMode mode)
     {
+        if (newScene.name == Constants.NetworkSceneName) return;
         if (mode == LoadSceneMode.Additive) return;
 
-        currentScene = newScene;
-        if (currentScene.name != Constants.MenuSceneName) return;
+        currentScene = newScene.name;
+        if (currentScene != Constants.MenuSceneName) return;
+
         StartCoroutine(OnMainMenuLoaded()); 
     }
 
     public void ToggleMenu(bool visible) {
-        if (currentScene.name == Constants.MenuSceneName) { MainMenuSetMenuState(visible); return; }
+        if (currentScene == Constants.MenuSceneName) { MainMenuSetMenuState(visible); return; }
         GameplaySetMenuState(visible);
     }
 
@@ -62,7 +64,7 @@ public class MenuToggle : MonoBehaviour
     {
         if (!uiInstance) return; 
 
-        if (currentScene.name == Constants.MenuSceneName) { MainMenuUpdate(); return; }
+        if (currentScene == Constants.MenuSceneName) { MainMenuUpdate(); return; }
         GameplayUpdate();
     }
 

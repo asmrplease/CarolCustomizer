@@ -55,6 +55,7 @@ public static class Constants
 
     public const string MenuSceneName = "SYS - Main Menu";
     public const string LoadingSceneName = "SYS - Loading Zone";
+    public const string NetworkSceneName = "SYS - Network Manager";
     public const string IntroCutsceneName = "ADV - Intro Cutscene";
     public const string Pyjamas = "CAROL_PyjamaBasic";
     public const string RobotHead = "Robocarolhead";
@@ -121,14 +122,14 @@ public static class Constants
         {"Halloween_2023", "TAL - High Tension" },
         {"Halloween_Area_15", "TAL - Area 15" },
         {"INTRO_CUTSCENES", "ADV - Intro Cutscene" },
-        {"LoadingZone", "SYS - Loading Zone" },
-        {"Main_menu_new", "SYS - Main Menu" },
+        {"LoadingZone", LoadingSceneName },
+        {"Main_menu_new", MenuSceneName },
         {"Marshmalotts_Celestialforge", "ADV - Celestial Forge" },
         {"Marshmalotts_Synistrus", "ADV - Cursed Forest" },
         {"Marshmalotts", "ADV - Marshmalotts" },
         {"Meadows", "ADV - Meadows" },
         {"Moonbase", "ADV - Moonbase" },
-        {"NetworkManager", "SYS - Network Manager" },
+        {"NetworkManager",  NetworkSceneName},
         {"NEWForest", "ADV - Chroma Falls" },
         {"Newyear_event_2021", "TAL - Hikari No Saiten" },
         {"Pinewood_Bonus_1", "BNS - Pinewood Bonus 1" },
