@@ -30,22 +30,22 @@ public class BoneData : MonoBehaviour
             .Where(x => CommonBones.IsCommon(x.name))
             .ToList();
 
-        //if (CommonBones.CommonBoneCount > standardBones.Count())
-        //{
-        //    var pelvis = standardBones.FirstOrDefault(x => x.name == Constants.Pelvis);
-        //    var boneNames = standardBones
-        //        .Select(x => x.name);
-        //    CommonBones.Bones
-        //        .Except(boneNames)
-        //        .ForEach(name => ArmatureNormalizer.FindAndRename(pelvis, name));
-        //}
+        if (CommonBones.CommonBoneCount > standardBones.Count())
+        {
+            var pelvis = standardBones.FirstOrDefault(x => x.name == Constants.Pelvis);
+            var boneNames = standardBones
+                .Select(x => x.name);
+            CommonBones.Bones
+                .Except(boneNames)
+                .ForEach(name => ArmatureNormalizer.FindAndRename(pelvis, name));
+        }
 
         BespokeBones = filteringList
-        .Except(standardBones)
-        .Where(x=> 
-            x.transform.parent
-            && CommonBones.IsCommon(x.transform.parent.name))
-        .ToList();
+            .Except(standardBones)
+            .Where(x=> 
+                x.transform.parent
+                && CommonBones.IsCommon(x.transform.parent.name))
+            .ToList();
 
         return this;
     }

@@ -62,6 +62,7 @@ internal class MagicaManager
     {
         if (!targetPelvis || targetPelvis.Behavior is null) return;
 
+        //Does this work when the armature has no colliders to start with?
         var sourceColliders = colliderSource
             .GetColliders()
             .Where(x => x)

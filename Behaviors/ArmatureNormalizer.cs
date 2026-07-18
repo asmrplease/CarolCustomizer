@@ -42,9 +42,10 @@ internal class ArmatureNormalizer
         if (parent.childCount == 1) found = parent.GetChild(0);
         if (parent.childCount > 1) 
         {
+            if (!parent.name.EndsWith("Palm")) { return null; }
             //Log.Warning($"{expectedName}'s parent {parentName} had too many children to infer which is the correct bone."); return null; 
             var index = referenceBone.GetSiblingIndex();
-            if (parent.childCount <= index) { Log.Warning("parent had too few children to match sibling index."); return null; }
+            if (parent.childCount < index) { Log.Warning("parent had too few children to match sibling index."); return null; }
 
             found = parent.GetChild(index);
         }

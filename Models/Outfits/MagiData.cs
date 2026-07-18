@@ -6,6 +6,8 @@ using UnityEngine;
 using static MagicaCloth2.CullingSettings;
 using static MagicaCloth2.ClothProcess;
 using FuseBox.External.MagicaCloth2;
+using CarolCustomizer.Assets;
+using CarolCustomizer.Hooks.Watchdogs;
 
 namespace CarolCustomizer.Models.Outfits;
 public class MagiData : MonoBehaviour
@@ -71,6 +73,20 @@ public class MagiData : MonoBehaviour
         CapsuleColliders = transform
             .GetComponentsInChildren<MagicaCapsuleCollider>(true)
             .ToList();
+        if (CapsuleColliders.Count() == 0)
+        {
+            var myBones = this.GetComponent<PelvisWatchdog>().BoneData.StandardBones;
+            OutfitAssetManager
+                .GetPyjamas()
+                .magiData
+                .CapsuleColliders
+                .Select(cc => (cc, found: myBones.TryGetValue(cc.name, out var bone), bone.gameObject))
+                .Where(tup => tup.found)
+                .ForEach(tup => tup.gameObject.AddComponent<MagicaCapsuleCollider>().CopyFrom(tup.cc));
+            CapsuleColliders = transform
+                .GetComponentsInChildren<MagicaCapsuleCollider>(true)
+                .ToList();
+        }
 
         ClothCompanion = transform
             .parent?.parent?.parent?

@@ -1,6 +1,7 @@
 ﻿using CarolCustomizer.Models;
 using CarolCustomizer.Models.Materials;
 using CarolCustomizer.Utils;
+using Onirism;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -67,7 +68,7 @@ internal class SceneResourceProvider
             .ForEach(x => batchLoad.TryAdd(x, []))
             .ToList()
             .ForEach(x => lazyLoad.Remove(x));
-        Log.Info("Loading the folling scenes:");
+        Log.Info("Loading the following scenes:");
         batchLoadScenes.ForEach(Log.Info);
         GetResourcesFromScene(currentScene);
         foreach (var scene in batchLoadScenes) yield return BatchLoadMatsFromScene(scene);
@@ -79,15 +80,26 @@ internal class SceneResourceProvider
     static IEnumerator BatchLoadMatsFromScene(string scene)
     {
         Log.Debug("Starting Scene Load");
-        
-        loadedScenes.Add(scene);
-        yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
+        if (CorrectSceneName(scene) is not string corrected) { yield break; }
+
+        loadedScenes.Add(corrected);
+        yield return SceneManager.LoadSceneAsync(corrected, LoadSceneMode.Additive);
         GetResourcesFromScene(scene);
-        yield return SceneManager.UnloadSceneAsync(scene);
+        yield return SceneManager.UnloadSceneAsync(corrected);
         yield return Resources.UnloadUnusedAssets();
-        loadedScenes.Remove(scene);
+        loadedScenes.Remove(corrected);
         Log.Info("Scene Unload complete.");
     }
+
+    static string CorrectSceneName(string sceneName)
+    {
+        if (SceneLoaderSvc.I.allScenes.Any(x => x.name == sceneName)) { return sceneName; }
+        if (Constants.LegacySceneNames.TryGetValue(sceneName, out var correction)) { return correction; }
+
+        Log.Error($"SceneResourceProvider was asked to load {sceneName}, but this is not a valid scene.");
+        return null;
+    }
+
 
     static void GetResourcesFromScene(string sceneName)
     {

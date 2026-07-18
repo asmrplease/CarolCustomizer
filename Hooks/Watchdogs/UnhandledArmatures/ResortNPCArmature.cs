@@ -3,6 +3,9 @@ using CarolCustomizer.Behaviors.Recipes;
 using CarolCustomizer.Contracts;
 using CarolCustomizer.Models.Outfits;
 using CarolCustomizer.Utils;
+using Onirism;
+using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace CarolCustomizer.Hooks.Watchdogs.UnhandledArmatures;
@@ -49,9 +52,18 @@ internal class ResortNPCArmature : MonoBehaviour, ICarolType, ICustomizable
         //throw new System.NotImplementedException();
     }
 
-    public void SetBaseVisibility(bool visibility)
+    public void SetBaseVisibility(bool visibility) => StartCoroutine(BaseVisibility(visibility));
+
+    IEnumerator BaseVisibility(bool visibility)
     {
-        //throw new System.NotImplementedException();
+        yield return new WaitForSeconds(3);
+
+        watchdog
+            .transform
+            .parent
+            .GetComponents<ChildRandomizer>()
+            .SelectMany(rand => rand.children)
+            .ForEach(t => t.gameObject.SetActive(visibility));
     }
 
     public void Dispose()
