@@ -7,6 +7,8 @@ internal class ArmatureNormalizer
 {
     public static bool FindAndRename(Transform pelvis, string expectedName)
     {
+        Log.Debug($"Looking for misnamed bone {expectedName}.");
+        if (expectedName == "badgemaster" || expectedName == "Badgepos") return false;
         if (FindMisnamedBone(pelvis, expectedName) is not Transform foundBone) { Log.Warning($"Unable to find missing standard bone {expectedName}"); return false; }
         
         foundBone.name = expectedName;
@@ -24,34 +26,37 @@ internal class ArmatureNormalizer
             .GetOutfitByAssetName(Constants.Pyjamas)
             .boneData
             .StandardBones[expectedName];
+
+        Log.Debug($"referenceBone {referenceBone.name} is valid.");
         var parentName = referenceBone
             .parent
             .name;
+        Log.Debug($"parentName: {parentName} is valid.");
         if (!CommonBones.IsCommon(parentName)) { Log.Warning($"Tried to find {expectedName}'s parent {parentName}, but that is not a standard bone name."); return null; }
 
         //try to find the parent on the pelvis
         var result = pelvis.RecursiveFindTransform(x => x.name == parentName);
         if (result is not Transform parent) { Log.Warning($"Failed to find parent bone {parentName}"); return null; }
-
-        //confirm parent has only one child
-        if (parent.childCount == 0) { Log.Warning($"{expectedName}'s parent {parentName} had no children."); return null; }
+        Log.Debug($"found parent bone on pelvis: {result.name}");
+        
         //could we simply instantiate the missing bone if it isn't present?
 
         Transform found = null;
-        if (parent.childCount < 1) { Log.Warning("parent bone had no children."); return null; }
+        if (parent.childCount < 1) { Log.Warning($"{expectedName}'s parent {parentName} had no children."); return null; }
         if (parent.childCount == 1) found = parent.GetChild(0);
         if (parent.childCount > 1) 
         {
+            Log.Debug($"parent bone had {parent.childCount} children.");
             if (!parent.name.EndsWith("Palm")) { return null; }
-            //Log.Warning($"{expectedName}'s parent {parentName} had too many children to infer which is the correct bone."); return null; 
+
             var index = referenceBone.GetSiblingIndex();
+            Log.Debug($"sibling index: {index}");
             if (parent.childCount < index) { Log.Warning("parent had too few children to match sibling index."); return null; }
 
             found = parent.GetChild(index);
         }
-
         if (found is null) { Log.Error("Failed to "); return null; }
-
+        
         Log.Debug($"Found {found.name} where {expectedName} should be. ");
         return found;
     }

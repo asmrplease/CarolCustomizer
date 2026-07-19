@@ -9,7 +9,7 @@ using UnityEngine;
 namespace CarolCustomizer.Assets;
 public class PlayerInstances : IDisposable
 {
-    static List<PlayerCarolInstance> Players;
+    public static List<PlayerCarolInstance> Players;
     public static IEnumerable<PlayerCarolInstance> ValidPlayers => Players.Where(x => x.Exists());
     public static PlayerCarolInstance DefaultPlayer => Players.First();
     static int numPlayers = 4;
