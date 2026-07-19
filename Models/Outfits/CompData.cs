@@ -51,7 +51,8 @@ public class CompData : MonoBehaviour
             .ToList();
         coopToggles = transform.parent.GetComponentsInChildren<CoopModelToggle>(true);
         SetCoopVariants();
-        coopToggles.ForEach(x => x.enabled = false);
+        //coopToggles.ForEach(x => x.enabled = false);
+        coopToggles.ForEach(GameObject.Destroy);
         EffectSetup();
         return this;
     }
