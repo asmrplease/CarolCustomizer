@@ -67,7 +67,7 @@ public static class OnirismPatches
         }
     }
 
-    [HarmonyPatch(typeof(SaveManager), nameof(SaveManager.Load))]
+    [HarmonyPatch(typeof(SaveManager), "LoadSlot")]
     public static class SetPyjamasInSave
     {
         [HarmonyPostfix]

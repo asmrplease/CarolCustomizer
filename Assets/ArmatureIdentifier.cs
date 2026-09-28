@@ -25,8 +25,8 @@ internal class ArmatureIdentifier
     static readonly List<(Func<PelvisWatchdog, Predicate<PelvisWatchdog>, Result> func, Predicate<PelvisWatchdog> pred)> checks;
     static ArmatureIdentifier() => checks =
     [
-        ///Check<SearchType,    ResultType>,          (watchdog) => additional detection condition),             //Purpose
-        (Check<Entity,          PlayerArmature>,      (x) => x.transform.GetPath().Contains("Carol - Player")),   //Standard Player
+      ///Check<SearchType,      ResultType>,          (watchdog) => additional detection condition),             //Purpose
+        (Check<Entity,          PlayerArmature>,      (x) => x.transform.GetPath().Contains("Carol - Player")),  //Standard Player
         (Check<Transform,       SpoilerArmature>,     (x) => x.parentName.Contains("Carol_Adult")),              //Adult Carol
         (Check<MenuSwitchOutfit,MenuArmature>,        (x) => true),                                              //Menu
         (Check<VirtualCarol,    MPBotArmature>,       (x) => true),                                              //Multiplayer Bots

@@ -72,4 +72,13 @@ public static class OnirismExtensions
             .ForEach(x => x.gameObject.SetActive(true));
         yield break;
     }
+
+    public static IEnumerator EnableScubasuit(this PelvisWatchdog watchdog)
+    {
+        Log.Debug("EnableScubasuit");
+        watchdog.CompData.allSMRs
+            .Where(x => x.name == "Divingmask")
+            .ForEach(x => x.gameObject.SetActive(true));
+        yield break;
+    }
 }

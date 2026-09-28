@@ -58,12 +58,13 @@ public class CarolInstance : IDisposable
         SpawnEvent?.Invoke(targetPelvis);
     }
 
-    public bool RestorePrevious(PelvisWatchdog pelvis)
+    public virtual bool RestorePrevious(PelvisWatchdog pelvis)
     {
         if (SceneResourceProvider.Loading) return false;
         if (targetPelvis != pelvis) return false;
         if (previousTargets is null) return false;
         if (!previousTargets.Any(x => x)) return false;
+
         Log.Debug("Notifying last valid target of spawn");
         NotifySpawned(previousTargets.Last(x => x));
         return true;

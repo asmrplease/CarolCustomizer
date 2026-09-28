@@ -7,14 +7,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace CarolCustomizer.Assets;
-/// <summary>
-/// Class responsible for collecting references to all optional assets.
-/// Primarily outfits.
-/// </summary>
+
 public class ScenePelvisFinder : IDisposable
 {
-    HashSet<PelvisWatchdog> allWatchdogs = [];
-
     public ScenePelvisFinder(Transform parent)
     {
         SceneManager.sceneLoaded += FindAllPelvises;
@@ -24,12 +19,12 @@ public class ScenePelvisFinder : IDisposable
     {
         Log.Debug("FindAllPelvises");
         if (mode == LoadSceneMode.Additive) return;
-        
+
         Resources
             .FindObjectsOfTypeAll<GameObject>()
             .Where(x => x.name == Constants.Pelvis)
-            .Select(PelvisWatchdog.GetAddWatchdog)
-            .ForEach(x => allWatchdogs.Add(x));
+            //.Select(PelvisWatchdog.GetAddWatchdog)
+            .ForEach(x => PelvisWatchdog.GetAddWatchdog(x));
     }
 
     public void Dispose()

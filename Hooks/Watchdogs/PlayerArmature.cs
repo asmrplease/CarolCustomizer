@@ -173,13 +173,19 @@ public class PlayerArmature : MonoBehaviour, ICarolType
 
     public void SetBaseVisibility(bool visibility) 
     {
+        Log.Info("SetBaseVisibility");
         watchdog.CompData.SetBaseVisibility(visibility);
-        if (transform.parent.name == "Carol_Hazmat") StartCoroutine(watchdog.EnableSpacesuit());
-        if (!playerModelData) return;
+        if (transform.parent.name == "Carol_Hazmat")     StartCoroutine(watchdog.EnableSpacesuit()); 
+        StartCoroutine(watchdog.EnableScubasuit());
+        //if (transform.parent.name == "Carol_Divingsuit") StartCoroutine(watchdog.EnableScubasuit()); //CAROL_Divingsuit(Clone)
+        if (!playerModelData) { Log.Warning("No model data available during SetBaseVisibility"); return; }
 
+        Log.Debug(playerModelData.assetName);
+        
         playerModelData.hairIsVisible = visibility;
         var inventory = GetComponentInParent<Inventory>();
-        if (inventory) inventory.currentHairstyle.GetComponent<Hairstyle>().SetVisible(visibility);  
+        if (inventory) inventory.currentHairstyle.GetComponent<Hairstyle>().SetVisible(visibility);
+        Log.Info("SetBaseVisibility Complete");
     } 
 
     public void Dispose()
